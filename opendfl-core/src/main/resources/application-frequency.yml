@@ -2,14 +2,23 @@
 frequency:
   redisPrefix: 'limitFreq'
   ifActive: '1'
+  #启动时每个接口前100次接口调用白名单可输出日志
+  initLogCount: 100
+  #接口级用户白名单
+  whiteCodeUsers:
+    #管理员白名单
+    manager: none
+  #全局白名单
   white:
     items: 'whiteIp,whiteUser,'
     ips: 'none'
     users: 'none'
+  #全局黑名单
   black:
     items: 'blackIp,blackUser,'
     ips: '192.168.2.154'
     users: 'none'
+  #接口限制
   limit:
     items: 'limit,userCount,userIp,ipUser,'
     #IP限制是否区分功能，如果不区分功能，则缓存有效期相同，以及ip数或用户数共享
