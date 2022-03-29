@@ -16,7 +16,7 @@
 @RequestLock(name = "waitLockTest", time=5, errMsg = "任务%s正在执行")
  ```
 
-2，分布式频率限制，@Frequency注解模式，并支持通过yml修改频率限制次数
+2，分布式频率限制，@Frequency注解模式，并支持通过yml动态修改频率限制次数
 ```java
 /**
  * 5秒限5次
@@ -30,12 +30,23 @@ public Long serverTimeFreq(HttpServletRequest request){
     return System.currentTimeMillis();
 }
 ```
+动态修改限制，见application-frequency.yml
+```yaml
+limit:
+  frequencyConfigs:
+    - name: serverTimeFreq
+      time: 5
+      limit: 10 #改成新值
+    - name: serverTimeFreq
+      time: 3600
+      limit: 50 #改成新值
+```
 
 3，分布式频频率限制，配置模式，见application-frequency.yml
 ```yaml
 limit:
   uriConfigs:
-      - uri: /frequencyTest/serverTimeUri
+      - uri: /frequencyTest/serverTimeUri #依赖接口uri
         time: 5
         limit: 8
         attrName: account
@@ -47,7 +58,7 @@ limit:
         attrName: account
 ```
 
-4,有控制台能方便查看接口信息，以及对应的限制
+4，有控制台能方便查看接口信息，以及对应的限制
 
 示例见：http://175.178.252.112:8080/index.html
 

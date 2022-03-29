@@ -33,3 +33,6 @@ frequency:
       - name: serverTimeFreq
         time: 5
         limit: 10
+      - name: serverTimeFreq
+        time: 3600
+        limit: 50
