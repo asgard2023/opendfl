@@ -1,4 +1,4 @@
-package org.ccs.opendfl.core.vo;
+package org.ccs.opendfl.console.vo;
 
 import lombok.Data;
 import org.ccs.opendfl.core.config.vo.UserVo;
