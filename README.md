@@ -1,5 +1,5 @@
 # OpenDFL Open Distributed frequency limitation 
-* 分布式访问频率限制
+* Springboot,Springcloud分布式访问频率限制
 * Distributed locks分布式锁
 * 基于Redis
 * Spring boot, spring cloud
