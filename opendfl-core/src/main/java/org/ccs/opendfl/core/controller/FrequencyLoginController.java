@@ -91,10 +91,12 @@ public class FrequencyLoginController {
         ValidateUtils.notNull(clientIdRsa, "clientIdRsa is null");
         String username = user.getUsername();
         String pwd = user.getPwd();
+        String ip=RequestUtils.getIpAddress(request);
         if (StringUtils.isNotEmpty(clientIdRsa)) {
             username = rsaBiz.checkRSAKey(clientIdRsa, username);
             pwd = rsaBiz.checkRSAKey(clientIdRsa, pwd);
         }
+        log.info("----login--username={} ip={}", username, ip);
         UserVo loginedUser = FrequencyLoginUtils.loginUser(username, pwd);
         if (loginedUser != null) {
             String token=UUID.randomUUID().toString().replaceAll("-", "");
@@ -105,6 +107,7 @@ public class FrequencyLoginController {
             login.setUser(loginedUser);
             return ResultData.success(login);
         } else {
+            log.warn("---login-username={} ip={}", username, ip);
             throw new FailedException("登入失败");
         }
     }
