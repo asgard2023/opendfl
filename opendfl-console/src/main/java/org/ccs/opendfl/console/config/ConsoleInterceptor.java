@@ -26,7 +26,7 @@ public class ConsoleInterceptor extends WebMvcConfigurationSupport {
     private HandlerInterceptor frequencyHandlerInterceptor;
 
     @Autowired
-    private FrequencyConfiguration strategyConfiguration;
+    private FrequencyConfiguration frequencyConfiguration;
 
     @Autowired
     private RequestLockConfiguration requestLockConfiguration;
@@ -39,7 +39,7 @@ public class ConsoleInterceptor extends WebMvcConfigurationSupport {
             registry.addInterceptor(requestLockHandlerInterceptor)
                     .addPathPatterns("/**");
         }
-        if (StringUtils.ifYes(strategyConfiguration.getIfActive())) {
+        if (StringUtils.ifYes(frequencyConfiguration.getIfActive())) {
             log.info("----addInterceptors--Frequency");
             registry.addInterceptor(frequencyHandlerInterceptor)
                     .addPathPatterns("/**");

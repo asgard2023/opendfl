@@ -2,7 +2,7 @@ package org.ccs.opendfl.core.limitcount;
 
 
 import org.ccs.opendfl.core.biz.IUserBiz;
-import org.ccs.opendfl.core.config.ConsoleConfiguration;
+import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.vo.FrequencyVo;
@@ -18,17 +18,16 @@ public class FrequencyWhiteCodeUtils {
 
     }
 
-    private static ConsoleConfiguration consoleConfiguration;
     private static IUserBiz userBiz;
-
-    @Autowired
-    public void setFrequencyConfiguration(ConsoleConfiguration consoleConfiguration) {
-        FrequencyWhiteCodeUtils.consoleConfiguration = consoleConfiguration;
-    }
+    private static FrequencyConfiguration frequencyConfiguration;
 
     @Autowired
     public void setUserBiz(IUserBiz userBiz) {
         FrequencyWhiteCodeUtils.userBiz = userBiz;
+    }
+    @Autowired
+    public void setFrequencyConfiguration(FrequencyConfiguration frequencyConfiguration) {
+        FrequencyWhiteCodeUtils.frequencyConfiguration = frequencyConfiguration;
     }
 
     public static String getUserId(String userCode) {
@@ -66,7 +65,7 @@ public class FrequencyWhiteCodeUtils {
     }
 
     private static String getWhiteCodeUserId(String whiteCode) {
-        return consoleConfiguration.getWhiteCodeUsers().get(whiteCode);
+        return frequencyConfiguration.getWhiteCodeUsers().get(whiteCode);
     }
 
     public static boolean isWhiteId(String userId, String whiteUserIds) {

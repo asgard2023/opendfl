@@ -28,7 +28,7 @@ public class FreqLimitIpStrategy implements FreqLimitStrategy {
     private static FrequencyConfiguration frequencyConfiguration;
 
     @Autowired
-    public void setLimitStrategyConfiguration(FrequencyConfiguration frequencyConfiguration) {
+    public void setFrequencyConfiguration(FrequencyConfiguration frequencyConfiguration) {
         FreqLimitIpStrategy.frequencyConfiguration = frequencyConfiguration;
     }
 

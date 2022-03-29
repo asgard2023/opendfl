@@ -29,7 +29,7 @@ public class FreqLimitUserCountStrategy implements FreqLimitStrategy {
     private static FrequencyConfiguration frequencyConfiguration;
 
     @Autowired
-    public void setLimitStrategyConfiguration(FrequencyConfiguration frequencyConfiguration) {
+    public void setFrequencyConfiguration(FrequencyConfiguration frequencyConfiguration) {
         FreqLimitUserCountStrategy.frequencyConfiguration = frequencyConfiguration;
     }
 

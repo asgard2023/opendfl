@@ -26,7 +26,7 @@ public class DemoInterceptor extends WebMvcConfigurationSupport {
     private HandlerInterceptor frequencyHandlerInterceptor;
 
     @Autowired
-    private FrequencyConfiguration strategyConfiguration;
+    private FrequencyConfiguration frequencyConfiguration;
 
     @Autowired
     private RequestLockConfiguration requestLockConfiguration;;
@@ -41,7 +41,7 @@ public class DemoInterceptor extends WebMvcConfigurationSupport {
                     .excludePathPatterns("/loginPost");
         }
 
-        if(StringUtils.ifYes(strategyConfiguration.getIfActive())) {
+        if(StringUtils.ifYes(frequencyConfiguration.getIfActive())) {
             log.info("----addInterceptors--Frequency");
             registry.addInterceptor(frequencyHandlerInterceptor)
                     .addPathPatterns("/**")

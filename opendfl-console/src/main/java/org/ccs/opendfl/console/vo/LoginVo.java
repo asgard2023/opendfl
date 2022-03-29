@@ -1,7 +1,7 @@
 package org.ccs.opendfl.console.vo;
 
 import lombok.Data;
-import org.ccs.opendfl.core.config.vo.UserVo;
+import org.ccs.opendfl.console.config.vo.UserVo;
 
 @Data
 public class LoginVo {

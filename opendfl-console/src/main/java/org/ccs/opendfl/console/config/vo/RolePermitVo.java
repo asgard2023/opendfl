@@ -1,4 +1,4 @@
-package org.ccs.opendfl.core.config.vo;
+package org.ccs.opendfl.console.config.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

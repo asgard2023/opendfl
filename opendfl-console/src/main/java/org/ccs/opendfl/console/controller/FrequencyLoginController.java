@@ -1,17 +1,17 @@
-package org.ccs.opendfl.core.controller;
+package org.ccs.opendfl.console.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IRsaBiz;
-import org.ccs.opendfl.core.config.vo.UserVo;
+import org.ccs.opendfl.console.config.vo.UserVo;
 import org.ccs.opendfl.core.exception.FailedException;
 import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.limitcount.Frequency;
 import org.ccs.opendfl.core.limitcount.Frequency2;
-import org.ccs.opendfl.core.limitcount.FrequencyLoginUtils;
+import org.ccs.opendfl.console.utils.FrequencyLoginUtils;
 import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.utils.ValidateUtils;
-import org.ccs.opendfl.core.vo.LoginVo;
+import org.ccs.opendfl.console.vo.LoginVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;

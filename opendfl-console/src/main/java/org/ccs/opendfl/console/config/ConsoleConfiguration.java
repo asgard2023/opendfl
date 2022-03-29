@@ -1,8 +1,8 @@
-package org.ccs.opendfl.core.config;
+package org.ccs.opendfl.console.config;
 
 import lombok.Data;
-import org.ccs.opendfl.core.config.vo.RolePermitVo;
-import org.ccs.opendfl.core.config.vo.UserVo;
+import org.ccs.opendfl.console.config.vo.RolePermitVo;
+import org.ccs.opendfl.console.config.vo.UserVo;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
@@ -23,8 +23,6 @@ public class ConsoleConfiguration {
     private String redisPrefix;
     private Character ifConsole='0';
     private String consoleWhiteIp="none";
-    private Integer initLogCount=100;
-    private Map<String, String> whiteCodeUsers;
     private List<RolePermitVo> rolePermits;
     private List<UserVo> users;
 

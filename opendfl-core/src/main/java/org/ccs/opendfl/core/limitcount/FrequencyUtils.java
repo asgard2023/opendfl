@@ -2,15 +2,11 @@ package org.ccs.opendfl.core.limitcount;
 
 
 import org.ccs.opendfl.core.biz.IUserBiz;
-import org.ccs.opendfl.core.config.ConsoleConfiguration;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
-import org.ccs.opendfl.core.config.vo.UserVo;
 import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.exception.FrequencyException;
 import org.ccs.opendfl.core.exception.ResultCode;
-import org.ccs.opendfl.core.utils.CommUtils;
 import org.ccs.opendfl.core.utils.LangType;
-import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
@@ -19,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,7 +29,6 @@ public class FrequencyUtils {
 
 
     private static IUserBiz userBiz;
-    private static ConsoleConfiguration consoleConfiguration;
     private static FrequencyConfiguration frequencyConfiguration;
 
     @Autowired
@@ -43,12 +37,7 @@ public class FrequencyUtils {
     }
 
     @Autowired
-    public void setFrequencyConfiguration(ConsoleConfiguration consoleConfiguration) {
-        FrequencyUtils.consoleConfiguration = consoleConfiguration;
-    }
-
-    @Autowired
-    public void setLimitStrategyConfiguration(FrequencyConfiguration frequencyConfiguration) {
+    public void setFrequencyConfiguration(FrequencyConfiguration frequencyConfiguration) {
         FrequencyUtils.frequencyConfiguration = frequencyConfiguration;
     }
 
@@ -78,21 +67,7 @@ public class FrequencyUtils {
         logger.info("----addFreqLog--type={} uri={} limit={} attrData={} reqCount={} ip={}", type.getCode(), uri, countLimit, userId, v, ip);
     }
 
-    /**
-     * 审计日志，记录console的操作记录
-     *
-     * @param request
-     * @param user
-     * @param operType
-     * @param attrData
-     * @param times
-     */
-    public static void addAuditLog(HttpServletRequest request, UserVo user, String operType, String attrData, Integer... times) {
-        String uri = RequestUtils.getRequestUri(request);
-        String timeStr = CommUtils.concat(",", times);
-        logger.info("----addAuditLog--uri={} operType={} user={} role={} time={} attrData={}"
-                , uri, operType, user.getUsername(), user.getRole(), timeStr, attrData);
-    }
+
 
     public static boolean failExceptionMsg(String errMsg, String errMsgEn, String lang) {
         boolean isCn = LangType.ZH.code.equals(lang);
@@ -139,7 +114,7 @@ public class FrequencyUtils {
         }
         if (isLog) {
             Integer count = counter.incrementAndGet();
-            if (count > consoleConfiguration.getInitLogCount()) {
+            if (count > frequencyConfiguration.getInitLogCount()) {
                 isLog = false;
                 initLogrMap.put(key, isLog);
             }

@@ -1,9 +1,13 @@
-package org.ccs.opendfl.core.limitcount;
+package org.ccs.opendfl.console.utils;
 
-import org.ccs.opendfl.core.config.ConsoleConfiguration;
-import org.ccs.opendfl.core.config.vo.RolePermitVo;
-import org.ccs.opendfl.core.config.vo.UserVo;
+
+import lombok.extern.slf4j.Slf4j;
+import org.ccs.opendfl.console.config.ConsoleConfiguration;
+import org.ccs.opendfl.console.config.vo.RolePermitVo;
+import org.ccs.opendfl.console.config.vo.UserVo;
 import org.ccs.opendfl.core.exception.FailedException;
+import org.ccs.opendfl.core.utils.CommUtils;
+import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.utils.ValidateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +15,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Component
 public class FrequencyLoginUtils {
     private FrequencyLoginUtils() {
@@ -86,5 +92,21 @@ public class FrequencyLoginUtils {
             }
         }
         return rolePermitVo;
+    }
+
+    /**
+     * 审计日志，记录console的操作记录
+     *
+     * @param request
+     * @param user
+     * @param operType
+     * @param attrData
+     * @param times
+     */
+    public static void addAuditLog(HttpServletRequest request, UserVo user, String operType, String attrData, Integer... times) {
+        String uri = RequestUtils.getRequestUri(request);
+        String timeStr = CommUtils.concat(",", times);
+        log.info("----addAuditLog--uri={} operType={} user={} role={} time={} attrData={}"
+                , uri, operType, user.getUsername(), user.getRole(), timeStr, attrData);
     }
 }

@@ -1,6 +1,5 @@
 package org.ccs.opendfl.core.limitcount;
 
-import org.ccs.opendfl.core.config.ConsoleConfiguration;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitFrequencyConfigVo;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
@@ -30,7 +29,6 @@ public class FrequencyConfigUtils {
 
 
     private static RedisTemplate<String, Object> redisTemplateJson;
-    private static ConsoleConfiguration consoleConfiguration;
     private static FrequencyConfiguration frequencyConfiguration;
 
     @Resource(name = "redisTemplateJson")
@@ -39,12 +37,7 @@ public class FrequencyConfigUtils {
     }
 
     @Autowired
-    public void setConsoleConfiguration(ConsoleConfiguration consoleConfiguration) {
-        FrequencyConfigUtils.consoleConfiguration = consoleConfiguration;
-    }
-
-    @Autowired
-    public void setLimitStrategyConfiguration(FrequencyConfiguration frequencyConfiguration) {
+    public void setFrequencyConfiguration(FrequencyConfiguration frequencyConfiguration) {
         FrequencyConfigUtils.frequencyConfiguration = frequencyConfiguration;
     }
 

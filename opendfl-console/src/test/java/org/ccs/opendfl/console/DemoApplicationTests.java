@@ -1,6 +1,7 @@
 package org.ccs.opendfl.console;
 
-import org.ccs.opendfl.core.config.ConsoleConfiguration;
+import org.ccs.opendfl.console.config.ConsoleConfiguration;
+import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,13 +15,13 @@ import org.springframework.test.context.ActiveProfiles;
 class DemoApplicationTests {
     private static Logger logger = LoggerFactory.getLogger(DemoApplicationTests.class);
     @Autowired
-    private ConsoleConfiguration consoleConfiguration;
+    private FrequencyConfiguration frequencyConfiguration;
     @Autowired
     private RedisTemplate redisTemplate;
 
     @Test
     void contextLoads() {
-        logger.debug("--ifConsole={} pwd={}", consoleConfiguration.getIfConsole(), consoleConfiguration.getInitLogCount());
+        logger.debug("--ifActive={} pwd={}", frequencyConfiguration.getIfActive(), frequencyConfiguration.getWhiteCodeUsers());
     }
 
     @Test

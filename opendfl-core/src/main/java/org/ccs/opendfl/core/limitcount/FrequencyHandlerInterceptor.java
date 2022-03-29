@@ -39,7 +39,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
-    private FrequencyConfiguration strategyConfiguration;
+    private FrequencyConfiguration frequencyConfiguration;
 
     @Autowired
     private FreqLimitChain freqLimitChain;
@@ -56,7 +56,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             return true;
         }
         //支持关闭频率限制，可用于测试环境，ST环境
-        if (!StringUtils.ifYes(strategyConfiguration.getIfActive())) {
+        if (!StringUtils.ifYes(frequencyConfiguration.getIfActive())) {
             return true;
         }
 
@@ -82,7 +82,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             RequestVo requestVo = this.logFirstLoadRequest(handlerMethod, request.getMethod(), strategyParams);
 
             blackChain.setStrategyParams(strategyParams);
-            blackChain.setBlackConfig(strategyConfiguration.getBlack());
+            blackChain.setBlackConfig(frequencyConfiguration.getBlack());
             blackChain.clearLimit();
             boolean isBlack = blackChain.doCheckLimit(blackChain);
             if (isBlack) {
@@ -94,7 +94,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
 
 
             whiteChain.setStrategyParams(strategyParams);
-            whiteChain.setWhiteConfig(strategyConfiguration.getWhite());
+            whiteChain.setWhiteConfig(frequencyConfiguration.getWhite());
             whiteChain.clearLimit();
             boolean isWhite = whiteChain.doCheckLimit(whiteChain);
             if (isWhite) {
@@ -130,15 +130,15 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
      * 按配置顺序选取有配置的策略
      */
     private void selectStrategyItems() {
-        String freqTypeItems = strategyConfiguration.getLimit().getItems();
+        String freqTypeItems = frequencyConfiguration.getLimit().getItems();
         freqTypeItems = CommUtils.appendComma(freqTypeItems);
         freqLimitChain.sortStrategies(freqTypeItems);
 
-        String whiteItems = strategyConfiguration.getWhite().getItems();
+        String whiteItems = frequencyConfiguration.getWhite().getItems();
         whiteItems = CommUtils.appendComma(whiteItems);
         whiteChain.sortStrategies(whiteItems);
 
-        String blackItems = strategyConfiguration.getBlack().getItems();
+        String blackItems = frequencyConfiguration.getBlack().getItems();
         blackItems = CommUtils.appendComma(blackItems);
         blackChain.sortStrategies(blackItems);
     }
@@ -280,7 +280,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         if (!freqMap.containsKey(key)) {
             frequency.setCreateTime(curTime);
             freqMap.put(key, frequency.clone());
-            logger.info("----logFirstload--redisPrefix={} name={} time={} limit={} ipUser={} userIp={}", strategyConfiguration.getRedisPrefix(), frequency.getName(), frequency.getTime(), frequency.getLimit(), frequency.getIpUserCount(), frequency.getUserIpCount());
+            logger.info("----logFirstload--redisPrefix={} name={} time={} limit={} ipUser={} userIp={}", frequencyConfiguration.getRedisPrefix(), frequency.getName(), frequency.getTime(), frequency.getLimit(), frequency.getIpUserCount(), frequency.getUserIpCount());
         }
     }
 
