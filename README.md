@@ -2,16 +2,15 @@
 * Springboot,Springcloud分布式访问频率限制
 * Distributed locks分布式锁
 * 基于Redis
-* Spring boot, spring cloud
-* 支持@Frequency注解
+* Spring boot, spring cloud，springmvc
 * 支持基于uri的限制，配置允许动态修改
-* 依赖少
-* 核心代码采用责任连模式，功能扩展性好
+* 核心代码采用责任链模式，功能扩展性好
 * 支持可功能可配置，不需要的功能可以关闭
 
 Example示例 http://175.178.252.112:8080/index.html
 
 ##简单使用：
+
 1，分布式交易锁，@RequestLock注解
  ```java
 @GetMapping("/waitLockTest")
@@ -50,3 +49,6 @@ limit:
         attrName: account
 ```
 
+4,有控制台能方便查看接口信息，以及对应的限制
+
+示例见：http://175.178.252.112:8080/index.html
