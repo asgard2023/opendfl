@@ -35,6 +35,7 @@ public class FrequencyController {
     private IUserBiz userBiz;
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
+    private static final Integer TIME_NULL = null;
 
 
     @GetMapping("/ipConvert")
@@ -63,14 +64,14 @@ public class FrequencyController {
         String resetFreqMap = request.getParameter("resetRequestMap");
         if (StringUtils.equals(resetFreqMap, "clearRequest")) {
             if (rolePermitVo.getIfClear() != 1) {
-                FrequencyUtils.addAuditLog(request, userVo, resetFreqMap, "fail", null);
+                FrequencyUtils.addAuditLog(request, userVo, resetFreqMap, "fail", TIME_NULL);
                 throw new PermissionDeniedException(INSUFFICIENT_USER_PERMISSIONS);
             }
-            FrequencyUtils.addAuditLog(request, userVo, resetFreqMap, "success", null);
+            FrequencyUtils.addAuditLog(request, userVo, resetFreqMap, "success", TIME_NULL);
             FrequencyHandlerInterceptor.requestVoMap.clear();
         }
 
-        FrequencyUtils.addAuditLog(request, userVo, "list", "ok", null);
+        FrequencyUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
         Collection<RequestVo> list = FrequencyHandlerInterceptor.requestVoMap.values();
         List<RequestShowVo> showList = toRequestShowList(list);
         return ResultData.success(showList);
@@ -122,14 +123,14 @@ public class FrequencyController {
         String resetFreqMap = request.getParameter("resetFreqMap");
         if (StringUtils.equals(resetFreqMap, "clearFreq")) {
             if (rolePermitVo.getIfClear() != 1) {
-                FrequencyUtils.addAuditLog(request, userVo, resetFreqMap, "fail", null);
+                FrequencyUtils.addAuditLog(request, userVo, resetFreqMap, "fail", TIME_NULL);
                 throw new PermissionDeniedException(INSUFFICIENT_USER_PERMISSIONS);
             }
-            FrequencyUtils.addAuditLog(request, userVo, resetFreqMap, "success", null);
+            FrequencyUtils.addAuditLog(request, userVo, resetFreqMap, "success", TIME_NULL);
             FrequencyHandlerInterceptor.freqMap.clear();
         }
 
-        FrequencyUtils.addAuditLog(request, userVo, "list", "ok", null);
+        FrequencyUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
         Collection<FrequencyVo> list = FrequencyHandlerInterceptor.freqMap.values();
         return ResultData.success(list);
     }
@@ -149,14 +150,14 @@ public class FrequencyController {
         String resetFreqMap = request.getParameter("resetLockMap");
         if (StringUtils.equals(resetFreqMap, "clearLock")) {
             if (rolePermitVo.getIfClear() != 1) {
-                FrequencyUtils.addAuditLog(request, userVo, resetFreqMap, "fail", null);
+                FrequencyUtils.addAuditLog(request, userVo, resetFreqMap, "fail", TIME_NULL);
                 throw new PermissionDeniedException(INSUFFICIENT_USER_PERMISSIONS);
             }
-            FrequencyUtils.addAuditLog(request, userVo, resetFreqMap, "success", null);
+            FrequencyUtils.addAuditLog(request, userVo, resetFreqMap, "success", TIME_NULL);
             RequestLockHandlerInterceptor.locksMap.clear();
         }
 
-        FrequencyUtils.addAuditLog(request, userVo, "list", "ok", null);
+        FrequencyUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
         Collection<RequestLockVo> list = RequestLockHandlerInterceptor.locksMap.values();
         return ResultData.success(list);
     }

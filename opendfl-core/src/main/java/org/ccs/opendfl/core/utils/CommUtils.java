@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public class CommUtils {
+public final class CommUtils {
     private CommUtils(){
 
     }
@@ -43,12 +43,12 @@ public class CommUtils {
         }
         splitChar=splitChar!=null?splitChar:",";
 
-        String str="";
+        StringBuilder sb = new StringBuilder();
         for(Object obj:list){
-            str+=obj+splitChar;
+            sb.append(obj+splitChar);
         }
 
-        str=str.trim();
+        String str=sb.toString();
         if(str.endsWith(splitChar)){
             str=str.substring(0, str.length()-splitChar.length());
         }
@@ -60,13 +60,14 @@ public class CommUtils {
             return "";
         }
 
-        String str="";
+        StringBuilder sb = new StringBuilder();
         for(Object obj:objs){
             if(obj==null){
                 continue;
             }
-            str=str+obj+splitChar;
+            sb.append(obj+splitChar);
         }
+        String str=sb.toString();
         if(str.endsWith(splitChar)){
             str=str.substring(0, str.length()-splitChar.length());
         }

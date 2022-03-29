@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 public class SpringContextUtil implements ApplicationContextAware {   
    private static ApplicationContext applicationContext;     //Spring应用上下文环境
    public static boolean isContextLoaded;
-   public static String sysType="none";
      
    /**  
    * 实现ApplicationContextAware接口的回调方法，设置上下文环境     
@@ -20,11 +19,6 @@ public class SpringContextUtil implements ApplicationContextAware {
 	   SpringContextUtil.applicationContext = applicationContext;
        isContextLoaded=true;
    }
-
-   public void setSysType(String sysType){
-       SpringContextUtil.sysType=sysType;
-   }
-
 
    /**  
    * @return ApplicationContext  

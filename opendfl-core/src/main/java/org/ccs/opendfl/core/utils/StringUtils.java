@@ -1,6 +1,8 @@
 package org.ccs.opendfl.core.utils;
 
-
+/**
+ * 大部份代码来源commons-lang包，主要是减少依赖
+ */
 public class StringUtils {
     /**
      * <p>Checks if any of the CharSequences are empty ("") or null or whitespace only.</p>

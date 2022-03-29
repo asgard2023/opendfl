@@ -1,6 +1,6 @@
 package org.ccs.opendfl.core.utils;
 
-public class LangCodes {
+public final class LangCodes {
 	/**
 	 * 中文
 	 */

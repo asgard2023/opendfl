@@ -2,7 +2,10 @@ package org.ccs.opendfl.core.utils;
 
 import java.lang.reflect.Array;
 
-public class ArrayUtils {
+public final class ArrayUtils {
+    private ArrayUtils(){
+
+    }
     /**
      * <p>Checks if an array of primitive booleans is empty or {@code null}.
      *

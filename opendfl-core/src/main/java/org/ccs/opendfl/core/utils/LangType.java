@@ -13,16 +13,16 @@ public enum LangType {
     TW(LangCodes.TW, "繁体", false),
     JA(LangCodes.JA, "日语", false),
     EN(LangCodes.EN, "英语", false);
-    public static final List<String> LANG_TYPES= Arrays.asList(LangType.values()).stream().map(t->t.code).collect(Collectors.toList());
+    protected static final List<String> LANG_TYPES= Arrays.asList(LangType.values()).stream().map(t->t.code).collect(Collectors.toList());
     public static final String NONE_LANG="noneLang";//表示整个数据不做国际化，即不显示
-    static Logger LOGGER = LoggerFactory.getLogger(LangType .class);
-    public String code;
-    public String name;
-    public boolean isDefault;
+    static Logger logger = LoggerFactory.getLogger(LangType .class);
+    public final String code;
+    public final String descs;
+    public final boolean isDefault;
 
-    LangType(String code, String name, boolean isDefault) {
+    LangType(String code, String descs, boolean isDefault) {
         this.code =code;
-        this.name = name;
+        this.descs = descs;
         this.isDefault=isDefault;
     }
 
@@ -36,7 +36,7 @@ public enum LangType {
                 return cur;
             }
         }
-        LOGGER.warn("----setLang lang={} invalid, allow(zh,en,tw)", code);
+        logger.warn("----setLang lang={} invalid, allow(zh,en,tw)", code);
         return null;
     }
 

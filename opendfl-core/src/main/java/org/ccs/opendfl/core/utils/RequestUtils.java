@@ -273,7 +273,7 @@ public class RequestUtils {
     public static String getNumConvertIp(long ipLong) {
         long mask[] = {0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000};
         long num = 0;
-        StringBuffer ipInfo = new StringBuffer();
+        StringBuilder ipInfo = new StringBuilder();
         for (int i = 0; i < 4; i++) {
             num = (ipLong & mask[i]) >> (i * 8);
             if (i > 0)
