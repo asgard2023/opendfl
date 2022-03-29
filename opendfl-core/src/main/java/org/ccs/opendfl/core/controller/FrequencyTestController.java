@@ -43,7 +43,7 @@ public class FrequencyTestController {
         try {
             Thread.sleep(sleepTime*1000L);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.warn("---waitLockTest--Interrupted!", e);
         }
         return System.currentTimeMillis();
     }

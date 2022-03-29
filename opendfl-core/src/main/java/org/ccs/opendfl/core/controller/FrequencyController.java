@@ -84,12 +84,12 @@ public class FrequencyController {
         list.forEach(t -> {
             RequestShowVo showVo = new RequestShowVo();
             BeanUtils.copyProperties(t, showVo);
-            String limitTypes = "";
+            StringBuilder limitTypes = new StringBuilder();
             List<FrequencyVo> tmpList = new ArrayList<>();
             for (FrequencyVo freq : frequencyList) {
                 if (StringUtils.equals(t.getRequestUri(), freq.getRequestUri())) {
                     tmpList.add(freq);
-                    limitTypes += freq.getLimitType() + ",";
+                    limitTypes.append(freq.getLimitType()).append(",");
                 }
             }
             showVo.setLimitFrequencys(tmpList);
@@ -98,12 +98,12 @@ public class FrequencyController {
             for (RequestLockVo lock : lockList) {
                 if (StringUtils.equals(t.getRequestUri(), lock.getRequestUri())) {
                     tmpLockList.add(lock);
-                    limitTypes += "lock";
+                    limitTypes.append("lock");
                 }
             }
             showVo.setLocks(tmpLockList);
-            limitTypes = CommUtils.removeEndComma(limitTypes);
-            showVo.setLimitTypes(limitTypes);
+            String limitTypeStr = CommUtils.removeEndComma(limitTypes.toString());
+            showVo.setLimitTypes(limitTypeStr);
             showList.add(showVo);
         });
         return showList;

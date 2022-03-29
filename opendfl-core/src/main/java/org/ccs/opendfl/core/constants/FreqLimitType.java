@@ -20,23 +20,23 @@ public enum FreqLimitType {
     /**
      * 同用户次数频率
      */
-    LIMIT(10, "limit", WhiteBlackType.Frequency),
+    LIMIT(10, "limit", WhiteBlackType.FREQUENCY),
     /**
      * 同IP次数频率
      */
-    LIMIT_IP(11, "limitIp", WhiteBlackType.Frequency),
+    LIMIT_IP(11, "limitIp", WhiteBlackType.FREQUENCY),
     /**
      * 同用户多IP数限制
      */
-    USER_IP_COUNT(12, "userIp", WhiteBlackType.Frequency),
+    USER_IP_COUNT(12, "userIp", WhiteBlackType.FREQUENCY),
     /**
      * 同IP多用户数限制
      */
-    IP_USER_COUNT(13, "ipUser", WhiteBlackType.Frequency);
+    IP_USER_COUNT(13, "ipUser", WhiteBlackType.FREQUENCY);
     /**
      * IP限制的redis的zset 超限个数，以提高性能
      */
-    public static int REDIS_SET_OUT_LIMIT=2;
+    public static final int REDIS_SET_OUT_LIMIT=2;
 
     private Integer type;
     private String code;

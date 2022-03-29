@@ -4,7 +4,7 @@ public enum WhiteBlackType {
     /**
      * 白名单
      */
-    Frequency(1, "frequency"),
+    FREQUENCY(1, "frequency"),
     /**
      * 白名单
      */

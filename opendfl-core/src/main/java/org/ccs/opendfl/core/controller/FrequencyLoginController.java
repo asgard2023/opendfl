@@ -63,7 +63,6 @@ public class FrequencyLoginController {
     public ResultData generateRSAKey(HttpServletRequest request, @RequestParam(value = "funcCode", required = false) String funcCode) {
         String clientIdRsa = request.getSession().getId();
         try {
-//            String funcCode = request.getParameter("funcCode");
             // 将公钥传到前端
             Map<String, String> map = rsaBiz.generateRSAKey(clientIdRsa, funcCode);
             map.put("clientIdRsa", clientIdRsa);
