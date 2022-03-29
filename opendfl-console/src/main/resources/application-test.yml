@@ -1,0 +1,22 @@
+# /info端点信息配置
+info:
+  app:
+    name: OpenDFL console test
+    version: 0.1
+
+spring:
+  redis:
+    host: localhost
+    password: ''
+    port: 6379
+    jedis:
+      pool:
+        max-idle: 100
+        max-wait: 1000ms
+
+logging:
+  level:
+    root: INFO
+    com:
+      ccs:
+        opendfl: DEBUG

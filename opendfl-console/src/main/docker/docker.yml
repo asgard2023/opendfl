@@ -1,0 +1,9 @@
+version: '2'
+services:
+  frequency:
+    restart: always
+    image: frequency
+    ports:
+      - 8080:8080
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev

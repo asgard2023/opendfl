@@ -1,0 +1,3 @@
+requestlock:
+  redisPrefix: 'limitLock'
+  ifActive: '1'

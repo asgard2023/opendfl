@@ -1,0 +1,25 @@
+# /info端点信息配置
+info:
+  app:
+    name: OpenDFL console dev
+    version: 0.1
+
+spring:
+  redis:
+    host: localhost
+    password: ''
+    port: 6379
+    jedis:
+      pool:
+        max-idle: 100
+        max-wait: 1000ms
+
+
+logging:
+  level:
+    root: INFO
+    org:
+      ccs:
+        opendfl: DEBUG
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(-){faint} %clr([%14.14t]){faint} %clr(%-40.40logger.%13.13M){cyan} %clr(%3.3L) %clr(:){faint} %msg%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"
