@@ -68,7 +68,7 @@ public class FrequencyConfigUtils {
         String key = frequency.getName() + ":" + frequency.getTime();
         Long time = loadSysconfigTimeMap.get(key);
         FrequencyVo frequencyExist = sysconfigLimitMap.get(key);
-        if (time == null || curTime - time > 10000 || frequencyExist == null) {
+        if (time == null || curTime - time > 10000) {
             loadSysconfigTimeMap.put(key, curTime);
             FrequencyVo frequencyNew = limitBySysconfig(frequency);
             if (checkChange(frequencyExist, frequencyNew)) {

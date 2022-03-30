@@ -1,3 +1,7 @@
 requestlock:
   redisPrefix: 'limitLock'
   ifActive: '1'
+  lockConfigs:
+    - name: waitLockTest
+      time: 6
+      errMsg: 任务%s正在执行中...
