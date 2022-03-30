@@ -119,12 +119,17 @@ public class FrequencyConfigUtils {
      * @param requestVo
      */
     public static void limitBySysconfig(RequestVo requestVo) {
-        String key = requestVo.getRequestUri();
+        String requestUri = requestVo.getRequestUri();
         List<LimitUriConfigVo> limitConfigs = frequencyConfiguration.getLimit().getUriConfigs();
         List<LimitUriConfigVo> list = new ArrayList<>();
-        for (LimitUriConfigVo limitFrequencyConfigVo : limitConfigs) {
-            if (StringUtils.equals(key, limitFrequencyConfigVo.getUri())) {
-                list.add(limitFrequencyConfigVo);
+        for (LimitUriConfigVo uriConfigVo : limitConfigs) {
+            if (StringUtils.equals(requestUri, uriConfigVo.getUri())) {
+                boolean isSameMethod = StringUtils.equals(uriConfigVo.getMethod(), requestVo.getMethod());
+                boolean isEmptyMethod = StringUtils.isBlank(uriConfigVo.getMethod());
+                //uriConfig支持请求方法,如GET/POST
+                if (isEmptyMethod || !isEmptyMethod && isSameMethod) {
+                    list.add(uriConfigVo);
+                }
             }
         }
         requestVo.setLimitRequests(list);

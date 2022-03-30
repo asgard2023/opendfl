@@ -28,6 +28,7 @@ frequency:
     #基于uri的限制
     uriConfigs:
       - uri: /frequencyTest/serverTimeUri
+        method: GET
         time: 5
         limit: 8
         attrName: account

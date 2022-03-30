@@ -6,6 +6,7 @@ import org.ccs.opendfl.core.constants.FrequencyConstant;
 @Data
 public class LimitUriConfigVo {
     private String uri;
+    private String method;
     private String aliasName;
     private Integer time;
     private Integer limit=0;
