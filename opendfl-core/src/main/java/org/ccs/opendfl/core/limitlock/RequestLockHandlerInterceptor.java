@@ -39,10 +39,10 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
     private RequestLockConfiguration requestLockConfiguration;
     @Resource(name = "redisTemplateString")
     private RedisTemplate<String, String> redisTemplateString;
-    protected static final Map<String, String> limitDataMap = new ConcurrentHashMap<>();
     public static final Map<String, RequestLockVo> locksMap = new ConcurrentHashMap<>();
     private Random random = new Random();
     private AtomicInteger counter = new AtomicInteger();
+    private ThreadLocal<String> lockRandomId = new ThreadLocal<>();
 
     /**
      * 首次加载日志一下
@@ -103,7 +103,7 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
 
                 if (isLimit) {
                     logger.debug("----preHandle--name={} time={} dataId={}, rndId={}", reqLimit.name(), reqLimit.time(), dataId, rndId);
-                    limitDataMap.put(ip + dataId, rndId);
+                    lockRandomId.set(rndId);
                     redisTemplateString.expire(redisKey, reqLimit.time(), TimeUnit.SECONDS);
                 } else {
                     logger.warn("----preHandle--redisKey={} time={} dataId={} ip={} limited", redisKey, reqLimit.time(), dataId, ip);
@@ -136,8 +136,8 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
             dataId = (String) request.getAttribute(reqLimit.attrName());
         }
         if (dataId != null) {
-            String ip = RequestUtils.getIpAddress(request);
-            String rndId = limitDataMap.get(ip + dataId);
+            String rndId = lockRandomId.get();
+            lockRandomId.remove();
             logger.debug("----afterCompletion--dataId={} rndId={}", dataId, rndId);
             String redisKey = getRedisKey(reqLimit, dataId);
             String v = redisTemplateString.opsForValue().get(redisKey);
