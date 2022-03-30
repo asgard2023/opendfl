@@ -4,4 +4,3 @@ requestlock:
   lockConfigs:
     - name: waitLockTest
       time: 6
-      errMsg: 任务%s正在执行中...

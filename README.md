@@ -19,7 +19,7 @@
 
 ## 简单使用：
 
-1，分布式交易锁，@RequestLock注解
+1，分布式交易锁，@RequestLock注解，并支持通过yml动态修改锁时长
  ```java
 @GetMapping("/waitLockTest")
 @ResponseBody
