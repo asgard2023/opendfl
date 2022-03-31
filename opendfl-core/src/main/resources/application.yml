@@ -6,6 +6,7 @@ info:
 spring:
   profiles:
     include:
+      - opendfl
       - frequency
       - requestlock
       - console

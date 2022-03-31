@@ -113,7 +113,8 @@
     <logger name="org.springframework.data.redis.core.RedisConnectionUtils" level="INFO"/>
     <logger name="org.apache.http" level="INFO"/>
     <logger name="org.springframework" level="INFO"/>
-    
+    <logger name="io.lettuce.core" level="INFO"/>
+
     <!-- 日志输出级别 -->
     <root level="${LOG_LEVEL}">
         <appender-ref ref="STDOUT_APPENDER" />
