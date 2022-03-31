@@ -7,6 +7,7 @@ import org.ccs.opendfl.core.config.RequestLockConfiguration;
 import org.ccs.opendfl.core.config.vo.RequestLockConfigVo;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.FrequencyException;
+import org.ccs.opendfl.core.utils.RequestParams;
 import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.vo.RequestLockVo;
@@ -92,7 +93,10 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
             loadLockConfig(requestLockVo, curTime);
             logFirstload(requestLockVo);
 
-            final String attrName = requestLockVo.getAttrName();
+            String attrName = RequestParams.USER_ID;
+            if(StringUtils.isNotBlank(requestLockVo.getAttrName())){
+                attrName = requestLockVo.getAttrName();
+            }
             final Integer time = requestLockVo.getTime();
             final String errMsg = requestLockVo.getErrMsg();
             String dataId = request.getParameter(attrName);
@@ -180,9 +184,9 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
             if (rndId != null) {
                 lockRandomId.remove();
             }
-            logger.debug("----afterCompletion--dataId={} rndId={}", dataId, rndId);
             String redisKey = getRedisKey(reqLimit, dataId);
             String v = redisTemplateString.opsForValue().get(redisKey);
+            logger.debug("----afterCompletion--dataId={} rndId={} v={}", dataId, rndId, v);
             if (StringUtils.equals(rndId, v)) {
                 redisTemplateString.delete(redisKey);
             }

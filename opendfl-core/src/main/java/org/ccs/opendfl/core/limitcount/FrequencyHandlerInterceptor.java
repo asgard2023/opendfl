@@ -236,13 +236,16 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         }
 
         String userId = strategyParams.getUserId();
-        if (!"".equals(frequency.getAttrName())) {
-            Object attrValue = params.get(frequency.getAttrName());
-            if (attrValue != null) {
-                userId = "" + attrValue;
-                params.put(RequestParams.USER_ID, userId);
-            }
+        String attrName = RequestParams.USER_ID;
+        if(StringUtils.isNotBlank(frequency.getAttrName())){
+            attrName = frequency.getAttrName();
         }
+        Object attrValue = params.get(attrName);
+        if (attrValue != null) {
+            userId = "" + attrValue;
+            params.put(RequestParams.USER_ID, userId);
+        }
+
         logFirstload(frequency, curTime);
 
         strategyParams.load(frequency, userId);
