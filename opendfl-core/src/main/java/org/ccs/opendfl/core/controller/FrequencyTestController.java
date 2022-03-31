@@ -47,4 +47,19 @@ public class FrequencyTestController {
         }
         return System.currentTimeMillis();
     }
+
+    @GetMapping("/waitLockTest2")
+    @ResponseBody
+    @RequestLock(name = "waitLockTest2", time=5, errMsg = "任务%s正在执行")
+    public Object waitLockTest2(@RequestParam(name="sleepTime", required = false) Integer sleepTime, HttpServletRequest request){
+        if(sleepTime==null||sleepTime>100){
+            sleepTime=1;
+        }
+        try {
+            Thread.sleep(sleepTime*1000L);
+        } catch (InterruptedException e) {
+            log.warn("---waitLockTest--Interrupted!", e);
+        }
+        return System.currentTimeMillis();
+    }
 }
