@@ -1,9 +1,13 @@
 version: '2'
 services:
-  frequency:
+  opendfl:
     restart: always
-    image: frequency
+    image: opendfl-console
     ports:
       - 8080:8080
+    # 设置容器 hosts
+    extra_hosts:
+      - "dockerhost:10.0.8.3"
     environment:
-      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_PROFILES_ACTIVE=docker
+    mem_limit: 200m
