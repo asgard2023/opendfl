@@ -151,6 +151,7 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
             }
         }
         if (lockConfigVo != null) {
+            requestLockVo.setSysconfig(true);
             if (StringUtils.isNotBlank(lockConfigVo.getAttrName())) {
                 requestLockVo.setAttrName(lockConfigVo.getAttrName());
             }

@@ -10,6 +10,7 @@ public class RequestLockVo implements Cloneable {
     private String attrName;
     private String errMsg;
     private Long createTime;
+    private boolean sysconfig;
 
     @Override
     public RequestLockVo clone(){

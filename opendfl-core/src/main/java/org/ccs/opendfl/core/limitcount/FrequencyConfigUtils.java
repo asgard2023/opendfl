@@ -62,9 +62,6 @@ public class FrequencyConfigUtils {
     private static Map<String, FrequencyVo> sysconfigLimitMap = new ConcurrentHashMap<>();
 
     public static void limitBySysconfigLoad(FrequencyVo frequency, Long curTime) {
-        if (!frequency.isSysconfig()) {
-            return;
-        }
         String key = frequency.getName() + ":" + frequency.getTime();
         Long time = loadSysconfigTimeMap.get(key);
         FrequencyVo frequencyExist = sysconfigLimitMap.get(key);
@@ -81,6 +78,7 @@ public class FrequencyConfigUtils {
         frequency.setLimit(frequencyExist.getLimit());
         frequency.setIpUserCount(frequencyExist.getIpUserCount());
         frequency.setUserIpCount(frequencyExist.getUserIpCount());
+        frequency.setSysconfig(frequencyExist.isSysconfig());
     }
 
     /**
@@ -100,6 +98,7 @@ public class FrequencyConfigUtils {
         for (LimitFrequencyConfigVo configVo : frequencyConfigList) {
             if (StringUtils.equals(key, configVo.getName()) && frequency.getTime() == configVo.getTime()) {
                 frequencyConfigVo = configVo;
+                frequency.setSysconfig(true);
                 break;
             }
         }
