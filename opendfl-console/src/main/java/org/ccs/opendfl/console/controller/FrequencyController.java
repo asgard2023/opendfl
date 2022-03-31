@@ -23,7 +23,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/frequency")
@@ -79,13 +81,15 @@ public class FrequencyController {
     private List<RequestShowVo> toRequestShowList(Collection<RequestVo> list) {
         List<RequestShowVo> showList = new ArrayList<>(list.size());
         Collection<FrequencyVo> frequencyList = FrequencyHandlerInterceptor.freqMap.values();
+        final  Collection<FrequencyVo> frequencyListSorted  = frequencyList.stream()
+                .sorted(Comparator.comparing(FrequencyVo::getName).thenComparing(FrequencyVo::getTime)).collect(Collectors.toList());
         Collection<RequestLockVo> lockList = RequestLockHandlerInterceptor.locksMap.values();
         list.forEach(t -> {
             RequestShowVo showVo = new RequestShowVo();
             BeanUtils.copyProperties(t, showVo);
             StringBuilder limitTypes = new StringBuilder();
             List<FrequencyVo> tmpList = new ArrayList<>();
-            for (FrequencyVo freq : frequencyList) {
+            for (FrequencyVo freq : frequencyListSorted) {
                 if (StringUtils.equals(t.getRequestUri(), freq.getRequestUri())) {
                     tmpList.add(freq);
                     limitTypes.append(freq.getLimitType()).append(",");
