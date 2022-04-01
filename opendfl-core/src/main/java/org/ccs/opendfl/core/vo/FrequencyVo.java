@@ -2,16 +2,15 @@ package org.ccs.opendfl.core.vo;
 
 import lombok.Data;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
-import org.ccs.opendfl.core.limitcount.Frequency;
-import org.ccs.opendfl.core.limitcount.Frequency2;
-import org.ccs.opendfl.core.limitcount.Frequency3;
-import org.ccs.opendfl.core.utils.RequestParams;
-import org.ccs.opendfl.core.utils.StringUtils;
+import org.ccs.opendfl.core.limitfrequency.Frequency;
+import org.ccs.opendfl.core.limitfrequency.Frequency2;
+import org.ccs.opendfl.core.limitfrequency.Frequency3;
+import org.springframework.beans.BeanUtils;
 
 import java.util.Objects;
 
 @Data
-public class FrequencyVo implements Cloneable {
+public class FrequencyVo{
     private String name;
     private String aliasName;
     private String requestUri;
@@ -57,9 +56,6 @@ public class FrequencyVo implements Cloneable {
         vo.errMsgEn= uriConfigVo.getErrMsgEn();
         vo.whiteCode= uriConfigVo.getWhiteCode();
         vo.attrName= uriConfigVo.getAttrName();
-        if(StringUtils.isBlank(vo.getAttrName())){
-            vo.setAttrName(RequestParams.USER_ID);
-        }
         return vo;
     }
     public static FrequencyVo toFrequencyVo(Frequency frequency, FrequencyVo vo){
@@ -77,9 +73,6 @@ public class FrequencyVo implements Cloneable {
         vo.errMsgEn=frequency.errMsgEn();
         vo.whiteCode=frequency.whiteCode();
         vo.attrName=frequency.attrName();
-        if(StringUtils.isBlank(vo.getAttrName())){
-            vo.setAttrName(RequestParams.USER_ID);
-        }
         vo.sysconfig=frequency.sysconfig();
         return vo;
     }
@@ -106,9 +99,6 @@ public class FrequencyVo implements Cloneable {
         vo.whiteCode=frequency.whiteCode();
         vo.attrName=frequency.attrName();
         vo.sysconfig=frequency.sysconfig();
-        if(StringUtils.isBlank(vo.getAttrName())){
-            vo.setAttrName(RequestParams.USER_ID);
-        }
         return vo;
     }
 
@@ -134,9 +124,6 @@ public class FrequencyVo implements Cloneable {
         vo.whiteCode=frequency.whiteCode();
         vo.attrName=frequency.attrName();
         vo.sysconfig=frequency.sysconfig();
-        if(StringUtils.isBlank(vo.getAttrName())){
-            vo.setAttrName(RequestParams.USER_ID);
-        }
         return vo;
     }
 
@@ -163,14 +150,10 @@ public class FrequencyVo implements Cloneable {
         return Objects.hash(name, time, limit, userIpCount, ipUserCount);
     }
 
-    @Override
-    public FrequencyVo clone(){
-        FrequencyVo obj = null;
-        try{
-            obj = (FrequencyVo)super.clone();
-        }catch(CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
+
+    public FrequencyVo toCopy(){
+        FrequencyVo obj = new FrequencyVo();
+        BeanUtils.copyProperties(this, obj);
         return obj;
     }
 }

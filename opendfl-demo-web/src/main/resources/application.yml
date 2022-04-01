@@ -1,11 +1,12 @@
 info:
   app:
-    name: OpenDFL test demo
+    name: OpenDFL Open Ddstributed frequency limitation
     version: 0.1
 
 spring:
   profiles:
     include:
+      - opendfl
       - frequency
       - requestlock
       - console

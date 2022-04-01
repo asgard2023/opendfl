@@ -1,4 +1,4 @@
-package org.ccs.opendfl.core.limitcount;
+package org.ccs.opendfl.core.limitfrequency;
 
 
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class FrequencyHandlerInterceptor implements HandlerInterceptor {
@@ -48,6 +49,9 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     @Autowired
     private BlackChain blackChain;
     private static final String BLACK_LIST_INFO = "{\"resultCode\":\"100010\",\"errorMsg\":\"Frequency limit\",\"data\":\"WaT+azid/F/83e1UpLc6ZA==\",\"errorType\":\"biz\",\"success\":false}";
+
+    private ThreadLocal<Long> startTime = new ThreadLocal<>();
+    private ThreadLocal<String> requestKey = new ThreadLocal<>();
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -70,6 +74,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             String ip = getConvertIp(remoteIp);
             String lang = RequestUtils.getLang(request);
             Long curTime = System.currentTimeMillis();
+            startTime.set(curTime);
 
             selectStrategyItems();
 
@@ -190,11 +195,6 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         }
     }
 
-    private String getRequestIp(HttpServletRequest request) {
-        String ip = RequestUtils.getIpAddress(request);
-        return getConvertIp(ip);
-    }
-
     private String getConvertIp(String ip) {
         try {
             if (!(RequestUtils.isIpv6Address(ip) || "localhost".equals(ip))) {
@@ -209,6 +209,30 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        Long requestStartTime = this.startTime.get();
+        if (requestStartTime == null) {
+            return;
+        }
+        if(frequencyConfiguration.getMinRunTime()==0){
+            startTime.remove();
+            requestKey.remove();
+            return;
+        }
+        String key = requestKey.get();
+        startTime.remove();
+        requestKey.remove();
+        Long runTime = System.currentTimeMillis() - requestStartTime;
+        //记录超出最小执行时间的最大值
+        if (runTime > frequencyConfiguration.getMinRunTime()) {
+            RequestVo requestVo = requestVoMap.get(key);
+            //排除等一次请求
+            if (requestVo != null && requestVo.getCounter().get() > 1) {
+                if(requestVo.getMaxRunTime()==null || requestVo.getMaxRunTime() < runTime){
+                    requestVo.setMaxRunTime(runTime);
+                    requestVo.setMaxRunTimeCreateTime(requestStartTime);
+                }
+            }
+        }
 
     }
 
@@ -237,7 +261,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
 
         String userId = strategyParams.getUserId();
         String attrName = RequestParams.USER_ID;
-        if(StringUtils.isNotBlank(frequency.getAttrName())){
+        if (StringUtils.isNotBlank(frequency.getAttrName())) {
             attrName = frequency.getAttrName();
         }
         Object attrValue = params.get(attrName);
@@ -270,8 +294,8 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     }
 
 
-    public static final Map<String, FrequencyVo> freqMap = new ConcurrentHashMap<>();
-    public static final Map<String, RequestVo> requestVoMap = new ConcurrentHashMap<>();
+    public static final Map<String, FrequencyVo> freqMap = new ConcurrentHashMap<>(50);
+    public static final Map<String, RequestVo> requestVoMap = new ConcurrentHashMap<>(100);
 
     /**
      * 首次加载日志一下
@@ -282,16 +306,18 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         String key = frequency.getName() + ":" + frequency.getTime();
         if (!freqMap.containsKey(key)) {
             frequency.setCreateTime(curTime);
-            freqMap.put(key, frequency.clone());
+            freqMap.put(key, frequency.toCopy());
             logger.info("----logFirstload--redisPrefix={} name={} time={} limit={} ipUser={} userIp={}", frequencyConfiguration.getRedisPrefix(), frequency.getName(), frequency.getTime(), frequency.getLimit(), frequency.getIpUserCount(), frequency.getUserIpCount());
         }
     }
 
     private RequestVo logFirstLoadRequest(HandlerMethod handlerMethod, String method, RequestStrategyParamsVo strategyParams) {
         String key = strategyParams.getRequestUri() + "." + method;
+        requestKey.set(key);
         RequestVo requestVo = requestVoMap.get(key);
         if (requestVo == null) {
             requestVo = new RequestVo();
+            requestVo.setCounter(new AtomicInteger());
             requestVo.setRequestUri(strategyParams.getRequestUri());
             requestVo.setBeanName(handlerMethod.getBeanType().getSimpleName());
             requestVo.setMethod(method);
@@ -299,6 +325,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             requestVo.setCreateTime(strategyParams.getCurTime());
             requestVoMap.put(key, requestVo);
         }
+        requestVo.getCounter().incrementAndGet();
         return requestVo;
     }
 

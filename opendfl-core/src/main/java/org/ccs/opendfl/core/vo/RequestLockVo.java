@@ -1,9 +1,10 @@
 package org.ccs.opendfl.core.vo;
 
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 @Data
-public class RequestLockVo implements Cloneable {
+public class RequestLockVo{
     private String requestUri;
     private String name;
     private Integer time;
@@ -12,14 +13,9 @@ public class RequestLockVo implements Cloneable {
     private Long createTime;
     private boolean sysconfig;
 
-    @Override
-    public RequestLockVo clone(){
-        RequestLockVo obj = null;
-        try{
-            obj = (RequestLockVo)super.clone();
-        }catch(CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
+    public RequestLockVo toCopy(){
+        RequestLockVo obj = new RequestLockVo();
+        BeanUtils.copyProperties(this, obj);
         return obj;
     }
 }

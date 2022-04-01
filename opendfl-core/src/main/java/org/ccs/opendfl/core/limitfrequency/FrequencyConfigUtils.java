@@ -1,4 +1,4 @@
-package org.ccs.opendfl.core.limitcount;
+package org.ccs.opendfl.core.limitfrequency;
 
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitFrequencyConfigVo;
@@ -70,7 +70,7 @@ public class FrequencyConfigUtils {
             FrequencyVo frequencyNew = limitBySysconfig(frequency);
             if (checkChange(frequencyExist, frequencyNew)) {
                 //因为FrequencyVo是可以共用的，存起来也可以发生变化，所以这里缓存时clone一下
-                sysconfigLimitMap.put(key, frequencyNew.clone());
+                sysconfigLimitMap.put(key, frequencyNew.toCopy());
             }
             frequencyExist = frequencyNew;
         }

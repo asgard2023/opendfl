@@ -1,4 +1,4 @@
-package org.ccs.opendfl.core.limitcount;
+package org.ccs.opendfl.core.limitfrequency;
 
 
 import org.ccs.opendfl.core.biz.IUserBiz;

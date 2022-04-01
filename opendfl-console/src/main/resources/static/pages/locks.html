@@ -79,7 +79,7 @@
         <div id="toolbar">
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="onEdit()">Edit</a>
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
-               onclick="onReset()">Reset</a>
+               onclick="onClear()">Clear list</a>
         </div>
         <table id="dg" class="easyui-datagrid" data-options="onDblClickRow:onDblClick"
                toolbar="#toolbar"
@@ -131,8 +131,6 @@
 
 <script type="text/javascript">
     $('#mainWindow').css('display', 'block');//用于避免chrome下页面刚打开时，画面会有一小会的格式不好的问题
-    var lookupId;
-    var canModify;
     $('#search-btn').click(function () {
         doSearch();
     });
@@ -217,7 +215,7 @@
         });
     }
 
-    function onReset() {
+    function onClear() {
         $.messager.confirm('Confirm', '确定要清空当前的数据，以便于再次首次加载吗?', function (r) {
             if (r) {
                 var url = '/frequency/locks?resetLockMap=clearLock';
@@ -255,17 +253,6 @@
     $('#query_code').keydown(listenerName);
     $('#query_name').keydown(listenerName);
 
-
-    function getRowData(entityName, row) {
-        var tmp;
-        var obj = {}
-        obj[entityName] = {};
-        for (i in row) {
-            tmp = row[i];
-            obj[i] = tmp;
-        }
-        return obj;
-    }
 
     $(function () {
         doSearch();

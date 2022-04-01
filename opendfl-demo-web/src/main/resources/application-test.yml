@@ -1,7 +1,7 @@
 # /info端点信息配置
 info:
   app:
-    name: OpenDFL test demo test
+    name: OpenDFL Open Ddstributed frequency limitation
     version: 0.1
 
 spring:
@@ -19,4 +19,4 @@ logging:
     root: INFO
     com:
       ccs:
-        opendfl: DEBUG
+        m3u8end: DEBUG

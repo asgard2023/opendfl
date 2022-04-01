@@ -2,8 +2,8 @@ package org.ccs.opendfl.core.strategy.limits.impl;
 
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.constants.FreqLimitType;
-import org.ccs.opendfl.core.limitcount.FrequencyUtils;
-import org.ccs.opendfl.core.limitcount.FrequencyWhiteCodeUtils;
+import org.ccs.opendfl.core.limitfrequency.FrequencyUtils;
+import org.ccs.opendfl.core.limitfrequency.FrequencyWhiteCodeUtils;
 import org.ccs.opendfl.core.strategy.limits.FreqLimitChain;
 import org.ccs.opendfl.core.strategy.limits.FreqLimitStrategy;
 import org.ccs.opendfl.core.utils.RedisTemplateUtil;

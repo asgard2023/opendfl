@@ -79,7 +79,7 @@
         <div id="toolbar">
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="onEdit()">Edit</a>
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
-               onclick="onReset()">Reset</a>
+               onclick="onClear()">Clear list</a>
         </div>
         <table id="dg" class="easyui-datagrid" data-options="onDblClickRow:onDblClick"
                toolbar="#toolbar"
@@ -91,6 +91,9 @@
                 <th field="method" width="30" sortable="true">method</th>
                 <th field="attrName" width="50" sortable="true">attrName(默认userId)</th>
                 <th field="limitTypes" width="50" sortable="true">限制类型</th>
+                <th field="counter" width="50" sortable="true">counter</th>
+                <th field="maxRunTime" width="50" sortable="true">maxRunTime</th>
+                <th field="maxRunTimeCreateTime" width="50" sortable="true" formatter="timestampFormatDateTime">maxRunCreateTime</th>
                 <th field="createTime" width="50" sortable="true" formatter="timestampFormatDateTime">加载时间</th>
             </tr>
             </thead>
@@ -163,8 +166,6 @@
 
 <script type="text/javascript">
     $('#mainWindow').css('display', 'block');//用于避免chrome下页面刚打开时，画面会有一小会的格式不好的问题
-    var lookupId;
-    var canModify;
     $('#search-btn').click(function () {
         doSearch();
     });
@@ -264,7 +265,7 @@
         });
     }
 
-    function onReset() {
+    function onClear() {
         $.messager.confirm('Confirm', '确定要清空当前的数据，以便于再次首次加载吗?', function (r) {
             if (r) {
                 var url = '/frequency/requests?resetRequestMap=clearRequest';
@@ -301,18 +302,6 @@
 
     $('#query_code').keydown(listenerName);
     $('#query_name').keydown(listenerName);
-
-
-    function getRowData(entityName, row) {
-        var tmp;
-        var obj = {}
-        obj[entityName] = {};
-        for (i in row) {
-            tmp = row[i];
-            obj[i] = tmp;
-        }
-        return obj;
-    }
 
     $(function () {
         doSearch();

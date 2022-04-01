@@ -7,8 +7,8 @@ import org.ccs.opendfl.console.utils.FrequencyLoginUtils;
 import org.ccs.opendfl.core.biz.IUserBiz;
 import org.ccs.opendfl.core.exception.PermissionDeniedException;
 import org.ccs.opendfl.core.exception.ResultData;
-import org.ccs.opendfl.core.limitcount.FrequencyEvictUtil;
-import org.ccs.opendfl.core.limitcount.FrequencyHandlerInterceptor;
+import org.ccs.opendfl.core.limitfrequency.FrequencyEvictUtil;
+import org.ccs.opendfl.core.limitfrequency.FrequencyHandlerInterceptor;
 import org.ccs.opendfl.core.limitlock.RequestLockHandlerInterceptor;
 import org.ccs.opendfl.core.utils.*;
 import org.ccs.opendfl.core.vo.FrequencyVo;
@@ -88,14 +88,14 @@ public class FrequencyController {
             RequestShowVo showVo = new RequestShowVo();
             BeanUtils.copyProperties(t, showVo);
             StringBuilder limitTypes = new StringBuilder();
+            StringBuilder attrNames = new StringBuilder();
             List<FrequencyVo> tmpList = new ArrayList<>();
-            String attrName = "";
             for (FrequencyVo freq : frequencyListSorted) {
                 if (StringUtils.equals(t.getRequestUri(), freq.getRequestUri())) {
                     tmpList.add(freq);
                     limitTypes.append(freq.getLimitType()).append(",");
-                    if(StringUtils.isNotBlank(freq.getAttrName()) && !attrName.contains(freq.getAttrName()+",")){
-                        attrName+=freq.getAttrName()+",";
+                    if(StringUtils.isNotBlank(freq.getAttrName()) && attrNames.indexOf(freq.getAttrName()+",")<0){
+                        attrNames.append(freq.getAttrName()).append(",");
                     }
                 }
             }
@@ -106,14 +106,13 @@ public class FrequencyController {
                 if (StringUtils.equals(t.getRequestUri(), lock.getRequestUri())) {
                     tmpLockList.add(lock);
                     limitTypes.append("lock");
-                    if(StringUtils.isNotBlank(lock.getAttrName()) && !attrName.contains(lock.getAttrName()+",")){
-                        attrName+=lock.getAttrName()+",";
+                    if(StringUtils.isNotBlank(lock.getAttrName()) && attrNames.indexOf(lock.getAttrName()+",")<0){
+                        attrNames.append(lock.getAttrName()).append(",");
                     }
                 }
 
             }
-            attrName=CommUtils.removeEndComma(attrName);
-            showVo.setAttrName(attrName);
+            showVo.setAttrName(CommUtils.removeEndComma(attrNames.toString()));
             showVo.setLocks(tmpLockList);
             String limitTypeStr = CommUtils.removeEndComma(limitTypes.toString());
             showVo.setLimitTypes(limitTypeStr);

@@ -246,6 +246,9 @@ DateUtils.timeMinute = function (value) {
 
 
 function timestampFormatDateTime(value, row, index) {
+    if(!value){
+        return ;
+    }
     var date = new Date(value);
     return DateUtils.formatDate(date, 'yyyy-MM-dd hh:mm:ss');
 }

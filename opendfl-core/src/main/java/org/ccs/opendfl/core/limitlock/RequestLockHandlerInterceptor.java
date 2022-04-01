@@ -67,7 +67,7 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
     private void logFirstload(RequestLockVo requestLock) {
         String key = requestLock.getName();
         if (!locksMap.containsKey(key)) {
-            locksMap.put(key, requestLock.clone());
+            locksMap.put(key, requestLock.toCopy());
             logger.info("----logFirstload--name={} time={}", requestLock.getName(), requestLock.getTime());
         }
     }

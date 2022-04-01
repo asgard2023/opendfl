@@ -1,8 +1,8 @@
 package org.ccs.opendfl.core.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.ccs.opendfl.core.limitcount.Frequency;
-import org.ccs.opendfl.core.limitcount.Frequency2;
+import org.ccs.opendfl.core.limitfrequency.Frequency;
+import org.ccs.opendfl.core.limitfrequency.Frequency2;
 import org.ccs.opendfl.core.limitlock.RequestLock;
 import org.springframework.web.bind.annotation.*;
 

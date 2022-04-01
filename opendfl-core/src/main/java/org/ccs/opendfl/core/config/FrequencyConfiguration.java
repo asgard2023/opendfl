@@ -20,7 +20,14 @@ public class FrequencyConfiguration {
     private Character ifActive='1';
     private String redisPrefix="limitCount";
     private Map<String, String> whiteCodeUsers;
+    /**
+     * 启动时每个接口前100次接口调用白名单可输出日志
+     */
     private Integer initLogCount=100;
+    /**
+     * 记录慢接口时间(毫秒)
+     */
+    private Long minRunTime=500L;
     /**
      * 黑名单配置
      */

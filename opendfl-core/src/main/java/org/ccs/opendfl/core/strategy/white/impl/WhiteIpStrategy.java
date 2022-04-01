@@ -2,8 +2,8 @@ package org.ccs.opendfl.core.strategy.white.impl;
 
 import org.ccs.opendfl.core.config.vo.WhiteBlackConfigVo;
 import org.ccs.opendfl.core.constants.FreqLimitType;
-import org.ccs.opendfl.core.limitcount.FrequencyUtils;
-import org.ccs.opendfl.core.limitcount.FrequencyWhiteCodeUtils;
+import org.ccs.opendfl.core.limitfrequency.FrequencyUtils;
+import org.ccs.opendfl.core.limitfrequency.FrequencyWhiteCodeUtils;
 import org.ccs.opendfl.core.strategy.white.WhiteChain;
 import org.ccs.opendfl.core.strategy.white.WhiteStrategy;
 import org.ccs.opendfl.core.utils.RequestUtils;
