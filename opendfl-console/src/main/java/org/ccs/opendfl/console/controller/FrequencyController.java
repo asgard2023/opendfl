@@ -89,10 +89,14 @@ public class FrequencyController {
             BeanUtils.copyProperties(t, showVo);
             StringBuilder limitTypes = new StringBuilder();
             List<FrequencyVo> tmpList = new ArrayList<>();
+            String attrName = "";
             for (FrequencyVo freq : frequencyListSorted) {
                 if (StringUtils.equals(t.getRequestUri(), freq.getRequestUri())) {
                     tmpList.add(freq);
                     limitTypes.append(freq.getLimitType()).append(",");
+                    if(StringUtils.isNotBlank(freq.getAttrName()) && !attrName.contains(freq.getAttrName()+",")){
+                        attrName+=freq.getAttrName()+",";
+                    }
                 }
             }
             showVo.setLimitFrequencys(tmpList);
@@ -102,8 +106,14 @@ public class FrequencyController {
                 if (StringUtils.equals(t.getRequestUri(), lock.getRequestUri())) {
                     tmpLockList.add(lock);
                     limitTypes.append("lock");
+                    if(StringUtils.isNotBlank(lock.getAttrName()) && !attrName.contains(lock.getAttrName()+",")){
+                        attrName+=lock.getAttrName()+",";
+                    }
                 }
+
             }
+            attrName=CommUtils.removeEndComma(attrName);
+            showVo.setAttrName(attrName);
             showVo.setLocks(tmpLockList);
             String limitTypeStr = CommUtils.removeEndComma(limitTypes.toString());
             showVo.setLimitTypes(limitTypeStr);

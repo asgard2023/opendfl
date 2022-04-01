@@ -7,6 +7,7 @@ import java.util.List;
 @Data
 public class RequestShowVo extends RequestVo {
     private String limitTypes;
+    private String attrName;
     private List<FrequencyVo> limitFrequencys;
     private List<RequestLockVo> locks;
 }
