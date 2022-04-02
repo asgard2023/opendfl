@@ -1,6 +1,7 @@
 package org.ccs.opendfl.core.limitfrequency;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
 import org.ccs.opendfl.core.exception.BaseException;
@@ -34,8 +35,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
+@Slf4j
 public class FrequencyHandlerInterceptor implements HandlerInterceptor {
-    private static Logger logger = LoggerFactory.getLogger(FrequencyHandlerInterceptor.class);
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
@@ -50,8 +51,8 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     private BlackChain blackChain;
     private static final String BLACK_LIST_INFO = "{\"resultCode\":\"100010\",\"errorMsg\":\"Frequency limit\",\"data\":\"WaT+azid/F/83e1UpLc6ZA==\",\"errorType\":\"biz\",\"success\":false}";
 
-    private ThreadLocal<Long> startTime = new ThreadLocal<>();
-    private ThreadLocal<String> requestKey = new ThreadLocal<>();
+    private final ThreadLocal<Long> startTime = new ThreadLocal<>();
+    private final ThreadLocal<String> requestKey = new ThreadLocal<>();
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -69,7 +70,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         try {
 
             HandlerMethod handlerMethod = (HandlerMethod) handler;
-            Map<String, Object> params = new HashMap<>();
+            Map<String, Object> params = new HashMap<>(5);
             String remoteIp = RequestUtils.getIpAddress(request);
             String ip = getConvertIp(remoteIp);
             String lang = RequestUtils.getLang(request);
@@ -91,7 +92,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             blackChain.clearLimit();
             boolean isBlack = blackChain.doCheckLimit(blackChain);
             if (isBlack) {
-                logger.warn("----preHandle--uri={} blackIp={} ", request.getRequestURI(), remoteIp);
+                log.warn("----preHandle--uri={} blackIp={} ", request.getRequestURI(), remoteIp);
                 response.getWriter().println(BLACK_LIST_INFO);
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return false;
@@ -104,7 +105,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             boolean isWhite = whiteChain.doCheckLimit(whiteChain);
             if (isWhite) {
                 if (FrequencyUtils.isInitLog("preHandle")) {
-                    logger.info("----preHandle--white-uri={}", requestUri);
+                    log.info("----preHandle--white-uri={}", requestUri);
                 }
                 return true;
             }
@@ -122,11 +123,11 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             params = null;
             return true;
         } catch (BaseException e) {
-            logger.error("-----preHandle--uri={} error={}", requestUri, e.getMessage());
+            log.error("-----preHandle--uri={} error={}", requestUri, e.getMessage());
             throw e;
         } catch (Exception e) {
             String reqInfo = frequencyVo != null ? frequencyVo.toString() : "{}";
-            logger.error("-----preHandle--uri={} reqInfo={} error={}", requestUri, reqInfo, e.getMessage());
+            log.error("-----preHandle--uri={} reqInfo={} error={}", requestUri, reqInfo, e.getMessage());
             throw e;
         }
     }
@@ -191,6 +192,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         List<LimitUriConfigVo> limitConfigList = requestVo.getLimitRequests();
         for (LimitUriConfigVo uriConfigVo : limitConfigList) {
             frequencyVo = FrequencyVo.toFrequencyVo(frequencyVo, uriConfigVo);
+            frequencyVo.setSysconfig(true);
             handleFrequency(response, params, frequencyVo, strategyParams);
         }
     }
@@ -201,7 +203,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
                 ip = "" + RequestUtils.getIpConvertNum(ip);
             }
         } catch (Exception e) {
-            logger.warn("----handleFrequency--ip={} error={}", ip, e.getMessage());
+            log.warn("----handleFrequency--ip={} error={}", ip, e.getMessage());
         }
         return ip;
     }
@@ -249,11 +251,11 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         final int limit = frequency.getLimit();
         final int time = frequency.getTime();
         if (time == 0 || limit == 0) {
-            logger.warn("----handleFrequency--uri={} time={} limit={} invalid", strategyParams.getRequestUri(), time, limit);
+            log.warn("----handleFrequency--uri={} time={} limit={} invalid", strategyParams.getRequestUri(), time, limit);
             try {
                 response.getWriter().println(BLACK_LIST_INFO);
             } catch (IOException e) {
-                logger.warn("----handleFrequency--uri={} error={}", strategyParams.getRequestUri(), e.getMessage());
+                log.warn("----handleFrequency--uri={} error={}", strategyParams.getRequestUri(), e.getMessage());
             }
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return false;
@@ -307,7 +309,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         if (!freqMap.containsKey(key)) {
             frequency.setCreateTime(curTime);
             freqMap.put(key, frequency.toCopy());
-            logger.info("----logFirstload--redisPrefix={} name={} time={} limit={} ipUser={} userIp={}", frequencyConfiguration.getRedisPrefix(), frequency.getName(), frequency.getTime(), frequency.getLimit(), frequency.getIpUserCount(), frequency.getUserIpCount());
+            log.info("----logFirstload--redisPrefix={} name={} time={} limit={} ipUser={} userIp={}", frequencyConfiguration.getRedisPrefix(), frequency.getName(), frequency.getTime(), frequency.getLimit(), frequency.getIpUserCount(), frequency.getUserIpCount());
         }
     }
 
