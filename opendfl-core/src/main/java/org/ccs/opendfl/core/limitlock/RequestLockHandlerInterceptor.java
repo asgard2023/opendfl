@@ -37,16 +37,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class RequestLockHandlerInterceptor implements HandlerInterceptor {
 
-    private static Logger logger = LoggerFactory.getLogger(RequestLockHandlerInterceptor.class);
+    private static final Logger logger = LoggerFactory.getLogger(RequestLockHandlerInterceptor.class);
     @Autowired
     private RequestLockConfiguration requestLockConfiguration;
     @Resource(name = "redisTemplateString")
     private RedisTemplate<String, String> redisTemplateString;
     public static final Map<String, RequestLockVo> locksMap = new ConcurrentHashMap<>();
-    private Random random = new Random();
-    private AtomicInteger counter = new AtomicInteger();
-    private ThreadLocal<String> lockRandomId = new ThreadLocal<>();
-    private ThreadLocal<String> lockDataId = new ThreadLocal<>();
+    private final Random random = new Random();
+    private final AtomicInteger counter = new AtomicInteger();
+    private final ThreadLocal<String> lockRandomId = new ThreadLocal<>();
+    private final ThreadLocal<String> lockDataId = new ThreadLocal<>();
 
     private RequestLockVo newRequestLockVo(RequestLock requestLimit, String requestUri, Long curTime) {
         RequestLockVo lockVo = new RequestLockVo();
@@ -122,7 +122,10 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
                     redisTemplateString.expire(redisKey, time, TimeUnit.SECONDS);
                 } else {
                     logger.warn("----preHandle--redisKey={} time={} dataId={} ip={} limited", redisKey, time, dataId, ip);
-                    throw new FrequencyException("重复任务限制:" + String.format(errMsg, dataId));
+                    String title="frequency:lock";
+                    BaseException baseException= new FrequencyException("重复任务限制:" + String.format(errMsg, dataId));
+                    baseException.setTitle(title);
+                    throw baseException;
                 }
             }
         } catch (BaseException e) {
@@ -134,12 +137,13 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
         return true;
     }
 
-    private static Map<String, Long> loadSysconfigTimeMap = new ConcurrentHashMap<>();
-    private static Map<String, RequestLockConfigVo> sysconfigLimitMap = new ConcurrentHashMap<>();
+    private static final Map<String, Long> loadSysconfigTimeMap = new ConcurrentHashMap<>();
+    private static final Map<String, RequestLockConfigVo> sysconfigLimitMap = new ConcurrentHashMap<>();
 
     private void loadLockConfig(RequestLockVo requestLockVo, Long curTime) {
         String key = requestLockVo.getName();
         RequestLockConfigVo lockConfigVo = sysconfigLimitMap.get(key);
+        //缓存10秒刷一次，以免cloud模式配置有变更
         Long time = loadSysconfigTimeMap.get(key);
         if (time == null || curTime - time > 10000) {
             loadSysconfigTimeMap.put(key, curTime);

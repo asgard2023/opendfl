@@ -1,6 +1,7 @@
 package org.ccs.opendfl.console;
 
-import junit.framework.TestCase;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,16 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * 频率限制mock测试
+ *
+ * @author chenjh
+ */
 @SpringBootTest
 @ActiveProfiles(value = "dev")
 @AutoConfigureMockMvc
@@ -27,8 +38,7 @@ class FrequencyTestControllerTest {
     private MockMvc mockMvc;
 
     @BeforeEach
-    public void setUp() throws Exception {
-//        MockMvcBuilders.webAppContextSetup(WebApplicationContext webApplicationContext)//指定WebApplicationContext，将会从该上下文获取相应的控制器并得到相应的MockMvc；
+    public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();//建议使用这种
     }
 
@@ -57,8 +67,8 @@ class FrequencyTestControllerTest {
             }
             System.out.println("----serverTimeFreqDefaultNoUser status=" + status + " content=" + content);
         }
-        TestCase.assertTrue("successCount:" + successCount, successCount > 0);
-        TestCase.assertTrue("limtCount:" + limtCount, limtCount > 0);
+        Assertions.assertTrue(successCount > 0, "successCount:" + successCount);
+        Assertions.assertTrue(limtCount > 0, "limtCount:" + limtCount);
     }
 
     /**
@@ -87,8 +97,8 @@ class FrequencyTestControllerTest {
             }
             System.out.println("----serverTimeFreqSameUser status=" + status + " content=" + content);
         }
-        TestCase.assertTrue("successCount:" + successCount, successCount > 0);
-        TestCase.assertTrue("limtCount:" + limtCount, limtCount > 0);
+        Assertions.assertTrue(successCount > 0, "successCount:" + successCount);
+        Assertions.assertTrue(limtCount > 0, "limtCount:" + limtCount);
     }
 
     /**
@@ -119,8 +129,8 @@ class FrequencyTestControllerTest {
             }
             System.out.println("----serverTimeFreqSameUser_whiteIp status=" + status + " content=" + content);
         }
-        TestCase.assertTrue("successCount:" + successCount, successCount > 0);
-        TestCase.assertEquals("limtCount:" + limtCount , 0, limtCount);
+        Assertions.assertTrue(successCount > 0, "successCount:" + successCount);
+        Assertions.assertEquals(0, limtCount, "limtCount:" + limtCount);
     }
 
     /**
@@ -148,8 +158,8 @@ class FrequencyTestControllerTest {
             }
             System.out.println("----serverTimeFreqSameUser_whiteUser status=" + status + " content=" + content);
         }
-        TestCase.assertTrue("successCount:" + successCount, successCount > 0);
-        TestCase.assertEquals("limtCount:" + limtCount , 0, limtCount);
+        Assertions.assertTrue(successCount > 0, "successCount:" + successCount);
+        Assertions.assertEquals(0, limtCount, "limtCount:" + limtCount);
     }
 
     /**
@@ -178,8 +188,8 @@ class FrequencyTestControllerTest {
             }
             System.out.println("----serverTimeFreqSameUser_blackUser status=" + status + " content=" + content);
         }
-        TestCase.assertEquals("successCount:" + successCount , 0, successCount);
-        TestCase.assertTrue("limtCount:" + limtCount, limtCount > 0);
+        Assertions.assertEquals(0, successCount, "successCount:" + successCount);
+        Assertions.assertTrue(limtCount > 0, "limtCount:" + limtCount);
     }
 
     /**
@@ -210,8 +220,8 @@ class FrequencyTestControllerTest {
             }
             System.out.println("----serverTimeFreqSameUser_blackIp status=" + status + " content=" + content);
         }
-        TestCase.assertEquals("successCount:" + successCount , 0, successCount);
-        TestCase.assertTrue("limtCount:" + limtCount, limtCount > 0);
+        Assertions.assertEquals(0, successCount, "successCount:" + successCount);
+        Assertions.assertTrue(limtCount > 0, "limtCount:" + limtCount);
     }
 
     /**
@@ -240,8 +250,8 @@ class FrequencyTestControllerTest {
             }
             System.out.println("----serverTimeFreqDiffUser status=" + status + " content=" + content);
         }
-        TestCase.assertTrue("successCount:" + successCount, successCount > 0);
-        TestCase.assertEquals("limtCount:" + limtCount , 0, limtCount);
+        Assertions.assertTrue(successCount > 0, "successCount:" + successCount);
+        Assertions.assertEquals(0, limtCount, "limtCount:" + limtCount);
     }
 
     /**
@@ -269,8 +279,8 @@ class FrequencyTestControllerTest {
             }
             System.out.println("----serverTimeFreqIp  status=" + status + " content=" + content);
         }
-        TestCase.assertTrue("ipUserCount:" + limtCount, limtCount > 0);
-//        TestCase.assertTrue("successCount:"+successCount,successCount>0);
+        Assertions.assertTrue(limtCount > 0, "ipUserCount:" + limtCount);
+//        Assertions.assertTrue("successCount:"+successCount,successCount>0);
     }
 
     /**
@@ -297,8 +307,8 @@ class FrequencyTestControllerTest {
             }
             System.out.println("----serverTimeFreqIpUser  status=" + status + " content=" + content);
         }
-        TestCase.assertTrue("successCount:" + successCount, successCount > 0);
-        TestCase.assertTrue("ipUserCount:" + limtCount, limtCount > 0);
+        Assertions.assertTrue(successCount > 0, "successCount:" + successCount);
+        Assertions.assertTrue(limtCount > 0, "ipUserCount:" + limtCount);
     }
 
     /**
@@ -311,7 +321,7 @@ class FrequencyTestControllerTest {
         int limtCount = 0;
         int successCount = 0;
         String errorLimitType = "frequency:userIp";
-        String ip = "192.168.0.";
+        String ip = null;
         for (int i = 0; i < 20; i++) {
             ip = "192.168.0." + i;
             MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqUserIp")
@@ -328,7 +338,112 @@ class FrequencyTestControllerTest {
             }
             System.out.println("----serverTimeFreqUserIp  status=" + status + " content=" + content);
         }
-        TestCase.assertTrue("successCount:" + successCount, successCount > 0);
-        TestCase.assertTrue("ipUserCount:" + limtCount, limtCount > 0);
+        Assertions.assertTrue(successCount > 0, "successCount:" + successCount);
+        Assertions.assertTrue(limtCount > 0, "ipUserCount:" + limtCount);
+    }
+
+    @Test
+    void waitLockTestUser() {
+        AtomicInteger lockedCounter = new AtomicInteger();
+        AtomicInteger successCounter = new AtomicInteger();
+        Integer sleepTime = 2;//单位秒(s)
+        String errorLimitType = "frequency:lock";
+
+        ExecutorService executorService = Executors.newFixedThreadPool(20);
+        for (int i = 0; i < 20; i++) {
+            final int iOper = i;
+            final String ip = "192.168.0." + i;
+            executorService.execute(new Runnable() {
+                public void run() {
+                    try {
+                        this.waitLockTest();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                private void waitLockTest() throws Exception {
+                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/waitLockTestUser")
+                                    .param("userId", "123" + (iOper / 4))
+                                    .param("sleepTime", "" + sleepTime)
+                                    .header("x-forwarded-for", ip)
+                                    .accept(MediaType.APPLICATION_JSON))
+                            .andReturn();
+                    int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+                    String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+                    if (content.contains(errorLimitType)) {
+                        lockedCounter.incrementAndGet();
+                    } else {
+                        successCounter.incrementAndGet();
+                    }
+                    System.out.println("----waitLockTestUser  status=" + status + " content=" + content);
+                }
+            });
+        }
+
+        executorService.shutdown();
+        try {
+            while (!executorService.awaitTermination(1, TimeUnit.SECONDS)) {
+                System.out.println("等待中");
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        Assertions.assertTrue(successCounter.get() >= 4, "successCount:" + successCounter.get());
+        Assertions.assertTrue(lockedCounter.get() >= 15, "lockedCount:" + lockedCounter.get());
+    }
+
+    @Test
+    void waitLockTestOrder() {
+        AtomicInteger lockedCounter = new AtomicInteger();
+        AtomicInteger successCounter = new AtomicInteger();
+        Integer sleepTime = 2;//单位秒(s)
+        String errorLimitType = "frequency:lock";
+        String orderId = "testOrder123";
+
+        int size = 20;
+        ExecutorService executorService = Executors.newFixedThreadPool(20);
+        for (int i = 0; i < size; i++) {
+            final int iOper = i;
+            final String ip = "192.168.0." + i;
+            executorService.execute(new Runnable() {
+                public void run() {
+                    try {
+                        this.waitLockTest();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                private void waitLockTest() throws Exception {
+                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/waitLockTestOrder")
+                                    .param("userId", "123" + (iOper / 4))
+                                    .param("sleepTime", "" + sleepTime)
+                                    .param("orderId", orderId)
+                                    .header("x-forwarded-for", ip)
+                                    .accept(MediaType.APPLICATION_JSON))
+                            .andReturn();
+                    int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+                    String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+                    if (content.contains(errorLimitType)) {
+                        lockedCounter.incrementAndGet();
+                    } else {
+                        successCounter.incrementAndGet();
+                    }
+                    System.out.println("----waitLockTestOrder  status=" + status + " content=" + content);
+                }
+            });
+        }
+
+        executorService.shutdown();
+        try {
+            while (!executorService.awaitTermination(1, TimeUnit.SECONDS)) {
+                System.out.println("等待中");
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        Assertions.assertEquals(successCounter.get(), 1, "successCount:" + successCounter.get());
+        Assertions.assertEquals(lockedCounter.get(), size - 1, "lockedCount:" + lockedCounter.get());
     }
 }

@@ -1,6 +1,7 @@
 package org.ccs.opendfl.demo.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.ccs.opendfl.core.exception.FailedException;
 import org.ccs.opendfl.core.limitfrequency.Frequency;
 import org.ccs.opendfl.core.limitlock.RequestLock;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,9 @@ public class FrequencyDemoController {
         try {
             Thread.sleep(sleepTime*1000L);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.warn("---waitLockTestUser--Interrupted!", e);
+            Thread.currentThread().interrupt();
+            throw new FailedException(e.getMessage());
         }
         return System.currentTimeMillis();
     }
