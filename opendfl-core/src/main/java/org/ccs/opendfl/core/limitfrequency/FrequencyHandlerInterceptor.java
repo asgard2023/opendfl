@@ -47,7 +47,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     private WhiteChain whiteChain;
     @Autowired
     private BlackChain blackChain;
-    private static final String BLACK_LIST_INFO = "{\"resultCode\":\"100010\",\"errorMsg\":\"Frequency limit\",\"data\":\"WaT+azid/F/83e1UpLc6ZA==\",\"errorType\":\"biz\",\"success\":false}";
+    private static final String BLACK_LIST_INFO = "{\"resultCode\":\"100010\",\"errorMsg\":\"Frequency limit\",\"data\":\"WaT+azid/F/83e1UpLc6ZA==\",\"errorType\":\"%s\",\"success\":false}";
 
     private final ThreadLocal<Long> startTime = new ThreadLocal<>();
     private final ThreadLocal<String> requestKey = new ThreadLocal<>();
@@ -91,7 +91,11 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             boolean isBlack = blackChain.doCheckLimit(blackChain);
             if (isBlack) {
                 log.warn("----preHandle--uri={} blackIp={} ", request.getRequestURI(), remoteIp);
-                response.getWriter().println(BLACK_LIST_INFO);
+                String title="frequency:black";
+                if(blackChain.getBlackStrategy()!=null){
+                    title="frequency:"+blackChain.getBlackStrategy().getLimitType();
+                }
+                response.getWriter().println(String.format(BLACK_LIST_INFO, title));
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return false;
             }

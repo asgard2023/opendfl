@@ -60,6 +60,14 @@ public class BlackChain  {
         blackStrategies.add(limitStrategy);
     }
 
+    private BlackStrategy blackStrategy;
+    public void setBlackStrategy(BlackStrategy black){
+        this.blackStrategy = black;
+    }
+    public BlackStrategy getBlackStrategy(){
+        return blackStrategy;
+    }
+
 
     public void clearLimit() {
         pos = 0;

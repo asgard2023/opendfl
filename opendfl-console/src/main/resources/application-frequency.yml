@@ -13,13 +13,13 @@ frequency:
   #全局白名单
   white:
     items: 'whiteIp,whiteUser,'
-    ips: 'none'
-    users: 'none'
+    ips: '192.168.5.101'
+    users: '5101,'
   #全局黑名单
   black:
     items: 'blackIp,blackUser,'
-    ips: '192.168.2.154'
-    users: 'none'
+    ips: '192.168.5.103'
+    users: '5103,'
   #接口限制
   limit:
     items: 'limit,userCount,userIp,ipUser,'

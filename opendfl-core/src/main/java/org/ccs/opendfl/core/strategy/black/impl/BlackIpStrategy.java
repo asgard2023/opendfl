@@ -38,6 +38,7 @@ public class BlackIpStrategy implements BlackStrategy {
             WhiteBlackConfigVo whiteConfig = limitChain.getBlackConfig();
             if (FrequencyWhiteCodeUtils.isWhiteId(ip, whiteConfig.getIps())) {
                 logger.warn("----doCheckLimit-blackIp={} userId={} uri={}", ip, userId, strategyParams.getRequestUri());
+                limitChain.setBlackStrategy(this);
                 return true;
             }
         }
