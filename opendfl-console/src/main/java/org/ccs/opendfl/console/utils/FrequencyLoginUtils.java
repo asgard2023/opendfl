@@ -106,7 +106,7 @@ public class FrequencyLoginUtils {
     public static void addAuditLog(HttpServletRequest request, UserVo user, String operType, String attrData, Integer... times) {
         String uri = RequestUtils.getRequestUri(request);
         String timeStr = CommUtils.concat(",", times);
-        log.info("----addAuditLog--uri={} operType={} user={} role={} time={} attrData={}"
+        log.info("----auditLog--uri={} operType={} user={} role={} time={} attrData={}"
                 , uri, operType, user.getUsername(), user.getRole(), timeStr, attrData);
     }
 }

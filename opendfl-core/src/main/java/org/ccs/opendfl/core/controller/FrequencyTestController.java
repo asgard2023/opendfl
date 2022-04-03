@@ -27,6 +27,15 @@ public class FrequencyTestController {
         return System.currentTimeMillis();
     }
 
+    @GetMapping("/serverTimeFreqIp")
+    @ResponseBody
+    @Frequency(time = 5, limit = 5, userIpCount = 7, ipUserCount = 7, name = "serverTimeFreqIp")
+    @Frequency2(time =3600, limit = 100, userIpCount = 7, ipUserCount = 7, name = "serverTimeFreqIp")
+    public Object serverTimeFreqIp(HttpServletRequest request){
+        System.out.println("----user="+request.getParameter("userId"));
+        return System.currentTimeMillis();
+    }
+
     @GetMapping("/serverTimeUri")
     @ResponseBody
     public Object serverTimeUri(HttpServletRequest request){

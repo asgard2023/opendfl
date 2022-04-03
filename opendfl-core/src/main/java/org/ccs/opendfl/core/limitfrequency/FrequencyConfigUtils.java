@@ -68,17 +68,19 @@ public class FrequencyConfigUtils {
         if (time == null || curTime - time > 10000) {
             loadSysconfigTimeMap.put(key, curTime);
             FrequencyVo frequencyNew = limitBySysconfig(frequency);
-            if (checkChange(frequencyExist, frequencyNew)) {
+            if (frequencyNew!=null && checkChange(frequencyExist, frequencyNew)) {
                 //因为FrequencyVo是可以共用的，存起来也可以发生变化，所以这里缓存时clone一下
                 sysconfigLimitMap.put(key, frequencyNew.toCopy());
             }
             frequencyExist = frequencyNew;
         }
 
-        frequency.setLimit(frequencyExist.getLimit());
-        frequency.setIpUserCount(frequencyExist.getIpUserCount());
-        frequency.setUserIpCount(frequencyExist.getUserIpCount());
-        frequency.setSysconfig(frequencyExist.isSysconfig());
+        if(frequencyExist!=null) {
+            frequency.setLimit(frequencyExist.getLimit());
+            frequency.setIpUserCount(frequencyExist.getIpUserCount());
+            frequency.setUserIpCount(frequencyExist.getUserIpCount());
+            frequency.setSysconfig(frequencyExist.isSysconfig());
+        }
     }
 
     /**
@@ -107,9 +109,10 @@ public class FrequencyConfigUtils {
             frequency.setLimit(frequencyConfigVo.getLimit());
             frequency.setIpUserCount(frequencyConfigVo.getIpUser());
             frequency.setUserIpCount(frequencyConfigVo.getUserIp());
+            return frequency;
         }
 
-        return frequency;
+        return null;
     }
 
     /**

@@ -23,9 +23,9 @@ public @interface Frequency2 {
 
     int limit() default 0;
 
-    int userIpCount() default 7;//支持ip数限制，同一个用户能使用的ip数
+    int userIpCount() default 0;//支持ip数限制，同一个用户能使用的ip数
 
-    int ipUserCount() default 7;//支持ip数限制，同一个IP能登入的用户数
+    int ipUserCount() default 0;//支持ip数限制，同一个IP能登入的用户数
 
     String attrName() default "";
 
