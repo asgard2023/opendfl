@@ -16,25 +16,25 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles(value = "dev")
 @Slf4j
-public class FreqLimitChainTest {
+class FreqLimitChainTest {
     @Autowired
     private FreqLimitChain freqLimitChain;
 
     @BeforeEach
-    public void init() {
+    void init() {
         System.out.println("----init----");
         String freqTypeItems = "limit,userCount,userIp,ipUser,";
         freqLimitChain.sortStrategies(freqTypeItems);
     }
 
     @Test
-    public void doCheckLimit_userIp() throws Exception {
+    void doCheckLimit_userIp() {
         String lang = null;
         String ip = "192.168.5.2";
         String requestUri = "/frequencyTest/serverTimeFreqUserIp";
         String methodName = "serverTimeFreqUserIp";
         Long curTime = System.currentTimeMillis();
-        RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, methodName, requestUri, curTime);
+        RequestStrategyParamsVo strategyParamsVo;
 
         FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
         frequencyVo.setName("serverTimeFreqUserIp");
@@ -43,7 +43,7 @@ public class FreqLimitChainTest {
 
         String freqTypeItems = "limit,userCount,userIp,ipUser,";
         freqLimitChain.sortStrategies(freqTypeItems);
-        Long time = System.currentTimeMillis();
+        long time = System.currentTimeMillis();
         int successCount = 0;
         int failCount = 0;
         for (int i = 0; i < 20; i++) {
@@ -60,8 +60,8 @@ public class FreqLimitChainTest {
             }
         }
         log.info("-----doCheckLimit_userIp--successCount={} failCount={} runTime={}", successCount, failCount, System.currentTimeMillis() - time);
-        Assertions.assertEquals(successCount , 10, "successCount:" + successCount);
-        Assertions.assertEquals(failCount , 10, "failCount:" + failCount);
+        Assertions.assertEquals(10, successCount, "successCount:" + successCount);
+        Assertions.assertEquals(10, failCount, "failCount:" + failCount);
     }
 
     private FrequencyVo getFrequencyServerTime(String requestUri) {
@@ -75,7 +75,7 @@ public class FreqLimitChainTest {
     }
 
     @Test
-    public void doCheckLimit_ipUser() throws Exception {
+    void doCheckLimit_ipUser() {
         String lang = null;
         String ip = "192.168.5.101";
         String requestUri = "/frequencyTest/serverTimeFreqIpUser";
@@ -92,7 +92,7 @@ public class FreqLimitChainTest {
 
         freqLimitChain.setStrategyParams(strategyParamsVo);
         freqLimitChain.sortStrategies(freqTypeItems);
-        Long time = System.currentTimeMillis();
+        long time = System.currentTimeMillis();
         int successCount = 0;
         int failCount = 0;
         for (int i = 0; i < 20; i++) {
@@ -107,12 +107,12 @@ public class FreqLimitChainTest {
             }
         }
         log.info("-----doCheckLimit_ipUser--successCount={} failCount={} runTime={}", successCount, failCount, System.currentTimeMillis() - time);
-        Assertions.assertEquals(successCount , 10, "successCount:" + successCount);
-        Assertions.assertEquals(failCount , 10, "failCount:" + failCount);
+        Assertions.assertEquals(10, successCount, "successCount:" + successCount);
+        Assertions.assertEquals(10, failCount, "failCount:" + failCount);
     }
 
     @Test
-    public void doCheckLimit() throws Exception {
+    void doCheckLimit() {
         String lang = null;
         String ip = "192.168.5.101";
         String requestUri = "/frequencyTest/serverTimeFreq";
@@ -127,7 +127,7 @@ public class FreqLimitChainTest {
 
         freqLimitChain.setStrategyParams(strategyParamsVo);
         freqLimitChain.sortStrategies(freqTypeItems);
-        Long time = System.currentTimeMillis();
+        long time = System.currentTimeMillis();
         int successCount = 0;
         int failCount = 0;
         for (int i = 0; i < 1020; i++) {
@@ -142,13 +142,13 @@ public class FreqLimitChainTest {
             }
         }
         log.info("-----doCheckLimit--successCount={} failCount={} runTime={}", successCount, failCount, System.currentTimeMillis() - time);
-        Assertions.assertEquals(successCount , 1000, "successCount:" + successCount);
-        Assertions.assertEquals(failCount , 20, "failCount:" + failCount);
+        Assertions.assertEquals(1000, successCount, "successCount:" + successCount);
+        Assertions.assertEquals(20, failCount, "failCount:" + failCount);
 
     }
 
     @Test
-    public void doCheckLimit_limit() throws Exception {
+    void doCheckLimit_limit() {
         String lang = null;
         String ip = "192.168.5.101";
         String requestUri = "/frequencyTest/serverTimeFreq";
@@ -163,7 +163,7 @@ public class FreqLimitChainTest {
 
         freqLimitChain.setStrategyParams(strategyParamsVo);
         freqLimitChain.sortStrategies(freqTypeItems);
-        Long time = System.currentTimeMillis();
+        long time = System.currentTimeMillis();
         int successCount = 0;
         int failCount = 0;
         for (int i = 0; i < 1020; i++) {
@@ -178,13 +178,13 @@ public class FreqLimitChainTest {
             }
         }
         log.info("-----doCheckLimit_limit--successCount={} failCount={} runTime={}", successCount, failCount, System.currentTimeMillis() - time);
-        Assertions.assertEquals(successCount , 1000, "successCount:" + successCount);
-        Assertions.assertEquals(failCount , 20, "failCount:" + failCount);
+        Assertions.assertEquals(1000, successCount, "successCount:" + successCount);
+        Assertions.assertEquals(20, failCount, "failCount:" + failCount);
 
     }
 
     @Test
-    public void doCheckLimit_noLimit() throws Exception {
+    void doCheckLimit_noLimit() {
         String lang = null;
         String ip = "192.168.5.101";
         String requestUri = "/frequencyTest/serverTimeFreq";
@@ -199,7 +199,7 @@ public class FreqLimitChainTest {
 
         freqLimitChain.setStrategyParams(strategyParamsVo);
         freqLimitChain.sortStrategies(freqTypeItems);
-        Long time = System.currentTimeMillis();
+        long time = System.currentTimeMillis();
         int successCount = 0;
         int failCount = 0;
         for (int i = 0; i < 1020; i++) {
@@ -214,8 +214,8 @@ public class FreqLimitChainTest {
             }
         }
         log.info("-----doCheckLimit_noLimit--successCount={} failCount={} runTime={}", successCount, failCount, System.currentTimeMillis() - time);
-        Assertions.assertEquals(successCount , 1020, "successCount:" + successCount);
-        Assertions.assertEquals(failCount , 0, "failCount:" + failCount);
+        Assertions.assertEquals(1020, successCount, "successCount:" + successCount);
+        Assertions.assertEquals(0, failCount, "failCount:" + failCount);
 
     }
 }

@@ -46,7 +46,6 @@ class FrequencyTestControllerTest {
      * 用户访问频率-没有用户（默认走IP）
      * user request limit-- no userId use IP as default
      *
-     * @throws Exception
      */
     @Test
     void serverTimeFreqDefaultNoUser() throws Exception {
@@ -74,7 +73,6 @@ class FrequencyTestControllerTest {
     /**
      * 用户访问频率-同一用户
      *
-     * @throws Exception
      */
     @Test
     void serverTimeFreqSameUser() throws Exception {
@@ -104,7 +102,6 @@ class FrequencyTestControllerTest {
     /**
      * 用户访问频率-同一用户-IP白名单
      *
-     * @throws Exception
      */
     @Test
     void serverTimeFreqSameUser_whiteIp() throws Exception {
@@ -136,7 +133,6 @@ class FrequencyTestControllerTest {
     /**
      * 用户访问频率-同一用户-用户白名单
      *
-     * @throws Exception
      */
     @Test
     void serverTimeFreqSameUser_whiteUser() throws Exception {
@@ -165,7 +161,6 @@ class FrequencyTestControllerTest {
     /**
      * 用户访问频率-同一用户-用户黑名单
      *
-     * @throws Exception
      */
     @Test
     void serverTimeFreqSameUser_blackUser() throws Exception {
@@ -195,7 +190,6 @@ class FrequencyTestControllerTest {
     /**
      * 用户访问频率-同一用户-IP黑名单
      *
-     * @throws Exception
      */
     @Test
     void serverTimeFreqSameUser_blackIp() throws Exception {
@@ -227,7 +221,6 @@ class FrequencyTestControllerTest {
     /**
      * 用户访问频率-不同用户
      *
-     * @throws Exception
      */
     @Test
     void serverTimeFreqDiffUser() throws Exception {
@@ -257,7 +250,6 @@ class FrequencyTestControllerTest {
     /**
      * ip限制
      *
-     * @throws Exception
      */
     @Test
     void serverTimeFreqIp() throws Exception {
@@ -286,7 +278,6 @@ class FrequencyTestControllerTest {
     /**
      * 同IP多用户测试
      *
-     * @throws Exception
      */
     @Test
     void serverTimeFreqIpUser() throws Exception {
@@ -314,14 +305,13 @@ class FrequencyTestControllerTest {
     /**
      * 同用户多IP测试
      *
-     * @throws Exception
      */
     @Test
     void serverTimeFreqUserIp() throws Exception {
         int limtCount = 0;
         int successCount = 0;
         String errorLimitType = "frequency:userIp";
-        String ip = null;
+        String ip;
         for (int i = 0; i < 20; i++) {
             ip = "192.168.0." + i;
             MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqUserIp")
@@ -443,7 +433,7 @@ class FrequencyTestControllerTest {
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
-        Assertions.assertEquals(successCounter.get(), 1, "successCount:" + successCounter.get());
-        Assertions.assertEquals(lockedCounter.get(), size - 1, "lockedCount:" + lockedCounter.get());
+        Assertions.assertEquals(1, successCounter.get(), "successCount:" + successCounter.get());
+        Assertions.assertEquals(size - 1, lockedCounter.get(), "lockedCount:" + lockedCounter.get());
     }
 }
