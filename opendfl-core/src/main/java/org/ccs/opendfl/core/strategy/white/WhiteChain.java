@@ -19,6 +19,7 @@ public class WhiteChain {
     private static Logger logger = LoggerFactory.getLogger(WhiteChain.class);
     private int pos = 0;
     private int size = 0;
+    private final List<WhiteStrategy> whiteStrategieList=new ArrayList<>();
     private List<WhiteStrategy> whiteStrategies;
     private WhiteBlackConfigVo whiteConfig;
     private RequestStrategyParamsVo strategyParams;
@@ -36,10 +37,7 @@ public class WhiteChain {
     }
 
     private void addLimit(WhiteStrategy limitStrategy) {
-        if (whiteStrategies == null) {
-            whiteStrategies = new ArrayList<>();
-        }
-        whiteStrategies.add(limitStrategy);
+        whiteStrategieList.add(limitStrategy);
     }
 
     public void setStrategyParams(RequestStrategyParamsVo strategyParams) {
@@ -63,7 +61,7 @@ public class WhiteChain {
         pos = 0;
     }
 
-    public void setFreqTypeItems(String freqTypeItems) {
+    private void setFreqTypeItems(String freqTypeItems) {
         this.freqTypeItems = freqTypeItems;
     }
 
@@ -93,23 +91,22 @@ public class WhiteChain {
         }
         this.limitItemsLast = limitItems;
         this.setFreqTypeItems(limitItems);
-        if (whiteStrategies != null) {
-            String[] items = getLimitItems(limitItems);
-            List<WhiteStrategy> limits = new ArrayList<>();
-            for (String item : items) {
-                if ("".equals(item)) {
-                    continue;
-                }
-                for (WhiteStrategy strategy : whiteStrategies) {
-                    if (item.equals(strategy.getLimitType())) {
-                        limits.add(strategy);
-                        break;
-                    }
+        String[] items = getLimitItems(limitItems);
+        List<WhiteStrategy> limits = new ArrayList<>();
+        for (String item : items) {
+            if ("".equals(item)) {
+                continue;
+            }
+            for (WhiteStrategy strategy : whiteStrategieList) {
+                if (item.equals(strategy.getLimitType())) {
+                    limits.add(strategy);
+                    break;
                 }
             }
-            whiteStrategies = limits;
-            size = whiteStrategies.size();
         }
+        whiteStrategies = limits;
+        size = whiteStrategies.size();
+
     }
 
 

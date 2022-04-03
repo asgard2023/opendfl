@@ -79,7 +79,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
 
             loadReqParamsOnce(request, params);
 
-            RequestStrategyParamsVo strategyParams = new RequestStrategyParamsVo(request, lang, ip, handlerMethod.getMethod().getName(), requestUri, curTime);
+            RequestStrategyParamsVo strategyParams = new RequestStrategyParamsVo(lang, ip, handlerMethod.getMethod().getName(), requestUri, curTime);
             String userId = (String) params.get(RequestParams.USER_ID);
             strategyParams.setUserId(userId);
 

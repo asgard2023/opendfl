@@ -19,6 +19,7 @@ public class BlackChain  {
     private static Logger logger = LoggerFactory.getLogger(BlackChain.class);
     private int pos = 0;
     private int size = 0;
+    private final List<BlackStrategy> blackStrategieList=new ArrayList<>();
     private List<BlackStrategy> blackStrategies;
     private WhiteBlackConfigVo blackConfig;
     private RequestStrategyParamsVo strategyParams;
@@ -54,10 +55,7 @@ public class BlackChain  {
     }
 
     private void addLimit(BlackStrategy limitStrategy) {
-        if (blackStrategies == null) {
-            blackStrategies = new ArrayList<>();
-        }
-        blackStrategies.add(limitStrategy);
+        blackStrategieList.add(limitStrategy);
     }
 
     private BlackStrategy blackStrategy;
@@ -100,23 +98,23 @@ public class BlackChain  {
         }
         this.limitItemsLast=limitItems;
         this.setFreqTypeItems(limitItems);
-        if (blackStrategies != null) {
-            String[] items = getLimitItems(limitItems);
-            List<BlackStrategy> limits = new ArrayList<>();
-            for (String item : items) {
-                if ("".equals(item)) {
-                    continue;
-                }
-                for (BlackStrategy strategy : blackStrategies) {
-                    if (item.equals(strategy.getLimitType())) {
-                        limits.add(strategy);
-                        break;
-                    }
+
+        String[] items = getLimitItems(limitItems);
+        List<BlackStrategy> limits = new ArrayList<>();
+        for (String item : items) {
+            if ("".equals(item)) {
+                continue;
+            }
+            for (BlackStrategy strategy : blackStrategieList) {
+                if (item.equals(strategy.getLimitType())) {
+                    limits.add(strategy);
+                    break;
                 }
             }
-            blackStrategies = limits;
-            size = blackStrategies.size();
         }
+        blackStrategies = limits;
+        size = blackStrategies.size();
+
     }
 
 

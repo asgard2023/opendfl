@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 @Data
 @Getter
 public class RequestStrategyParamsVo{
-    private final HttpServletRequest request;
     private String requestUri;
     private final String lang;
     private final String ip;
@@ -18,8 +17,7 @@ public class RequestStrategyParamsVo{
     private Long curTime;
     private String userId;
 
-    public RequestStrategyParamsVo(HttpServletRequest request, String lang, String ip, String methodName, String requestUri, Long curTime) {
-        this.request = request;
+    public RequestStrategyParamsVo(String lang, String ip, String methodName, String requestUri, Long curTime) {
         this.lang = lang;
         this.ip = ip;
         this.methodName = methodName;

@@ -17,6 +17,7 @@ public class FreqLimitChain {
     private static Logger logger = LoggerFactory.getLogger(FreqLimitChain.class);
     private int pos = 0;
     private int size = 0;
+    private final List<FreqLimitStrategy> limitStrategieList=new ArrayList<>();
     private List<FreqLimitStrategy> limitStrategies;
     private RequestStrategyParamsVo strategyParams;
     private String freqTypeItems;
@@ -44,10 +45,7 @@ public class FreqLimitChain {
     }
 
     private void addLimit(FreqLimitStrategy limitStrategy) {
-        if (limitStrategies == null) {
-            limitStrategies = new ArrayList<>();
-        }
-        limitStrategies.add(limitStrategy);
+        limitStrategieList.add(limitStrategy);
     }
 
     public RequestStrategyParamsVo getStrategyParams() {
@@ -58,7 +56,7 @@ public class FreqLimitChain {
         pos = 0;
     }
 
-    public void setFreqTypeItems(String freqTypeItems) {
+    private void setFreqTypeItems(String freqTypeItems) {
         this.freqTypeItems = freqTypeItems;
     }
 
@@ -88,23 +86,24 @@ public class FreqLimitChain {
         }
         this.limitItemsLast = limitItems;
         this.setFreqTypeItems(limitItems);
-        if (limitStrategies != null) {
-            String[] items = getLimitItems(limitItems);
-            List<FreqLimitStrategy> limits = new ArrayList<>();
-            for (String item : items) {
-                if ("".equals(item)) {
-                    continue;
-                }
-                for (FreqLimitStrategy strategy : limitStrategies) {
-                    if (item.equals(strategy.getLimitType())) {
-                        limits.add(strategy);
-                        break;
-                    }
+
+        logger.info("-----sortStrategies--limitItems={}", limitItems);
+        String[] items = getLimitItems(limitItems);
+        List<FreqLimitStrategy> limits = new ArrayList<>();
+        for (String item : items) {
+            if ("".equals(item)) {
+                continue;
+            }
+            for (FreqLimitStrategy strategy : limitStrategieList) {
+                if (item.equals(strategy.getLimitType())) {
+                    limits.add(strategy);
+                    break;
                 }
             }
-            limitStrategies = limits;
-            size = limitStrategies.size();
         }
+        limitStrategies = limits;
+        size = limitStrategies.size();
+
     }
 
 
