@@ -76,13 +76,13 @@ public class FrequencyUtils {
         BaseException exception = null;
         if (StringUtils.isBlank(errMsg)) {
             if (isCn) {
-                exception = new FrequencyException("周波数制限");
+                exception = new FrequencyException();
             } else {
                 exception = new FrequencyException("Frequency limit");
             }
         } else {
             if (isCn && StringUtils.isNotBlank(errMsg)) {
-                exception = new FrequencyException("周波数制限" + ":" + errMsg);
+                exception = new FrequencyException("访问频率限制" + ":" + errMsg);
             } else if (StringUtils.isNotBlank(errMsgEn)) {
                 exception = new FrequencyException("Frequency limit" + ":" + errMsgEn);
             } else {
