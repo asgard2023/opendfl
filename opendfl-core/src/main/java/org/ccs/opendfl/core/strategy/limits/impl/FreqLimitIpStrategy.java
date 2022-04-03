@@ -18,10 +18,12 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * IP限限制检查
+ *
+ * @author chenjh
  */
 @Service(value = "freqLimitIpStrategy")
 public class FreqLimitIpStrategy implements FreqLimitStrategy {
-    private static Logger logger = LoggerFactory.getLogger(FreqLimitIpStrategy.class);
+    private static final Logger logger = LoggerFactory.getLogger(FreqLimitIpStrategy.class);
     public static final FreqLimitType LIMIT_TYPE = FreqLimitType.LIMIT_IP;
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -66,8 +68,8 @@ public class FreqLimitIpStrategy implements FreqLimitStrategy {
                 logger.warn("----doCheckLimit-limitIp--redisKey={} userId={} time={} count={} limit={} ip={}", redisKey, userId, time, v, limit, ip);
 
 
-                FrequencyUtils.addFreqLog(strategyParams, limit, strategyParams.getCurTime(), v, LIMIT_TYPE);
-                FrequencyUtils.failExceptionMsg(errMsg, errMsgEn, lang);
+                FrequencyUtils.addFreqLog(strategyParams, limit, v, LIMIT_TYPE);
+                FrequencyUtils.failExceptionMsg(getLimitType(), errMsg, errMsgEn, lang);
             }
         }
         limitChain.doCheckLimit(limitChain);

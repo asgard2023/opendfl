@@ -10,7 +10,8 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 /**
- * @author justin
+ * 频率限制配置
+ * @author chenjh
  */
 @Configuration
 @ConfigurationProperties(prefix = "frequency")

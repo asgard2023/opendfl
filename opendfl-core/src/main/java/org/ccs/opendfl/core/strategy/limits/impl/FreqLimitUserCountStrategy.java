@@ -19,10 +19,12 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 用户访问频率检查
+ *
+ * @author chenjh
  */
 @Service(value = "freqLimitUserCountStrategy")
 public class FreqLimitUserCountStrategy implements FreqLimitStrategy {
-    private static Logger logger = LoggerFactory.getLogger(FreqLimitUserCountStrategy.class);
+    private static final Logger logger = LoggerFactory.getLogger(FreqLimitUserCountStrategy.class);
     public static final FreqLimitType LIMIT_TYPE = FreqLimitType.LIMIT;
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -74,10 +76,10 @@ public class FreqLimitUserCountStrategy implements FreqLimitStrategy {
                     }
                     logger.warn("----doCheckLimit-userCount--redisKey={} lang={} time={} count={} limit={} ip={}", redisKey, lang, time, v, limit, ip);
 
-                    FrequencyUtils.addFreqLog(strategyParams, limit, strategyParams.getCurTime(), v, LIMIT_TYPE);
+                    FrequencyUtils.addFreqLog(strategyParams, limit, v, LIMIT_TYPE);
                     final String errMsg = String.format(frequency.getErrMsg(), frequency.getLimit());
                     final String errMsgEn = String.format(frequency.getErrMsgEn(), frequency.getLimit());
-                    FrequencyUtils.failExceptionMsg(errMsg, errMsgEn, lang);
+                    FrequencyUtils.failExceptionMsg(getLimitType(), errMsg, errMsgEn, lang);
                 }
             }
         }

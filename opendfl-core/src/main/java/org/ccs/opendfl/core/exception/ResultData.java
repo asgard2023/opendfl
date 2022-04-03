@@ -3,6 +3,10 @@ package org.ccs.opendfl.core.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Return result type
+ * @author chenjh
+ */
 public class ResultData {
     private String resultCode;
     private String errorMsg;
@@ -28,7 +32,11 @@ public class ResultData {
     }
 
     public static ResultData error(BaseException myException) {
-        return new ResultData(myException.getResultCode(), myException.getMessage(), null, "biz");
+        String title= myException.getTitle();
+        if(title==null){
+            title="biz";
+        }
+        return new ResultData(myException.getResultCode(), myException.getMessage(), null, title);
     }
 
     public static ResultData success() {

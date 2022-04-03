@@ -19,10 +19,12 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * IP用户数检查
+ *
+ * @author chenjh
  */
 @Service(value = "freqLimitIpUserStrategy")
 public class FreqLimitIpUserStrategy implements FreqLimitStrategy {
-    private static Logger logger = LoggerFactory.getLogger(FreqLimitIpUserStrategy.class);
+    private static final Logger logger = LoggerFactory.getLogger(FreqLimitIpUserStrategy.class);
     public static final FreqLimitType LIMIT_TYPE = FreqLimitType.IP_USER_COUNT;
 
     @Autowired
@@ -74,8 +76,8 @@ public class FreqLimitIpUserStrategy implements FreqLimitStrategy {
 
                     logger.warn("----doCheckLimit-ipUser--redisKey={} userId={} time={} count={} limit={} ip={}", redisKey, userId, time, v, limit, ip);
 
-                    FrequencyUtils.addFreqLog(strategyParams, limit, strategyParams.getCurTime(), v, LIMIT_TYPE);
-                    FrequencyUtils.failExceptionMsg(errMsg, errMsgEn, lang);
+                    FrequencyUtils.addFreqLog(strategyParams, limit, v, LIMIT_TYPE);
+                    FrequencyUtils.failExceptionMsg(getLimitType(), errMsg, errMsgEn, lang);
                 }
             }
         }

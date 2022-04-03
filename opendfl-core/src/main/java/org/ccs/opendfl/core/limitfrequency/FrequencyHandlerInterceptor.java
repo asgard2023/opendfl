@@ -15,8 +15,6 @@ import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
 import org.ccs.opendfl.core.vo.RequestVo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -276,9 +274,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
 
         strategyParams.load(frequency, userId);
 
-        /**
-         * 这里的顺序没有关系，主要由SYS_TEST_FREQUENT_ITEM这个参数来控制是否启用及顺序
-         */
+        //这里的顺序没有关系，主要由frequency.limit.items这个参数来控制是否启用及顺序
         freqLimitChain.clearLimit();
         freqLimitChain.doCheckLimit(freqLimitChain);
         return going;
@@ -287,8 +283,6 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     /**
      * 只从请求中获取参数一次
      *
-     * @param request
-     * @param params
      */
     private void loadReqParamsOnce(HttpServletRequest request, Map<String, Object> params) {
         Map<String, Object> reqParams = RequestUtils.getParamsObject(request);
@@ -302,7 +296,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     /**
      * 首次加载日志一下
      *
-     * @param frequency
+     * @param frequency FrequencyVo
      */
     private void logFirstload(FrequencyVo frequency, Long curTime) {
         String key = frequency.getName() + ":" + frequency.getTime();
