@@ -290,6 +290,9 @@ public class RequestUtils {
      * @return 转换成数字类型的ip地址
      */
     public static long getIpConvertNum(String ipAddress) {
+        if(StringUtils.equals("localhost", ipAddress)){
+            ipAddress = "127.0.0.1";
+        }
         String[] ip = ipAddress.split("\\.");
         long a = Integer.parseInt(ip[0]);
         long b = Integer.parseInt(ip[1]);

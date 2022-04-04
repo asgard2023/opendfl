@@ -2,6 +2,7 @@ package org.ccs.opendfl.core.limitfrequency;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.ccs.opendfl.core.biz.IRsaBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
 import org.ccs.opendfl.core.exception.BaseException;
@@ -16,7 +17,6 @@ import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
 import org.ccs.opendfl.core.vo.RequestVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -32,12 +32,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * 频率限制处理
+ * 白名单，黑名单，IP限制，用户访问限制等
+ *
+ * @author chenjh
+ */
 @Service
 @Slf4j
 public class FrequencyHandlerInterceptor implements HandlerInterceptor {
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
-
     @Autowired
     private FrequencyConfiguration frequencyConfiguration;
 
@@ -47,6 +50,8 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     private WhiteChain whiteChain;
     @Autowired
     private BlackChain blackChain;
+    @Autowired
+    private IRsaBiz rsaBiz;
     private static final String BLACK_LIST_INFO = "{\"resultCode\":\"100010\",\"errorMsg\":\"Frequency limit\",\"data\":\"WaT+azid/F/83e1UpLc6ZA==\",\"errorType\":\"%s\",\"success\":false}";
 
     private final ThreadLocal<Long> startTime = new ThreadLocal<>();
@@ -201,7 +206,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
 
     private String getConvertIp(String ip) {
         try {
-            if (!(RequestUtils.isIpv6Address(ip) || "localhost".equals(ip))) {
+            if (!(RequestUtils.isIpv6Address(ip))) {
                 ip = "" + RequestUtils.getIpConvertNum(ip);
             }
         } catch (Exception e) {
@@ -269,6 +274,8 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             attrName = frequency.getAttrName();
         }
         Object attrValue = params.get(attrName);
+        attrValue = decryptValue(params, attrValue);
+
         if (attrValue != null) {
             userId = "" + attrValue;
             params.put(RequestParams.USER_ID, userId);
@@ -282,6 +289,20 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         freqLimitChain.clearLimit();
         freqLimitChain.doCheckLimit(freqLimitChain);
         return going;
+    }
+
+    /**
+     * 用于支持加密的数据解密，比如登入账号，否则不好限制
+     * @param params
+     * @param attrValue
+     * @return
+     */
+    private Object decryptValue(Map<String, Object> params, Object attrValue) {
+        String clientIdRsa=(String) params.get("clientIdRsa");
+        if (attrValue !=null && StringUtils.isNotBlank(clientIdRsa)) {
+            attrValue = rsaBiz.checkRSAKey(clientIdRsa, (String) attrValue);
+        }
+        return attrValue;
     }
 
     /**

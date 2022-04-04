@@ -1,6 +1,7 @@
 package org.ccs.opendfl.console.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.ccs.opendfl.console.biz.IFrequencyDataBiz;
 import org.ccs.opendfl.console.config.vo.RolePermitVo;
 import org.ccs.opendfl.console.config.vo.UserVo;
 import org.ccs.opendfl.console.constant.UserOperType;
@@ -8,7 +9,6 @@ import org.ccs.opendfl.console.utils.FrequencyLoginUtils;
 import org.ccs.opendfl.core.biz.IUserBiz;
 import org.ccs.opendfl.core.exception.PermissionDeniedException;
 import org.ccs.opendfl.core.exception.ResultData;
-import org.ccs.opendfl.core.limitfrequency.FrequencyEvictUtil;
 import org.ccs.opendfl.core.limitfrequency.FrequencyHandlerInterceptor;
 import org.ccs.opendfl.core.limitlock.RequestLockHandlerInterceptor;
 import org.ccs.opendfl.core.utils.*;
@@ -18,9 +18,9 @@ import org.ccs.opendfl.core.vo.RequestShowVo;
 import org.ccs.opendfl.core.vo.RequestVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +28,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * 限数数据查询及处理
+ *
+ * @author chenjh
+ */
 @RestController
 @RequestMapping("/frequency")
 @Slf4j
@@ -35,8 +40,8 @@ public class FrequencyController {
     public static final String INSUFFICIENT_USER_PERMISSIONS = "Insufficient user permissions";
     @Autowired
     private IUserBiz userBiz;
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    @Resource(name = "frequencyDataRedisBiz")
+    private IFrequencyDataBiz frequencyDataBiz;
     private static final Integer TIME_NULL = null;
 
 
@@ -133,7 +138,8 @@ public class FrequencyController {
 
     @ResponseBody
     @RequestMapping(value = "/limits", method = {RequestMethod.POST, RequestMethod.GET})
-    public Object limits(HttpServletRequest request, FrequencyVo frequency) {
+    public Object limits(HttpServletRequest request, FrequencyVo frequency
+            , @RequestParam(value = "ip", required = false) String ip, @RequestParam(value = "userId", required = false) String userId) {
         String token = RequestUtils.getToken(request);
         UserVo userVo = FrequencyLoginUtils.getUserByToken(token);
         checkUserPermission(userVo, UserOperType.VIEW);
@@ -149,8 +155,18 @@ public class FrequencyController {
             FrequencyHandlerInterceptor.freqMap.clear();
         }
 
-        FrequencyLoginUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
-        Collection<FrequencyVo> list = FrequencyHandlerInterceptor.freqMap.values();
+        Collection<FrequencyVo> list = null;
+        if (StringUtils.isNotBlank(userId)) {
+            FrequencyLoginUtils.addAuditLog(request, userVo, "list", userId, TIME_NULL);
+            list = frequencyDataBiz.limitUsers(userId);
+        } else if (StringUtils.isNotBlank(ip)) {
+            FrequencyLoginUtils.addAuditLog(request, userVo, "list", ip, TIME_NULL);
+            list = frequencyDataBiz.limitIps(ip);
+        } else {
+            list = FrequencyHandlerInterceptor.freqMap.values();
+            FrequencyLoginUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
+        }
+
         boolean isBlankUri = StringUtils.isBlank(frequency.getRequestUri());
         list = list.stream().filter(f -> isBlankUri || !isBlankUri && f.getRequestUri().contains(frequency.getRequestUri()))
                 .filter(f -> frequency.getTime() == 0 || frequency.getTime() > 0 && f.getTime() == frequency.getTime())
@@ -160,7 +176,7 @@ public class FrequencyController {
 
     @ResponseBody
     @RequestMapping(value = "/locks", method = {RequestMethod.POST, RequestMethod.GET})
-    public Object locks(HttpServletRequest request, RequestLockVo lockVo) {
+    public Object locks(HttpServletRequest request, RequestLockVo lockVo, @RequestParam(value = "userId", required = false) String userId) {
         String token = RequestUtils.getToken(request);
         UserVo userVo = FrequencyLoginUtils.getUserByToken(token);
         checkUserPermission(userVo, UserOperType.VIEW);
@@ -177,8 +193,15 @@ public class FrequencyController {
             RequestLockHandlerInterceptor.locksMap.clear();
         }
 
-        FrequencyLoginUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
-        Collection<RequestLockVo> list = RequestLockHandlerInterceptor.locksMap.values();
+        Collection<RequestLockVo> list;
+        if (StringUtils.isNotBlank(userId)) {
+            FrequencyLoginUtils.addAuditLog(request, userVo, "list", userId, TIME_NULL);
+            list = frequencyDataBiz.lockByData(userId);
+        } else {
+            list = RequestLockHandlerInterceptor.locksMap.values();
+            FrequencyLoginUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
+        }
+
         boolean isBlankUri = StringUtils.isBlank(lockVo.getRequestUri());
         list = list.stream().filter(f -> isBlankUri || !isBlankUri && f.getRequestUri().contains(lockVo.getRequestUri()))
                 .filter(f -> lockVo.getTime() == 0 || lockVo.getTime() > 0 && f.getTime() == lockVo.getTime())
@@ -202,7 +225,7 @@ public class FrequencyController {
             userId = userIdByCode;
         }
         FrequencyLoginUtils.addAuditLog(request, userVo, operType.getType(), userId, frequency.getTime());
-        String evictKey = FrequencyEvictUtil.freqEvict(frequency, userId, redisTemplate);
+        String evictKey = frequencyDataBiz.freqEvict(frequency, userId);
         return ResultData.success(evictKey);
     }
 
@@ -254,7 +277,7 @@ public class FrequencyController {
             userId = userIdByCode;
         }
         FrequencyLoginUtils.addAuditLog(request, userVo, operType.getType(), userId, timeList.toArray(new Integer[0]));
-        List<String> infoList = FrequencyEvictUtil.freqEvictList(frequency.getName(), timeList, userId, redisTemplate);
+        List<String> infoList = frequencyDataBiz.freqEvictList(frequency.getName(), timeList, userId);
         return ResultData.success(infoList);
     }
 
@@ -272,7 +295,7 @@ public class FrequencyController {
         ValidateUtils.notNull(frequency.getTime(), "time is null");
         ip = "" + RequestUtils.getIpConvertNum(ip);
         FrequencyLoginUtils.addAuditLog(request, userVo, operType.getType(), ip, frequency.getTime());
-        String evictKey = FrequencyEvictUtil.freqIpUserEvict(frequency, ip, redisTemplate);
+        String evictKey = frequencyDataBiz.freqIpUserEvict(frequency, ip);
         return ResultData.success(evictKey);
     }
 
@@ -293,9 +316,7 @@ public class FrequencyController {
             userId = userIdByCode;
         }
         FrequencyLoginUtils.addAuditLog(request, userVo, operType.getType(), userId, frequency.getTime());
-        String evictKey = FrequencyEvictUtil.freqUserIpEvict(frequency, userId, redisTemplate);
+        String evictKey = frequencyDataBiz.freqUserIpEvict(frequency, userId);
         return ResultData.success(evictKey);
     }
-
-
 }

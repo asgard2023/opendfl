@@ -1,8 +1,8 @@
 package org.ccs.opendfl.core.limitfrequency;
 
 
-import org.ccs.opendfl.core.biz.IUserBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
+import org.ccs.opendfl.core.config.RequestLockConfiguration;
 import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.FrequencyException;
@@ -32,17 +32,21 @@ public class FrequencyUtils {
     }
 
 
-    private static IUserBiz userBiz;
     private static FrequencyConfiguration frequencyConfiguration;
-
-    @Autowired
-    public void setUserBiz(IUserBiz userBiz) {
-        FrequencyUtils.userBiz = userBiz;
-    }
+    private static RequestLockConfiguration requestLockConfiguration;
 
     @Autowired
     public void setFrequencyConfiguration(FrequencyConfiguration frequencyConfiguration) {
         FrequencyUtils.frequencyConfiguration = frequencyConfiguration;
+    }
+
+    @Autowired
+    public void setRequestLockConfiguration(RequestLockConfiguration requestLockConfiguration) {
+        FrequencyUtils.requestLockConfiguration = requestLockConfiguration;
+    }
+
+    public static String getRedisKeyLock(String lockName, String dataId) {
+        return requestLockConfiguration.getRedisPrefix() + ":" + lockName + ":" + dataId;
     }
 
 
@@ -50,8 +54,8 @@ public class FrequencyUtils {
      * 频率超限日志，超出部分才记录
      *
      * @param strategyParams
-     * @param limit limitCount, use when not null
-     * @param type limit type
+     * @param limit          limitCount, use when not null
+     * @param type           limit type
      */
     public static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, FreqLimitType type) {
         Integer logTime = frequencyConfiguration.getLimit().getOutLimitLogTime();

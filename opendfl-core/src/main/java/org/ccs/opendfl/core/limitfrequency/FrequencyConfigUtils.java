@@ -3,6 +3,7 @@ package org.ccs.opendfl.core.limitfrequency;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitFrequencyConfigVo;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
+import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.utils.CommUtils;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.vo.FrequencyVo;
@@ -10,31 +11,25 @@ import org.ccs.opendfl.core.vo.RequestVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * @author chenjh
+ */
 @Component
 public class FrequencyConfigUtils {
-    private static Logger logger = LoggerFactory.getLogger(FrequencyConfigUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(FrequencyConfigUtils.class);
 
     private FrequencyConfigUtils() {
 
     }
 
-
-    private static RedisTemplate<String, Object> redisTemplateJson;
     private static FrequencyConfiguration frequencyConfiguration;
-
-    @Resource(name = "redisTemplateJson")
-    public void setRedisTemplate(RedisTemplate<String, Object> redisTemplateJson) {
-        FrequencyConfigUtils.redisTemplateJson = redisTemplateJson;
-    }
 
     @Autowired
     public void setFrequencyConfiguration(FrequencyConfiguration frequencyConfiguration) {
@@ -65,7 +60,7 @@ public class FrequencyConfigUtils {
         String key = frequency.getName() + ":" + frequency.getTime();
         Long time = loadSysconfigTimeMap.get(key);
         FrequencyVo frequencyExist = sysconfigLimitMap.get(key);
-        if (time == null || curTime - time > 10000) {
+        if (time == null || curTime - time > FrequencyConstant.LOAD_CONFIG_INTERVAL) {
             loadSysconfigTimeMap.put(key, curTime);
             FrequencyVo frequencyNew = limitBySysconfig(frequency);
             if (frequencyNew!=null && checkChange(frequencyExist, frequencyNew)) {

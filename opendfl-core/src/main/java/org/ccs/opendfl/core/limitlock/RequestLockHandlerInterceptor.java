@@ -5,8 +5,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.ccs.opendfl.core.config.RequestLockConfiguration;
 import org.ccs.opendfl.core.config.vo.RequestLockConfigVo;
+import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.FrequencyException;
+import org.ccs.opendfl.core.limitfrequency.FrequencyUtils;
 import org.ccs.opendfl.core.utils.RequestParams;
 import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.utils.StringUtils;
@@ -32,7 +34,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * 分布式锁处理
  * 当任务限制，如果同dataId的任务未处理完，后面的不能处理
+ *
+ * @author chenjh
  */
 @Service
 public class RequestLockHandlerInterceptor implements HandlerInterceptor {
@@ -114,7 +119,7 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
                 String ip = RequestUtils.getIpAddress(request);
                 Integer count = counter.incrementAndGet();
                 String rndId = count + "-" + random.nextInt(1000);
-                String redisKey = getRedisKey(reqLimit, dataId);
+                String redisKey = FrequencyUtils.getRedisKeyLock(reqLimit.name(), dataId);
                 boolean isLimit = redisTemplateString.opsForValue().setIfAbsent(redisKey, rndId);
                 if (isLimit) {
                     logger.debug("----preHandle--name={} time={} dataId={}, rndId={}", reqLimit.name(), time, dataId, rndId);
@@ -140,12 +145,18 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
     private static final Map<String, Long> loadSysconfigTimeMap = new ConcurrentHashMap<>();
     private static final Map<String, RequestLockConfigVo> sysconfigLimitMap = new ConcurrentHashMap<>();
 
+
+    /**
+     * 10秒一次，从application-requestlock.yml配置文件读取配置
+     * @param requestLockVo
+     * @param curTime
+     */
     private void loadLockConfig(RequestLockVo requestLockVo, Long curTime) {
         String key = requestLockVo.getName();
         RequestLockConfigVo lockConfigVo = sysconfigLimitMap.get(key);
         //缓存10秒刷一次，以免cloud模式配置有变更
         Long time = loadSysconfigTimeMap.get(key);
-        if (time == null || curTime - time > 10000) {
+        if (time == null || curTime - time > FrequencyConstant.LOAD_CONFIG_INTERVAL) {
             loadSysconfigTimeMap.put(key, curTime);
             List<RequestLockConfigVo> lockConfigVos = requestLockConfiguration.getLockConfigs();
             if(lockConfigVos==null){
@@ -188,7 +199,8 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
             if (rndId != null) {
                 lockRandomId.remove();
             }
-            String redisKey = getRedisKey(reqLimit, dataId);
+
+            String redisKey = FrequencyUtils.getRedisKeyLock(reqLimit.name(), dataId);
             String v = redisTemplateString.opsForValue().get(redisKey);
             logger.debug("----afterCompletion--dataId={} rndId={} v={}", dataId, rndId, v);
             if (StringUtils.equals(rndId, v)) {
@@ -206,10 +218,5 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
         }
         return false;
     }
-
-    private String getRedisKey(RequestLock reqLimit, String dataId) {
-        return requestLockConfiguration.getRedisPrefix() + ":" + reqLimit.name() + ":" + dataId;
-    }
-
 
 }

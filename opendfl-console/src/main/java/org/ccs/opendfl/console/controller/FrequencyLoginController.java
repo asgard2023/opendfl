@@ -84,8 +84,8 @@ public class FrequencyLoginController {
      */
     @PostMapping("/login")
     @ResponseBody
-    @Frequency(time = 5, limit = 4, name = "FrequencyLogin")
-    @Frequency2(time = 3600, limit = 30, name = "FrequencyLogin")
+    @Frequency(time = 5, limit = 4, name = "FrequencyLogin", attrName = "username")
+    @Frequency2(time = 3600, limit = 30, name = "FrequencyLogin", attrName = "username")
     public Object login(UserVo user, @RequestParam(value = "clientIdRsa", required = false) String clientIdRsa, ModelAndView mv, HttpServletRequest request) {
         ValidateUtils.notNull(clientIdRsa, "clientIdRsa is null");
         String username = user.getUsername();
