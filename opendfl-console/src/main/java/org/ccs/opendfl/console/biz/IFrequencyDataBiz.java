@@ -32,7 +32,15 @@ public interface IFrequencyDataBiz {
      * @param data attrName(默认userId)的值
      * @return 删除的Key及数量
      */
-    List<RequestLockVo> lockByData(String data);
+    List<RequestLockVo> requestLocks(String data);
+
+    /**
+     * 删除锁数据
+     * @param name
+     * @param data
+     * @return
+     */
+    String lockEvict(String name, String data);
 
     /**
      * 删除code对应功能的全部限制

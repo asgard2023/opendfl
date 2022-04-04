@@ -88,24 +88,25 @@
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="onEdit()">Edit</a>
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
                onclick="onClear()">Clear list</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="onEvict()">Evict</a>
         </div>
         <table id="dg" class="easyui-datagrid" data-options="onDblClickRow:onDblClick"
                toolbar="#toolbar"
                rownumbers="true" fitColumns="true" singleSelect="true" remoteSort="false">
             <thead>
             <tr>
-                <th field="requestUri" width="50" sortable="true">Request Uri</th>
+                <th field="requestUri" width="70" sortable="true">Request Uri</th>
                 <th field="name" width="50" sortable="true">name</th>
-                <th field="aliasName" width="50" sortable="true">别名</th>
+                <th field="aliasName" width="30" sortable="true">别名</th>
                 <th field="attrName" width="50" sortable="true">attrName(默认userId)</th>
-                <th field="time" width="50" sortable="true">time(秒)</th>
+                <th field="time" width="30" sortable="true">time(秒)</th>
                 <th field="limit" width="30" sortable="true">上限</th>
                 <th field="userIpCount" width="30" sortable="true">userIp</th>
                 <th field="ipUserCount" width="30" sortable="true">ipUser</th>
                 <th field="sysconfig" width="30" sortable="true">动态配置参数</th>
-                <th field="whiteCode" width="50" sortable="true">白名单</th>
-                <th field="errMsg" width="50" sortable="true">errMsg</th>
-                <th field="errMsgEn" width="50" sortable="true">errMsgEn</th>
+                <th field="whiteCode" width="30" sortable="true">白名单</th>
+                <th field="errMsg" width="70" sortable="true">errMsg</th>
+                <th field="errMsgEn" width="40" sortable="true">errMsgEn</th>
                 <th field="createTime" width="60" sortable="true" formatter="timestampFormatDateTime">加载时间</th>
             </tr>
             </thead>
@@ -172,7 +173,7 @@
             </legend>
             <div class="fitem">
                 <label>errMsg:</label>
-                <input name="errMsg" class="easyui-validatebox">
+                <textarea name="errMsg" id="role_remark" style="height:60px;width:250px"></textarea>
             </div>
             <div class="fitem">
                 <label>errMsgEn:</label>
@@ -295,6 +296,106 @@
             }
         });
     }
+
+    function onEvict(){
+        var row = $('#dg').datagrid('getSelected');
+        if(!row){
+            showToastmessage('Error', '请先选中行')
+        }
+        var errMsg=row.errMsg;
+        if(!errMsg){
+            showToastmessage('Error', '选中行无效，请先输入attrValue(userId)值或IP值查询一下');
+            return;
+        }
+        var jsonParam = $('#search-form').serializeJson();
+        if(errMsg.indexOf('limit:')==0 || errMsg.indexOf('userIp:')==0){
+            if(!jsonParam.userId){
+                showToastmessage('Error', 'attrValue(userId)值为空')
+                return;
+            }
+        }
+        else if(errMsg.indexOf('ipUser:')==0){
+            if(!jsonParam.ip){
+                showToastmessage('Error', 'IP值为空')
+                return;
+            }
+        }
+
+
+        if (row){
+            $.messager.confirm('Confirm', '确定要清空当前的数据，以便于再次首次加载吗?', function (r) {
+                if(r){
+                    var errMsg=row.errMsg;
+                    if(errMsg){
+                        if(errMsg.indexOf('limit:')==0){
+                            evict(row.name, row.time, jsonParam.userId)
+                        }
+                        else if(errMsg.indexOf('userIp:')==0){
+                            evictUserIp(row.name, row.time, jsonParam.userId)
+                        }
+                        else if(errMsg.indexOf('ipUser:')==0){
+                            evictIpUser(row.name, row.time, jsonParam.ip)
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    function evictUserIp(name, time, userId){
+        var data={name: name, time: time, userId: userId}
+        var url = '/frequency/evictUserIp';
+        $.ajax({
+            type: "post",
+            headers: {'source': app.source, 'Authorization': app.authorToken()},
+            url: url,
+            data: data,
+            success: function (data) {
+                if (data.success) {
+                    doSearchReload();    // reload the user data
+                } else {
+                    showToastmessage('Error', data.errorMsg)
+                }
+            }
+        });
+    }
+
+    function evictIpUser(name, time, ip){
+        var data={name: name, time: time, ip: ip}
+        var url = '/frequency/evictIpUser';
+        $.ajax({
+            type: "post",
+            headers: {'source': app.source, 'Authorization': app.authorToken()},
+            url: url,
+            data: data,
+            success: function (data) {
+                if (data.success) {
+                    doSearchReload();    // reload the user data
+                } else {
+                    showToastmessage('Error', data.errorMsg)
+                }
+            }
+        });
+    }
+
+    function evict(name, time, userId){
+        var data={name: name, time: time, userId: userId}
+        var url = '/frequency/evict';
+        $.ajax({
+            type: "post",
+            headers: {'source': app.source, 'Authorization': app.authorToken()},
+            url: url,
+            data: data,
+            success: function (data) {
+                if (data.success) {
+                    doSearchReload();    // reload the user data
+                } else {
+                    showToastmessage('Error', data.errorMsg)
+                }
+            }
+        });
+    }
+
 
     function doSearchReload() {
         loadData();

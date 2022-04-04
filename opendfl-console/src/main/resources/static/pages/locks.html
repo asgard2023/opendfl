@@ -85,6 +85,7 @@
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="onEdit()">Edit</a>
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
                onclick="onClear()">Clear list</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="onEvict()">Evict</a>
         </div>
         <table id="dg" class="easyui-datagrid" data-options="onDblClickRow:onDblClick"
                toolbar="#toolbar"
@@ -243,6 +244,43 @@
                         }
                     }
                 });
+            }
+        });
+    }
+
+    function onEvict(){
+        var row = $('#dg').datagrid('getSelected');
+        var jsonParam = $('#search-form').serializeJson();
+        if(!jsonParam.userId){
+            showToastmessage('Error', 'attrValue(userId)值为空')
+            return;
+        }
+        if(!row){
+            showToastmessage('Error', '请先选中行')
+        }
+        if (row){
+            $.messager.confirm('Confirm', '确定要清空当前的数据，以便于再次首次加载吗?', function (r) {
+                if(r){
+                    evictLock(row.name, row.time, jsonParam.userId);
+                }
+            });
+        }
+    }
+
+    function evictLock(name, time, userId){
+        var data={name: name, time: time, userId: userId}
+        var url = '/frequency/lockEvict';
+        $.ajax({
+            type: "post",
+            headers: {'source': app.source, 'Authorization': app.authorToken()},
+            url: url,
+            data: data,
+            success: function (data) {
+                if (data.success) {
+                    doSearchReload();    // reload the user data
+                } else {
+                    showToastmessage('Error', data.errorMsg)
+                }
             }
         });
     }

@@ -196,10 +196,10 @@ public class FrequencyController {
         Collection<RequestLockVo> list;
         if (StringUtils.isNotBlank(userId)) {
             FrequencyLoginUtils.addAuditLog(request, userVo, "list", userId, TIME_NULL);
-            list = frequencyDataBiz.lockByData(userId);
+            list = frequencyDataBiz.requestLocks(userId);
         } else {
-            list = RequestLockHandlerInterceptor.locksMap.values();
             FrequencyLoginUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
+            list = RequestLockHandlerInterceptor.locksMap.values();
         }
 
         boolean isBlankUri = StringUtils.isBlank(lockVo.getRequestUri());
@@ -317,6 +317,25 @@ public class FrequencyController {
         }
         FrequencyLoginUtils.addAuditLog(request, userVo, operType.getType(), userId, frequency.getTime());
         String evictKey = frequencyDataBiz.freqUserIpEvict(frequency, userId);
+        return ResultData.success(evictKey);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/lockEvict", method = {RequestMethod.POST, RequestMethod.GET})
+    public Object lockEvict(HttpServletRequest request, RequestLockVo lockVo) {
+        String token = RequestUtils.getToken(request);
+        UserVo userVo = FrequencyLoginUtils.getUserByToken(token);
+        UserOperType operType = UserOperType.EVICT;
+        checkUserPermission(userVo, operType);
+
+        String userId = request.getParameter(RequestParams.USER_ID);
+
+        String userIdByCode = userBiz.getUserId(userId);
+        if (userIdByCode != null) {
+            userId = userIdByCode;
+        }
+        FrequencyLoginUtils.addAuditLog(request, userVo, operType.getType(), userId, lockVo.getTime());
+        String evictKey = frequencyDataBiz.lockEvict(lockVo.getName(), userId);
         return ResultData.success(evictKey);
     }
 }

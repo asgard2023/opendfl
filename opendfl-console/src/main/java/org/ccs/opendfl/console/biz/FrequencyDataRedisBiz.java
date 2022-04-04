@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -43,12 +45,21 @@ public class FrequencyDataRedisBiz implements IFrequencyDataBiz {
             redisKey = FreqLimitUserCountStrategy.getRedisKey(frequency, account, null);
             isExist = redisTemplate.hasKey(redisKey);
             if (isExist) {
-                tmpList.add(frequency);
-            } else {
+                FrequencyVo copy = frequency.toCopy();
+                long count = redisTemplate.opsForValue().increment(redisKey, 0);
+                Long expireSecond=redisTemplate.getExpire(redisKey);
+                copy.setErrMsg("limit:count="+count+",expireSec="+expireSecond);
+                tmpList.add(copy.toCopy());
+            }
+            else if(frequency.getUserIpCount()>0){
                 redisKey = FreqLimitUserIpStrategy.getRedisKey(frequency, account);
                 isExist = redisTemplate.hasKey(redisKey);
                 if (isExist) {
-                    tmpList.add(frequency);
+                    FrequencyVo copy = frequency.toCopy();
+                    long size = redisTemplate.opsForSet().size(redisKey);
+                    Set values = redisTemplate.opsForSet().members(redisKey);
+                    copy.setErrMsg("userIp:size=" + size + ",values=" + values);
+                    tmpList.add(copy.toCopy());
                 }
             }
         }
@@ -67,10 +78,18 @@ public class FrequencyDataRedisBiz implements IFrequencyDataBiz {
         Collection<FrequencyVo> limits = FrequencyHandlerInterceptor.freqMap.values();
         List<FrequencyVo> tmpList = new ArrayList<>();
         for (FrequencyVo frequency : limits) {
+            if(frequency.getIpUserCount()==0){
+                continue;
+            }
             String redisKey = FreqLimitIpUserStrategy.getRedisKey(frequency, ip);
             boolean isExist = redisTemplate.hasKey(redisKey);
             if (isExist) {
-                tmpList.add(frequency);
+                long size = redisTemplate.opsForSet().size(redisKey);
+                Set values=redisTemplate.opsForSet().members(redisKey);
+                Long expireSecond=redisTemplate.getExpire(redisKey);
+                FrequencyVo copy = frequency.toCopy();
+                copy.setErrMsg("ipUser:size="+size+",expireSec="+expireSecond+",values="+values);
+                tmpList.add(copy.toCopy());
             }
         }
         return tmpList;
@@ -81,17 +100,30 @@ public class FrequencyDataRedisBiz implements IFrequencyDataBiz {
      *
      */
     @Override
-    public List<RequestLockVo> lockByData(String data) {
+    public List<RequestLockVo> requestLocks(String data) {
         Collection<RequestLockVo> limits = RequestLockHandlerInterceptor.locksMap.values();
         List<RequestLockVo> tmpList = new ArrayList<>();
         for (RequestLockVo lockVo : limits) {
             String redisKey = FrequencyUtils.getRedisKeyLock(lockVo.getName(), data);
             boolean isExist = redisTemplate.hasKey(redisKey);
             if (isExist) {
-                tmpList.add(lockVo);
+                long second = redisTemplate.getExpire(redisKey, TimeUnit.SECONDS);
+                RequestLockVo copy=lockVo.toCopy();
+                copy.setErrMsg("lock:expireSec:"+second);
+                tmpList.add(copy);
             }
         }
         return tmpList;
+    }
+
+
+    @Override
+    public String lockEvict(String name, String data){
+        String redisKey = FrequencyUtils.getRedisKeyLock(name, data);
+        long expireSec=redisTemplate.getExpire(redisKey, TimeUnit.SECONDS);
+        log.info("-----lockEvict--redisKey={} expireSec={}", redisKey, expireSec);
+        redisTemplate.delete(redisKey);
+        return name+"="+expireSec;
     }
 
     @Override
@@ -120,8 +152,8 @@ public class FrequencyDataRedisBiz implements IFrequencyDataBiz {
         boolean isExist = redisTemplate.hasKey(key);
         if (isExist) {
             Long count = redisTemplate.opsForValue().increment(key, 0);
+            log.info("----freqEvict--redisKey={} count={}", key, count);
             redisTemplate.delete(key);
-            log.info("----freqEvict--key={} count={}", key, count);
             return key + "=" + count;
         }
         return null;
@@ -139,6 +171,7 @@ public class FrequencyDataRedisBiz implements IFrequencyDataBiz {
             return null;
         }
         long count = redisTemplate.opsForSet().size(redisKey);
+        log.info("----freqIpUserEvict--redisKey={} count={}", redisKey, count);
         redisTemplate.delete(redisKey);
         return redisKey + "=" + count;
     }
@@ -155,6 +188,7 @@ public class FrequencyDataRedisBiz implements IFrequencyDataBiz {
             return null;
         }
         long count = redisTemplate.opsForSet().size(redisKey);
+        log.info("----freqUserIpEvict--redisKey={} count={}", redisKey, count);
         redisTemplate.delete(redisKey);
         return redisKey + "=" + count;
     }
