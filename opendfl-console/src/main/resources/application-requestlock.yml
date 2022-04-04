@@ -3,4 +3,4 @@ requestlock:
   ifActive: '1'
   lockConfigs:
     - name: waitLockTestUser
-      time: 100
+      time: 6
