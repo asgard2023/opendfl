@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FrequencyEvictUtil {
-    static Logger logger = LoggerFactory.getLogger(FrequencyEvictUtil.class);
+    static final Logger logger = LoggerFactory.getLogger(FrequencyEvictUtil.class);
 
     private FrequencyEvictUtil() {
 
@@ -33,7 +33,7 @@ public class FrequencyEvictUtil {
             info = freqUserIpEvict(frequencyVo, account, redisTemplate);
             list.add(info);
         }
-        return list.stream().filter(t -> StringUtils.isNotBlank(t)).collect(Collectors.toList());
+        return list.stream().filter(StringUtils::isNotBlank).collect(Collectors.toList());
     }
 
     /**

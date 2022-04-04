@@ -59,14 +59,14 @@ public class FrequencyController {
         UserVo userVo = FrequencyLoginUtils.getUserByToken(token);
         checkUserPermission(userVo, UserOperType.VIEW);
 
-        String resetFreqMap = request.getParameter("resetRequestMap");
-        if (StringUtils.equals(resetFreqMap, "clearRequest")) {
+        String clearRequestType = request.getParameter("clearRequestType");
+        if (StringUtils.equals(clearRequestType, "clearRequest")) {
             RolePermitVo rolePermitVo = FrequencyLoginUtils.getRolePermit(userVo.getRole());
             if (rolePermitVo.getIfClear() != 1) {
-                FrequencyLoginUtils.addAuditLog(request, userVo, resetFreqMap, "fail", TIME_NULL);
+                FrequencyLoginUtils.addAuditLog(request, userVo, clearRequestType, "fail", TIME_NULL);
                 throw new PermissionDeniedException(INSUFFICIENT_USER_PERMISSIONS);
             }
-            FrequencyLoginUtils.addAuditLog(request, userVo, resetFreqMap, "success", TIME_NULL);
+            FrequencyLoginUtils.addAuditLog(request, userVo, clearRequestType, "success", TIME_NULL);
             FrequencyHandlerInterceptor.requestVoMap.clear();
         }
 
@@ -138,14 +138,14 @@ public class FrequencyController {
         UserVo userVo = FrequencyLoginUtils.getUserByToken(token);
         checkUserPermission(userVo, UserOperType.VIEW);
 
-        String resetFreqMap = request.getParameter("resetFreqMap");
-        if (StringUtils.equals(resetFreqMap, "clearFreq")) {
+        String clearFreqType = request.getParameter("clearFreqType");
+        if (StringUtils.equals(clearFreqType, "clearFreq")) {
             RolePermitVo rolePermitVo = FrequencyLoginUtils.getRolePermit(userVo.getRole());
             if (rolePermitVo.getIfClear() != 1) {
-                FrequencyLoginUtils.addAuditLog(request, userVo, resetFreqMap, "fail", TIME_NULL);
+                FrequencyLoginUtils.addAuditLog(request, userVo, clearFreqType, "fail", TIME_NULL);
                 throw new PermissionDeniedException(INSUFFICIENT_USER_PERMISSIONS);
             }
-            FrequencyLoginUtils.addAuditLog(request, userVo, resetFreqMap, "success", TIME_NULL);
+            FrequencyLoginUtils.addAuditLog(request, userVo, clearFreqType, "success", TIME_NULL);
             FrequencyHandlerInterceptor.freqMap.clear();
         }
 
@@ -166,14 +166,14 @@ public class FrequencyController {
         checkUserPermission(userVo, UserOperType.VIEW);
 
 
-        String resetFreqMap = request.getParameter("resetLockMap");
-        if (StringUtils.equals(resetFreqMap, "clearLock")) {
+        String clearLockType = request.getParameter("clearLockType");
+        if (StringUtils.equals(clearLockType, "clearLock")) {
             RolePermitVo rolePermitVo = FrequencyLoginUtils.getRolePermit(userVo.getRole());
             if (rolePermitVo.getIfClear() != 1) {
-                FrequencyLoginUtils.addAuditLog(request, userVo, resetFreqMap, "fail", TIME_NULL);
+                FrequencyLoginUtils.addAuditLog(request, userVo, clearLockType, "fail", TIME_NULL);
                 throw new PermissionDeniedException(INSUFFICIENT_USER_PERMISSIONS);
             }
-            FrequencyLoginUtils.addAuditLog(request, userVo, resetFreqMap, "success", TIME_NULL);
+            FrequencyLoginUtils.addAuditLog(request, userVo, clearLockType, "success", TIME_NULL);
             RequestLockHandlerInterceptor.locksMap.clear();
         }
 
@@ -215,7 +215,13 @@ public class FrequencyController {
     private void checkUserPermission(UserVo userVo, UserOperType operType) {
         ValidateUtils.notNull(userVo, "token invalid");
         RolePermitVo rolePermitVo = FrequencyLoginUtils.getRolePermit(userVo.getRole());
+        if (UserOperType.VIEW == operType && rolePermitVo.getIfView() != 1) {
+            throw new PermissionDeniedException(INSUFFICIENT_USER_PERMISSIONS);
+        }
         if (UserOperType.EVICT == operType && rolePermitVo.getIfEvict() != 1) {
+            throw new PermissionDeniedException(INSUFFICIENT_USER_PERMISSIONS);
+        }
+        if (UserOperType.CLEAR == operType && rolePermitVo.getIfClear() != 1) {
             throw new PermissionDeniedException(INSUFFICIENT_USER_PERMISSIONS);
         }
     }

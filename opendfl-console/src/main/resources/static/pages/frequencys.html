@@ -231,7 +231,7 @@
         var jsonParam = $('#search-form').serializeJson();
         var url = '/frequency/limits';
         $.ajax({
-            method: 'get',
+            method: 'post',
             url: url,
             data: jsonParam,
             headers: {'source': app.source, 'Authorization': app.authorToken()},
@@ -270,7 +270,7 @@
     function onClear() {
         $.messager.confirm('Confirm', '确定要清空当前的数据，以便于再次首次加载吗?', function (r) {
             if (r) {
-                var url = '/frequency/limits?resetFreqMap=clearFreq';
+                var url = '/frequency/limits?clearFreqType=clearFreq';
                 $.ajax({
                     type: "post",
                     headers: {'source': app.source, 'Authorization': app.authorToken()},
