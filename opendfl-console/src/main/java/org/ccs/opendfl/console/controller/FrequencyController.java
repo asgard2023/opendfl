@@ -3,6 +3,7 @@ package org.ccs.opendfl.console.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.console.config.vo.RolePermitVo;
 import org.ccs.opendfl.console.config.vo.UserVo;
+import org.ccs.opendfl.console.constant.UserOperType;
 import org.ccs.opendfl.console.utils.FrequencyLoginUtils;
 import org.ccs.opendfl.core.biz.IUserBiz;
 import org.ccs.opendfl.core.exception.PermissionDeniedException;
@@ -53,17 +54,14 @@ public class FrequencyController {
 
     @ResponseBody
     @RequestMapping(value = "/requests", method = {RequestMethod.POST, RequestMethod.GET})
-    public Object requests(HttpServletRequest request) {
+    public Object requests(HttpServletRequest request, RequestVo requestVo) {
         String token = RequestUtils.getToken(request);
         UserVo userVo = FrequencyLoginUtils.getUserByToken(token);
-        ValidateUtils.notNull(userVo, "token invalid");
-        RolePermitVo rolePermitVo = FrequencyLoginUtils.getRolePermit(userVo.getRole());
-        if (rolePermitVo.getIfView() != 1) {
-            throw new PermissionDeniedException(INSUFFICIENT_USER_PERMISSIONS);
-        }
+        checkUserPermission(userVo, UserOperType.VIEW);
 
         String resetFreqMap = request.getParameter("resetRequestMap");
         if (StringUtils.equals(resetFreqMap, "clearRequest")) {
+            RolePermitVo rolePermitVo = FrequencyLoginUtils.getRolePermit(userVo.getRole());
             if (rolePermitVo.getIfClear() != 1) {
                 FrequencyLoginUtils.addAuditLog(request, userVo, resetFreqMap, "fail", TIME_NULL);
                 throw new PermissionDeniedException(INSUFFICIENT_USER_PERMISSIONS);
@@ -74,46 +72,30 @@ public class FrequencyController {
 
         FrequencyLoginUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
         Collection<RequestVo> list = FrequencyHandlerInterceptor.requestVoMap.values();
-        List<RequestShowVo> showList = toRequestShowList(list);
+        List<RequestShowVo> showList = toRequestShowList(list, requestVo);
         return ResultData.success(showList);
     }
 
-    private List<RequestShowVo> toRequestShowList(Collection<RequestVo> list) {
+    private List<RequestShowVo> toRequestShowList(Collection<RequestVo> list, RequestVo requestVo) {
         List<RequestShowVo> showList = new ArrayList<>(list.size());
         Collection<FrequencyVo> frequencyList = FrequencyHandlerInterceptor.freqMap.values();
-        final  Collection<FrequencyVo> frequencyListSorted  = frequencyList.stream()
+        final Collection<FrequencyVo> frequencyListSorted = frequencyList.stream()
                 .sorted(Comparator.comparing(FrequencyVo::getName).thenComparing(FrequencyVo::getTime)).collect(Collectors.toList());
         Collection<RequestLockVo> lockList = RequestLockHandlerInterceptor.locksMap.values();
         list.forEach(t -> {
+            if (StringUtils.isNotBlank(requestVo.getRequestUri()) && !t.getRequestUri().contains(requestVo.getRequestUri())) {
+                return;
+            }
+            if (StringUtils.isNotBlank(requestVo.getMethod()) && !StringUtils.equals(t.getMethod(), requestVo.getMethod())) {
+                return;
+            }
             RequestShowVo showVo = new RequestShowVo();
             BeanUtils.copyProperties(t, showVo);
             StringBuilder limitTypes = new StringBuilder();
             StringBuilder attrNames = new StringBuilder();
-            List<FrequencyVo> tmpList = new ArrayList<>();
-            for (FrequencyVo freq : frequencyListSorted) {
-                if (StringUtils.equals(t.getRequestUri(), freq.getRequestUri())) {
-                    tmpList.add(freq);
-                    limitTypes.append(freq.getLimitType()).append(",");
-                    if(StringUtils.isNotBlank(freq.getAttrName()) && attrNames.indexOf(freq.getAttrName()+",")<0){
-                        attrNames.append(freq.getAttrName()).append(",");
-                    }
-                }
-            }
-            showVo.setLimitFrequencys(tmpList);
-
-            List<RequestLockVo> tmpLockList = new ArrayList<>();
-            for (RequestLockVo lock : lockList) {
-                if (StringUtils.equals(t.getRequestUri(), lock.getRequestUri())) {
-                    tmpLockList.add(lock);
-                    limitTypes.append("lock");
-                    if(StringUtils.isNotBlank(lock.getAttrName()) && attrNames.indexOf(lock.getAttrName()+",")<0){
-                        attrNames.append(lock.getAttrName()).append(",");
-                    }
-                }
-
-            }
+            relFrequencys(frequencyListSorted, t, showVo, limitTypes, attrNames);
+            relLocks(lockList, t, showVo, limitTypes, attrNames);
             showVo.setAttrName(CommUtils.removeEndComma(attrNames.toString()));
-            showVo.setLocks(tmpLockList);
             String limitTypeStr = CommUtils.removeEndComma(limitTypes.toString());
             showVo.setLimitTypes(limitTypeStr);
             showList.add(showVo);
@@ -121,19 +103,44 @@ public class FrequencyController {
         return showList;
     }
 
+    private void relLocks(Collection<RequestLockVo> lockList, RequestVo t, RequestShowVo showVo, StringBuilder limitTypes, StringBuilder attrNames) {
+        List<RequestLockVo> tmpLockList = new ArrayList<>();
+        for (RequestLockVo lock : lockList) {
+            if (StringUtils.equals(t.getRequestUri(), lock.getRequestUri())) {
+                tmpLockList.add(lock);
+                limitTypes.append("lock");
+                if (StringUtils.isNotBlank(lock.getAttrName()) && attrNames.indexOf(lock.getAttrName() + ",") < 0) {
+                    attrNames.append(lock.getAttrName()).append(",");
+                }
+            }
+        }
+        showVo.setLocks(tmpLockList);
+    }
+
+    private void relFrequencys(Collection<FrequencyVo> frequencyListSorted, RequestVo t, RequestShowVo showVo, StringBuilder limitTypes, StringBuilder attrNames) {
+        List<FrequencyVo> tmpList = new ArrayList<>();
+        for (FrequencyVo freq : frequencyListSorted) {
+            if (StringUtils.equals(t.getRequestUri(), freq.getRequestUri())) {
+                tmpList.add(freq);
+                limitTypes.append(freq.getLimitType()).append(",");
+                if (StringUtils.isNotBlank(freq.getAttrName()) && attrNames.indexOf(freq.getAttrName() + ",") < 0) {
+                    attrNames.append(freq.getAttrName()).append(",");
+                }
+            }
+        }
+        showVo.setLimitFrequencys(tmpList);
+    }
+
     @ResponseBody
     @RequestMapping(value = "/limits", method = {RequestMethod.POST, RequestMethod.GET})
-    public Object limits(HttpServletRequest request) {
+    public Object limits(HttpServletRequest request, FrequencyVo frequency) {
         String token = RequestUtils.getToken(request);
         UserVo userVo = FrequencyLoginUtils.getUserByToken(token);
-        ValidateUtils.notNull(userVo, "token invalid");
-        RolePermitVo rolePermitVo = FrequencyLoginUtils.getRolePermit(userVo.getRole());
-        if (rolePermitVo.getIfView() != 1) {
-            throw new PermissionDeniedException(INSUFFICIENT_USER_PERMISSIONS);
-        }
+        checkUserPermission(userVo, UserOperType.VIEW);
 
         String resetFreqMap = request.getParameter("resetFreqMap");
         if (StringUtils.equals(resetFreqMap, "clearFreq")) {
+            RolePermitVo rolePermitVo = FrequencyLoginUtils.getRolePermit(userVo.getRole());
             if (rolePermitVo.getIfClear() != 1) {
                 FrequencyLoginUtils.addAuditLog(request, userVo, resetFreqMap, "fail", TIME_NULL);
                 throw new PermissionDeniedException(INSUFFICIENT_USER_PERMISSIONS);
@@ -144,23 +151,24 @@ public class FrequencyController {
 
         FrequencyLoginUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
         Collection<FrequencyVo> list = FrequencyHandlerInterceptor.freqMap.values();
+        boolean isBlankUri = StringUtils.isBlank(frequency.getRequestUri());
+        list = list.stream().filter(f -> isBlankUri || !isBlankUri && f.getRequestUri().contains(frequency.getRequestUri()))
+                .filter(f -> frequency.getTime() == 0 || frequency.getTime() > 0 && f.getTime() == frequency.getTime())
+                .collect(Collectors.toList());
         return ResultData.success(list);
     }
 
     @ResponseBody
     @RequestMapping(value = "/locks", method = {RequestMethod.POST, RequestMethod.GET})
-    public Object locks(HttpServletRequest request) {
+    public Object locks(HttpServletRequest request, RequestLockVo lockVo) {
         String token = RequestUtils.getToken(request);
         UserVo userVo = FrequencyLoginUtils.getUserByToken(token);
-        ValidateUtils.notNull(userVo, "token invalid");
-        RolePermitVo rolePermitVo = FrequencyLoginUtils.getRolePermit(userVo.getRole());
-        if (rolePermitVo.getIfView() != 1) {
-            throw new PermissionDeniedException(INSUFFICIENT_USER_PERMISSIONS);
-        }
+        checkUserPermission(userVo, UserOperType.VIEW);
 
 
         String resetFreqMap = request.getParameter("resetLockMap");
         if (StringUtils.equals(resetFreqMap, "clearLock")) {
+            RolePermitVo rolePermitVo = FrequencyLoginUtils.getRolePermit(userVo.getRole());
             if (rolePermitVo.getIfClear() != 1) {
                 FrequencyLoginUtils.addAuditLog(request, userVo, resetFreqMap, "fail", TIME_NULL);
                 throw new PermissionDeniedException(INSUFFICIENT_USER_PERMISSIONS);
@@ -171,6 +179,10 @@ public class FrequencyController {
 
         FrequencyLoginUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
         Collection<RequestLockVo> list = RequestLockHandlerInterceptor.locksMap.values();
+        boolean isBlankUri = StringUtils.isBlank(lockVo.getRequestUri());
+        list = list.stream().filter(f -> isBlankUri || !isBlankUri && f.getRequestUri().contains(lockVo.getRequestUri()))
+                .filter(f -> lockVo.getTime() == 0 || lockVo.getTime() > 0 && f.getTime() == lockVo.getTime())
+                .collect(Collectors.toList());
         return ResultData.success(list);
     }
 
@@ -179,24 +191,33 @@ public class FrequencyController {
     public Object evict(HttpServletRequest request, FrequencyVo frequency) {
         String token = RequestUtils.getToken(request);
         UserVo userVo = FrequencyLoginUtils.getUserByToken(token);
-        ValidateUtils.notNull(userVo, "token invalid");
-        RolePermitVo rolePermitVo = FrequencyLoginUtils.getRolePermit(userVo.getRole());
-        if (rolePermitVo.getIfEvict() != 1) {
-            throw new PermissionDeniedException(INSUFFICIENT_USER_PERMISSIONS);
-        }
+        UserOperType operType = UserOperType.EVICT;
+        checkUserPermission(userVo, operType);
 
         String userId = request.getParameter(RequestParams.USER_ID);
-        ValidateUtils.notNull(frequency.getName(), "name is null");
-        ValidateUtils.notNull(frequency.getTime(), "time is null");
-        ValidateUtils.notNull(userId, "userId is null");
+        checkInputFrequency(frequency, userId);
 
         String userIdByCode = userBiz.getUserId(userId);
         if (userIdByCode != null) {
             userId = userIdByCode;
         }
-        FrequencyLoginUtils.addAuditLog(request, userVo, "evict", userId, frequency.getTime());
+        FrequencyLoginUtils.addAuditLog(request, userVo, operType.getType(), userId, frequency.getTime());
         String evictKey = FrequencyEvictUtil.freqEvict(frequency, userId, redisTemplate);
         return ResultData.success(evictKey);
+    }
+
+    private void checkInputFrequency(FrequencyVo frequency, String userId) {
+        ValidateUtils.notNull(frequency.getName(), "name is null");
+        ValidateUtils.notNull(frequency.getTime(), "time is null");
+        ValidateUtils.notNull(userId, "userId is null");
+    }
+
+    private void checkUserPermission(UserVo userVo, UserOperType operType) {
+        ValidateUtils.notNull(userVo, "token invalid");
+        RolePermitVo rolePermitVo = FrequencyLoginUtils.getRolePermit(userVo.getRole());
+        if (UserOperType.EVICT == operType && rolePermitVo.getIfEvict() != 1) {
+            throw new PermissionDeniedException(INSUFFICIENT_USER_PERMISSIONS);
+        }
     }
 
     @ResponseBody
@@ -204,11 +225,8 @@ public class FrequencyController {
     public Object evictTimes(HttpServletRequest request, FrequencyVo frequency) {
         String token = RequestUtils.getToken(request);
         UserVo userVo = FrequencyLoginUtils.getUserByToken(token);
-        ValidateUtils.notNull(userVo, "token invalid");
-        RolePermitVo rolePermitVo = FrequencyLoginUtils.getRolePermit(userVo.getRole());
-        if (rolePermitVo.getIfEvict() != 1) {
-            throw new PermissionDeniedException(INSUFFICIENT_USER_PERMISSIONS);
-        }
+        UserOperType operType = UserOperType.EVICT;
+        checkUserPermission(userVo, operType);
 
         String times = request.getParameter("times");
         String userId = request.getParameter(RequestParams.USER_ID);
@@ -229,7 +247,7 @@ public class FrequencyController {
         if (userIdByCode != null) {
             userId = userIdByCode;
         }
-        FrequencyLoginUtils.addAuditLog(request, userVo, "evict", userId, timeList.toArray(new Integer[0]));
+        FrequencyLoginUtils.addAuditLog(request, userVo, operType.getType(), userId, timeList.toArray(new Integer[0]));
         List<String> infoList = FrequencyEvictUtil.freqEvictList(frequency.getName(), timeList, userId, redisTemplate);
         return ResultData.success(infoList);
     }
@@ -239,18 +257,15 @@ public class FrequencyController {
     public Object evictIpUser(HttpServletRequest request, FrequencyVo frequency) {
         String token = RequestUtils.getToken(request);
         UserVo userVo = FrequencyLoginUtils.getUserByToken(token);
-        ValidateUtils.notNull(userVo, "token invalid");
-        RolePermitVo rolePermitVo = FrequencyLoginUtils.getRolePermit(userVo.getRole());
-        if (rolePermitVo.getIfEvict() != 1) {
-            throw new PermissionDeniedException(INSUFFICIENT_USER_PERMISSIONS);
-        }
+        UserOperType operType = UserOperType.EVICT;
+        checkUserPermission(userVo, operType);
 
         String ip = request.getParameter("ip");
         ValidateUtils.notNull(ip, "ip is null");
         ValidateUtils.notNull(frequency.getName(), "name is null");
         ValidateUtils.notNull(frequency.getTime(), "time is null");
         ip = "" + RequestUtils.getIpConvertNum(ip);
-        FrequencyLoginUtils.addAuditLog(request, userVo, "evict", ip, frequency.getTime());
+        FrequencyLoginUtils.addAuditLog(request, userVo, operType.getType(), ip, frequency.getTime());
         String evictKey = FrequencyEvictUtil.freqIpUserEvict(frequency, ip, redisTemplate);
         return ResultData.success(evictKey);
     }
@@ -261,22 +276,17 @@ public class FrequencyController {
     public Object evictUserIp(HttpServletRequest request, FrequencyVo frequency) {
         String token = RequestUtils.getToken(request);
         UserVo userVo = FrequencyLoginUtils.getUserByToken(token);
-        ValidateUtils.notNull(userVo, "token invalid");
-        RolePermitVo rolePermitVo = FrequencyLoginUtils.getRolePermit(userVo.getRole());
-        if (rolePermitVo.getIfEvict() != 1) {
-            throw new PermissionDeniedException(INSUFFICIENT_USER_PERMISSIONS);
-        }
+        UserOperType operType = UserOperType.EVICT;
+        checkUserPermission(userVo, operType);
 
         String userId = request.getParameter(RequestParams.USER_ID);
-        ValidateUtils.notNull(frequency.getName(), "name is null");
-        ValidateUtils.notNull(frequency.getTime(), "time is null");
-        ValidateUtils.notNull(userId, "userId is null");
+        checkInputFrequency(frequency, userId);
 
         String userIdByCode = userBiz.getUserId(userId);
         if (userIdByCode != null) {
             userId = userIdByCode;
         }
-        FrequencyLoginUtils.addAuditLog(request, userVo, "evict", userId, frequency.getTime());
+        FrequencyLoginUtils.addAuditLog(request, userVo, operType.getType(), userId, frequency.getTime());
         String evictKey = FrequencyEvictUtil.freqUserIpEvict(frequency, userId, redisTemplate);
         return ResultData.success(evictKey);
     }

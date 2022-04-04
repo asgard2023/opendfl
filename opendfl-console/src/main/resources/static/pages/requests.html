@@ -6,10 +6,10 @@
     <script type="text/javascript" src="../scripts/lib/easyui1.7.0/jquery.min.js"></script>
     <script type="text/javascript" src="../scripts/lib/easyui1.7.0/jquery.easyui.min.js"></script>
     <script type="text/javascript" src="../scripts/lib/easyui1.7.0/easyui.comm.valid.js"></script>
+    <script type="text/javascript" src="../scripts/lib/easyui1.7.0/locale/easyui-lang-zh_CN.js"></script>
     <script type="text/javascript" src="../scripts/lib/easyui.grid.hide.js"></script>
     <script type="text/javascript" src="../scripts/lib/Common.js"></script>
     <script type="text/javascript" src="../scripts/lib/DateUtils.js"></script>
-    <script type="text/javascript" src="../scripts/lib/easyui1.7.0/locale/easyui-lang-zh_CN.js"></script>
     <link rel="stylesheet" type="text/css" href="../scripts/lib/easyui1.7.0/themes/bootstrap/easyui.css">
     <link rel="stylesheet" type="text/css" href="../scripts/lib/easyui1.7.0/themes/icon.css">
 
@@ -33,7 +33,7 @@
 
         .fitem label {
             display: inline-block;
-            width: 120px;
+            width: 100px;
         }
 
         .input_query {
@@ -41,7 +41,7 @@
         }
 
         input, textarea {
-            width: 160px;
+            width: 250px;
             border: 1px solid #ccc;
             padding: 2px;
         }
@@ -57,12 +57,12 @@
             <table class="search-table">
                 <tr>
                     <td>
-                        time(秒):
-                        <input type="text" class="input_query" name="time" id="query_time"/>
+                        Request Uri:
+                        <input type="text" class="input_query" name="requestUri" id="query_requestUri"/>
                     </td>
                     <td>
-                        name:
-                        <input type="text" class="input_query" name="name" id="query_name"/>
+                        method:
+                        <input type="text" class="input_query" name="method" id="query_method"/>
                     </td>
                     <td>
                         <a class="easyui-linkbutton"
@@ -101,7 +101,7 @@
     </div>
 </div>
 
-<div id="dlg" class="easyui-dialog" style="width:450px;height:600px;padding:5px 10px;display:none"
+<div id="dlg" class="easyui-dialog" style="width:500px;height:600px;padding:5px 10px;display:none"
      closed="true" buttons="#dlg-buttons">
     <form id="fm" method="post" novalidate>
         <div class="fitem">
@@ -228,10 +228,12 @@
     }
 
     function loadData() {
+        var jsonParam = $('#search-form').serializeJson();
         var url = '/frequency/requests';
         $.ajax({
             method: 'get',
             url: url,
+            data: jsonParam,
             headers: {'source': app.source, 'Authorization': app.authorToken()},
             dataType: 'json',
             success: function (data) {

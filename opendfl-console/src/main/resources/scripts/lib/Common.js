@@ -102,3 +102,41 @@ function showToastmessage(title, msg){
         showType: 'slide'
     });
 }
+
+
+/**
+ * easyui支持serializeJson
+ */
+if(typeof jQuery != 'undefined'){
+    (function(){
+        if (!window.WebUtil)
+            WebUtil = {};
+    })();
+    WebUtil.form = {
+        serializeJson : function(frm){
+            var json = {};
+            frm = frm || $('body');
+            if (!frm) {
+                return json;
+            }
+            var inputs = frm.find('input[type!=button][type!=reset][type!=submit][type!=image],select,textarea');
+            if (!inputs) {
+                return json;
+            }
+            for (var index = 0; index < inputs.length; index++) {
+                var input = $(inputs[index]);
+                var name = input.attr('name');
+                var value = input.val();
+                if (name != null && $.trim(name) != '' && value != null && $.trim(value) != '') {
+                    json[name] = value;
+                }
+            }
+            return json;
+        }
+    };
+    (function($){
+        $.fn.serializeJson = function(){
+            return WebUtil.form.serializeJson($(this));
+        };
+    }(jQuery));
+}

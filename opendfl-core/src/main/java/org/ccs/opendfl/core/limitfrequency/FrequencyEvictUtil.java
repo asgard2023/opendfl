@@ -4,6 +4,7 @@ package org.ccs.opendfl.core.limitfrequency;
 import org.ccs.opendfl.core.strategy.limits.impl.FreqLimitIpUserStrategy;
 import org.ccs.opendfl.core.strategy.limits.impl.FreqLimitUserCountStrategy;
 import org.ccs.opendfl.core.strategy.limits.impl.FreqLimitUserIpStrategy;
+import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,7 @@ public class FrequencyEvictUtil {
 
     }
 
-    public static List<String> freqEvictList(String code, List<Integer> timeList, String account, RedisTemplate redisTemplate) {
+    public static List<String> freqEvictList(String code, List<Integer> timeList, String account, RedisTemplate<String, Object> redisTemplate) {
         List<String> list = new ArrayList<>();
         FrequencyVo frequencyVo = new FrequencyVo();
         String info = null;
@@ -32,15 +33,14 @@ public class FrequencyEvictUtil {
             info = freqUserIpEvict(frequencyVo, account, redisTemplate);
             list.add(info);
         }
-        return list.stream().filter(t -> t != null).collect(Collectors.toList());
+        return list.stream().filter(t -> StringUtils.isNotBlank(t)).collect(Collectors.toList());
     }
 
     /**
      * 重置用户频率限制次数
      *
-     * @param frequency
-     * @param account
-     * @param redisTemplate
+     * @param frequency 对应的频限制
+     * @param account userId或account等
      */
     public static String freqEvict(FrequencyVo frequency, String account, RedisTemplate<String, Object> redisTemplate) {
         String key = FreqLimitUserCountStrategy.getRedisKey(frequency, account, null);
@@ -57,10 +57,9 @@ public class FrequencyEvictUtil {
     /**
      * 重置同一用户多个IP登入限制
      *
-     * @param frequency
-     * @param account
-     * @param redisTemplate
-     * @return
+     * @param frequency 对应的频限制
+     * @param account userId或account等
+     * @return 删除的Key及数量
      */
     public static String freqIpUserEvict(FrequencyVo frequency, String account, RedisTemplate<String, Object> redisTemplate) {
         String redisKey = FreqLimitIpUserStrategy.getRedisKey(frequency, account);
@@ -76,10 +75,9 @@ public class FrequencyEvictUtil {
     /**
      * 重置同一用户多个IP登入限制
      *
-     * @param frequency
-     * @param account
-     * @param redisTemplate
-     * @return
+     * @param frequency 对应的频限制
+     * @param account userId或account等
+     * @return 删除的Key及数量
      */
     public static String freqUserIpEvict(FrequencyVo frequency, String account, RedisTemplate<String, Object> redisTemplate) {
         String redisKey = FreqLimitUserIpStrategy.getRedisKey(frequency, account);
