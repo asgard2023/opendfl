@@ -1,12 +1,10 @@
 package org.ccs.opendfl.core.utils;
 
 
-
+import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.FailedException;
 import org.ccs.opendfl.core.exception.ParamErrorException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
@@ -20,12 +18,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+@Slf4j
 public class RequestUtils {
     private RequestUtils() {
 
     }
-
-    static Logger logger = LoggerFactory.getLogger(RequestUtils.class);
 
 
     public static final String DEFAULT_PARAM_NAME = "reqParams";
@@ -122,21 +119,21 @@ public class RequestUtils {
             }
             return body;
         } catch (IOException e) {
-            logger.error("----getRequestParams-io-error={}", e.getMessage(), e);
+            log.error("----getRequestParams-io-error={}", e.getMessage(), e);
             throw new ParamErrorException(e.getMessage());
         } finally {
             if (br != null) {
                 try {
                     br.close();
                 } catch (IOException e) {
-                    logger.error("----getRequestParams-br-error={}", e.getMessage());
+                    log.error("----getRequestParams-br-error={}", e.getMessage());
                 }
             }
             if (isr != null) {
                 try {
                     isr.close();
                 } catch (IOException e) {
-                    logger.error("----getRequestParams-isr-error={}", e.getMessage());
+                    log.error("----getRequestParams-isr-error={}", e.getMessage());
                 }
             }
         }
@@ -213,7 +210,12 @@ public class RequestUtils {
         if ("127.0.0.1".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip)) {
             ip = "localhost";
         }
-        ip = getIpFirst(ip);
+        else {
+            ip = getIpFirst(ip);
+            if (!isIpAddress(ip)) {
+                ip = request.getRemoteAddr();
+            }
+        }
         return ip;
     }
 
@@ -304,11 +306,36 @@ public class RequestUtils {
 
     public static boolean isIpv6Address(String address) {
         try {
+            if (checkIpLength(address)) {
+                return false;
+            }
             final InetAddress inetAddress = InetAddress.getByName(address);
             return inetAddress instanceof Inet6Address;
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            log.warn("----isIpv6Address--address={}", address);
             return false;
         }
+    }
+
+    public static boolean isIpAddress(String address) {
+        try {
+            if (checkIpLength(address)) {
+                return false;
+            }
+            final InetAddress inetAddress = InetAddress.getByName(address);
+            return inetAddress instanceof Inet6Address||inetAddress instanceof InetAddress;
+        } catch (UnknownHostException e) {
+            log.warn("----isIpAddress--address={}", address);
+            return false;
+        }
+    }
+
+    private static boolean checkIpLength(String address) {
+        int length = address.length();
+        if(length<8 || length>48){
+            log.warn("----checkIpLength--address={} length={} invalid", address, length);
+            return true;
+        }
+        return false;
     }
 }
