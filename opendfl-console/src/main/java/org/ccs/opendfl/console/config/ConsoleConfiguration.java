@@ -6,14 +6,16 @@ import org.ccs.opendfl.console.config.vo.UserVo;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 控制台管理配置信息
  * 角色，用户，权限
+ *
+ * @author chenjh
  */
 @Configuration
 @ConfigurationProperties(prefix = "console")
@@ -23,6 +25,10 @@ public class ConsoleConfiguration {
     private String redisPrefix;
     private Character ifConsole='0';
     private String consoleWhiteIp="none";
+    /**
+     * token有效期1小时
+     */
+    private Integer tokenExpire=3600;
     private List<RolePermitVo> rolePermits;
     private List<UserVo> users;
 
@@ -41,10 +47,10 @@ public class ConsoleConfiguration {
     /**
      * 角色权限表
      * 如果系统完全没配，自动用默认配置
-     * @return
+     * @return 配置的所有角色权限表
      */
     public List<RolePermitVo> getRolePermitResults() {
-        if(rolePermits==null||rolePermits.size()==0){
+        if(CollectionUtils.isEmpty(rolePermits)){
             return defaultRolePermitList;
         }
         return rolePermits;
@@ -53,10 +59,10 @@ public class ConsoleConfiguration {
     /**
      * 用户表
      * 如果完全没配用户，自动用默认用户
-     * @return
+     * @return 配置的所有用户
      */
     public List<UserVo> getUserResults() {
-        if(users==null||users.size()==0){
+        if(CollectionUtils.isEmpty(users)){
             return defaultUserList;
         }
         return users;

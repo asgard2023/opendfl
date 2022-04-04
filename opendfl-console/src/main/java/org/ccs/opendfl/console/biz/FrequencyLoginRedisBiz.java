@@ -1,47 +1,37 @@
-package org.ccs.opendfl.console.utils;
-
+package org.ccs.opendfl.console.biz;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.console.config.ConsoleConfiguration;
 import org.ccs.opendfl.console.config.vo.RolePermitVo;
 import org.ccs.opendfl.console.config.vo.UserVo;
 import org.ccs.opendfl.core.exception.FailedException;
-import org.ccs.opendfl.core.utils.CommUtils;
-import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.utils.ValidateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 用户登入，token查询
+ *
+ * @author chenjh
+ */
+@Service(value = "frequencyLoginRedisBiz")
 @Slf4j
-@Component
-public class FrequencyLoginUtils {
-    private FrequencyLoginUtils() {
-
-    }
-
-    private static RedisTemplate<String, Object> redisTemplateJson;
-    private static ConsoleConfiguration consoleConfiguration;
-
-    @Resource(name = "redisTemplateJson")
-    public void setRedisTemplate(RedisTemplate<String, Object> redisTemplateJson) {
-        FrequencyLoginUtils.redisTemplateJson = redisTemplateJson;
-    }
-
+public class FrequencyLoginRedisBiz implements IFrequencyLoginBiz {
     @Autowired
-    public void setConsoleConfiguration(ConsoleConfiguration consoleConfiguration) {
-        FrequencyLoginUtils.consoleConfiguration = consoleConfiguration;
-    }
+    private RedisTemplate<String, Object> redisTemplateJson;
+    @Autowired
+    private ConsoleConfiguration consoleConfiguration;
+    public static final String REDIS_FREQUENCY_LOGIN_TOKEN = "freqLoginToken:";
 
-
-    public static UserVo loginUser(String username, String pwd) {
+    @Override
+    public UserVo loginUser(String username, String pwd) {
         if (!StringUtils.ifYes(consoleConfiguration.getIfConsole())) {
+            log.warn("-----loginUser--ifConsole={}", consoleConfiguration.getIfConsole());
             throw new FailedException("console close");
         }
         List<UserVo> users = consoleConfiguration.getUserResults();
@@ -56,6 +46,7 @@ public class FrequencyLoginUtils {
             throw new FailedException("invalid username or password");
         }
 
+        log.warn("-----loginUser--username={}", username);
         RolePermitVo rolePermitVo = getRolePermit(userVo.getRole());
         if (rolePermitVo == null) {
             throw new FailedException("Role not found");
@@ -63,26 +54,29 @@ public class FrequencyLoginUtils {
         return userVo.clone();
     }
 
-    public static final String REDIS_FREQUENCY_LOGIN_TOKEN = "freqLoginToken:";
-
-    public static UserVo getUserByToken(String token) {
+    @Override
+    public UserVo getUserByToken(String token) {
         ValidateUtils.notNull(token, "token is null");
         return (UserVo) redisTemplateJson.opsForValue().get(REDIS_FREQUENCY_LOGIN_TOKEN + token);
     }
 
-    public static void setUserByToken(String token, UserVo loginedUser) {
+    @Override
+    public void saveUserByToken(String token, UserVo loginedUser) {
         ValidateUtils.notNull(token, "token is null");
-        String redisKey = FrequencyLoginUtils.REDIS_FREQUENCY_LOGIN_TOKEN + token;
-        redisTemplateJson.opsForValue().set(redisKey, loginedUser, 1, TimeUnit.HOURS);
+        ValidateUtils.notNull(loginedUser, "user is null");
+        String redisKey = REDIS_FREQUENCY_LOGIN_TOKEN + token;
+        redisTemplateJson.opsForValue().set(redisKey, loginedUser, consoleConfiguration.getTokenExpire(), TimeUnit.SECONDS);
     }
 
-    public static RolePermitVo getUserPermitByToken(String token) {
+    @Override
+    public RolePermitVo getUserPermitByToken(String token) {
         UserVo userVo = getUserByToken(token);
         ValidateUtils.notNull(userVo, "token invalid");
         return getRolePermit(userVo.getRole());
     }
 
-    public static RolePermitVo getRolePermit(String roleCode) {
+    @Override
+    public RolePermitVo getRolePermit(String roleCode) {
         List<RolePermitVo> roles = consoleConfiguration.getRolePermitResults();
         RolePermitVo rolePermitVo = null;
         for (RolePermitVo role : roles) {
@@ -92,21 +86,5 @@ public class FrequencyLoginUtils {
             }
         }
         return rolePermitVo;
-    }
-
-    /**
-     * 审计日志，记录console的操作记录
-     *
-     * @param request
-     * @param user
-     * @param operType
-     * @param attrData
-     * @param times
-     */
-    public static void addAuditLog(HttpServletRequest request, UserVo user, String operType, String attrData, Integer... times) {
-        String uri = RequestUtils.getRequestUri(request);
-        String timeStr = CommUtils.concat(",", times);
-        log.info("----auditLog--uri={} operType={} user={} role={} time={} attrData={}"
-                , uri, operType, user.getUsername(), user.getRole(), timeStr, attrData);
     }
 }

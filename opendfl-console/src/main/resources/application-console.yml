@@ -1,6 +1,7 @@
 console:
   redisPrefix: 'freqConsole'
   ifConsole: '1'
+  tokenExpire: 3600
   consoleWhiteIp: none
   rolePermits:
     - role: admin
