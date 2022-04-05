@@ -4,7 +4,7 @@ frequency:
   ifActive: '1'
   #启动时每个接口前100次接口调用白名单可输出日志
   initLogCount: 100
-  #记录慢接口时间(毫秒)
+  #记录慢接口时间(毫秒)，为0关闭此功能
   minRunTime: 500
   #接口级用户白名单
   whiteCodeUsers:

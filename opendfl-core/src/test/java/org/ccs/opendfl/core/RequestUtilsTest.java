@@ -4,9 +4,13 @@ import org.ccs.opendfl.core.utils.RequestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+
 class RequestUtilsTest {
     @Test
     void isIpAddress() {
+
+        System.out.println(StandardCharsets.UTF_8.name());
         String host;
         boolean isIpAddress;
         long time = System.currentTimeMillis();

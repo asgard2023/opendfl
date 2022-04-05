@@ -9,7 +9,6 @@ spring:
       - opendfl
       - frequency
       - requestlock
-      - console
   redis:
     host: localhost
     password: ''

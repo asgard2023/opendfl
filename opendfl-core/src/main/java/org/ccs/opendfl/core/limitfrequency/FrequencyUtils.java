@@ -1,6 +1,9 @@
 package org.ccs.opendfl.core.limitfrequency;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import org.ccs.opendfl.core.biz.IRsaBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.RequestLockConfiguration;
 import org.ccs.opendfl.core.constants.FreqLimitType;
@@ -8,6 +11,7 @@ import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.FrequencyException;
 import org.ccs.opendfl.core.exception.ResultCode;
 import org.ccs.opendfl.core.utils.LangType;
+import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
@@ -31,7 +35,7 @@ public class FrequencyUtils {
 
     }
 
-
+    private static IRsaBiz rsaBiz;
     private static FrequencyConfiguration frequencyConfiguration;
     private static RequestLockConfiguration requestLockConfiguration;
 
@@ -43,6 +47,11 @@ public class FrequencyUtils {
     @Autowired
     public void setRequestLockConfiguration(RequestLockConfiguration requestLockConfiguration) {
         FrequencyUtils.requestLockConfiguration = requestLockConfiguration;
+    }
+
+    @Autowired
+    public void setRsaBiz(IRsaBiz rsaBiz){
+        FrequencyUtils.rsaBiz = rsaBiz;
     }
 
     public static String getRedisKeyLock(String lockName, String dataId) {
@@ -125,5 +134,40 @@ public class FrequencyUtils {
             }
         }
         return isLog;
+    }
+
+
+    public static String getAttrNameValue(Map<String, Object> params, String attrName) {
+        Object attrValue = params.get(attrName);
+        String clientIdRsa = (String) params.get("clientIdRsa");
+
+        if (attrValue == null) {
+            String reqBody = (String) params.get(RequestUtils.REQ_BODYS);
+            if (reqBody != null) {
+                JSONObject jsonObject = JSON.parseObject(reqBody);
+                attrValue = jsonObject.getString(attrName);
+                if (clientIdRsa == null) {
+                    clientIdRsa = jsonObject.getString(clientIdRsa);
+                }
+            }
+        }
+        if (attrValue == null) {
+            return null;
+        }
+        return decryptValue(clientIdRsa, ""+attrValue);
+    }
+
+    /**
+     * 用于支持加密的数据解密，比如登入账号，否则不好限制
+     *
+     * @param clientIdRsa
+     * @param attrValue
+     * @return decryptValue
+     */
+    private static String decryptValue(String clientIdRsa, String attrValue) {
+        if (attrValue != null && StringUtils.isNotBlank(clientIdRsa)) {
+            attrValue = rsaBiz.checkRSAKey(clientIdRsa, (String) attrValue);
+        }
+        return attrValue;
     }
 }

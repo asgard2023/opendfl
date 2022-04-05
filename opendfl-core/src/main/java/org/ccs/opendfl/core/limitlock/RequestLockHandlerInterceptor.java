@@ -1,8 +1,6 @@
 package org.ccs.opendfl.core.limitlock;
 
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import org.ccs.opendfl.core.biz.IRequestLockConfigBiz;
 import org.ccs.opendfl.core.config.RequestLockConfiguration;
 import org.ccs.opendfl.core.exception.BaseException;
@@ -104,15 +102,8 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
             }
             final Integer time = requestLockVo.getTime();
             final String errMsg = requestLockVo.getErrMsg();
-            String dataId = request.getParameter(attrName);
-            if (dataId == null) {
-                String body = RequestUtils.getRequestParams(request);
-                if (StringUtils.isNotBlank(body)) {
-                    JSONObject jsonObject = JSON.parseObject(body);
-                    dataId = jsonObject.getString(attrName);
-                }
-            }
-
+            Map<String, Object> reqParams = RequestUtils.getParamsObject(request);
+            String dataId = FrequencyUtils.getAttrNameValue(reqParams, attrName);
 
             if (dataId != null) {
                 lockDataId.set(dataId);

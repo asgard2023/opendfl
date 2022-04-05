@@ -3,7 +3,6 @@ package org.ccs.opendfl.core.limitfrequency;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IFrequencyConfigBiz;
-import org.ccs.opendfl.core.biz.IRsaBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
 import org.ccs.opendfl.core.exception.BaseException;
@@ -54,8 +53,6 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     private WhiteChain whiteChain;
     @Autowired
     private BlackChain blackChain;
-    @Autowired
-    private IRsaBiz rsaBiz;
     private static final String BLACK_LIST_INFO = "{\"resultCode\":\"100010\",\"errorMsg\":\"Frequency limit\",\"data\":\"WaT+azid/F/83e1UpLc6ZA==\",\"errorType\":\"%s\",\"success\":false}";
 
     private final ThreadLocal<Long> startTime = new ThreadLocal<>();
@@ -275,11 +272,10 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         if (StringUtils.isNotBlank(frequency.getAttrName())) {
             attrName = frequency.getAttrName();
         }
-        Object attrValue = params.get(attrName);
-        attrValue = decryptValue(params, attrValue);
+        String attrValue = FrequencyUtils.getAttrNameValue(params, attrName);
 
         if (attrValue != null) {
-            userId = "" + attrValue;
+            userId = attrValue;
             params.put(RequestParams.USER_ID, userId);
         }
 
@@ -293,20 +289,6 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         return going;
     }
 
-    /**
-     * 用于支持加密的数据解密，比如登入账号，否则不好限制
-     *
-     * @param params
-     * @param attrValue
-     * @return
-     */
-    private Object decryptValue(Map<String, Object> params, Object attrValue) {
-        String clientIdRsa = (String) params.get("clientIdRsa");
-        if (attrValue != null && StringUtils.isNotBlank(clientIdRsa)) {
-            attrValue = rsaBiz.checkRSAKey(clientIdRsa, (String) attrValue);
-        }
-        return attrValue;
-    }
 
     /**
      * 只从请求中获取参数一次

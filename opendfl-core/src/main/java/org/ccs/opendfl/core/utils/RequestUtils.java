@@ -84,6 +84,12 @@ public class RequestUtils {
             }
             params.put(name, valueStr);
         }
+
+        String postStr=(String)request.getAttribute(REQ_BODYS);
+        if (postStr != null) {
+            params.put(REQ_BODYS, postStr);
+            request.removeAttribute(REQ_BODYS);
+        }
         return params;
     }
 
