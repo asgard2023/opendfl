@@ -1,7 +1,6 @@
 package org.ccs.opendfl.core.biz;
 
 import org.ccs.opendfl.core.config.vo.WhiteBlackConfigVo;
-import org.ccs.opendfl.core.vo.FrequencyVo;
 
 import java.util.Map;
 

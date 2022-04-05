@@ -30,7 +30,6 @@ public class ConsoleInterceptor extends WebMvcConfigurationSupport {
 
     @Autowired
     private RequestLockConfiguration requestLockConfiguration;
-    ;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
