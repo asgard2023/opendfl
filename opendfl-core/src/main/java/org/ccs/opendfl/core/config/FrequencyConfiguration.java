@@ -34,6 +34,10 @@ public class FrequencyConfiguration {
      */
     private Long minRunTime = 500L;
     /**
+     * 记录慢接口时间(毫秒)
+     */
+    private Integer maxRunTimeInterval=30;
+    /**
      * 黑名单配置
      */
     private WhiteBlackConfigVo black;

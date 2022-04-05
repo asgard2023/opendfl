@@ -27,7 +27,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -71,10 +70,10 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
 
         String requestUri = RequestUtils.getRequestUri(request);
         FrequencyVo frequencyVo = null;
+        RequestVo requestVo = null;
         try {
 
             HandlerMethod handlerMethod = (HandlerMethod) handler;
-            Map<String, Object> params = new HashMap<>(5);
             String remoteIp = RequestUtils.getIpAddress(request);
             String ip = getConvertIp(remoteIp);
             String lang = RequestUtils.getLang(request);
@@ -83,13 +82,13 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
 
             selectStrategyItems();
 
-            loadReqParamsOnce(request, params);
+            Map<String, Object> params = RequestUtils.getParamsObject(request);
 
             RequestStrategyParamsVo strategyParams = new RequestStrategyParamsVo(lang, ip, handlerMethod.getMethod().getName(), requestUri, curTime);
             String userId = (String) params.get(RequestParams.USER_ID);
             strategyParams.setUserId(userId);
 
-            RequestVo requestVo = this.logFirstLoadRequest(handlerMethod, request.getMethod(), strategyParams);
+            requestVo = this.logFirstLoadRequest(handlerMethod, request.getMethod(), strategyParams);
 
             blackChain.setStrategyParams(strategyParams);
             blackChain.clearLimit();
@@ -100,6 +99,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
                 if (blackChain.getBlackStrategy() != null) {
                     title = "frequency:" + blackChain.getBlackStrategy().getLimitType();
                 }
+                this.frequencyReturn(requestVo, true);
                 response.getWriter().println(String.format(BLACK_LIST_INFO, title));
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return false;
@@ -113,6 +113,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
                 if (FrequencyUtils.isInitLog("preHandle")) {
                     log.info("----preHandle--white-uri={}", requestUri);
                 }
+                this.frequencyReturn(requestVo, false);
                 return true;
             }
 
@@ -130,11 +131,25 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             return true;
         } catch (BaseException e) {
             log.error("-----preHandle--uri={} error={}", requestUri, e.getMessage());
+            frequencyReturn(requestVo, true);
             throw e;
         } catch (Exception e) {
+            frequencyReturn(requestVo, true);
             String reqInfo = frequencyVo != null ? frequencyVo.toString() : "{}";
             log.error("-----preHandle--uri={} reqInfo={} error={}", requestUri, reqInfo, e.getMessage());
             throw e;
+        }
+    }
+
+    /**
+     * 结束处理
+     * @param requestVo RequestVo
+     */
+    private void frequencyReturn(RequestVo requestVo, boolean isFail) {
+        startTime.remove();
+        requestKey.remove();
+        if (isFail && requestVo != null) {
+            requestVo.getLimitCounter().incrementAndGet();
         }
     }
 
@@ -158,12 +173,12 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     /**
      * 基于@Frequency注释的限制
      *
-     * @param handlerMethod
-     * @param frequencyVo
-     * @param strategyParams
-     * @param params
-     * @param response
-     * @return
+     * @param handlerMethod HandlerMethod
+     * @param frequencyVo FrequencyVo
+     * @param strategyParams RequestStrategyParamsVo
+     * @param params Map<String, Object>
+     * @param response HttpServletResponse
+     * @return boolean
      */
     private boolean limitByFrequency(HandlerMethod handlerMethod, FrequencyVo frequencyVo, RequestStrategyParamsVo strategyParams, Map<String, Object> params, HttpServletResponse response) {
         boolean isAllNull = true;
@@ -188,10 +203,11 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     /**
      * 基于uri地址的频率限制
      *
-     * @param frequencyVo
-     * @param strategyParams
-     * @param params
-     * @param response
+     * @param requestVo RequestVo
+     * @param frequencyVo FrequencyVo
+     * @param strategyParams RequestStrategyParamsVo
+     * @param params Map<String, Object>
+     * @param response HttpServletResponse
      */
     private void limitByRequestConfig(RequestVo requestVo, FrequencyVo frequencyVo, RequestStrategyParamsVo strategyParams, Map<String, Object> params, HttpServletResponse response) {
         frequencyConfigBiz.limitBySysconfigUri(requestVo);
@@ -235,7 +251,12 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             RequestVo requestVo = requestVoMap.get(key);
             //排除等一次请求
             if (requestVo != null && requestVo.getCounter().get() > 1) {
-                if (requestVo.getMaxRunTime() == null || requestVo.getMaxRunTime() < runTime) {
+                //上次时间如果超过30秒，则清空，以便于重算
+                if (requestVo.getMaxRunTimeCreateTime() > requestStartTime - frequencyConfiguration.getMaxRunTimeInterval()*1000) {
+                    requestVo.setMaxRunTime(0L);
+                    requestVo.setMaxRunTimeCreateTime(0L);
+                }
+                if (requestVo.getMaxRunTime() < runTime) {
                     requestVo.setMaxRunTime(runTime);
                     requestVo.setMaxRunTimeCreateTime(requestStartTime);
                 }
@@ -289,16 +310,6 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         return going;
     }
 
-
-    /**
-     * 只从请求中获取参数一次
-     */
-    private void loadReqParamsOnce(HttpServletRequest request, Map<String, Object> params) {
-        Map<String, Object> reqParams = RequestUtils.getParamsObject(request);
-        params.putAll(reqParams);
-    }
-
-
     /**
      * 主要按接口缓存，理论上接口数不会太多，用Map做持久缓存，不会占太多内存
      */
@@ -326,6 +337,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         if (requestVo == null) {
             requestVo = new RequestVo();
             requestVo.setCounter(new AtomicInteger());
+            requestVo.setLimitCounter(new AtomicInteger());
             requestVo.setRequestUri(strategyParams.getRequestUri());
             requestVo.setBeanName(handlerMethod.getBeanType().getSimpleName());
             requestVo.setMethod(method);

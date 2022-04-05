@@ -18,8 +18,21 @@ public class RequestVo {
     private String method;
 
     private Long createTime;
+    /**
+     * 请求记数器
+     */
     private AtomicInteger counter;
-    private Long maxRunTime;
-    private Long maxRunTimeCreateTime;
+    /**
+     * 失败或被限计数器
+     */
+    private AtomicInteger limitCounter;
+    /**
+     * 间格时间内最大执行时间
+     */
+    private Long maxRunTime=0L;
+    /**
+     * 间格时间内最大执行时间的发生时间
+     */
+    private Long maxRunTimeCreateTime=0L;
     List<LimitUriConfigVo> limitRequests;
 }

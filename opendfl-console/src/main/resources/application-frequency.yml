@@ -6,6 +6,8 @@ frequency:
   initLogCount: 100
   #记录慢接口时间(毫秒)，为0关闭此功能
   minRunTime: 500
+  #记录最大时间的间格，每30秒记录最大访问时间
+  maxRunTimeInterval: 30
   #接口级用户白名单
   whiteCodeUsers:
     #管理员白名单

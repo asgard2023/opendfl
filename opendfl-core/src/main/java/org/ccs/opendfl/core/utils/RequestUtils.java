@@ -5,16 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.FailedException;
-import org.ccs.opendfl.core.exception.ParamErrorException;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -24,9 +19,6 @@ public class RequestUtils {
     private RequestUtils() {
 
     }
-
-
-    public static final String DEFAULT_PARAM_NAME = "reqParams";
 
     public static String getParam(HttpServletRequest request, Map<String, Object> params, String paramName) {
         String paraValue = (String) params.get(paramName);
@@ -41,42 +33,18 @@ public class RequestUtils {
 
 
     /**
-     * 阿里回调时使用   不解密
-     *
-     * @param request
-     * @return
-     * @throws BaseException
-     */
-    @SuppressWarnings("rawtypes")
-    public static Map<String, String> getParamsString(HttpServletRequest request) throws BaseException {
-        Map<String, String> params = new HashMap<>();
-        Map requestParams = request.getParameterMap();
-        for (Iterator iter = requestParams.keySet().iterator(); iter.hasNext(); ) {
-            String name = (String) iter.next();
-            String[] values = (String[]) requestParams.get(name);
-            String valueStr = "";
-            for (int i = 0; i < values.length; i++) {
-                valueStr = (i == values.length - 1) ? valueStr + values[i]
-                        : valueStr + values[i] + ",";
-            }
-            params.put(name, valueStr);
-        }
-        return params;
-    }
-
-    /**
      * 获取请求参数    不加解密
      *
-     * @param request
-     * @return
+     * @param request HttpServletRequest
+     * @return Map<String, Object>
      * @throws BaseException
      */
     public static Map<String, Object> getParamsObject(HttpServletRequest request) throws BaseException {
-        Map<String, Object> params = new HashMap<>();
-        Map requestParams = request.getParameterMap();
+        Map<String, String[]> requestParams = request.getParameterMap();
+        Map<String, Object> params = new HashMap<>(requestParams.size());
         for (Iterator<String> iter = requestParams.keySet().iterator(); iter.hasNext(); ) {
             String name = iter.next();
-            String[] values = (String[]) requestParams.get(name);
+            String[] values = requestParams.get(name);
             String valueStr = "";
             for (int i = 0; i < values.length; i++) {
                 valueStr = (i == values.length - 1) ? valueStr + values[i]
@@ -85,7 +53,7 @@ public class RequestUtils {
             params.put(name, valueStr);
         }
 
-        String postStr=(String)request.getAttribute(REQ_BODYS);
+        String postStr = (String) request.getAttribute(REQ_BODYS);
         if (postStr != null) {
             params.put(REQ_BODYS, postStr);
             request.removeAttribute(REQ_BODYS);
@@ -95,56 +63,6 @@ public class RequestUtils {
 
     public static final String REQ_BODYS = "reqBodys";
 
-    /**
-     * 从流获取请求参数
-     *
-     * @param request
-     * @return
-     */
-    public static String getRequestParams(HttpServletRequest request) {
-        StringBuilder sb = null;
-        BufferedReader br = null;
-        InputStreamReader isr = null;
-        try {
-            if (request.getInputStream().isFinished()) {
-                String reqBodys = (String) request.getAttribute(REQ_BODYS);
-                if (reqBodys != null) {
-                    request.removeAttribute(REQ_BODYS);
-                }
-                return reqBodys;
-            }
-            sb = new StringBuilder("");
-            isr = new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8);
-            br = new BufferedReader(isr);
-            String temp;
-            while ((temp = br.readLine()) != null) {
-                sb.append(temp);
-            }
-            String body = sb.toString();
-            if (StringUtils.isNotBlank(body)) {
-                request.setAttribute(REQ_BODYS, body);
-            }
-            return body;
-        } catch (IOException e) {
-            log.error("----getRequestParams-io-error={}", e.getMessage(), e);
-            throw new ParamErrorException(e.getMessage());
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    log.error("----getRequestParams-br-error={}", e.getMessage());
-                }
-            }
-            if (isr != null) {
-                try {
-                    isr.close();
-                } catch (IOException e) {
-                    log.error("----getRequestParams-isr-error={}", e.getMessage());
-                }
-            }
-        }
-    }
 
     public static String getLang(HttpServletRequest request) {
         String lang = request.getHeader(RequestParams.LANG);
@@ -241,8 +159,8 @@ public class RequestUtils {
     /**
      * 封装一层，主要抛出参数为空的异常
      *
-     * @param params
-     * @return
+     * @param params Map<String, Object>
+     * @return String
      * @throws BaseException
      */
     public static String getStringFromMap(Map<String, Object> params, String key) throws BaseException {
@@ -257,9 +175,9 @@ public class RequestUtils {
     /**
      * 从Map里取Double数据
      *
-     * @param params
-     * @param key
-     * @return
+     * @param params Map<String, Object>
+     * @param key String
+     * @return double
      * @throws BaseException
      */
     public static double getDoubleFromMap(Map<String, Object> params, String key) throws BaseException {
@@ -278,13 +196,14 @@ public class RequestUtils {
      * @return 转换后的ip地址
      */
     public static String getNumConvertIp(long ipLong) {
-        long mask[] = {0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000};
+        long[] mask = {0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000};
         long num = 0;
         StringBuilder ipInfo = new StringBuilder();
         for (int i = 0; i < 4; i++) {
             num = (ipLong & mask[i]) >> (i * 8);
-            if (i > 0)
+            if (i > 0) {
                 ipInfo.insert(0, ".");
+            }
             ipInfo.insert(0, Long.toString(num, 10));
         }
         return ipInfo.toString();
