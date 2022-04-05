@@ -1,8 +1,6 @@
 package org.ccs.opendfl.core.strategy.white;
 
 
-import org.ccs.opendfl.core.config.vo.WhiteBlackConfigVo;
-import org.ccs.opendfl.core.utils.CommUtils;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
 import org.slf4j.Logger;
@@ -14,14 +12,25 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 白名单责任链
+ * 特点：满足任一名名单条件，直接通过
+ *
+ * @author chenjh
+ */
 @Service
 public class WhiteChain {
-    private static Logger logger = LoggerFactory.getLogger(WhiteChain.class);
+    private static final Logger logger = LoggerFactory.getLogger(WhiteChain.class);
     private int pos = 0;
     private int size = 0;
-    private final List<WhiteStrategy> whiteStrategieList=new ArrayList<>();
+    /**
+     * 注册的策略
+     */
+    private final List<WhiteStrategy> whiteStrategieRegists = new ArrayList<>();
+    /**
+     * 当前生效在用的策略，可根据limitItems起作用
+     */
     private List<WhiteStrategy> whiteStrategies;
-    private WhiteBlackConfigVo whiteConfig;
     private RequestStrategyParamsVo strategyParams;
     private String freqTypeItems;
 
@@ -30,6 +39,9 @@ public class WhiteChain {
     @Resource(name = "whiteUserStrategy")
     private WhiteStrategy whiteUserStrategy;
 
+    /**
+     * 新增策略需要在这里注册
+     */
     @PostConstruct
     public void initStrategy() {
         this.addLimit(whiteIpStrategy);
@@ -37,7 +49,7 @@ public class WhiteChain {
     }
 
     private void addLimit(WhiteStrategy limitStrategy) {
-        whiteStrategieList.add(limitStrategy);
+        whiteStrategieRegists.add(limitStrategy);
     }
 
     public void setStrategyParams(RequestStrategyParamsVo strategyParams) {
@@ -46,15 +58,6 @@ public class WhiteChain {
 
     public RequestStrategyParamsVo getStrategyParams() {
         return strategyParams;
-    }
-
-    public void setWhiteConfig(WhiteBlackConfigVo whiteConfig) {
-        this.whiteConfig = whiteConfig;
-    }
-
-    public WhiteBlackConfigVo getWhiteConfig() {
-        whiteConfig.setIps(CommUtils.appendComma(whiteConfig.getIps()));
-        return whiteConfig;
     }
 
     public void clearLimit() {
@@ -97,7 +100,7 @@ public class WhiteChain {
             if ("".equals(item)) {
                 continue;
             }
-            for (WhiteStrategy strategy : whiteStrategieList) {
+            for (WhiteStrategy strategy : whiteStrategieRegists) {
                 if (item.equals(strategy.getLimitType())) {
                     limits.add(strategy);
                     break;

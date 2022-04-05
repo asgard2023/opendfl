@@ -1,6 +1,7 @@
-package org.ccs.opendfl.console.biz;
+package org.ccs.opendfl.console.biz.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.ccs.opendfl.console.biz.IFrequencyLoginBiz;
 import org.ccs.opendfl.console.config.ConsoleConfiguration;
 import org.ccs.opendfl.console.config.vo.RolePermitVo;
 import org.ccs.opendfl.console.config.vo.UserVo;

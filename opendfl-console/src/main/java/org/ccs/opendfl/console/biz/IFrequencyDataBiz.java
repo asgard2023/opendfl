@@ -1,7 +1,6 @@
 package org.ccs.opendfl.console.biz;
 
 import org.ccs.opendfl.core.vo.FrequencyVo;
-import org.ccs.opendfl.core.vo.RequestLockVo;
 
 import java.util.List;
 
@@ -27,25 +26,9 @@ public interface IFrequencyDataBiz {
 
 
     /**
-     * 查询用户的分布式锁的数据
-     *
-     * @param data attrName(默认userId)的值
-     * @return 删除的Key及数量
-     */
-    List<RequestLockVo> requestLocks(String data);
-
-    /**
-     * 删除锁数据
-     * @param name
-     * @param data
-     * @return
-     */
-    String lockEvict(String name, String data);
-
-    /**
      * 删除code对应功能的全部限制
      *
-     * @param code
+     * @param code @Frequency.name
      * @param timeList 间格时间5,3600
      * @param account  attrName(默认userId)的值
      * @return

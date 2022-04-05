@@ -1,7 +1,6 @@
 package org.ccs.opendfl.core;
 
 import lombok.extern.slf4j.Slf4j;
-import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.ResultCode;
 import org.ccs.opendfl.core.strategy.white.WhiteChain;
@@ -18,7 +17,6 @@ import org.springframework.test.context.ActiveProfiles;
  * 白名单测试
  *
  * @author chenjh
- *
  */
 @SpringBootTest
 @ActiveProfiles(value = "dev")
@@ -27,16 +25,12 @@ class WhiteChainTest {
     @Autowired
     private WhiteChain whiteChain;
 
-    @Autowired
-    private FrequencyConfiguration frequencyConfiguration;
-
 
     @BeforeEach
     void init() {
         System.out.println("----init----");
         String freqTypeItems = "whiteUser,whiteIp,";
         whiteChain.sortStrategies(freqTypeItems);
-        whiteChain.setWhiteConfig(frequencyConfiguration.getWhite());
     }
 
     private FrequencyVo getFrequencyServerTime(String requestUri) {

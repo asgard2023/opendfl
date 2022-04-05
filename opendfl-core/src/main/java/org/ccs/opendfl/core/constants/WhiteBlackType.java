@@ -1,5 +1,10 @@
 package org.ccs.opendfl.core.constants;
 
+/**
+ * 黑名单，白名单类型
+ *
+ * @author chenjh
+ */
 public enum WhiteBlackType {
     /**
      * 白名单

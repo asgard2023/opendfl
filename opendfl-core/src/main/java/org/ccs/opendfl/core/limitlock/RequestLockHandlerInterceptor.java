@@ -3,9 +3,8 @@ package org.ccs.opendfl.core.limitlock;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import org.ccs.opendfl.core.biz.IRequestLockConfigBiz;
 import org.ccs.opendfl.core.config.RequestLockConfiguration;
-import org.ccs.opendfl.core.config.vo.RequestLockConfigVo;
-import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.FrequencyException;
 import org.ccs.opendfl.core.limitfrequency.FrequencyUtils;
@@ -26,7 +25,6 @@ import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,6 +43,8 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
     private static final Logger logger = LoggerFactory.getLogger(RequestLockHandlerInterceptor.class);
     @Autowired
     private RequestLockConfiguration requestLockConfiguration;
+    @Resource(name = "requestLockConfigBiz")
+    private IRequestLockConfigBiz requestLockConfigBiz;
     @Resource(name = "redisTemplateString")
     private RedisTemplate<String, String> redisTemplateString;
     public static final Map<String, RequestLockVo> locksMap = new ConcurrentHashMap<>();
@@ -95,11 +95,11 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
             Long curTime = System.currentTimeMillis();
             String requestUri = RequestUtils.getRequestUri(request);
             RequestLockVo requestLockVo = newRequestLockVo(reqLimit, requestUri, curTime);
-            loadLockConfig(requestLockVo, curTime);
+            requestLockConfigBiz.loadLockConfig(requestLockVo, curTime);
             logFirstload(requestLockVo);
 
             String attrName = RequestParams.USER_ID;
-            if(StringUtils.isNotBlank(requestLockVo.getAttrName())){
+            if (StringUtils.isNotBlank(requestLockVo.getAttrName())) {
                 attrName = requestLockVo.getAttrName();
             }
             final Integer time = requestLockVo.getTime();
@@ -127,8 +127,8 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
                     redisTemplateString.expire(redisKey, time, TimeUnit.SECONDS);
                 } else {
                     logger.warn("----preHandle--redisKey={} time={} dataId={} ip={} limited", redisKey, time, dataId, ip);
-                    String title="frequency:lock";
-                    BaseException baseException= new FrequencyException("重复任务限制:" + String.format(errMsg, dataId));
+                    String title = "frequency:lock";
+                    BaseException baseException = new FrequencyException("重复任务限制:" + String.format(errMsg, dataId));
                     baseException.setTitle(title);
                     throw baseException;
                 }
@@ -140,44 +140,6 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
             throw e;
         }
         return true;
-    }
-
-    private static final Map<String, Long> loadSysconfigTimeMap = new ConcurrentHashMap<>();
-    private static final Map<String, RequestLockConfigVo> sysconfigLimitMap = new ConcurrentHashMap<>();
-
-
-    /**
-     * 10秒一次，从application-requestlock.yml配置文件读取配置
-     * @param requestLockVo
-     * @param curTime
-     */
-    private void loadLockConfig(RequestLockVo requestLockVo, Long curTime) {
-        String key = requestLockVo.getName();
-        RequestLockConfigVo lockConfigVo = sysconfigLimitMap.get(key);
-        //缓存10秒刷一次，以免cloud模式配置有变更
-        Long time = loadSysconfigTimeMap.get(key);
-        if (time == null || curTime - time > FrequencyConstant.LOAD_CONFIG_INTERVAL) {
-            loadSysconfigTimeMap.put(key, curTime);
-            List<RequestLockConfigVo> lockConfigVos = requestLockConfiguration.getLockConfigs();
-            if(lockConfigVos==null){
-                return;
-            }
-            for (RequestLockConfigVo lockConfig : lockConfigVos) {
-                if (StringUtils.equals(requestLockVo.getName(), lockConfig.getName())) {
-                    lockConfigVo = lockConfig;
-                    sysconfigLimitMap.put(key, lockConfigVo);
-                }
-            }
-        }
-        if (lockConfigVo != null) {
-            requestLockVo.setSysconfig(true);
-            if (StringUtils.isNotBlank(lockConfigVo.getAttrName())) {
-                requestLockVo.setAttrName(lockConfigVo.getAttrName());
-            }
-            if (lockConfigVo.getTime() != null) {
-                requestLockVo.setTime(lockConfigVo.getTime());
-            }
-        }
     }
 
 

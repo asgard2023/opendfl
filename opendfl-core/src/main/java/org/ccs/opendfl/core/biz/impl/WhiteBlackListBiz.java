@@ -1,41 +1,42 @@
-package org.ccs.opendfl.core.limitfrequency;
-
+package org.ccs.opendfl.core.biz.impl;
 
 import org.ccs.opendfl.core.biz.IUserBiz;
+import org.ccs.opendfl.core.biz.IWhiteBlackListBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
+import org.ccs.opendfl.core.config.vo.WhiteBlackConfigVo;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
-public class FrequencyWhiteCodeUtils {
-    private FrequencyWhiteCodeUtils() {
-
-    }
-
-    private static IUserBiz userBiz;
-    private static FrequencyConfiguration frequencyConfiguration;
-
+/**
+ * 黑白名单管理
+ *
+ * @author chenjh
+ */
+@Service(value = "whiteBlackListBiz")
+public class WhiteBlackListBiz implements IWhiteBlackListBiz {
     @Autowired
-    public void setUserBiz(IUserBiz userBiz) {
-        FrequencyWhiteCodeUtils.userBiz = userBiz;
-    }
+    private IUserBiz userBiz;
     @Autowired
-    public void setFrequencyConfiguration(FrequencyConfiguration frequencyConfiguration) {
-        FrequencyWhiteCodeUtils.frequencyConfiguration = frequencyConfiguration;
-    }
-
-    public static String getUserId(String userCode) {
-        return userBiz.getUserId(userCode);
-    }
+    private FrequencyConfiguration frequencyConfiguration;
 
     private static Map<String, Long> whiteCodeMap = new ConcurrentHashMap<>();
     private static Map<String, String> whiteUserIdsMap = new ConcurrentHashMap<>();
+
+    @Override
+    public WhiteBlackConfigVo getBlackConfig() {
+        return frequencyConfiguration.getBlack();
+    }
+
+    @Override
+    public WhiteBlackConfigVo getWhiteConfig() {
+        return frequencyConfiguration.getWhite();
+    }
 
     /**
      * 用于已经触发频率限制时，如果在白名单中则不限制
@@ -45,7 +46,8 @@ public class FrequencyWhiteCodeUtils {
      * @param userId
      * @return
      */
-    public static boolean checkWhiteUserId(FrequencyVo frequency, Long curTime, String userId) {
+    @Override
+    public boolean checkWhiteUserId(FrequencyVo frequency, Long curTime, String userId) {
         String whiteCode = frequency.getWhiteCode();
         if (whiteCode == null || StringUtils.equals(FrequencyConstant.NONE, whiteCode) || userId == null) {
             return false;
@@ -61,14 +63,15 @@ public class FrequencyWhiteCodeUtils {
                 whiteUserIdsMap.put(whiteCode, whiteUserIds);
             }
         }
-        return isWhiteId(userId, whiteUserIds);
+        return isIncludeId(userId, whiteUserIds);
     }
 
-    private static String getWhiteCodeUserId(String whiteCode) {
+    private String getWhiteCodeUserId(String whiteCode) {
         return frequencyConfiguration.getWhiteCodeUsers().get(whiteCode);
     }
 
-    public static boolean isWhiteId(String userId, String whiteUserIds) {
+    @Override
+    public boolean isIncludeId(String userId, String whiteUserIds) {
         if (StringUtils.isBlank(userId)) {//userId无效忽略
             return false;
         }
@@ -80,7 +83,7 @@ public class FrequencyWhiteCodeUtils {
     }
 
 
-    private static String userCodeToUserId(final String whiteUserIds) {
+    private String userCodeToUserId(final String whiteUserIds) {
         if ("none".equals(whiteUserIds)) {
             return whiteUserIds;
         }
@@ -91,7 +94,7 @@ public class FrequencyWhiteCodeUtils {
             if (StringUtils.isBlank(userCode)) {
                 continue;
             }
-            String userCodeId = getUserId(userCode);
+            String userCodeId = userBiz.getUserId(userCode);
             if (userCodeId != null) {
                 resultIds.append(userCodeId);
             } else {

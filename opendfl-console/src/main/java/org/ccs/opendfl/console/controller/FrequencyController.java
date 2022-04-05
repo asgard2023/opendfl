@@ -3,6 +3,7 @@ package org.ccs.opendfl.console.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.console.biz.IFrequencyDataBiz;
 import org.ccs.opendfl.console.biz.IFrequencyLoginBiz;
+import org.ccs.opendfl.console.biz.IRequestLockDataBiz;
 import org.ccs.opendfl.console.config.vo.RolePermitVo;
 import org.ccs.opendfl.console.config.vo.UserVo;
 import org.ccs.opendfl.console.constant.UserOperType;
@@ -43,6 +44,8 @@ public class FrequencyController {
     private IUserBiz userBiz;
     @Resource(name = "frequencyDataRedisBiz")
     private IFrequencyDataBiz frequencyDataBiz;
+    @Resource(name = "requestLockDataRedisBiz")
+    private IRequestLockDataBiz requestLockDataBiz;
     @Resource(name = "frequencyLoginRedisBiz")
     private IFrequencyLoginBiz frequencyLoginBiz;
     private static final Integer TIME_NULL = null;
@@ -199,7 +202,7 @@ public class FrequencyController {
         Collection<RequestLockVo> list;
         if (StringUtils.isNotBlank(userId)) {
             AuditLogUtils.addAuditLog(request, userVo, "list", userId, TIME_NULL);
-            list = frequencyDataBiz.requestLocks(userId);
+            list = requestLockDataBiz.requestLocks(userId);
         } else {
             AuditLogUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
             list = RequestLockHandlerInterceptor.locksMap.values();
@@ -356,7 +359,7 @@ public class FrequencyController {
             userId = userIdByCode;
         }
         AuditLogUtils.addAuditLog(request, userVo, operType.getType(), userId, lockVo.getTime());
-        String evictKey = frequencyDataBiz.lockEvict(lockVo.getName(), userId);
+        String evictKey = requestLockDataBiz.lockEvict(lockVo.getName(), userId);
         return ResultData.success(evictKey);
     }
 }

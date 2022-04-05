@@ -12,7 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles(value="dev")
 class DemoApplicationTests {
-    private static Logger logger = LoggerFactory.getLogger(DemoApplicationTests.class);
+    private static final Logger logger = LoggerFactory.getLogger(DemoApplicationTests.class);
     @Autowired
     private FrequencyConfiguration frequencyConfiguration;
     @Autowired

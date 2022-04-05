@@ -1,8 +1,6 @@
 package org.ccs.opendfl.core.strategy.black;
 
 
-import org.ccs.opendfl.core.config.vo.WhiteBlackConfigVo;
-import org.ccs.opendfl.core.utils.CommUtils;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
 import org.slf4j.Logger;
@@ -14,14 +12,25 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 黑名单链
+ * 特点：满足任一黑名单，直接拒绝
+ *
+ * @author chenjh
+ */
 @Service
-public class BlackChain  {
-    private static Logger logger = LoggerFactory.getLogger(BlackChain.class);
+public class BlackChain {
+    private static final Logger logger = LoggerFactory.getLogger(BlackChain.class);
     private int pos = 0;
     private int size = 0;
-    private final List<BlackStrategy> blackStrategieList=new ArrayList<>();
+    /**
+     * 注册的策略
+     */
+    private final List<BlackStrategy> blackStrategieRegists = new ArrayList<>();
+    /**
+     * 当前生效在用的策略，可根据limitItems起作用
+     */
     private List<BlackStrategy> blackStrategies;
-    private WhiteBlackConfigVo blackConfig;
     private RequestStrategyParamsVo strategyParams;
     private String freqTypeItems;
 
@@ -30,6 +39,9 @@ public class BlackChain  {
     @Resource(name = "blackUserStrategy")
     private BlackStrategy blackUserStrategy;
 
+    /**
+     * 新增策略需要在这里注册
+     */
     @PostConstruct
     public void initStrategy() {
         this.addLimit(blackIpStrategy);
@@ -37,7 +49,7 @@ public class BlackChain  {
     }
 
 
-    public void setStrategyParams(RequestStrategyParamsVo strategyParams){
+    public void setStrategyParams(RequestStrategyParamsVo strategyParams) {
         this.strategyParams = strategyParams;
     }
 
@@ -45,24 +57,18 @@ public class BlackChain  {
         return strategyParams;
     }
 
-    public void setBlackConfig(WhiteBlackConfigVo blackConfig){
-        blackConfig.setIps(CommUtils.appendComma(blackConfig.getIps()));
-        this.blackConfig = blackConfig;
-    }
-
-    public WhiteBlackConfigVo getBlackConfig(){
-        return blackConfig;
-    }
 
     private void addLimit(BlackStrategy limitStrategy) {
-        blackStrategieList.add(limitStrategy);
+        blackStrategieRegists.add(limitStrategy);
     }
 
     private BlackStrategy blackStrategy;
-    public void setBlackStrategy(BlackStrategy black){
+
+    public void setBlackStrategy(BlackStrategy black) {
         this.blackStrategy = black;
     }
-    public BlackStrategy getBlackStrategy(){
+
+    public BlackStrategy getBlackStrategy() {
         return blackStrategy;
     }
 
@@ -71,32 +77,35 @@ public class BlackChain  {
         pos = 0;
     }
 
-    public void setFreqTypeItems(String freqTypeItems){
+    public void setFreqTypeItems(String freqTypeItems) {
         this.freqTypeItems = freqTypeItems;
     }
+
     private static String freqLimitItemStr = null;
     private static String[] freqLimitItems = null;
 
     private String[] getLimitItems(String limitItems) {
         if (freqLimitItems == null || !StringUtils.equals(limitItems, freqLimitItemStr)) {
             logger.info("----getLimitItems--limitItems={}", limitItems);
-            freqLimitItemStr=limitItems;
+            freqLimitItemStr = limitItems;
             freqLimitItems = limitItems.split(",");
         }
         return freqLimitItems;
     }
 
     private String limitItemsLast;
+
     /**
      * 按limitItems过滤及重新排序
+     *
      * @param limitItems
      */
     public void sortStrategies(String limitItems) {
         //配置值相同不用继续处理
-        if(StringUtils.equals(limitItems, limitItemsLast)){
+        if (StringUtils.equals(limitItems, limitItemsLast)) {
             return;
         }
-        this.limitItemsLast=limitItems;
+        this.limitItemsLast = limitItems;
         this.setFreqTypeItems(limitItems);
 
         String[] items = getLimitItems(limitItems);
@@ -105,7 +114,7 @@ public class BlackChain  {
             if ("".equals(item)) {
                 continue;
             }
-            for (BlackStrategy strategy : blackStrategieList) {
+            for (BlackStrategy strategy : blackStrategieRegists) {
                 if (item.equals(strategy.getLimitType())) {
                     limits.add(strategy);
                     break;

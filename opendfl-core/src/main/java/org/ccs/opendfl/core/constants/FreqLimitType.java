@@ -1,5 +1,8 @@
 package org.ccs.opendfl.core.constants;
 
+/**
+ * 频率限制类型
+ */
 public enum FreqLimitType {
     /**
      * 同用户次数频率

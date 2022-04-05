@@ -1,7 +1,6 @@
 package org.ccs.opendfl.core;
 
 import lombok.extern.slf4j.Slf4j;
-import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.ResultCode;
 import org.ccs.opendfl.core.strategy.black.BlackChain;
@@ -26,16 +25,11 @@ class BlackChainTest {
     @Autowired
     private BlackChain blackChain;
 
-    @Autowired
-    private FrequencyConfiguration frequencyConfiguration;
-
-
     @BeforeEach
     void init() {
         System.out.println("----init----");
         String freqTypeItems = "blackUser,blackIp,";
         blackChain.sortStrategies(freqTypeItems);
-        blackChain.setBlackConfig(frequencyConfiguration.getBlack());
     }
 
     private FrequencyVo getFrequencyServerTime(String requestUri) {
@@ -49,7 +43,7 @@ class BlackChainTest {
     }
 
     @Test
-    void doCheckLimit_blackIp_normal(){
+    void doCheckLimit_blackIp_normal() {
         String lang = null;
         String ip = "192.168.5.105";
         String requestUri = "/frequencyTest/serverTime";

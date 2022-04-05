@@ -1,14 +1,15 @@
 package org.ccs.opendfl.core.strategy.white.impl;
 
+import org.ccs.opendfl.core.biz.IWhiteBlackListBiz;
 import org.ccs.opendfl.core.config.vo.WhiteBlackConfigVo;
 import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.limitfrequency.FrequencyUtils;
-import org.ccs.opendfl.core.limitfrequency.FrequencyWhiteCodeUtils;
 import org.ccs.opendfl.core.strategy.white.WhiteChain;
 import org.ccs.opendfl.core.strategy.white.WhiteStrategy;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,8 +17,10 @@ import org.springframework.stereotype.Service;
  */
 @Service(value = "whiteUserStrategy")
 public class WhiteUserStrategy implements WhiteStrategy {
-    private static Logger logger = LoggerFactory.getLogger(WhiteUserStrategy.class);
+    private static final Logger logger = LoggerFactory.getLogger(WhiteUserStrategy.class);
     public static final FreqLimitType LIMIT_TYPE = FreqLimitType.WHITE_USER;
+    @Autowired
+    private IWhiteBlackListBiz whiteBlackListBiz;
 
     @Override
     public String getLimitType() {
@@ -29,8 +32,8 @@ public class WhiteUserStrategy implements WhiteStrategy {
         if (containLimit(limitItems, LIMIT_TYPE)) {
             RequestStrategyParamsVo strategyParams = limitChain.getStrategyParams();
             String userId = strategyParams.getUserId();
-            WhiteBlackConfigVo whiteConfig = limitChain.getWhiteConfig();
-            if (FrequencyWhiteCodeUtils.isWhiteId(userId, whiteConfig.getUsers())) {
+            WhiteBlackConfigVo whiteConfig = whiteBlackListBiz.getWhiteConfig();
+            if (whiteBlackListBiz.isIncludeId(userId, whiteConfig.getUsers())) {
                 //方便测试，日志前1000条
                 if (FrequencyUtils.isInitLog(getLimitType())) {
                     logger.info("----doCheckLimit-whiteUser={} uri={}", userId, strategyParams.getRequestUri());

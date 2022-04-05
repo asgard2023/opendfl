@@ -3,6 +3,7 @@ package org.ccs.opendfl.core.config;
 import lombok.Data;
 import org.ccs.opendfl.core.config.vo.LimitConfigVo;
 import org.ccs.opendfl.core.config.vo.WhiteBlackConfigVo;
+import org.ccs.opendfl.core.utils.CommUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
@@ -33,10 +34,19 @@ public class FrequencyConfiguration {
      * 黑名单配置
      */
     private WhiteBlackConfigVo black;
+    public void setBlack(WhiteBlackConfigVo black) {
+        black.setIps(CommUtils.appendComma(black.getIps()));
+        this.black = black;
+    }
     /**
      * 白名单配置
      */
     private WhiteBlackConfigVo white;
+    public void setWhite(WhiteBlackConfigVo white) {
+        white.setIps(CommUtils.appendComma(white.getIps()));
+        this.white = white;
+
+    }
     /**
      * 频率限制
      */

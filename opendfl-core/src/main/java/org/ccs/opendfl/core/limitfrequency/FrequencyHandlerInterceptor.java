@@ -2,6 +2,7 @@ package org.ccs.opendfl.core.limitfrequency;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.ccs.opendfl.core.biz.IFrequencyConfigBiz;
 import org.ccs.opendfl.core.biz.IRsaBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
@@ -23,6 +24,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.resource.DefaultServletHttpRequestHandler;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -43,6 +45,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     @Autowired
     private FrequencyConfiguration frequencyConfiguration;
+    @Resource(name = "frequencyConfigBiz")
+    private IFrequencyConfigBiz frequencyConfigBiz;
 
     @Autowired
     private FreqLimitChain freqLimitChain;
@@ -91,14 +95,13 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             RequestVo requestVo = this.logFirstLoadRequest(handlerMethod, request.getMethod(), strategyParams);
 
             blackChain.setStrategyParams(strategyParams);
-            blackChain.setBlackConfig(frequencyConfiguration.getBlack());
             blackChain.clearLimit();
             boolean isBlack = blackChain.doCheckLimit(blackChain);
             if (isBlack) {
                 log.warn("----preHandle--uri={} blackIp={} ", request.getRequestURI(), remoteIp);
-                String title="frequency:black";
-                if(blackChain.getBlackStrategy()!=null){
-                    title="frequency:"+blackChain.getBlackStrategy().getLimitType();
+                String title = "frequency:black";
+                if (blackChain.getBlackStrategy() != null) {
+                    title = "frequency:" + blackChain.getBlackStrategy().getLimitType();
                 }
                 response.getWriter().println(String.format(BLACK_LIST_INFO, title));
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -107,7 +110,6 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
 
 
             whiteChain.setStrategyParams(strategyParams);
-            whiteChain.setWhiteConfig(frequencyConfiguration.getWhite());
             whiteChain.clearLimit();
             boolean isWhite = whiteChain.doCheckLimit(whiteChain);
             if (isWhite) {
@@ -195,7 +197,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
      * @param response
      */
     private void limitByRequestConfig(RequestVo requestVo, FrequencyVo frequencyVo, RequestStrategyParamsVo strategyParams, Map<String, Object> params, HttpServletResponse response) {
-        FrequencyConfigUtils.limitBySysconfig(requestVo);
+        frequencyConfigBiz.limitBySysconfigUri(requestVo);
         List<LimitUriConfigVo> limitConfigList = requestVo.getLimitRequests();
         for (LimitUriConfigVo uriConfigVo : limitConfigList) {
             frequencyVo = FrequencyVo.toFrequencyVo(frequencyVo, uriConfigVo);
@@ -222,7 +224,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         if (requestStartTime == null) {
             return;
         }
-        if(frequencyConfiguration.getMinRunTime()==0){
+        if (frequencyConfiguration.getMinRunTime() == 0) {
             startTime.remove();
             requestKey.remove();
             return;
@@ -236,7 +238,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             RequestVo requestVo = requestVoMap.get(key);
             //排除等一次请求
             if (requestVo != null && requestVo.getCounter().get() > 1) {
-                if(requestVo.getMaxRunTime()==null || requestVo.getMaxRunTime() < runTime){
+                if (requestVo.getMaxRunTime() == null || requestVo.getMaxRunTime() < runTime) {
                     requestVo.setMaxRunTime(runTime);
                     requestVo.setMaxRunTimeCreateTime(requestStartTime);
                 }
@@ -254,7 +256,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         Long curTime = strategyParams.getCurTime();
 
 
-        FrequencyConfigUtils.limitBySysconfigLoad(frequency, curTime);
+        frequencyConfigBiz.limitBySysconfigLoad(frequency, curTime);
         final int limit = frequency.getLimit();
         final int time = frequency.getTime();
         if (time == 0 || limit == 0) {
@@ -293,13 +295,14 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
 
     /**
      * 用于支持加密的数据解密，比如登入账号，否则不好限制
+     *
      * @param params
      * @param attrValue
      * @return
      */
     private Object decryptValue(Map<String, Object> params, Object attrValue) {
-        String clientIdRsa=(String) params.get("clientIdRsa");
-        if (attrValue !=null && StringUtils.isNotBlank(clientIdRsa)) {
+        String clientIdRsa = (String) params.get("clientIdRsa");
+        if (attrValue != null && StringUtils.isNotBlank(clientIdRsa)) {
             attrValue = rsaBiz.checkRSAKey(clientIdRsa, (String) attrValue);
         }
         return attrValue;
@@ -307,7 +310,6 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
 
     /**
      * 只从请求中获取参数一次
-     *
      */
     private void loadReqParamsOnce(HttpServletRequest request, Map<String, Object> params) {
         Map<String, Object> reqParams = RequestUtils.getParamsObject(request);
@@ -315,7 +317,10 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     }
 
 
-    public static final Map<String, FrequencyVo> freqMap = new ConcurrentHashMap<>(50);
+    /**
+     * 主要按接口缓存，理论上接口数不会太多，用Map做持久缓存，不会占太多内存
+     */
+    public static final Map<String, FrequencyVo> freqMap = new ConcurrentHashMap<>(64);
     public static final Map<String, RequestVo> requestVoMap = new ConcurrentHashMap<>(100);
 
     /**

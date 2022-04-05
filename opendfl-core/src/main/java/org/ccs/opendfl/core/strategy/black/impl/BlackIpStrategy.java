@@ -1,8 +1,8 @@
 package org.ccs.opendfl.core.strategy.black.impl;
 
+import org.ccs.opendfl.core.biz.IWhiteBlackListBiz;
 import org.ccs.opendfl.core.config.vo.WhiteBlackConfigVo;
 import org.ccs.opendfl.core.constants.FreqLimitType;
-import org.ccs.opendfl.core.limitfrequency.FrequencyWhiteCodeUtils;
 import org.ccs.opendfl.core.strategy.black.BlackChain;
 import org.ccs.opendfl.core.strategy.black.BlackStrategy;
 import org.ccs.opendfl.core.utils.RequestUtils;
@@ -10,6 +10,7 @@ import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,8 +18,10 @@ import org.springframework.stereotype.Service;
  */
 @Service(value = "blackIpStrategy")
 public class BlackIpStrategy implements BlackStrategy {
-    private static Logger logger = LoggerFactory.getLogger(BlackIpStrategy.class);
+    private static final Logger logger = LoggerFactory.getLogger(BlackIpStrategy.class);
     public static final FreqLimitType LIMIT_TYPE = FreqLimitType.BLACK_IP;
+    @Autowired
+    private IWhiteBlackListBiz whiteBlackListBiz;
 
 
     @Override
@@ -35,8 +38,8 @@ public class BlackIpStrategy implements BlackStrategy {
             if (StringUtils.isNumeric(ip)) {
                 ip = RequestUtils.getNumConvertIp(Long.parseLong(ip));
             }
-            WhiteBlackConfigVo whiteConfig = limitChain.getBlackConfig();
-            if (FrequencyWhiteCodeUtils.isWhiteId(ip, whiteConfig.getIps())) {
+            WhiteBlackConfigVo whiteConfig = whiteBlackListBiz.getBlackConfig();
+            if (whiteBlackListBiz.isIncludeId(ip, whiteConfig.getIps())) {
                 logger.warn("----doCheckLimit-blackIp={} userId={} uri={}", ip, userId, strategyParams.getRequestUri());
                 limitChain.setBlackStrategy(this);
                 return true;

@@ -12,12 +12,24 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 频率限制链，基于注解@Frequency或者于uriConfig的限制处理
+ * 特点：优先注解@Frequency方式，再uriConfig限制方式，达到条件后就限制访问
+ *
+ * @author chenjh
+ */
 @Service
 public class FreqLimitChain {
-    private static Logger logger = LoggerFactory.getLogger(FreqLimitChain.class);
+    private static final Logger logger = LoggerFactory.getLogger(FreqLimitChain.class);
     private int pos = 0;
     private int size = 0;
-    private final List<FreqLimitStrategy> limitStrategieList=new ArrayList<>();
+    /**
+     * 注册的策略
+     */
+    private final List<FreqLimitStrategy> limitStrategieRegists = new ArrayList<>();
+    /**
+     * 当前生效在用的策略，可根据limitItems起作用
+     */
     private List<FreqLimitStrategy> limitStrategies;
     private RequestStrategyParamsVo strategyParams;
     private String freqTypeItems;
@@ -31,6 +43,9 @@ public class FreqLimitChain {
     @Resource(name = "freqLimitUserIpStrategy")
     private FreqLimitStrategy freqLimitUserIpStrategy;
 
+    /**
+     * 新增策略需要在这里注册
+     */
     @PostConstruct
     public void initStrategy() {
         this.addLimit(this.freqLimitIpUserStrategy);
@@ -45,7 +60,7 @@ public class FreqLimitChain {
     }
 
     private void addLimit(FreqLimitStrategy limitStrategy) {
-        limitStrategieList.add(limitStrategy);
+        limitStrategieRegists.add(limitStrategy);
     }
 
     public RequestStrategyParamsVo getStrategyParams() {
@@ -94,7 +109,7 @@ public class FreqLimitChain {
             if ("".equals(item)) {
                 continue;
             }
-            for (FreqLimitStrategy strategy : limitStrategieList) {
+            for (FreqLimitStrategy strategy : limitStrategieRegists) {
                 if (item.equals(strategy.getLimitType())) {
                     limits.add(strategy);
                     break;
