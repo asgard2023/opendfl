@@ -3,6 +3,7 @@ package org.ccs.opendfl.console.config;
 import lombok.Data;
 import org.ccs.opendfl.console.config.vo.RolePermitVo;
 import org.ccs.opendfl.console.config.vo.UserVo;
+import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,7 @@ import java.util.List;
 public class ConsoleConfiguration {
     private String redisPrefix;
     private Character ifConsole='0';
-    private String consoleWhiteIp="none";
+    private String consoleWhiteIp= FrequencyConstant.NONE;
     /**
      * token有效期1小时
      */

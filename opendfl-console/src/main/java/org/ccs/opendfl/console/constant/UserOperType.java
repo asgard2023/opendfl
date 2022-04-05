@@ -6,8 +6,17 @@ package org.ccs.opendfl.console.constant;
  * @author chenjh
  */
 public enum UserOperType {
+    /**
+     * 查看权限
+     */
     VIEW("view"),
+    /**
+     * 删除限制缓存
+     */
     EVICT("evict"),
+    /**
+     * 清除list
+     */
     CLEAR("clear"),
     LIST("list");
     private final String type;

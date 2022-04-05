@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.ResultCode;
 import org.ccs.opendfl.core.strategy.white.WhiteChain;
+import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
 import org.junit.jupiter.api.Assertions;
@@ -47,6 +48,7 @@ class WhiteChainTest {
     void doCheckLimit_whiteIp_normal() {
         String lang = null;
         String ip = "192.168.5.105";
+        ip= ""+ RequestUtils.getIpConvertNum(ip);
         String requestUri = "/frequencyTest/serverTime";
         String methodName = "serverTime";
         Long curTime = System.currentTimeMillis();
@@ -84,6 +86,7 @@ class WhiteChainTest {
     void doCheckLimit_whiteIp() {
         String lang = null;
         String ip = "192.168.5.101";
+        ip= ""+RequestUtils.getIpConvertNum(ip);
         String requestUri = "/frequencyTest/serverTime";
         String methodName = "serverTime";
         Long curTime = System.currentTimeMillis();
@@ -138,6 +141,7 @@ class WhiteChainTest {
         for (int i = 0; i < 20; i++) {
             try {
                 String ip = "192.168.5.2" + i;
+                ip= ""+RequestUtils.getIpConvertNum(ip);
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip, methodName, requestUri, curTime);
                 strategyParamsVo.load(frequencyVo, whiteUser);
                 whiteChain.setStrategyParams(strategyParamsVo);

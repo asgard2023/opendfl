@@ -5,6 +5,7 @@ import org.ccs.opendfl.core.vo.RequestLockVo;
 import java.util.List;
 
 /**
+ * 分面式锁数据查询与管理
  * @author chenjh
  */
 public interface IRequestLockDataBiz {

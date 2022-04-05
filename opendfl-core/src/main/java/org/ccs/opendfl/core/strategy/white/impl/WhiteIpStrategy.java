@@ -1,8 +1,8 @@
 package org.ccs.opendfl.core.strategy.white.impl;
 
-import org.ccs.opendfl.core.biz.IWhiteBlackListBiz;
-import org.ccs.opendfl.core.config.vo.WhiteBlackConfigVo;
+import org.ccs.opendfl.core.biz.IWhiteBlackCheckBiz;
 import org.ccs.opendfl.core.constants.FreqLimitType;
+import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
 import org.ccs.opendfl.core.limitfrequency.FrequencyUtils;
 import org.ccs.opendfl.core.strategy.white.WhiteChain;
 import org.ccs.opendfl.core.strategy.white.WhiteStrategy;
@@ -16,13 +16,15 @@ import org.springframework.stereotype.Service;
 
 /**
  * IP限限制检查
+ *
+ * @author chenjh
  */
 @Service(value = "whiteIpStrategy")
 public class WhiteIpStrategy implements WhiteStrategy {
     private static final Logger logger = LoggerFactory.getLogger(WhiteIpStrategy.class);
     public static final FreqLimitType LIMIT_TYPE = FreqLimitType.WHITE_IP;
     @Autowired
-    private IWhiteBlackListBiz whiteBlackListBiz;
+    private IWhiteBlackCheckBiz whiteBlackCheckBiz;
 
 
     @Override
@@ -35,13 +37,12 @@ public class WhiteIpStrategy implements WhiteStrategy {
         if (containLimit(limitItems, LIMIT_TYPE)) {
             RequestStrategyParamsVo strategyParams = limitChain.getStrategyParams();
             String ip = strategyParams.getIp();
-            if (StringUtils.isNumeric(ip)) {
-                ip = RequestUtils.getNumConvertIp(Long.parseLong(ip));
-            }
-            WhiteBlackConfigVo whiteConfig = whiteBlackListBiz.getWhiteConfig();
-            if (whiteBlackListBiz.isIncludeId(ip, whiteConfig.getIps())) {
+            if (whiteBlackCheckBiz.isIncludeWhiteId(ip, WhiteBlackCheckType.IP)) {
                 //方便测试，日志前1000条
                 if (FrequencyUtils.isInitLog(getLimitType())) {
+                    if (StringUtils.isNumeric(ip)) {
+                        ip = RequestUtils.getNumConvertIp(Long.parseLong(ip));
+                    }
                     logger.info("----doCheckLimit-whiteIp={} uri={}", ip, strategyParams.getRequestUri());
                 }
                 return true;

@@ -4,7 +4,7 @@ frequency:
   ifActive: '1'
   #启动时每个接口前100次接口调用白名单可输出日志
   initLogCount: 100
-  #记录慢接口时间(毫秒)
+  #记录慢接口时间(毫秒)，为0关闭此功能
   minRunTime: 500
   #接口级用户白名单
   whiteCodeUsers:
@@ -13,13 +13,13 @@ frequency:
   #全局白名单
   white:
     items: 'whiteIp,whiteUser,'
-    ips: 'none'
-    users: 'none'
+    ips: '192.168.5.101'
+    users: '5101,'
   #全局黑名单
   black:
     items: 'blackIp,blackUser,'
-    ips: '192.168.2.154'
-    users: 'none'
+    ips: none
+    users: '5103,'
   #接口限制
   limit:
     items: 'limit,userCount,userIp,ipUser,'

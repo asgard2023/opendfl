@@ -5,6 +5,7 @@ import org.ccs.opendfl.core.vo.FrequencyVo;
 import java.util.List;
 
 /**
+ * 频率已限制数据查询与管理
  * @author chenjh
  */
 public interface IFrequencyDataBiz {

@@ -58,7 +58,7 @@ public class BlackChain {
     }
 
 
-    private void addLimit(BlackStrategy limitStrategy) {
+    public void addLimit(BlackStrategy limitStrategy) {
         blackStrategieRegists.add(limitStrategy);
     }
 

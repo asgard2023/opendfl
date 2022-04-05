@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.ResultCode;
 import org.ccs.opendfl.core.strategy.black.BlackChain;
+import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
 import org.junit.jupiter.api.Assertions;
@@ -87,6 +88,7 @@ class BlackChainTest {
     void doCheckLimit_blackIp() {
         String lang = null;
         String ip = "192.168.5.103";
+        ip= ""+RequestUtils.getIpConvertNum(ip);
         String requestUri = "/frequencyTest/serverTime";
         String methodName = "serverTime";
         Long curTime = System.currentTimeMillis();
@@ -145,6 +147,7 @@ class BlackChainTest {
         for (int i = 0; i < 20; i++) {
             try {
                 String ip = "192.168.5.2" + i;
+                ip= ""+RequestUtils.getIpConvertNum(ip);
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip, methodName, requestUri, curTime);
                 strategyParamsVo.load(frequencyVo, blackUser);
                 blackChain.setStrategyParams(strategyParamsVo);

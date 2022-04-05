@@ -13,7 +13,7 @@ public interface IRsaBiz {
      *
      * @param clientId
      * @param funcCode
-     * @return
+     * @return Map<String, String>
      */
     Map<String, String> generateRSAKey(String clientId, String funcCode);
 
@@ -22,7 +22,7 @@ public interface IRsaBiz {
      *
      * @param clientId
      * @param password
-     * @return
+     * @return String
      */
     String checkRSAKey(String clientId, String password);
 }

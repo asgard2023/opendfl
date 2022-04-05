@@ -2,6 +2,7 @@ package org.ccs.opendfl.core.utils;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.FailedException;
 import org.ccs.opendfl.core.exception.ParamErrorException;
@@ -101,7 +102,7 @@ public class RequestUtils {
         try {
             if (request.getInputStream().isFinished()) {
                 String reqBodys = (String) request.getAttribute(REQ_BODYS);
-                if(reqBodys!=null){
+                if (reqBodys != null) {
                     request.removeAttribute(REQ_BODYS);
                 }
                 return reqBodys;
@@ -113,8 +114,8 @@ public class RequestUtils {
             while ((temp = br.readLine()) != null) {
                 sb.append(temp);
             }
-            String body=sb.toString();
-            if(StringUtils.isNotBlank(body)){
+            String body = sb.toString();
+            if (StringUtils.isNotBlank(body)) {
                 request.setAttribute(REQ_BODYS, body);
             }
             return body;
@@ -141,14 +142,14 @@ public class RequestUtils {
 
     public static String getLang(HttpServletRequest request) {
         String lang = request.getHeader(RequestParams.LANG);
-        if(lang==null) {
+        if (lang == null) {
             return LangCodes.ZH;//默认中文
         }
-        if(lang.indexOf('-')!=-1) {
+        if (lang.indexOf('-') != -1) {
             //如en-CN
             return lang.split("-")[0];
         }
-        if(!LangCodes.ZH.equals(lang) && !LangCodes.EN.equals(lang) && !LangCodes.JA.equals(lang)) {
+        if (!LangCodes.ZH.equals(lang) && !LangCodes.EN.equals(lang) && !LangCodes.JA.equals(lang)) {
             return LangCodes.EN;
         }
         return lang;
@@ -157,7 +158,6 @@ public class RequestUtils {
     public static String getToken(HttpServletRequest request) {
         return request.getHeader(RequestParams.AUTHORIZATION);
     }
-
 
 
     public static Integer getInt(Object obj) {
@@ -182,7 +182,7 @@ public class RequestUtils {
         return ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip);
     }
 
-    public static String getRequestUri(HttpServletRequest request){
+    public static String getRequestUri(HttpServletRequest request) {
         return request.getRequestURI().substring(request.getContextPath().length());
     }
 
@@ -209,8 +209,7 @@ public class RequestUtils {
         }
         if ("127.0.0.1".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip)) {
             ip = "localhost";
-        }
-        else {
+        } else {
             ip = getIpFirst(ip);
             if (!isIpAddress(ip)) {
                 ip = request.getRemoteAddr();
@@ -292,7 +291,7 @@ public class RequestUtils {
      * @return 转换成数字类型的ip地址
      */
     public static long getIpConvertNum(String ipAddress) {
-        if(StringUtils.equals("localhost", ipAddress)){
+        if (StringUtils.equals("localhost", ipAddress)) {
             ipAddress = "127.0.0.1";
         }
         String[] ip = ipAddress.split("\\.");
@@ -302,6 +301,39 @@ public class RequestUtils {
         long d = Integer.parseInt(ip[3]);
 
         return a * 256 * 256 * 256 + b * 256 * 256 + c * 256 + d;
+    }
+
+    public static String convertIpv4(String ipAddress) {
+        if (isIpv6Address(ipAddress)) {
+            return ipAddress;
+        }
+        return "" + getIpConvertNum(ipAddress);
+    }
+
+    /**
+     * 将ip 地址转换成数字
+     *
+     * @param ipAddress 传入的ip地址
+     * @return 转换成数字类型的ip地址
+     */
+    public static String getIpConvertNums(String ipAddress) {
+        if (StringUtils.isBlank(ipAddress)) {
+            return ipAddress;
+        }
+        //none表示不起作，忽略
+        if (FrequencyConstant.NONE.equals(ipAddress)) {
+            return ipAddress;
+        }
+        if (ipAddress.indexOf(',') < 0) {
+            return convertIpv4(ipAddress) + ",";
+        } else {
+            String[] ips = ipAddress.split(",");
+            StringBuilder sb = new StringBuilder();
+            for (String ip : ips) {
+                sb.append(convertIpv4(ip)).append(",");
+            }
+            return sb.toString();
+        }
     }
 
     public static boolean isIpv6Address(String address) {
@@ -323,7 +355,7 @@ public class RequestUtils {
                 return false;
             }
             final InetAddress inetAddress = InetAddress.getByName(address);
-            return inetAddress instanceof Inet6Address||inetAddress instanceof InetAddress;
+            return inetAddress instanceof Inet6Address || inetAddress instanceof InetAddress;
         } catch (UnknownHostException e) {
             log.warn("----isIpAddress--address={}", address);
             return false;
@@ -332,7 +364,7 @@ public class RequestUtils {
 
     private static boolean checkIpLength(String address) {
         int length = address.length();
-        if(length<8 || length>48){
+        if (length < 8 || length > 48) {
             log.warn("----checkIpLength--address={} length={} invalid", address, length);
             return true;
         }

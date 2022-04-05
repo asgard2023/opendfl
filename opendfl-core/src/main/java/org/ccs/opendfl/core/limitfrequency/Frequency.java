@@ -1,5 +1,6 @@
 package org.ccs.opendfl.core.limitfrequency;
 
+import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.*;
@@ -36,7 +37,7 @@ public @interface Frequency {
      *
      * @return
      */
-    String whiteCode() default "none";
+    String whiteCode() default FrequencyConstant.NONE;
 
     String errMsg() default "";
 

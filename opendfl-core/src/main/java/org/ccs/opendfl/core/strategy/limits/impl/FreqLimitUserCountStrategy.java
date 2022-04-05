@@ -1,6 +1,6 @@
 package org.ccs.opendfl.core.strategy.limits.impl;
 
-import org.ccs.opendfl.core.biz.IWhiteBlackListBiz;
+import org.ccs.opendfl.core.biz.IWhiteBlackCheckBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.limitfrequency.FrequencyUtils;
@@ -29,7 +29,7 @@ public class FreqLimitUserCountStrategy implements FreqLimitStrategy {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
     @Autowired
-    private IWhiteBlackListBiz whiteBlackListBiz;
+    private IWhiteBlackCheckBiz whiteBlackCheckBiz;
     private static FrequencyConfiguration frequencyConfiguration;
 
     @Autowired
@@ -71,7 +71,7 @@ public class FreqLimitUserCountStrategy implements FreqLimitStrategy {
                     String ip = strategyParams.getIp();
                     //再次过期处理，以免有变成永久的key
                     RedisTemplateUtil.expireTimeTTL(redisTemplate, redisKey, frequency.getTime());
-                    if (whiteBlackListBiz.checkWhiteUserId(frequency, strategyParams.getCurTime(), userId)) {
+                    if (whiteBlackCheckBiz.checkWhiteUserId(frequency, strategyParams.getCurTime(), userId)) {
                         logger.info("----doCheckLimit-userCount--whiteUserId-redisKey={} time={} count={} limit={} ip={}", redisKey, time, v, limit, ip);
                         //如果是功能白名单直接结束策略，不用往下执行
                         return;

@@ -1,8 +1,8 @@
 package org.ccs.opendfl.core.strategy.black.impl;
 
-import org.ccs.opendfl.core.biz.IWhiteBlackListBiz;
-import org.ccs.opendfl.core.config.vo.WhiteBlackConfigVo;
+import org.ccs.opendfl.core.biz.IWhiteBlackCheckBiz;
 import org.ccs.opendfl.core.constants.FreqLimitType;
+import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
 import org.ccs.opendfl.core.strategy.black.BlackChain;
 import org.ccs.opendfl.core.strategy.black.BlackStrategy;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
@@ -21,8 +21,7 @@ public class BlackUserStrategy implements BlackStrategy {
     private static final Logger logger = LoggerFactory.getLogger(BlackUserStrategy.class);
     public static final FreqLimitType LIMIT_TYPE = FreqLimitType.BLACK_USER;
     @Autowired
-    private IWhiteBlackListBiz whiteBlackListBiz;
-
+    private IWhiteBlackCheckBiz whiteBlackCheckBiz;
 
     @Override
     public String getLimitType() {
@@ -34,13 +33,10 @@ public class BlackUserStrategy implements BlackStrategy {
         if (containLimit(limitItems, LIMIT_TYPE)) {
             RequestStrategyParamsVo strategyParams = limitChain.getStrategyParams();
             String userId = strategyParams.getUserId();
-            if (userId != null) {
-                WhiteBlackConfigVo whiteConfig = whiteBlackListBiz.getBlackConfig();
-                if (whiteBlackListBiz.isIncludeId(userId, whiteConfig.getUsers())) {
-                    logger.warn("-----doCheckLimit-blackUser={} uri={}", userId, strategyParams.getRequestUri());
-                    limitChain.setBlackStrategy(this);
-                    return true;
-                }
+            if (whiteBlackCheckBiz.isIncludeBlackId(userId, WhiteBlackCheckType.USER)) {
+                logger.warn("-----doCheckLimit-blackUser={} uri={}", userId, strategyParams.getRequestUri());
+                limitChain.setBlackStrategy(this);
+                return true;
             }
         }
         return limitChain.doCheckLimit(limitChain);

@@ -1,8 +1,8 @@
 package org.ccs.opendfl.core.strategy.black.impl;
 
-import org.ccs.opendfl.core.biz.IWhiteBlackListBiz;
-import org.ccs.opendfl.core.config.vo.WhiteBlackConfigVo;
+import org.ccs.opendfl.core.biz.IWhiteBlackCheckBiz;
 import org.ccs.opendfl.core.constants.FreqLimitType;
+import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
 import org.ccs.opendfl.core.strategy.black.BlackChain;
 import org.ccs.opendfl.core.strategy.black.BlackStrategy;
 import org.ccs.opendfl.core.utils.RequestUtils;
@@ -15,14 +15,15 @@ import org.springframework.stereotype.Service;
 
 /**
  * IP限限制检查
+ *
+ * @author chenjh
  */
 @Service(value = "blackIpStrategy")
 public class BlackIpStrategy implements BlackStrategy {
     private static final Logger logger = LoggerFactory.getLogger(BlackIpStrategy.class);
     public static final FreqLimitType LIMIT_TYPE = FreqLimitType.BLACK_IP;
     @Autowired
-    private IWhiteBlackListBiz whiteBlackListBiz;
-
+    private IWhiteBlackCheckBiz whiteBlackCheckBiz;
 
     @Override
     public String getLimitType() {
@@ -35,11 +36,11 @@ public class BlackIpStrategy implements BlackStrategy {
             RequestStrategyParamsVo strategyParams = limitChain.getStrategyParams();
             String userId = strategyParams.getUserId();
             String ip = strategyParams.getIp();
-            if (StringUtils.isNumeric(ip)) {
-                ip = RequestUtils.getNumConvertIp(Long.parseLong(ip));
-            }
-            WhiteBlackConfigVo whiteConfig = whiteBlackListBiz.getBlackConfig();
-            if (whiteBlackListBiz.isIncludeId(ip, whiteConfig.getIps())) {
+
+            if (whiteBlackCheckBiz.isIncludeBlackId(ip, WhiteBlackCheckType.IP)) {
+                if (StringUtils.isNumeric(ip)) {
+                    ip = RequestUtils.getNumConvertIp(Long.parseLong(ip));
+                }
                 logger.warn("----doCheckLimit-blackIp={} userId={} uri={}", ip, userId, strategyParams.getRequestUri());
                 limitChain.setBlackStrategy(this);
                 return true;
