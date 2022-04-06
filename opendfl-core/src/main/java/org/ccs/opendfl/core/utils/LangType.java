@@ -15,7 +15,7 @@ public enum LangType {
     EN(LangCodes.EN, "英语", false);
     protected static final List<String> LANG_TYPES= Arrays.asList(LangType.values()).stream().map(t->t.code).collect(Collectors.toList());
     public static final String NONE_LANG="noneLang";//表示整个数据不做国际化，即不显示
-    static Logger logger = LoggerFactory.getLogger(LangType .class);
+    static final Logger logger = LoggerFactory.getLogger(LangType .class);
     public final String code;
     public final String descs;
     public final boolean isDefault;
