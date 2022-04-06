@@ -22,13 +22,13 @@ class RequestUtilsTest {
 
         time = System.currentTimeMillis();
         host = "fe80::ce24:2eff:fef2:75e8";
-        isIpAddress = RequestUtils.isIpAddress(host);
+        isIpAddress = RequestUtils.isIpv6Address(host);
         Assertions.assertTrue(isIpAddress, host + " ipv6 valid");
         System.out.println(System.currentTimeMillis() - time);
 
         time = System.currentTimeMillis();
         host = "2409:8a55:3312:c4e0:ce24:2eff:fef3:75e2";
-        isIpAddress = RequestUtils.isIpAddress(host);
+        isIpAddress = RequestUtils.isIpv6Address(host);
         Assertions.assertTrue(isIpAddress, host + " ipv6 valid");
         System.out.println(System.currentTimeMillis() - time);
 
@@ -38,5 +38,24 @@ class RequestUtilsTest {
         Assertions.assertFalse(isIpAddress, host + " invalid");
         System.out.println(System.currentTimeMillis() - time);
 
+    }
+
+    @Test
+    public void getNumConvertIp(){
+        String host;
+        host = "192.168.0.101";
+        long ipNum=RequestUtils.getIpConvertNum(host);
+        System.out.println("host="+host+" "+" ipNum="+ipNum);
+        Assertions.assertEquals(host, RequestUtils.getNumConvertIp(ipNum));
+
+        host = "192.168.197.101";
+        ipNum=RequestUtils.getIpConvertNum(host);
+        System.out.println("host="+host+" "+" ipNum="+ipNum);
+        Assertions.assertEquals(host, RequestUtils.getNumConvertIp(ipNum));
+
+        host = "10.0.158.116";
+        ipNum=RequestUtils.getIpConvertNum(host);
+        System.out.println("host="+host+" "+" ipNum="+ipNum);
+        Assertions.assertEquals(host, RequestUtils.getNumConvertIp(ipNum));
     }
 }

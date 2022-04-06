@@ -11,9 +11,13 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * 请求参数处理
+ *
+ * @author chenjh
+ */
 @Slf4j
 public class RequestUtils {
     private RequestUtils() {
@@ -37,24 +41,25 @@ public class RequestUtils {
      *
      * @param request HttpServletRequest
      * @return Map<String, Object>
-     * @throws BaseException
      */
     public static Map<String, Object> getParamsObject(HttpServletRequest request) throws BaseException {
         Map<String, String[]> requestParams = request.getParameterMap();
         Map<String, Object> params = new HashMap<>(requestParams.size());
-        for (Iterator<String> iter = requestParams.keySet().iterator(); iter.hasNext(); ) {
-            String name = iter.next();
-            String[] values = requestParams.get(name);
+        String deviceId = request.getHeader(RequestParams.DEVICE_ID);
+        //参数优先，header允许被参数覆盖
+        if (deviceId != null) {
+            params.put(RequestParams.DEVICE_ID, deviceId);
+        }
+
+        for (Map.Entry<String, String[]> entry: requestParams.entrySet()) {
+            String[] values = entry.getValue();
             String valueStr = "";
-            for (int i = 0; i < values.length; i++) {
-                valueStr = (i == values.length - 1) ? valueStr + values[i]
+            int length=values.length;
+            for (int i = 0; i < length; i++) {
+                valueStr = (i == length - 1) ? valueStr + values[i]
                         : valueStr + values[i] + ",";
             }
-            params.put(name, valueStr);
-        }
-        String deviceId=request.getHeader(RequestParams.DEVICE_ID);
-        if(deviceId!=null){
-            params.put(RequestParams.DEVICE_ID, deviceId);
+            params.put(entry.getKey(), valueStr);
         }
 
         String postStr = (String) request.getAttribute(REQ_BODYS);
@@ -66,12 +71,16 @@ public class RequestUtils {
     }
 
     public static final String REQ_BODYS = "reqBodys";
+    public static final String LOCALHOST_IP = "127.0.0.1";
+    public static final String LOCALHOST_IPV6 = "0:0:0:0:0:0:0:1";
+    public static final String LOCALHOST_HOST = "localhost";
 
 
     public static String getLang(HttpServletRequest request) {
         String lang = request.getHeader(RequestParams.LANG);
         if (lang == null) {
-            return LangCodes.ZH;//默认中文
+            //默认中文
+            return LangCodes.ZH;
         }
         if (lang.indexOf('-') != -1) {
             //如en-CN
@@ -135,8 +144,8 @@ public class RequestUtils {
             //最后都取不到ip
             return null;
         }
-        if ("127.0.0.1".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip)) {
-            ip = "localhost";
+        if (LOCALHOST_IP.equals(ip) || LOCALHOST_IPV6.equals(ip)) {
+            ip = LOCALHOST_HOST;
         } else {
             ip = getIpFirst(ip);
             if (!isIpAddress(ip)) {
@@ -165,7 +174,6 @@ public class RequestUtils {
      *
      * @param params Map<String, Object>
      * @return String
-     * @throws BaseException
      */
     public static String getStringFromMap(Map<String, Object> params, String key) throws BaseException {
         if (params == null) {
@@ -180,14 +188,13 @@ public class RequestUtils {
      * 从Map里取Double数据
      *
      * @param params Map<String, Object>
-     * @param key String
+     * @param key    String
      * @return double
-     * @throws BaseException
      */
     public static double getDoubleFromMap(Map<String, Object> params, String key) throws BaseException {
         String value = getStringFromMap(params, key);
         try {
-            return Double.parseDouble(value);// 交易值
+            return Double.parseDouble(value);
         } catch (Exception e) {
             throw new FailedException("参数" + key + "必须为数值");
         }
@@ -203,12 +210,13 @@ public class RequestUtils {
         long[] mask = {0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000};
         long num = 0;
         StringBuilder ipInfo = new StringBuilder();
-        for (int i = 0; i < 4; i++) {
+        int length = mask.length;
+        for (int i = 0; i < length; i++) {
             num = (ipLong & mask[i]) >> (i * 8);
             if (i > 0) {
                 ipInfo.insert(0, ".");
             }
-            ipInfo.insert(0, Long.toString(num, 10));
+            ipInfo.insert(0, num);
         }
         return ipInfo.toString();
     }
@@ -220,8 +228,8 @@ public class RequestUtils {
      * @return 转换成数字类型的ip地址
      */
     public static long getIpConvertNum(String ipAddress) {
-        if (StringUtils.equals("localhost", ipAddress)) {
-            ipAddress = "127.0.0.1";
+        if (StringUtils.equals(LOCALHOST_HOST, ipAddress)) {
+            ipAddress = LOCALHOST_IP;
         }
         String[] ip = ipAddress.split("\\.");
         long a = Integer.parseInt(ip[0]);
@@ -293,7 +301,9 @@ public class RequestUtils {
 
     private static boolean checkIpLength(String address) {
         int length = address.length();
-        if (length < 8 || length > 48) {
+        int minIpLength = 8;
+        int maxIpLength = 48;
+        if (length < minIpLength || length > maxIpLength) {
             log.warn("----checkIpLength--address={} length={} invalid", address, length);
             return true;
         }

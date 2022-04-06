@@ -3,19 +3,30 @@ package org.ccs.opendfl.core.vo;
 import lombok.Data;
 import lombok.Getter;
 
-import javax.servlet.http.HttpServletRequest;
-
+/**
+ * 请求参数，用于限制处理
+ * @author chenjh
+ *
+ */
 @Data
 @Getter
 public class RequestStrategyParamsVo{
     private String requestUri;
     private final String lang;
-    private final String ip;
-    private final String deviceId;
     private final String methodName;
 
     private FrequencyVo frequency;
     private Long curTime;
+    private final String ip;
+    /**
+     * 可以从url参数或者header参数取值
+     * 默认取deviceId
+     */
+    private final String deviceId;
+    /**
+     * 可以从url参数，post的json参数，inputStream中的参数中取值
+     * 默认取userId也可以是接口注解指定的attrName参数
+     */
     private String userId;
 
     public RequestStrategyParamsVo(String lang, String ip, String deviceId, String methodName, String requestUri, Long curTime) {

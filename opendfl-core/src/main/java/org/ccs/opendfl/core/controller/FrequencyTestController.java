@@ -1,6 +1,6 @@
 package org.ccs.opendfl.core.controller;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.exception.FailedException;
 import org.ccs.opendfl.core.limitfrequency.Frequency;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 /**
  * 频率限制支持
@@ -29,6 +30,7 @@ public class FrequencyTestController {
     @GetMapping("/serverTime")
     @ResponseBody
     public Object serverTime(HttpServletRequest request) {
+        log.info("----serverTime--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();
     }
 
@@ -37,6 +39,7 @@ public class FrequencyTestController {
     @Frequency(time = 5, limit = 5, name = "serverTimeFreq")
     @Frequency2(time = 3600, limit = 100, name = "serverTimeFreq")
     public Object serverTimeFreq(HttpServletRequest request) {
+        log.info("----serverTimeFreq--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();
     }
 
@@ -68,7 +71,7 @@ public class FrequencyTestController {
     @ResponseBody
     public Object serverTimeFreqDevice(HttpServletRequest request) {
         String deviceId = request.getParameter(RequestParams.DEVICE_ID);
-        if(deviceId==null) {
+        if (deviceId == null) {
             deviceId = request.getHeader(RequestParams.DEVICE_ID);
         }
         log.info("----serverTimeFreqDevice--deviceId={}", deviceId);
@@ -82,20 +85,30 @@ public class FrequencyTestController {
         return System.currentTimeMillis();
     }
 
+    /**
+     * json参数测试
+     * @param requestTest RequestTestVo
+     * @return current time
+     */
     @PostMapping("/serverTimeJsonFreq")
     @ResponseBody
     @Frequency(time = 5, limit = 5, name = "serverTimeJsonFreq")
-    public Object serverTimeJsonFreq(HttpServletRequest request, @RequestBody RequestTestVo requestTest) {
+    public Object serverTimeJsonFreq(@RequestBody RequestTestVo requestTest) {
         ValidateUtils.notNull(requestTest.getUserId(), "userId is null");
         log.info("----serverTimeJsonFreq--userId={}", requestTest.getUserId());
         return System.currentTimeMillis();
     }
 
+    /**
+     * 字符流测试
+     * @param request HttpServletRequest
+     * @return current time
+     */
     @PostMapping("/serverTimeStreamFreq")
     @ResponseBody
     @Frequency(time = 5, limit = 5, name = "serverTimeStreamFreq")
     public Object serverTimeStreamFreq(HttpServletRequest request) throws Exception {
-        BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(), "utf-8"));
+        BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8));
         StringBuilder sb = new StringBuilder();
         String temp;
         while ((temp = br.readLine()) != null) {
@@ -104,7 +117,7 @@ public class FrequencyTestController {
         br.close();
         String params = sb.toString();
         log.info("-----serverTimeStreamFreq--params={}", params);
-        RequestTestVo requestTest = JSONObject.parseObject(params, RequestTestVo.class);
+        RequestTestVo requestTest = JSON.parseObject(params, RequestTestVo.class);
         ValidateUtils.notNull(requestTest.getUserId(), "userId is null");
         log.debug("----serverTimeStreamFreq--userId={}", requestTest.getUserId());
         return System.currentTimeMillis();
@@ -112,7 +125,8 @@ public class FrequencyTestController {
 
 
     private Integer getSleepTimeIfNull(Integer sleepTime) {
-        if (sleepTime == null || sleepTime > 100) {
+        int maxSleepTime = 100;
+        if (sleepTime == null || sleepTime > maxSleepTime) {
             sleepTime = 1;
         }
         return sleepTime;
@@ -122,7 +136,7 @@ public class FrequencyTestController {
      * 分布式锁测试，按用户，该用户前面请求未完成，再次请求全部拒绝
      *
      * @param sleepTime 测试线程 休睡时间(秒)
-     * @return
+     * @return currentTime
      */
     @GetMapping("/waitLockTestUser")
     @ResponseBody
@@ -142,10 +156,10 @@ public class FrequencyTestController {
 
 
     /**
-     * 分布式锁测试，按用户，按roderId的分布式锁，只能一个请求能处理，其他全部拒绝
+     * 分布式锁测试，按用户，按oderId的分布式锁，只能一个请求能处理，其他全部拒绝
      *
      * @param sleepTime 测试线程 休睡时间(秒)
-     * @return
+     * @return currentTime
      */
     @GetMapping("/waitLockTestOrder")
     @ResponseBody
