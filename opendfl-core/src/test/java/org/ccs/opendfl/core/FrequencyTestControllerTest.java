@@ -342,11 +342,11 @@ class FrequencyTestControllerTest {
     }
 
     /**
-     * 设备号限制
+     * 设备号黑名单限制
      *
      */
     @Test
-    void serverTimeDeviceId() throws Exception {
+    void serverTimeDeviceIdByHader() throws Exception {
         int limtCount = 0;
         int successCount = 0;
         String errorLimitType = "frequency:blackDeviceId";
@@ -368,8 +368,35 @@ class FrequencyTestControllerTest {
         }
         Assertions.assertTrue(successCount == 0, "successCount:" + successCount);
         Assertions.assertEquals(20, limtCount, "limtCount:" + limtCount);
+    }
 
-
+    /**
+     * 设备号黑名单限制
+     *
+     */
+    @Test
+    void serverTimeDeviceIdByParam() throws Exception {
+        int limtCount = 0;
+        int successCount = 0;
+        String errorLimitType = "frequency:blackDeviceId";
+        for (int i = 0; i < 20; i++) {
+            String userId = "123" + i;
+            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqDevice")
+                            .param("userId", userId)
+                            .param(RequestParams.DEVICE_ID, "blackDevice123")
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andReturn();
+            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+            if (content.contains(errorLimitType)) {
+                limtCount++;
+            } else {
+                successCount++;
+            }
+            System.out.println("----serverTimeFreqDiffUser status=" + status + " content=" + content);
+        }
+        Assertions.assertTrue(successCount == 0, "successCount:" + successCount);
+        Assertions.assertEquals(20, limtCount, "limtCount:" + limtCount);
     }
 
     /**
@@ -429,6 +456,9 @@ class FrequencyTestControllerTest {
         Assertions.assertTrue(limtCount > 0, "ipUserCount:" + limtCount);
     }
 
+    /**
+     * 分布式锁-用户锁
+     */
     @Test
     void waitLockTestUser() {
         AtomicInteger lockedCounter = new AtomicInteger();
@@ -480,6 +510,9 @@ class FrequencyTestControllerTest {
         Assertions.assertTrue(lockedCounter.get() >= 15, "lockedCount:" + lockedCounter.get());
     }
 
+    /**
+     * 分布式气密-订单号
+     */
     @Test
     void waitLockTestOrder() {
         AtomicInteger lockedCounter = new AtomicInteger();
