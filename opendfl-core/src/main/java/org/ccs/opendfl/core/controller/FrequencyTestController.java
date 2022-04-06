@@ -66,7 +66,6 @@ public class FrequencyTestController {
 
     @GetMapping("/serverTimeFreqDevice")
     @ResponseBody
-    @Frequency(time = 5, limit = 5, name = "serverTimeFreqDevice")
     public Object serverTimeFreqDevice(HttpServletRequest request) {
         String deviceId = request.getParameter(RequestParams.DEVICE_ID);
         if(deviceId==null) {
