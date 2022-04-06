@@ -87,11 +87,16 @@ public class WhiteBlackCheckBiz implements IWhiteBlackCheckBiz {
     @Override
     public boolean isIncludeBlackId(String id, WhiteBlackCheckType checkType) {
         boolean check = false;
-        WhiteBlackConfigVo whiteConfig = whiteBlackListBiz.getBlackConfig();
+        WhiteBlackConfigVo blackConfig = whiteBlackListBiz.getBlackConfig();
         if (WhiteBlackCheckType.USER == checkType) {
-            check = this.isIncludeId(id, whiteConfig.getUsers());
+            check = this.isIncludeId(id, blackConfig.getUsers());
         } else if (WhiteBlackCheckType.IP == checkType) {
-            check = this.isIncludeId(id, whiteConfig.getIps());
+            check = this.isIncludeId(id, blackConfig.getIps());
+        } else if (WhiteBlackCheckType.DEVICE == checkType) {
+            if (StringUtils.ifYes(blackConfig.getIfDeviceIdRequire()) && StringUtils.isEmpty(id)) {
+                return false;
+            }
+            check = this.isIncludeId(id, blackConfig.getDeviceIds());
         }
         return check;
     }

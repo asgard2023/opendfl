@@ -26,6 +26,8 @@ class WhiteChainTest {
     @Autowired
     private WhiteChain whiteChain;
 
+    private String deviceId="chainDeviceTest";
+
 
     @BeforeEach
     void init() {
@@ -65,7 +67,7 @@ class WhiteChainTest {
         int failCount = 0;
         for (int i = 0; i < 20; i++) {
             try {
-                strategyParamsVo = new RequestStrategyParamsVo(lang, ip, methodName, requestUri, curTime);
+                strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, curTime);
                 strategyParamsVo.load(frequencyVo, "130" + i);
                 whiteChain.setStrategyParams(strategyParamsVo);
                 whiteChain.clearLimit();
@@ -103,7 +105,7 @@ class WhiteChainTest {
         int failCount = 0;
         for (int i = 0; i < 20; i++) {
             try {
-                strategyParamsVo = new RequestStrategyParamsVo(lang, ip, methodName, requestUri, curTime);
+                strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, curTime);
                 strategyParamsVo.load(frequencyVo, "130" + i);
                 whiteChain.setStrategyParams(strategyParamsVo);
                 whiteChain.clearLimit();
@@ -142,7 +144,7 @@ class WhiteChainTest {
             try {
                 String ip = "192.168.5.2" + i;
                 ip= ""+RequestUtils.getIpConvertNum(ip);
-                strategyParamsVo = new RequestStrategyParamsVo(lang, ip, methodName, requestUri, curTime);
+                strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, curTime);
                 strategyParamsVo.load(frequencyVo, whiteUser);
                 whiteChain.setStrategyParams(strategyParamsVo);
                 whiteChain.clearLimit();

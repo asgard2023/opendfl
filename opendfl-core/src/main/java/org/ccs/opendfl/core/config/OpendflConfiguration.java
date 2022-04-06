@@ -9,4 +9,5 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpendflConfiguration {
     private String defaultAttrName="userId";
+    private String defaultDeviceId="deviceId";
 }

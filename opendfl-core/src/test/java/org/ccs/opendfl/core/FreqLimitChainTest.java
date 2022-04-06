@@ -19,6 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 class FreqLimitChainTest {
     @Autowired
     private FreqLimitChain freqLimitChain;
+    private String deviceId="freqTest123";
 
     @BeforeEach
     void init() {
@@ -48,7 +49,7 @@ class FreqLimitChainTest {
         int failCount = 0;
         for (int i = 0; i < 20; i++) {
             try {
-                strategyParamsVo = new RequestStrategyParamsVo(lang, ip + i, methodName, requestUri, curTime);
+                strategyParamsVo = new RequestStrategyParamsVo(lang, ip + i, deviceId, methodName, requestUri, curTime);
                 strategyParamsVo.load(frequencyVo, "130");
                 freqLimitChain.setStrategyParams(strategyParamsVo);
                 freqLimitChain.clearLimit();
@@ -81,7 +82,7 @@ class FreqLimitChainTest {
         String requestUri = "/frequencyTest/serverTimeFreqIpUser";
         String methodName = "serverTimeFreqIpUser";
         Long curTime = System.currentTimeMillis();
-        RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, methodName, requestUri, curTime);
+        RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, curTime);
 
         FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
         frequencyVo.setLimit(1000);
@@ -118,7 +119,7 @@ class FreqLimitChainTest {
         String requestUri = "/frequencyTest/serverTimeFreq";
         String methodName = "serverTimeFreq";
         Long curTime = System.currentTimeMillis();
-        RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, methodName, requestUri, curTime);
+        RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip,deviceId, methodName, requestUri, curTime);
 
         FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
         frequencyVo.setLimit(1000);
@@ -154,7 +155,7 @@ class FreqLimitChainTest {
         String requestUri = "/frequencyTest/serverTimeFreq";
         String methodName = "serverTimeFreq";
         Long curTime = System.currentTimeMillis();
-        RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, methodName, requestUri, curTime);
+        RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip,deviceId, methodName, requestUri, curTime);
 
         FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
         frequencyVo.setLimit(1000);
@@ -190,7 +191,7 @@ class FreqLimitChainTest {
         String requestUri = "/frequencyTest/serverTimeFreq";
         String methodName = "serverTimeFreq";
         Long curTime = System.currentTimeMillis();
-        RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, methodName, requestUri, curTime);
+        RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, curTime);
 
         FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
         frequencyVo.setLimit(1000);

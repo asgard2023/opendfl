@@ -19,9 +19,12 @@ frequency:
     users: '5101,'
   #全局黑名单
   black:
-    items: 'blackIp,blackUser,'
+    items: 'blackIp,blackUser,blackDeviceId,'
     ips: '192.168.5.103'
     users: '5103,'
+    #是否必填deviceId，如果是，deviceId为空，拒绝，否则忽略
+    ifDeviceIdRequire: '0'
+    deviceIds: 'blackDevice123,'
   #接口限制
   limit:
     items: 'limit,userCount,userIp,ipUser,'

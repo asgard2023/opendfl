@@ -21,11 +21,16 @@ public final class RequestParams {
             RequestParams.USER_ID = opendflConfiguration.getDefaultAttrName();
             log.info("-----USER_ID use default attrName={}", RequestParams.USER_ID);
         }
+        if(StringUtils.isNotBlank(opendflConfiguration.getDefaultAttrName())) {
+            RequestParams.DEVICE_ID = opendflConfiguration.getDefaultDeviceId();
+            log.info("-----DEVICE_ID use default attrName={}", RequestParams.DEVICE_ID);
+        }
     }
     /**
      * 用户ID
      */
     public static String USER_ID = "userId";
+    public static String DEVICE_ID ="deviceId";
     /**
      * username
      */

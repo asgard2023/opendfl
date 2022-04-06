@@ -52,6 +52,10 @@ public class RequestUtils {
             }
             params.put(name, valueStr);
         }
+        String deviceId=request.getHeader(RequestParams.DEVICE_ID);
+        if(deviceId!=null){
+            params.put(RequestParams.DEVICE_ID, deviceId);
+        }
 
         String postStr = (String) request.getAttribute(REQ_BODYS);
         if (postStr != null) {

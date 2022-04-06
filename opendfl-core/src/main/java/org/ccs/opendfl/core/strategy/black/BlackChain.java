@@ -38,6 +38,8 @@ public class BlackChain {
     private BlackStrategy blackIpStrategy;
     @Resource(name = "blackUserStrategy")
     private BlackStrategy blackUserStrategy;
+    @Resource(name = "blackDeviceIdtrategy")
+    private BlackStrategy blackDeviceIdtrategy;
 
     /**
      * 新增策略需要在这里注册
@@ -46,6 +48,7 @@ public class BlackChain {
     public void initStrategy() {
         this.addLimit(blackIpStrategy);
         this.addLimit(blackUserStrategy);
+        this.addLimit(blackDeviceIdtrategy);
     }
 
 

@@ -5,21 +5,25 @@ package org.ccs.opendfl.core.constants;
  */
 public enum FreqLimitType {
     /**
-     * 同用户次数频率
+     * IP白名单
      */
     WHITE_IP(1, "whiteIp", WhiteBlackType.WHITE),
     /**
-     * 同用户次数频率
+     * 用户白名单
      */
     WHITE_USER(2, "whiteUser", WhiteBlackType.WHITE),
     /**
-     * 同用户次数频率
+     * IP黑名单
      */
     BLACK_IP(3, "blackIp", WhiteBlackType.BLACK),
     /**
-     * 同用户次数频率
+     * 用户黑名单
      */
     BLACK_USER(4, "blackUser", WhiteBlackType.BLACK),
+    /**
+     * 设备ID黑名单
+     */
+    BLACK_DEVICE_ID(5, "blackDeviceId", WhiteBlackType.BLACK),
     /**
      * 同用户次数频率
      */

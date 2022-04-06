@@ -63,7 +63,7 @@ class BlackChainTest {
         int failCount = 0;
         for (int i = 0; i < 20; i++) {
             try {
-                strategyParamsVo = new RequestStrategyParamsVo(lang, ip, methodName, requestUri, curTime);
+                strategyParamsVo = new RequestStrategyParamsVo(lang, ip, null, methodName, requestUri, curTime);
                 strategyParamsVo.load(frequencyVo, "130" + i);
                 blackChain.setStrategyParams(strategyParamsVo);
                 blackChain.clearLimit();
@@ -105,7 +105,7 @@ class BlackChainTest {
         int failCount = 0;
         for (int i = 0; i < 20; i++) {
             try {
-                strategyParamsVo = new RequestStrategyParamsVo(lang, ip, methodName, requestUri, curTime);
+                strategyParamsVo = new RequestStrategyParamsVo(lang, ip, null, methodName, requestUri, curTime);
                 strategyParamsVo.load(frequencyVo, "130" + i);
                 blackChain.setStrategyParams(strategyParamsVo);
                 blackChain.clearLimit();
@@ -148,7 +148,7 @@ class BlackChainTest {
             try {
                 String ip = "192.168.5.2" + i;
                 ip= ""+RequestUtils.getIpConvertNum(ip);
-                strategyParamsVo = new RequestStrategyParamsVo(lang, ip, methodName, requestUri, curTime);
+                strategyParamsVo = new RequestStrategyParamsVo(lang, ip, null, methodName, requestUri, curTime);
                 strategyParamsVo.load(frequencyVo, blackUser);
                 blackChain.setStrategyParams(strategyParamsVo);
                 blackChain.clearLimit();

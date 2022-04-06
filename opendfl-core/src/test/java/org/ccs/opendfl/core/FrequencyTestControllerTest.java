@@ -2,6 +2,7 @@ package org.ccs.opendfl.core;
 
 
 import com.alibaba.fastjson.JSONObject;
+import org.ccs.opendfl.core.utils.RequestParams;
 import org.ccs.opendfl.core.vo.RequestTestVo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -338,6 +339,37 @@ class FrequencyTestControllerTest {
         }
         Assertions.assertTrue(limtCount > 0, "ipUserCount:" + limtCount);
 //        Assertions.assertTrue("successCount:"+successCount,successCount>0);
+    }
+
+    /**
+     * 设备号限制
+     *
+     */
+    @Test
+    void serverTimeDeviceId() throws Exception {
+        int limtCount = 0;
+        int successCount = 0;
+        String errorLimitType = "frequency:blackDeviceId";
+        for (int i = 0; i < 20; i++) {
+            String userId = "123" + i;
+            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqDevice")
+                            .param("userId", userId)
+                            .header(RequestParams.DEVICE_ID, "blackDevice123")
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andReturn();
+            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+            if (content.contains(errorLimitType)) {
+                limtCount++;
+            } else {
+                successCount++;
+            }
+            System.out.println("----serverTimeFreqDiffUser status=" + status + " content=" + content);
+        }
+        Assertions.assertTrue(successCount == 0, "successCount:" + successCount);
+        Assertions.assertEquals(20, limtCount, "limtCount:" + limtCount);
+
+
     }
 
     /**

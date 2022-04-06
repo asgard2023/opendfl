@@ -11,15 +11,17 @@ public class RequestStrategyParamsVo{
     private String requestUri;
     private final String lang;
     private final String ip;
+    private final String deviceId;
     private final String methodName;
 
     private FrequencyVo frequency;
     private Long curTime;
     private String userId;
 
-    public RequestStrategyParamsVo(String lang, String ip, String methodName, String requestUri, Long curTime) {
+    public RequestStrategyParamsVo(String lang, String ip, String deviceId, String methodName, String requestUri, Long curTime) {
         this.lang = lang;
         this.ip = ip;
+        this.deviceId = deviceId;
         this.methodName = methodName;
         this.requestUri = requestUri;
         this.curTime = curTime;

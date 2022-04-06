@@ -64,6 +64,14 @@ public class FrequencyTestController {
         return System.currentTimeMillis();
     }
 
+    @GetMapping("/serverTimeFreqDevice")
+    @ResponseBody
+    @Frequency(time = 5, limit = 5, name = "serverTimeFreqDevice")
+    public Object serverTimeFreqDevice(HttpServletRequest request) {
+        log.info("----serverTimeFreqDevice--deviceId={}", request.getHeader(RequestParams.DEVICE_ID));
+        return System.currentTimeMillis();
+    }
+
     @GetMapping("/serverTimeUri")
     @ResponseBody
     public Object serverTimeUri(HttpServletRequest request) {

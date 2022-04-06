@@ -11,7 +11,11 @@ public enum WhiteBlackCheckType {
     /**
      * IP
      */
-    IP(2, "ip");
+    IP(2, "ip"),
+    /**
+     * 设备号
+     */
+    DEVICE(3, "device");
 
     private Integer type;
     private String code;
