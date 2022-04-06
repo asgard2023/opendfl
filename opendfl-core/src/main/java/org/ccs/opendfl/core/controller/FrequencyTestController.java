@@ -68,7 +68,11 @@ public class FrequencyTestController {
     @ResponseBody
     @Frequency(time = 5, limit = 5, name = "serverTimeFreqDevice")
     public Object serverTimeFreqDevice(HttpServletRequest request) {
-        log.info("----serverTimeFreqDevice--deviceId={}", request.getHeader(RequestParams.DEVICE_ID));
+        String deviceId = request.getParameter(RequestParams.DEVICE_ID);
+        if(deviceId==null) {
+            deviceId = request.getHeader(RequestParams.DEVICE_ID);
+        }
+        log.info("----serverTimeFreqDevice--deviceId={}", deviceId);
         return System.currentTimeMillis();
     }
 

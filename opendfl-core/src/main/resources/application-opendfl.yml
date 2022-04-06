@@ -1,2 +1,3 @@
 opendfl:
   defaultAttrName: userId
+  defaultDeviceId: deviceId
