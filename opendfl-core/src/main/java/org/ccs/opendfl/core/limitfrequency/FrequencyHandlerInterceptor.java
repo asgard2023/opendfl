@@ -63,11 +63,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
-        if (!(handler instanceof HandlerMethod)) {
-            return true;
-        }
-        //支持关闭频率限制，可用于测试环境，ST环境
-        if (!StringUtils.ifYes(frequencyConfiguration.getIfActive())) {
+        if (isNoLimit(handler)) {
             return true;
         }
 
@@ -237,6 +233,9 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        if (isNoLimit(handler)) {
+            return;
+        }
         Long requestStartTime = this.startTime.get();
         if (requestStartTime == null) {
             return;
@@ -356,4 +355,14 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         return requestVo;
     }
 
+    private boolean isNoLimit(Object handler) {
+        if (!(handler instanceof HandlerMethod)) {
+            return true;
+        }
+        //支持关闭频率限制，可用于测试环境，ST环境
+        if (!StringUtils.ifYes(frequencyConfiguration.getIfActive())) {
+            return true;
+        }
+        return false;
+    }
 }

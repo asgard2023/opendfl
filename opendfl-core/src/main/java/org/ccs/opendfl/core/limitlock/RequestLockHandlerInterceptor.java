@@ -17,8 +17,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.resource.DefaultServletHttpRequestHandler;
-import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -163,10 +161,11 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
     }
 
     private boolean isNoLimit(Object handler) {
-        if (!StringUtils.ifYes(requestLockConfiguration.getIfActive())) {
+        if (!(handler instanceof HandlerMethod)) {
             return true;
         }
-        if (!(handler instanceof HandlerMethod)) {
+        //支持关闭频率限制，可用于测试环境，ST环境
+        if (!StringUtils.ifYes(requestLockConfiguration.getIfActive())) {
             return true;
         }
         return false;
