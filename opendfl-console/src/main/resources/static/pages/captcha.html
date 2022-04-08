@@ -5,22 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>验证码</title>
     <script type="text/javascript" src="../scripts/lib/easyui1.7.0/jquery.min.js"></script>
+    <script type="text/javascript" src="../scripts/lib/easyui1.7.0/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../scripts/lib/easyui1.7.0/easyui.comm.valid.js"></script>
+    <script type="text/javascript" src="../scripts/lib/easyui1.7.0/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css" href="../scripts/lib/easyui1.7.0/themes/bootstrap/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../scripts/lib/easyui1.7.0/themes/icon.css">
+
+    <style type="text/css">
+        #fm {
+            margin: 0;
+            padding: 10px 30px;
+        }
+
+        .ftitle {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 5px 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .fitem {
+            margin-bottom: 5px;
+        }
+
+        .fitem label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        .input_query {
+            width: 100px;
+        }
+
+        input, textarea {
+            width: 250px;
+            border: 1px solid #ccc;
+            padding: 2px;
+        }
+    </style>
 </head>
 <body>
+<fieldset>
+    <legend>
+        限制类型
+    </legend>
 <form action="/frequencyReset/resetLimits" method="POST">
     <input type="hidden" name="clientId" id="clientId">
-    <input type="hidden" name="type" id="type">
-    <label>功能编码</label><input type="text" name="name" value="serverTimeFreq">
-    <label>userId</label><input type="text" name="userId" value="123">
-    <img alt="验证码" id="img" onclick="refresh(this)">
-    <input type="text" name="verifyCode">
-    <button type="submit" value="ok" name="ok">OK</button>
+    <div class="fitem">
+        <label >接口测试</label>
+        <label id="serverTimeTest">0</label>
+        <button type="button" onclick="refreshTime()" >Click</button>
+    </div>
+    <div class="fitem">
+        <label>功能编码</label>
+        <input name="name" class="easyui-validatebox" value="serverTimeFreq">
+    </div>
+    <div class="fitem">
+        <label>userId</label>
+        <input name="userId" class="easyui-validatebox" value="123" >
+    </div>
+    <div class="fitem">
+        <label>验证码类型</label>
+        <select class="easyui-combobox"  name="type" id="type" style="width:100px;">
+            <option value ="num">数字</option>
+            <option value ="string">字符</option>
+            <option value="arithmetic">算术</option>
+        </select>
+    </div>
+    <div class="fitem">
+        <img alt="验证码" id="img" onclick="refresh(this)">
+        <input type="text" name="verifyCode" placeholder="验证码"><br/>
+    </div>
+    <div class="fitem">
+        <label></label>
+        <button type="submit" value="ok" name="ok">OK</button>
+    </div>
+
+
 </form>
+</fieldset>
 </body>
 
 <script>
     var ticketObj;
-
     function frequencyInit() {
         //type=num/string/arithmetic
         var jsonParam = {funcCode: 'serverTime', type: 'num'};
@@ -36,6 +104,7 @@
                     ticketObj = data.data;
                     $('#clientId').val(ticketObj.clientId);
                     var imgUrl = getImageCaptchaUrl(ticketObj);
+                    console.log(imgUrl);
                     $('#img').attr('src', imgUrl);
                 }
                 console.log(data);
@@ -46,34 +115,65 @@
         });
     }
 
-    function getImageCaptchaUrl(ticketObj) {
-        return "/frequencyReset/imageCaptcha?clientId=" + ticketObj.clientId + "&t=" + Math.floor(Math.random() * 100);
+    function getImageCaptchaUrl(ticketObj, captchaType) {
+        var typeInfo = '';
+        var type;
+        if (captchaType) {
+            type = captchaType;
+        }
+        if (!type) {
+            type=$('#type').val();
+        }
+        if(type){
+            typeInfo='&type='+type;
+        }
+        if(!ticketObj){
+            return;
+        }
+        return "/frequencyReset/imageCaptcha?clientId=" + ticketObj.clientId +typeInfo+ "&t=" + Math.floor(Math.random() * 100);
     }
 
     //点击刷新验证码
     function refresh(img) {
         var imgUrl = getImageCaptchaUrl(ticketObj);
+        img.src = imgUrl;
+
+    }
+
+    function refreshTime(){
+        var userId=$('#userId').val();
+        var url='/frequencyTest/serverTimeFreq';
         $.ajax({
             method: 'get',
-            url: imgUrl,
+            url: url,
+            data: {userId: userId},
             headers: {'source': 'h5'},
-            dataType: 'json',
             success: function (data) {
                 if(data.errorMsg){
-                    alert(data.errorMsg);
+                    $('#serverTimeTest').html(data.errorMsg);
                 }
                 else{
-                    img.src = data;
+                    $('#serverTimeTest').html(data);
                 }
             },
             error: function (d, e) {
-                alert(d.responseJSON.errorMsg);
+                if(d.responseJSON){
+                    $('#serverTimeTest').html(d.responseJSON.errorMsg);
+                }
             }
         });
     }
 
     $(function () {
         frequencyInit();
+        $('#type').combobox({
+            onSelect: function (n, o){
+                if(n.value){
+                    var imgUrl = getImageCaptchaUrl(ticketObj, n.value);
+                    $('#img').attr('src', imgUrl);
+                }
+            }
+        });
     });
 </script>
 </html>
