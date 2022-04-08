@@ -59,11 +59,11 @@
     </div>
     <div class="fitem">
         <label>功能编码</label>
-        <input name="name" class="easyui-validatebox" value="serverTimeFreq">
+        <input name="name" class="easyui-validatebox" value="serverTimeFreq120">
     </div>
     <div class="fitem">
         <label>userId</label>
-        <input name="userId" class="easyui-validatebox" value="123" >
+        <input name="userId" id="userId" class="easyui-validatebox" value="123" >
     </div>
     <div class="fitem">
         <label>验证码类型</label>
@@ -142,11 +142,12 @@
 
     function refreshTime(){
         var userId=$('#userId').val();
-        var url='/frequencyTest/serverTimeFreq';
+        //2分钟限制5次
+        var url='/frequencyTest/serverTimeFreq120';
         $.ajax({
             method: 'get',
             url: url,
-            data: {userId: userId},
+            data:{userId: userId},
             headers: {'source': 'h5'},
             success: function (data) {
                 if(data.errorMsg){

@@ -106,22 +106,25 @@ public class FrequencyResetController {
         String userId = request.getParameter(RequestParams.USER_ID);
 
 
+        //查出用户所有的限制
+        List<FrequencyVo> list=frequencyDataBiz.limitUsers(userId);
         List<String> limitInfoList = new ArrayList<>();
         if(StringUtils.isNotBlank(frequency.getName())) {
             String evictKey = frequencyDataBiz.freqIpUserEvict(frequency, ip);
             limitInfoList.add(evictKey);
-            List<Integer> timeList = Arrays.asList(3600, 86400);
+            //找出name对应的限制时间
+            List<Integer> timeList = list.stream().filter(t->t.getName().equals(frequency.getName())).map(t->t.getTime()).distinct().collect(Collectors.toList());
+            log.info("----resetLimits--name={} time={} userId={}", frequency.getName(), timeList, userId);
             List<String> infoList = frequencyDataBiz.freqEvictList(frequency.getName(), timeList, userId);
             limitInfoList.addAll(infoList);
             evictKey = frequencyDataBiz.freqUserIpEvict(frequency, userId);
             limitInfoList.add(evictKey);
         }
         else{
-            List<FrequencyVo> list=frequencyDataBiz.limitUsers(userId);
             for(FrequencyVo frequencyVo:list){
                 String evictKey = frequencyDataBiz.freqIpUserEvict(frequencyVo, ip);
                 limitInfoList.add(evictKey);
-                List<Integer> timeList = Arrays.asList(3600, 86400);
+                List<Integer> timeList = list.stream().map(t->t.getTime()).distinct().collect(Collectors.toList());
                 List<String> infoList = frequencyDataBiz.freqEvictList(frequencyVo.getName(), timeList, userId);
                 limitInfoList.addAll(infoList);
                 evictKey = frequencyDataBiz.freqUserIpEvict(frequencyVo, userId);
