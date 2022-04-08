@@ -41,7 +41,7 @@ public class VerificateBiz implements IVerificateBiz {
     /**
      * 限制时间内请求次数
      */
-    private final static Integer TRY_TIMES = 10;
+    private final static Integer TRY_TIMES = 20;
     /**
      * 失效时间
      */

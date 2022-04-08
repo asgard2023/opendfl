@@ -1,5 +1,7 @@
 package org.ccs.opendfl.core.captcha.constant;
 
+import java.util.Random;
+
 /**
  * 支持的验证码类型
  * @author chenjh
@@ -44,5 +46,13 @@ public enum CaptchaType {
             }
         }
         return null;
+    }
+
+    private static Random random = new Random();
+
+    public static CaptchaType randomType(){
+        CaptchaType[] types = CaptchaType.values();
+        int v=random.nextInt(types.length);
+        return types[v];
     }
 }

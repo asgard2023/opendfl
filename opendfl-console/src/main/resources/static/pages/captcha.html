@@ -35,7 +35,6 @@
                 if (data.data) {
                     ticketObj = data.data;
                     $('#clientId').val(ticketObj.clientId);
-                    $('#type').val(ticketObj.type);
                     var imgUrl = getImageCaptchaUrl(ticketObj);
                     $('#img').attr('src', imgUrl);
                 }
@@ -48,13 +47,29 @@
     }
 
     function getImageCaptchaUrl(ticketObj) {
-        return "/frequencyReset/imageCaptcha?type=" + ticketObj.type + "&clientId=" + ticketObj.clientId + "&t=" + Math.floor(Math.random() * 100);
+        return "/frequencyReset/imageCaptcha?clientId=" + ticketObj.clientId + "&t=" + Math.floor(Math.random() * 100);
     }
 
     //点击刷新验证码
     function refresh(img) {
         var imgUrl = getImageCaptchaUrl(ticketObj);
-        img.src = imgUrl;
+        $.ajax({
+            method: 'get',
+            url: imgUrl,
+            headers: {'source': 'h5'},
+            dataType: 'json',
+            success: function (data) {
+                if(data.errorMsg){
+                    alert(data.errorMsg);
+                }
+                else{
+                    img.src = data;
+                }
+            },
+            error: function (d, e) {
+                alert(d.responseJSON.errorMsg);
+            }
+        });
     }
 
     $(function () {

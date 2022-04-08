@@ -41,12 +41,10 @@ public class FrequencyResetController {
         if (StringUtils.isEmpty(clientId)) {
             throw new ParamNullException("clientId is null");
         }
-        if (StringUtils.isEmpty(type)) {
-            throw new ParamNullException("type is null");
-        }
+
         CaptchaType captchaType = CaptchaType.parse(type);
         if (captchaType == null) {
-            throw new ParamErrorException("type invalid");
+            captchaType=CaptchaType.randomType();
         }
         try {
             // 设置响应的类型格式为图片格式
