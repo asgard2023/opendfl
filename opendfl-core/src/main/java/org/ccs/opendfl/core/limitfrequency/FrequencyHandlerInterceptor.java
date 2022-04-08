@@ -63,7 +63,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
-        if (handler instanceof DefaultServletHttpRequestHandler || handler instanceof ResourceHttpRequestHandler) {
+        if (!(handler instanceof HandlerMethod)) {
             return true;
         }
         //支持关闭频率限制，可用于测试环境，ST环境

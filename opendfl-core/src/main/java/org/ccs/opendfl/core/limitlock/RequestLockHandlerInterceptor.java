@@ -166,7 +166,7 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
         if (!StringUtils.ifYes(requestLockConfiguration.getIfActive())) {
             return true;
         }
-        if (handler instanceof DefaultServletHttpRequestHandler || handler instanceof ResourceHttpRequestHandler) {
+        if (!(handler instanceof HandlerMethod)) {
             return true;
         }
         return false;
