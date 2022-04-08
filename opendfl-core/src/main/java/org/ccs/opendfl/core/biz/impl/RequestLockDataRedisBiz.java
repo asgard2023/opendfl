@@ -1,7 +1,7 @@
-package org.ccs.opendfl.console.biz.impl;
+package org.ccs.opendfl.core.biz.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.ccs.opendfl.console.biz.IRequestLockDataBiz;
+import org.ccs.opendfl.core.biz.IRequestLockDataBiz;
 import org.ccs.opendfl.core.limitfrequency.FrequencyUtils;
 import org.ccs.opendfl.core.limitlock.RequestLockHandlerInterceptor;
 import org.ccs.opendfl.core.vo.RequestLockVo;

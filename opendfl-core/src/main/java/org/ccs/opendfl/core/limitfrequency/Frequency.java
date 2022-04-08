@@ -16,24 +16,71 @@ import java.lang.annotation.*;
 @Component
 public @interface Frequency {
 
-    String name() default "all"; //uniqueKey
-
-    String aliasName() default "";
-
-    int time() default 5; //单位:秒/unit:s
-
-    int limit() default 0;
-
-    int userIpCount() default 0;//支持ip数限制，同一个用户能使用的ip数
-
-    int ipUserCount() default 0;//支持ip数限制，同一个IP能登入的用户数
-
-    String attrName() default "";
-
-    boolean sysconfig() default false;//是否支持系统参数配置
+    /**
+     * 编码，uniqueKey
+     *
+     * @return
+     */
+    String name() default "all";
 
     /**
-     * 白名单编码(系统参数)
+     * 别名，用于多个功能共用一个限制
+     *
+     * @return
+     */
+    String aliasName() default "";
+
+    /**
+     * 单位:秒/unit:s
+     *
+     * @return
+     */
+    int time() default 5;
+
+    /**
+     * 限制次数，为0不限次数
+     *
+     * @return
+     */
+    int limit() default 0;
+
+    /**
+     * 支持ip数限制，同一个用户能使用的ip数
+     *
+     * @return
+     */
+    int userIpCount() default 0;
+
+    /**
+     * 支持ip数限制，同一个IP能登入的用户数
+     *
+     * @return
+     */
+    int ipUserCount() default 0;
+
+    /**
+     * 方法参数名，默认userId
+     * 可以用于指定为其他的参数，比如account，username等
+     * @return
+     */
+    String attrName() default "";
+
+    /**
+     * 是否支持系统参数配置
+     *
+     * @return
+     */
+    boolean sysconfig() default false;
+
+    /**
+     * 是否需要登入
+     *
+     * @return
+     */
+    boolean needLogin() default false;
+
+    /**
+     * 方法级用户白名单
      *
      * @return
      */

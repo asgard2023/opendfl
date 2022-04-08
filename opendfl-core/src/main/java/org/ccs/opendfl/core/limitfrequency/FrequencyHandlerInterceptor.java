@@ -3,6 +3,7 @@ package org.ccs.opendfl.core.limitfrequency;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IFrequencyConfigBiz;
+import org.ccs.opendfl.core.biz.IUserBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
 import org.ccs.opendfl.core.exception.BaseException;
@@ -45,6 +46,8 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     private FrequencyConfiguration frequencyConfiguration;
     @Resource(name = "frequencyConfigBiz")
     private IFrequencyConfigBiz frequencyConfigBiz;
+    @Autowired
+    private IUserBiz userBiz;
 
     @Autowired
     private FreqLimitChain freqLimitChain;
@@ -290,6 +293,9 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         }
 
         String userId = strategyParams.getUserId();
+        if(frequency.isNeedLogin()){
+            userBiz.checkUser(userId);
+        }
         String attrName = RequestParams.USER_ID;
         if (StringUtils.isNotBlank(frequency.getAttrName())) {
             attrName = frequency.getAttrName();

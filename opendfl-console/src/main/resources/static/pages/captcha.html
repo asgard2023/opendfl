@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>验证码</title>
+    <script type="text/javascript" src="../scripts/lib/easyui1.7.0/jquery.min.js"></script>
+</head>
+<body>
+<form action="/frequencyReset/resetLimits" method="POST">
+    <input type="hidden" name="clientId" id="clientId">
+    <input type="hidden" name="type" id="type">
+    <label>功能编码</label><input type="text" name="name" value="serverTimeFreq">
+    <label>userId</label><input type="text" name="userId" value="123">
+    <img alt="验证码" id="img" onclick="refresh(this)">
+    <input type="text" name="verifyCode">
+    <button type="submit" value="ok" name="ok">OK</button>
+</form>
+</body>
+
+<script>
+    var ticketObj;
+
+    function frequencyInit() {
+        //type=num/string/arithmetic
+        var jsonParam = {funcCode: 'serverTime', type: 'num'};
+        var url = '/frequencyReset/resetTicket';
+        $.ajax({
+            method: 'get',
+            url: url,
+            data: jsonParam,
+            headers: {'source': 'h5'},
+            dataType: 'json',
+            success: function (data) {
+                if (data.data) {
+                    ticketObj = data.data;
+                    $('#clientId').val(ticketObj.clientId);
+                    $('#type').val(ticketObj.type);
+                    var imgUrl = getImageCaptchaUrl(ticketObj);
+                    $('#img').attr('src', imgUrl);
+                }
+                console.log(data);
+            },
+            error: function (d, e) {
+                alert(d.responseJSON.errorMsg);
+            }
+        });
+    }
+
+    function getImageCaptchaUrl(ticketObj) {
+        return "/frequencyReset/imageCaptcha?type=" + ticketObj.type + "&clientId=" + ticketObj.clientId + "&t=" + Math.floor(Math.random() * 100);
+    }
+
+    //点击刷新验证码
+    function refresh(img) {
+        var imgUrl = getImageCaptchaUrl(ticketObj);
+        img.src = imgUrl;
+    }
+
+    $(function () {
+        frequencyInit();
+    });
+</script>
+</html>

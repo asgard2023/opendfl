@@ -24,6 +24,7 @@ public class FrequencyVo{
     private String errMsg;
     private String errMsgEn;
     private boolean sysconfig;
+    private boolean needLogin;
     private Long createTime;
     public static final FrequencyVo instance=new FrequencyVo();
 

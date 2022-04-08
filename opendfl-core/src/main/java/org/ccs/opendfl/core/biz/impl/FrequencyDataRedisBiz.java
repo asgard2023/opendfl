@@ -1,7 +1,7 @@
-package org.ccs.opendfl.console.biz.impl;
+package org.ccs.opendfl.core.biz.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.ccs.opendfl.console.biz.IFrequencyDataBiz;
+import org.ccs.opendfl.core.biz.IFrequencyDataBiz;
 import org.ccs.opendfl.core.limitfrequency.FrequencyHandlerInterceptor;
 import org.ccs.opendfl.core.strategy.limits.impl.FreqLimitIpUserStrategy;
 import org.ccs.opendfl.core.strategy.limits.impl.FreqLimitUserCountStrategy;
