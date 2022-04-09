@@ -2,6 +2,7 @@ package org.ccs.opendfl.core.controller;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
+import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.exception.FailedException;
 import org.ccs.opendfl.core.limitfrequency.Frequency;
 import org.ccs.opendfl.core.limitfrequency.Frequency2;
@@ -40,6 +41,15 @@ public class FrequencyTestController {
     @Frequency2(time = 3600, limit = 100, name = "serverTimeFreq")
     public Object serverTimeFreq(HttpServletRequest request) {
         log.info("----serverTimeFreq--userId={}", request.getParameter(RequestParams.USER_ID));
+        return System.currentTimeMillis();
+    }
+
+    @GetMapping("/serverTimeNeedLogin")
+    @ResponseBody
+    @Frequency(time = 5, limit = 5, needLogin = true, name = "serverTimeNeedLogin")
+    @Frequency2(time = 3600, needLogin = true, limit = 100, name = "serverTimeNeedLogin")
+    public Object serverTimeNeedLogin(HttpServletRequest request) {
+        log.info("----serverTimeNeedLogin--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();
     }
 
@@ -96,6 +106,7 @@ public class FrequencyTestController {
 
     /**
      * json参数测试
+     *
      * @param requestTest RequestTestVo
      * @return current time
      */
@@ -110,6 +121,7 @@ public class FrequencyTestController {
 
     /**
      * 字符流测试
+     *
      * @param request HttpServletRequest
      * @return current time
      */
@@ -154,7 +166,7 @@ public class FrequencyTestController {
         log.info("----waitLockTestUser--userId={} ip={}", request.getParameter(RequestParams.USER_ID), RequestUtils.getIpAddress(request));
         sleepTime = getSleepTimeIfNull(sleepTime);
         try {
-            Thread.sleep(sleepTime * 1000L);
+            Thread.sleep(sleepTime * FrequencyConstant.TIME_MILLISECOND_TO_SECOND);
         } catch (InterruptedException e) {
             log.warn("---waitLockTestUser--Interrupted!", e);
             Thread.currentThread().interrupt();
@@ -178,7 +190,7 @@ public class FrequencyTestController {
         log.info("----waitLockTestOrder--userId={} orderId={} ip={}", request.getParameter(RequestParams.USER_ID), orderId, RequestUtils.getIpAddress(request));
         sleepTime = getSleepTimeIfNull(sleepTime);
         try {
-            Thread.sleep(sleepTime * 1000L);
+            Thread.sleep(sleepTime * FrequencyConstant.TIME_MILLISECOND_TO_SECOND);
         } catch (InterruptedException e) {
             log.warn("---waitLockTestOrder--Interrupted!", e);
             Thread.currentThread().interrupt();

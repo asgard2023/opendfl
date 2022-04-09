@@ -33,9 +33,14 @@ public @interface Frequency3 {
     boolean sysconfig() default false;//是否支持系统参数配置
 
     /**
+     * 是否需要登入
+     *
+     */
+    boolean needLogin() default false;
+
+    /**
      * 白名单编码
      *
-     * @return
      */
     String whiteCode() default FrequencyConstant.NONE;
 

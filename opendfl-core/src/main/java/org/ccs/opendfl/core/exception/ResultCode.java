@@ -38,6 +38,9 @@ public class ResultCode {
     public static final String USER_TOKEN_FAILED = "101000";
     public static final String USER_TOKEN_FAILED_MSG = "Token验证失败";
 
+    public static final String NEED_LOGIN = "101021";
+    public static final String NEED_LOGIN_MSG = "需要登入";
+
     public static final String DECRYPT_ERROR = "101022";
     public static final String DECRYPT_ERROR_MSG = "参数解密失败";
 

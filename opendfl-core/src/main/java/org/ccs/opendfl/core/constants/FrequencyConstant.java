@@ -21,4 +21,8 @@ public class FrequencyConstant {
      * 10秒一次读取配置
      */
     public static final int LOAD_CONFIG_INTERVAL = 10000;
+
+    public static final int TIME_MILLISECOND_TO_SECOND=1000;
+    public static final int TIME_MILLISECOND_TO_MINUTE=TIME_MILLISECOND_TO_SECOND*60;
+    public static final int TIME_MILLISECOND_TO_HOUR=TIME_MILLISECOND_TO_SECOND*3600;
 }

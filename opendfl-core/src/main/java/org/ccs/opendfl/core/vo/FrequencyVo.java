@@ -30,7 +30,7 @@ public class FrequencyVo{
 
     /**
      * 用于提高创建对象的性能
-     * @return
+     * @return FrequencyVo
      */
     public static FrequencyVo newInstance(){
         return new FrequencyVo();
@@ -75,6 +75,7 @@ public class FrequencyVo{
         vo.whiteCode=frequency.whiteCode();
         vo.attrName=frequency.attrName();
         vo.sysconfig=frequency.sysconfig();
+        vo.needLogin= frequency.needLogin();
         return vo;
     }
 
@@ -82,7 +83,7 @@ public class FrequencyVo{
      *
      * @param frequency
      * @param vo 复用已有对象
-     * @return
+     * @return FrequencyVo
      */
     public static FrequencyVo toFrequencyVo(Frequency2 frequency, FrequencyVo vo){
         if(frequency==null){
@@ -100,6 +101,7 @@ public class FrequencyVo{
         vo.whiteCode=frequency.whiteCode();
         vo.attrName=frequency.attrName();
         vo.sysconfig=frequency.sysconfig();
+        vo.needLogin= frequency.needLogin();
         return vo;
     }
 
@@ -107,7 +109,7 @@ public class FrequencyVo{
      *
      * @param frequency
      * @param vo 复用已有对象
-     * @return
+     * @return FrequencyVo
      */
     public static FrequencyVo toFrequencyVo(Frequency3 frequency, FrequencyVo vo){
         if(frequency==null){
@@ -125,6 +127,7 @@ public class FrequencyVo{
         vo.whiteCode=frequency.whiteCode();
         vo.attrName=frequency.attrName();
         vo.sysconfig=frequency.sysconfig();
+        vo.needLogin= frequency.needLogin();
         return vo;
     }
 

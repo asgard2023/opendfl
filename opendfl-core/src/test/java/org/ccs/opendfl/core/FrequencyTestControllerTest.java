@@ -48,7 +48,6 @@ class FrequencyTestControllerTest {
     /**
      * 用户访问频率-没有用户（默认走IP）
      * user request limit-- no userId use IP as default
-     *
      */
     @Test
     void serverTimeFreqDefaultNoUser() throws Exception {
@@ -74,8 +73,41 @@ class FrequencyTestControllerTest {
     }
 
     /**
+     * 用户访问频率-没有用户（默认走IP）
+     * user request limit-- no userId use IP as default
+     */
+    @Test
+    void serverTimeFreqNeedLogin() throws Exception {
+
+        int limtCount = 0;
+        int successCount = 0;
+        String errorLimitType = "limit:needLogin";
+        for (int i = 0; i < 2; i++) {
+            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeNeedLogin")
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andReturn();
+            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+            if (content.contains(errorLimitType)) {
+                limtCount++;
+            } else {
+                successCount++;
+            }
+            System.out.println("----serverTimeFreqNeedLogin status=" + status + " content=" + content);
+        }
+        Assertions.assertEquals(0, successCount, "successCount:" + successCount);
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeNeedLogin")
+                        .param("userId", "123")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+        int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+        String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+        Assertions.assertTrue(!content.contains(errorLimitType), "not fail");
+    }
+
+    /**
      * 用户访问频率-同一用户
-     *
      */
     @Test
     void serverTimeFreqSameUser() throws Exception {
@@ -104,7 +136,6 @@ class FrequencyTestControllerTest {
 
     /**
      * 用户访问频率-同一用户
-     *
      */
     @Test
     void serverTimeJsonFreqSameUser() throws Exception {
@@ -114,7 +145,7 @@ class FrequencyTestControllerTest {
         String errorLimitType = "frequency:limit";
         for (int i = 0; i < 20; i++) {
             String userId = "123";
-            requestTestVo=new RequestTestVo();
+            requestTestVo = new RequestTestVo();
             requestTestVo.setUserId(userId);
             String requestTestJson = JSONObject.toJSONString(requestTestVo);
             MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/frequencyTest/serverTimeJsonFreq")
@@ -144,7 +175,7 @@ class FrequencyTestControllerTest {
         String errorLimitType = "frequency:limit";
         for (int i = 0; i < 20; i++) {
             String userId = "123";
-            requestTestVo=new RequestTestVo();
+            requestTestVo = new RequestTestVo();
             requestTestVo.setUserId(userId);
             String requestTestJson = JSONObject.toJSONString(requestTestVo);
             MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/frequencyTest/serverTimeStreamFreq")
@@ -168,7 +199,6 @@ class FrequencyTestControllerTest {
 
     /**
      * 用户访问频率-同一用户-IP白名单
-     *
      */
     @Test
     void serverTimeFreqSameUser_whiteIp() throws Exception {
@@ -199,7 +229,6 @@ class FrequencyTestControllerTest {
 
     /**
      * 用户访问频率-同一用户-用户白名单
-     *
      */
     @Test
     void serverTimeFreqSameUser_whiteUser() throws Exception {
@@ -227,7 +256,6 @@ class FrequencyTestControllerTest {
 
     /**
      * 用户访问频率-同一用户-用户黑名单
-     *
      */
     @Test
     void serverTimeFreqSameUser_blackUser() throws Exception {
@@ -256,7 +284,6 @@ class FrequencyTestControllerTest {
 
     /**
      * 用户访问频率-同一用户-IP黑名单
-     *
      */
     @Test
     void serverTimeFreqSameUser_blackIp() throws Exception {
@@ -286,7 +313,6 @@ class FrequencyTestControllerTest {
 
     /**
      * 用户访问频率-不同用户
-     *
      */
     @Test
     void serverTimeFreqDiffUser() throws Exception {
@@ -315,7 +341,6 @@ class FrequencyTestControllerTest {
 
     /**
      * ip限制
-     *
      */
     @Test
     void serverTimeFreqIp() throws Exception {
@@ -343,7 +368,6 @@ class FrequencyTestControllerTest {
 
     /**
      * 设备号黑名单限制
-     *
      */
     @Test
     void serverTimeDeviceIdByHader() throws Exception {
@@ -366,13 +390,12 @@ class FrequencyTestControllerTest {
             }
             System.out.println("----serverTimeFreqDiffUser status=" + status + " content=" + content);
         }
-        Assertions.assertTrue(successCount == 0, "successCount:" + successCount);
+        Assertions.assertEquals(0, successCount, "successCount:" + successCount);
         Assertions.assertEquals(20, limtCount, "limtCount:" + limtCount);
     }
 
     /**
      * 设备号黑名单限制
-     *
      */
     @Test
     void serverTimeDeviceIdByParam() throws Exception {
@@ -395,13 +418,12 @@ class FrequencyTestControllerTest {
             }
             System.out.println("----serverTimeFreqDiffUser status=" + status + " content=" + content);
         }
-        Assertions.assertTrue(successCount == 0, "successCount:" + successCount);
+        Assertions.assertEquals(0, successCount, "successCount:" + successCount);
         Assertions.assertEquals(20, limtCount, "limtCount:" + limtCount);
     }
 
     /**
      * 同IP多用户测试
-     *
      */
     @Test
     void serverTimeFreqIpUser() throws Exception {
@@ -428,7 +450,6 @@ class FrequencyTestControllerTest {
 
     /**
      * 同用户多IP测试
-     *
      */
     @Test
     void serverTimeFreqUserIp() throws Exception {

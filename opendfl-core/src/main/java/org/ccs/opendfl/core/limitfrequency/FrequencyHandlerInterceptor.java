@@ -6,6 +6,7 @@ import org.ccs.opendfl.core.biz.IFrequencyConfigBiz;
 import org.ccs.opendfl.core.biz.IUserBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
+import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.strategy.black.BlackChain;
 import org.ccs.opendfl.core.strategy.limits.FreqLimitChain;
@@ -21,8 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.resource.DefaultServletHttpRequestHandler;
-import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -255,7 +254,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             //排除等一次请求
             if (requestVo != null && requestVo.getCounter().get() > 1) {
                 //上次时间如果超过30秒，则清空，以便于重算
-                if (requestVo.getMaxRunTimeCreateTime() > requestStartTime - frequencyConfiguration.getMaxRunTimeInterval()*1000) {
+                if (requestVo.getMaxRunTimeCreateTime() > requestStartTime - frequencyConfiguration.getMaxRunTimeInterval()* FrequencyConstant.TIME_MILLISECOND_TO_SECOND) {
                     requestVo.setMaxRunTime(0L);
                     requestVo.setMaxRunTimeCreateTime(0L);
                 }
