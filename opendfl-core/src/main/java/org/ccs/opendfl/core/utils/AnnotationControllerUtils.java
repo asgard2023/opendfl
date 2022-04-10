@@ -15,9 +15,13 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -59,6 +63,8 @@ public class AnnotationControllerUtils {
                     String filePath = URLDecoder.decode(url.getFile(), "UTF-8");
                     //以文件的方式扫描整个包下的文件 并添加到集合中
                     AnnotationClassUtils.findAndAddClassesInPackageByFile(packageName, filePath, recursive, classes);
+                } else {
+                    findAndAddClassesInJar(packageName, classes, recursive, url);
                 }
             }
         } catch (IOException e) {
@@ -83,10 +89,32 @@ public class AnnotationControllerUtils {
     }
 
     /**
+     * 从jar包中找packageName对应的所有controller接口
+     *
+     * @param packageName 包名
+     * @param classes     找到要加入的集合
+     * @param recursive   是否递归
+     * @param url         URL
+     * @throws MalformedURLException
+     */
+    private static void findAndAddClassesInJar(String packageName, List<Class<?>> classes, boolean recursive, URL url) throws MalformedURLException {
+        if (url.getPath().contains("!")) {
+            url = new URL(url.getPath().substring(0, url.getPath().indexOf("!")));
+        }
+        List<Class<?>> list = AnnotationClassUtils.getClassFromJars(new URL[]{url}, packageName, recursive);
+        StringBuilder sb = new StringBuilder();
+        for (Class<?> clazz : list) {
+            if (isController(clazz.getAnnotations(), sb)) {
+                classes.add(clazz);
+            }
+        }
+    }
+
+    /**
      * 检查是否是controller类
      *
-     * @param classAnnotations
-     * @param basePath
+     * @param classAnnotations 类注解
+     * @param basePath         controller的路径
      * @return
      */
     private static boolean isController(Annotation[] classAnnotations, StringBuilder basePath) {
@@ -113,6 +141,7 @@ public class AnnotationControllerUtils {
      */
     private static RequestVo toRequest(Method method, Class<?> c) {
         RequestVo requestVo = new RequestShowVo();
+        RequestShowVo requestShowVo = (RequestShowVo) requestVo;
         Annotation[] classAnnotations = c.getAnnotations();
         StringBuilder basePathSb = new StringBuilder();
         boolean isController = isController(classAnnotations, basePathSb);
@@ -125,29 +154,24 @@ public class AnnotationControllerUtils {
         String methodType = null;
         StringBuilder limitTypes = new StringBuilder();
 
-        List<Annotation> annotationList = Arrays.stream(methodAnnotations).sorted(new Comparator<Annotation>() {
-            @Override
-            public int compare(Annotation o1, Annotation o2) {
-                return o1.annotationType().getSimpleName().compareTo(o2.annotationType().getSimpleName());
-            }
-        }).collect(Collectors.toList());
+        List<Annotation> annotationList = Arrays.stream(methodAnnotations)
+                .sorted((o1, o2) -> o1.annotationType().getSimpleName().compareTo(o2.annotationType().getSimpleName())).collect(Collectors.toList());
 
         List<String> annotations = new ArrayList<>();
         List<FrequencyVo> frequencyVoList = new ArrayList<>();
         List<RequestLockVo> requestLockVos = new ArrayList<>();
         List<Annotation> otherAnnotations = new ArrayList<>();
         StringBuilder methodTypeSb = new StringBuilder();
-        String attrName = null;
+        StringBuilder attrNameSb = new StringBuilder();
+
         for (Annotation annotation : annotationList) {
             String annotationUri = getMethodUri(annotation, methodTypeSb);
             methodType = methodTypeSb.toString();
             if (annotationUri == null) {
-                FrequencyVo frequencyVo = toLimitFrequency(annotation, frequencyVoList, limitTypes);
+                FrequencyVo frequencyVo = toLimitFrequency(annotation, frequencyVoList, limitTypes, attrNameSb);
                 RequestLockVo requestLockVo = null;
                 if (frequencyVo == null) {
-                    requestLockVo = toLimitLock(annotation, requestLockVos, limitTypes);
-                } else if (attrName == null) {
-                    attrName = frequencyVo.getAttrName();
+                    requestLockVo = toLimitLock(annotation, requestLockVos, limitTypes, attrNameSb);
                 }
                 if (frequencyVo == null && requestLockVo == null) {
                     otherAnnotations.add(annotation);
@@ -159,11 +183,12 @@ public class AnnotationControllerUtils {
             }
             annotations.add(annotation.annotationType().getSimpleName());
         }
+        String attrName = attrNameSb.toString();
         requestVo.setMethod(methodType);
         requestVo.setMethodName(method.getName());
         requestVo.setBeanName(c.getSimpleName());
         requestVo.setAnnotations(CommUtils.concat(annotations, ","));
-        RequestShowVo requestShowVo = (RequestShowVo) requestVo;
+
         requestShowVo.setLimitFrequencys(frequencyVoList);
         requestShowVo.setLocks(requestLockVos);
         String limitTypeStr = CommUtils.removeEndComma(limitTypes.toString());
@@ -181,7 +206,7 @@ public class AnnotationControllerUtils {
      *
      * @param annotation   Annotation
      * @param methodTypeSb StringBuilder
-     * @return
+     * @return 方法uri
      */
     private static String getMethodUri(Annotation annotation, StringBuilder methodTypeSb) {
         String annotationUri = null;
@@ -192,7 +217,7 @@ public class AnnotationControllerUtils {
             RequestMapping getMapping = (RequestMapping) annotation;
             annotationUri = CommUtils.concat(getMapping.value(), ",");
             for (RequestMethod reqMethod : getMapping.method()) {
-                methodTypeSb.append(reqMethod.name() + ",");
+                methodTypeSb.append(reqMethod.name()).append(",");
             }
         } else if (annotation instanceof PostMapping) {
             PostMapping getMapping = (PostMapping) annotation;
@@ -221,7 +246,7 @@ public class AnnotationControllerUtils {
      * @param limitTypes   StringBuilder
      * @return
      */
-    private static FrequencyVo toLimitFrequency(Annotation annotation, List<FrequencyVo> frequencyVos, StringBuilder limitTypes) {
+    private static FrequencyVo toLimitFrequency(Annotation annotation, List<FrequencyVo> frequencyVos, StringBuilder limitTypes, StringBuilder attrNameSb) {
         FrequencyVo frequencyVo = null;
         if (annotation instanceof Frequency) {
             frequencyVo = FrequencyVo.toFrequencyVo((Frequency) annotation, FrequencyVo.newInstance());
@@ -233,6 +258,9 @@ public class AnnotationControllerUtils {
         if (frequencyVo != null) {
             frequencyVos.add(frequencyVo);
             limitTypes.append(frequencyVo.getLimitType()).append(",");
+            if (frequencyVo.getAttrName() != null && !attrNameSb.toString().contains(frequencyVo.getAttrName())) {
+                attrNameSb.append(frequencyVo.getAttrName());
+            }
         }
         return frequencyVo;
     }
@@ -245,11 +273,14 @@ public class AnnotationControllerUtils {
      * @param limitTypes     StringBuilder
      * @return
      */
-    private static RequestLockVo toLimitLock(Annotation annotation, List<RequestLockVo> requestLockVos, StringBuilder limitTypes) {
+    private static RequestLockVo toLimitLock(Annotation annotation, List<RequestLockVo> requestLockVos, StringBuilder limitTypes, StringBuilder attrNameSb) {
         if (annotation instanceof RequestLock) {
             RequestLock requestLock = (RequestLock) annotation;
             RequestLockVo requestLockVo = RequestLockVo.toLockVo(requestLock);
             requestLockVos.add(requestLockVo);
+            if (requestLockVo.getAttrName() != null && !attrNameSb.toString().contains(requestLockVo.getAttrName())) {
+                attrNameSb.append(requestLockVo.getAttrName());
+            }
             limitTypes.append("lock");
             return requestLockVo;
         }
