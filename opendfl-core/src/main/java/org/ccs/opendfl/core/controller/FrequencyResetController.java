@@ -104,6 +104,7 @@ public class FrequencyResetController {
             }
         }
         limitInfoList = limitInfoList.stream().filter(StringUtils::isNotBlank).collect(Collectors.toList());
+        log.info("----resetLimits--name={} userId={} evictsize={}", frequency.getName(), userId, limitInfoList.size());
         return ResultData.success(limitInfoList);
     }
 
