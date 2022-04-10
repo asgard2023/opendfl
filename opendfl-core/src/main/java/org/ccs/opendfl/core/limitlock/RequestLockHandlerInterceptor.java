@@ -50,13 +50,9 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
     private final ThreadLocal<String> lockDataId = new ThreadLocal<>();
 
     private RequestLockVo newRequestLockVo(RequestLock requestLimit, String requestUri, Long curTime) {
-        RequestLockVo lockVo = new RequestLockVo();
+        RequestLockVo lockVo = RequestLockVo.toLockVo(requestLimit);
         lockVo.setRequestUri(requestUri);
         lockVo.setCreateTime(curTime);
-        lockVo.setName(requestLimit.name());
-        lockVo.setTime(requestLimit.time());
-        lockVo.setAttrName(requestLimit.attrName());
-        lockVo.setErrMsg(requestLimit.errMsg());
         return lockVo;
     }
 

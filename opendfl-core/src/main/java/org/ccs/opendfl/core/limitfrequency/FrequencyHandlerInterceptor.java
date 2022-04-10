@@ -88,6 +88,10 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             strategyParams.setUserId(userId);
 
             requestVo = this.logFirstLoadRequest(handlerMethod, request.getMethod(), strategyParams);
+            //支持关闭频率限制，可用于测试环境，ST环境
+            if (!StringUtils.ifYes(frequencyConfiguration.getIfActive())) {
+                return true;
+            }
 
             blackChain.setStrategyParams(strategyParams);
             blackChain.clearLimit();
@@ -356,10 +360,6 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
 
     private boolean isNoLimit(Object handler) {
         if (!(handler instanceof HandlerMethod)) {
-            return true;
-        }
-        //支持关闭频率限制，可用于测试环境，ST环境
-        if (!StringUtils.ifYes(frequencyConfiguration.getIfActive())) {
             return true;
         }
         return false;

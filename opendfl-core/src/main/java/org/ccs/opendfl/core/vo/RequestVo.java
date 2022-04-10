@@ -14,6 +14,7 @@ public class RequestVo {
      */
     private String beanName;
     private String methodName;
+    private String annotations;
 
     private String method;
 

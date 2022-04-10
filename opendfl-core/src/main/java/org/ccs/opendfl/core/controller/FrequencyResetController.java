@@ -60,36 +60,8 @@ public class FrequencyResetController {
         }
     }
 
-    /**
-     * 用于支持在页面显示图片验证码，而不是后台生成
-     */
     @ResponseBody
-    @RequestMapping(value = "captchaCode", method = {RequestMethod.GET, RequestMethod.POST})
-    public ResultData getImageCaptchaCode(HttpServletRequest request) {
-        String clientId = request.getParameter("clientId");
-        if (StringUtils.isEmpty(clientId)) {
-            throw new ParamNullException("clientId is null");
-        }
-        String captchaCode = verificateBiz.setVerficationCode(clientId);
-        return ResultData.success(captchaCode);
-    }
-
-    @GetMapping("/resetTicket")
-    @ResponseBody
-    public ResultData getResetTicket(HttpServletRequest request, @RequestParam(value = "funcCode", required = false) String funcCode
-            , @RequestParam(value = "type", required = false) String type) {
-        String clientId = request.getSession().getId();
-        String userId = request.getParameter(RequestParams.USER_ID);
-        log.info("----getResetTicket--funcCode={} type={} userId={}", funcCode, type, userId);
-        Map<String, String> map = new HashMap<>();
-        map.put("clientId", clientId);
-        map.put("funcCode", funcCode);
-        map.put("type", type);
-        return ResultData.success(map);
-    }
-
     @RequestMapping(value = "/resetLimits", method = {RequestMethod.GET, RequestMethod.POST})
-    @ResponseBody
     public ResultData resetLimits(HttpServletRequest request
             , @RequestParam(value = "clientId", required = false) String clientId
             , @RequestParam(value = "type", required = false) String type
@@ -133,5 +105,33 @@ public class FrequencyResetController {
         }
         limitInfoList = limitInfoList.stream().filter(StringUtils::isNotBlank).collect(Collectors.toList());
         return ResultData.success(limitInfoList);
+    }
+
+    /**
+     * 用于支持在页面显示图片验证码，而不是后台生成
+     */
+    @ResponseBody
+    @RequestMapping(value = "captchaCode", method = {RequestMethod.GET, RequestMethod.POST})
+    public ResultData getImageCaptchaCode(HttpServletRequest request) {
+        String clientId = request.getParameter("clientId");
+        if (StringUtils.isEmpty(clientId)) {
+            throw new ParamNullException("clientId is null");
+        }
+        String captchaCode = verificateBiz.setVerficationCode(clientId);
+        return ResultData.success(captchaCode);
+    }
+
+    @ResponseBody
+    @GetMapping("/resetTicket")
+    public ResultData getResetTicket(HttpServletRequest request, @RequestParam(value = "funcCode", required = false) String funcCode
+            , @RequestParam(value = "type", required = false) String type) {
+        String clientId = request.getSession().getId();
+        String userId = request.getParameter(RequestParams.USER_ID);
+        log.info("----getResetTicket--funcCode={} type={} userId={}", funcCode, type, userId);
+        Map<String, String> map = new HashMap<>();
+        map.put("clientId", clientId);
+        map.put("funcCode", funcCode);
+        map.put("type", type);
+        return ResultData.success(map);
     }
 }

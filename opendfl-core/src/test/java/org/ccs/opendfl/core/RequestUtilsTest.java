@@ -1,10 +1,14 @@
 package org.ccs.opendfl.core;
 
+import com.alibaba.fastjson.JSON;
+import org.ccs.opendfl.core.utils.AnnotationControllerUtils;
 import org.ccs.opendfl.core.utils.RequestUtils;
+import org.ccs.opendfl.core.vo.RequestVo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 class RequestUtilsTest {
     @Test
@@ -41,21 +45,30 @@ class RequestUtilsTest {
     }
 
     @Test
-    public void getNumConvertIp(){
+    void getNumConvertIp() {
         String host;
         host = "192.168.0.101";
-        long ipNum=RequestUtils.getIpConvertNum(host);
-        System.out.println("host="+host+" "+" ipNum="+ipNum);
+        long ipNum = RequestUtils.getIpConvertNum(host);
+        System.out.println("host=" + host + " " + " ipNum=" + ipNum);
         Assertions.assertEquals(host, RequestUtils.getNumConvertIp(ipNum));
 
         host = "192.168.197.101";
-        ipNum=RequestUtils.getIpConvertNum(host);
-        System.out.println("host="+host+" "+" ipNum="+ipNum);
+        ipNum = RequestUtils.getIpConvertNum(host);
+        System.out.println("host=" + host + " " + " ipNum=" + ipNum);
         Assertions.assertEquals(host, RequestUtils.getNumConvertIp(ipNum));
 
         host = "10.0.158.116";
-        ipNum=RequestUtils.getIpConvertNum(host);
-        System.out.println("host="+host+" "+" ipNum="+ipNum);
+        ipNum = RequestUtils.getIpConvertNum(host);
+        System.out.println("host=" + host + " " + " ipNum=" + ipNum);
         Assertions.assertEquals(host, RequestUtils.getNumConvertIp(ipNum));
     }
+
+
+    @Test
+    void getControllerRequests() {
+        List<RequestVo> list = AnnotationControllerUtils.getControllerRequests("org.ccs.opendfl");
+        System.out.println(JSON.toJSON(list));
+        Assertions.assertTrue(list.size() > 0, "load size>00");
+    }
+
 }

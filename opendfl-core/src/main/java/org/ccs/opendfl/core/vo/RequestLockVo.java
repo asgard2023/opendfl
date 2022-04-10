@@ -1,6 +1,7 @@
 package org.ccs.opendfl.core.vo;
 
 import lombok.Data;
+import org.ccs.opendfl.core.limitlock.RequestLock;
 import org.springframework.beans.BeanUtils;
 
 /**
@@ -10,6 +11,14 @@ import org.springframework.beans.BeanUtils;
  */
 @Data
 public class RequestLockVo{
+    public static RequestLockVo toLockVo(RequestLock lock){
+        RequestLockVo lockVo = new RequestLockVo();
+        lockVo.setName(lock.name());
+        lockVo.setTime(lock.time());
+        lockVo.setAttrName(lock.attrName());
+        lockVo.setErrMsg(lock.errMsg());
+        return lockVo;
+    }
     private String requestUri;
     private String name;
     private int time;

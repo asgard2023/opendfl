@@ -8,6 +8,43 @@ public final class CommUtils {
     private CommUtils(){
 
     }
+    /**
+     * 以ch字符开头
+     * @return true/false
+     */
+    public static boolean startWithChar(String str, char ch){
+        if(str==null||str.length()<1){
+            return false;
+        }
+        return str.charAt(0)==ch;
+    }
+
+    /**
+     * 以ch字符结尾
+     * @return true/false
+     */
+    public static boolean endWithChar(String str, char ch){
+        if(str==null||str.length()<1){
+            return false;
+        }
+        return str.charAt(str.length()-1)==ch;
+    }
+    public static String appendUrl(String url, String path){
+        if(url==null){
+            return null;
+        }
+        if(path==null){
+            path="";
+        }
+        if(CommUtils.endWithChar(url, '/') && CommUtils.startWithChar(path, '/')){//相当于startsWith
+            return url+path.substring(1);
+        }
+        else if(CommUtils.endWithChar(url, '/') || CommUtils.startWithChar(path, '/')){//相当于startsWith
+            return url+path;
+        }
+
+        return url+"/"+path;
+    }
     public static Object nvl(Object ...objects ){
         for(Object obj:objects){
             if(obj!=null){

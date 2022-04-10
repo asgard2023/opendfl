@@ -50,9 +50,14 @@ public class FrequencyController {
     private IFrequencyLoginBiz frequencyLoginBiz;
     private static final Integer TIME_NULL = null;
 
-
-    @GetMapping("/ipConvert")
+    /**
+     * IP转数字转换
+     *
+     * @param request
+     * @return
+     */
     @ResponseBody
+    @GetMapping("/ipConvert")
     public Object ipConvert(HttpServletRequest request) {
         String ip = request.getParameter("ip");
         ValidateUtils.notNull(ip, "ip is null");
@@ -62,7 +67,14 @@ public class FrequencyController {
         return RequestUtils.getIpConvertNum(ip);
     }
 
-
+    /**
+     * 有调用的接口信息
+     * 有调用才会有记录
+     *
+     * @param request
+     * @param requestVo
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = "/requests", method = {RequestMethod.POST, RequestMethod.GET})
     public ResultData requests(HttpServletRequest request, RequestVo requestVo) {
@@ -84,6 +96,42 @@ public class FrequencyController {
         AuditLogUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
         Collection<RequestVo> list = FrequencyHandlerInterceptor.requestVoMap.values();
         List<RequestShowVo> showList = toRequestShowList(list, requestVo);
+        return ResultData.success(showList);
+    }
+
+    /**
+     * 从类中直接加载所有controller类的接口信息
+     * 并可与正在运行的接口关联
+     *
+     * @param request   HttpServletRequest
+     * @param requestVo RequestVo
+     * @return ResultData
+     */
+    @ResponseBody
+    @RequestMapping(value = "/requestInits", method = {RequestMethod.POST, RequestMethod.GET})
+    public ResultData requestInits(HttpServletRequest request, RequestVo requestVo) {
+        String token = RequestUtils.getToken(request);
+        UserVo userVo = frequencyLoginBiz.getUserByToken(token);
+        checkUserPermission(userVo, UserOperType.VIEW);
+        String pkg = request.getParameter("pkg");
+        pkg = (String) CommUtils.nvl(pkg, "org.ccs.opendfl");
+        List<RequestVo> list = AnnotationControllerUtils.getControllerRequests(pkg);
+        //把接口调用情况更新过来
+        final Collection<RequestVo> requestList = FrequencyHandlerInterceptor.requestVoMap.values();
+        List<RequestShowVo> showList = list.stream().map(t -> {
+            RequestShowVo showVo = (RequestShowVo) t;
+            for (RequestVo req : requestList) {
+                if (StringUtils.equals(t.getRequestUri(), req.getRequestUri())) {
+                    showVo.setCounter(req.getCounter());
+                    showVo.setLimitCounter(req.getLimitCounter());
+                    showVo.setMaxRunTime(req.getMaxRunTime());
+                    showVo.setMaxRunTimeCreateTime(req.getMaxRunTimeCreateTime());
+                    showVo.setCreateTime(req.getCreateTime());
+                    break;
+                }
+            }
+            return showVo;
+        }).collect(Collectors.toList());
         return ResultData.success(showList);
     }
 
@@ -142,6 +190,15 @@ public class FrequencyController {
         showVo.setLimitFrequencys(tmpList);
     }
 
+    /**
+     * 频率限制查询
+     *
+     * @param request   HttpServletRequest
+     * @param frequency FrequencyVo
+     * @param ip        IP地址
+     * @param userId    用户ID
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = "/limits", method = {RequestMethod.POST, RequestMethod.GET})
     public ResultData limits(HttpServletRequest request, FrequencyVo frequency
@@ -180,6 +237,14 @@ public class FrequencyController {
         return ResultData.success(list);
     }
 
+    /**
+     * 分布式锁接口信息
+     *
+     * @param request HttpServletRequest
+     * @param lockVo  RequestLockVo
+     * @param userId  String
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = "/locks", method = {RequestMethod.POST, RequestMethod.GET})
     public ResultData locks(HttpServletRequest request, RequestLockVo lockVo, @RequestParam(value = "userId", required = false) String userId) {
