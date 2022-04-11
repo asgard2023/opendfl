@@ -3,6 +3,7 @@ package org.ccs.opendfl.core.limitfrequency;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IFrequencyConfigBiz;
+import org.ccs.opendfl.core.biz.IMaxRunTimeBiz;
 import org.ccs.opendfl.core.biz.IUserBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
@@ -54,6 +55,8 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     private WhiteChain whiteChain;
     @Autowired
     private BlackChain blackChain;
+    @Autowired
+    private IMaxRunTimeBiz maxRunTimeBiz;
     private static final String BLACK_LIST_INFO = "{\"resultCode\":\"100010\",\"errorMsg\":\"Frequency limit\",\"data\":\"WaT+azid/F/83e1UpLc6ZA==\",\"errorType\":\"%s\",\"success\":false}";
 
     private final ThreadLocal<Long> startTime = new ThreadLocal<>();
@@ -258,13 +261,14 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             //排除等一次请求
             if (requestVo != null && requestVo.getCounter().get() > 1) {
                 //上次时间如果超过30秒，则清空，以便于重算
-                if (requestVo.getMaxRunTimeCreateTime() > requestStartTime - frequencyConfiguration.getMaxRunTimeInterval()* FrequencyConstant.TIME_MILLISECOND_TO_SECOND) {
+                if (requestVo.getMaxRunTimeCreateTime() < requestStartTime - frequencyConfiguration.getMaxRunTimeInterval()* FrequencyConstant.TIME_MILLISECOND_TO_SECOND) {
                     requestVo.setMaxRunTime(0L);
                     requestVo.setMaxRunTimeCreateTime(0L);
                 }
                 if (requestVo.getMaxRunTime() < runTime) {
                     requestVo.setMaxRunTime(runTime);
                     requestVo.setMaxRunTimeCreateTime(requestStartTime);
+                    maxRunTimeBiz.addMaxRunTime(requestVo.getRequestUri(), requestStartTime, runTime);
                 }
             }
         }

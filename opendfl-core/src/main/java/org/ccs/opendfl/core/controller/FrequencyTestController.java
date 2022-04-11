@@ -2,21 +2,28 @@ package org.ccs.opendfl.core.controller;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
+import org.ccs.opendfl.core.biz.IMaxRunTimeBiz;
+import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.exception.FailedException;
+import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.limitfrequency.Frequency;
 import org.ccs.opendfl.core.limitfrequency.Frequency2;
 import org.ccs.opendfl.core.limitlock.RequestLock;
 import org.ccs.opendfl.core.utils.RequestParams;
 import org.ccs.opendfl.core.utils.RequestUtils;
+import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.utils.ValidateUtils;
+import org.ccs.opendfl.core.vo.MaxRunTimeVo;
 import org.ccs.opendfl.core.vo.RequestTestVo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * 频率限制支持
@@ -27,6 +34,31 @@ import java.nio.charset.StandardCharsets;
 @RequestMapping("/frequencyTest")
 @Slf4j
 public class FrequencyTestController {
+    @Autowired
+    private IMaxRunTimeBiz maxRunTimeBiz;
+    @Autowired
+    private FrequencyConfiguration frequencyConfiguration;
+
+    /**
+     * 找出second时间内执行最慢的近count个接口
+     * 可用于做监控告警，比如5秒内执行时间最长的接口
+     *
+     * @param request HttpServletRequest
+     * @param second  单位秒
+     * @param count   接口个数
+     * @return
+     */
+    @GetMapping("/monitor")
+    @ResponseBody
+    public ResultData monitor(HttpServletRequest request, @RequestParam(name = "second", defaultValue = "30") Integer second
+            , @RequestParam(name = "count", defaultValue = "20") Integer count) {
+        log.info("----monitor--userId={}", request.getParameter(RequestParams.USER_ID));
+        if (!StringUtils.ifYes(frequencyConfiguration.getRunTimeMonitor())) {
+            throw new FailedException("feature is not open, see frequency.runTimeMonitor");
+        }
+        List<MaxRunTimeVo> list = this.maxRunTimeBiz.getNewlyMaxRunTime(second, count);
+        return ResultData.success(list);
+    }
 
     @GetMapping("/serverTime")
     @ResponseBody

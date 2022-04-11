@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>服务接口-从类中扫描所有controller类找接口方法</title>
+    <title>服务接口-最近调用时长最大的接口</title>
     <script type="text/javascript" src="../scripts/lib/easyui1.7.0/jquery.min.js"></script>
     <script type="text/javascript" src="../scripts/lib/easyui1.7.0/jquery.easyui.min.js"></script>
     <script type="text/javascript" src="../scripts/lib/easyui1.7.0/easyui.comm.valid.js"></script>
@@ -51,7 +51,7 @@
 <body>
 
 <div id="mainWindow" class="easyui-layout" data-options="fit:true" style="display:none">
-    <div data-options="region:'north', title:'info-从类中扫描所有controller类找接口方法'"
+    <div data-options="region:'north', title:'info-最近调用时长最大的接口-查出数据为空，表示系统所有接口性能较好'"
          style="height: 80px; padding: 5px 40px;display:none;">
         <form id="search-form">
             <table class="search-table">
@@ -65,6 +65,14 @@
                         <input type="text" class="input_query" style="width: 300px" name="pkg" id="query_pkg" value="org.ccs.opendfl"/>
                     </td>
                     <td>
+                        最近时间(秒):
+                        <input type="text" class="input_query" name="second" id="query_second" value="60"/>
+                    </td>
+                    <td>
+                        记录数:
+                        <input type="text" class="input_query"  name="count" id="query_count" value="20"/>
+                    </td>
+                    <td>
                         <a class="easyui-linkbutton"
                            data-options="iconCls:'icon-search'" id="search-btn">查询</a>
                         <a class="easyui-linkbutton"
@@ -75,7 +83,7 @@
         </form>
     </div>
     <!-- 查询结果 center -->
-    <div data-options="region:'center', title:'controller类中有的方法，以及调用情况'" id="dataInfo">
+    <div data-options="region:'center', title:'最近调用时长最大的接口-可用于监控接口性能'" id="dataInfo">
         <div id="toolbar">
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="onEdit()">Edit</a>
         </div>
@@ -238,7 +246,7 @@
 
     function loadData() {
         var jsonParam = $('#search-form').serializeJson();
-        var url = '/frequency/requestScans';
+        var url = '/frequency/requestMaxRunTimes';
         $.ajax({
             method: 'post',
             url: url,

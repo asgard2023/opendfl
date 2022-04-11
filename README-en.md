@@ -20,6 +20,7 @@
 * Support device ID blacklist restriction
 * Support to reset user's single function limit through verification code
 * Support reset all user restrictions by verification code
+* Support performance monitoring interface and query
 
 
 ## Simple to use:

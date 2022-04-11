@@ -8,6 +8,8 @@ frequency:
   minRunTime: 500
   #记录最大时间的间格，每30秒记录最大访问时间
   maxRunTimeInterval: 30
+  #是否支持接口监控，允许monitor接口返回最近接口执行时间
+  runTimeMonitor: 1
   #接口级用户白名单
   whiteCodeUsers:
     #管理员白名单

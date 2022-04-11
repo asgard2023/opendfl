@@ -38,6 +38,10 @@ public class FrequencyConfiguration {
      */
     private Integer maxRunTimeInterval=30;
     /**
+     * 是否启动执行时长监控
+     */
+    private Character runTimeMonitor='0';
+    /**
      * 黑名单配置
      */
     private WhiteBlackConfigVo black;

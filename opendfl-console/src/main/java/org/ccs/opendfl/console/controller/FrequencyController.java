@@ -7,6 +7,7 @@ import org.ccs.opendfl.console.config.vo.UserVo;
 import org.ccs.opendfl.console.constant.UserOperType;
 import org.ccs.opendfl.console.utils.AuditLogUtils;
 import org.ccs.opendfl.core.biz.IFrequencyDataBiz;
+import org.ccs.opendfl.core.biz.IMaxRunTimeBiz;
 import org.ccs.opendfl.core.biz.IRequestLockDataBiz;
 import org.ccs.opendfl.core.biz.IUserBiz;
 import org.ccs.opendfl.core.exception.PermissionDeniedException;
@@ -14,10 +15,7 @@ import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.limitfrequency.FrequencyHandlerInterceptor;
 import org.ccs.opendfl.core.limitlock.RequestLockHandlerInterceptor;
 import org.ccs.opendfl.core.utils.*;
-import org.ccs.opendfl.core.vo.FrequencyVo;
-import org.ccs.opendfl.core.vo.RequestLockVo;
-import org.ccs.opendfl.core.vo.RequestShowVo;
-import org.ccs.opendfl.core.vo.RequestVo;
+import org.ccs.opendfl.core.vo.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +46,8 @@ public class FrequencyController {
     private IRequestLockDataBiz requestLockDataBiz;
     @Resource(name = "frequencyLoginRedisBiz")
     private IFrequencyLoginBiz frequencyLoginBiz;
+    @Autowired
+    private IMaxRunTimeBiz maxRunTimeBiz;
     private static final Integer TIME_NULL = null;
 
     /**
@@ -108,14 +108,19 @@ public class FrequencyController {
      * @return ResultData
      */
     @ResponseBody
-    @RequestMapping(value = "/requestInits", method = {RequestMethod.POST, RequestMethod.GET})
-    public ResultData requestInits(HttpServletRequest request, RequestVo requestVo) {
+    @RequestMapping(value = "/requestScans", method = {RequestMethod.POST, RequestMethod.GET})
+    public ResultData requestScans(HttpServletRequest request, RequestVo requestVo) {
         String token = RequestUtils.getToken(request);
         UserVo userVo = frequencyLoginBiz.getUserByToken(token);
         checkUserPermission(userVo, UserOperType.VIEW);
         String pkg = request.getParameter("pkg");
         pkg = (String) CommUtils.nvl(pkg, "org.ccs.opendfl");
         List<RequestVo> list = AnnotationControllerUtils.getControllerRequests(pkg);
+        List<RequestShowVo> showList = addRequestRunTime(list);
+        return ResultData.success(showList);
+    }
+
+    private List<RequestShowVo> addRequestRunTime(List<RequestVo> list) {
         //把接口调用情况更新过来
         final Collection<RequestVo> requestList = FrequencyHandlerInterceptor.requestVoMap.values();
         List<RequestShowVo> showList = list.stream().map(t -> {
@@ -132,7 +137,42 @@ public class FrequencyController {
             }
             return showVo;
         }).collect(Collectors.toList());
-        return ResultData.success(showList);
+        return showList;
+    }
+
+    /**
+     *
+     * 查询最近时间内接口调后时间最大的数据
+     *
+     * @param request   HttpServletRequest
+     * @param requestVo RequestVo
+     * @return ResultData
+     */
+    @ResponseBody
+    @RequestMapping(value = "/requestMaxRunTimes", method = {RequestMethod.POST, RequestMethod.GET})
+    public ResultData requestMaxRunTimes(HttpServletRequest request, RequestVo requestVo
+            ,@RequestParam(name="second", defaultValue ="10") Integer second, @RequestParam(name="count", defaultValue="20") Integer count) {
+        String token = RequestUtils.getToken(request);
+        UserVo userVo = frequencyLoginBiz.getUserByToken(token);
+        checkUserPermission(userVo, UserOperType.VIEW);
+        String pkg = request.getParameter("pkg");
+        pkg = (String) CommUtils.nvl(pkg, "org.ccs.opendfl");
+        List<MaxRunTimeVo> maxRunTimes=this.maxRunTimeBiz.getNewlyMaxRunTime(second, count);
+
+        List<RequestVo> list = AnnotationControllerUtils.getControllerRequests(pkg);
+        List<RequestShowVo> showList = addRequestRunTime(list);
+        List<RequestShowVo> showMaxList=new ArrayList<>();
+        for(RequestShowVo showVo:showList){
+            for(MaxRunTimeVo maxRunTimeVo:maxRunTimes){
+                if(StringUtils.equals(showVo.getRequestUri(), maxRunTimeVo.getUri())){
+                    showVo.setMaxRunTime(maxRunTimeVo.getMaxRunTime());
+                    showVo.setMaxRunTimeCreateTime(maxRunTimeVo.getCreateTime());
+                    showMaxList.add(showVo);
+                    break;
+                }
+            }
+        }
+        return ResultData.success(showMaxList);
     }
 
     private List<RequestShowVo> toRequestShowList(Collection<RequestVo> list, RequestVo requestVo) {
