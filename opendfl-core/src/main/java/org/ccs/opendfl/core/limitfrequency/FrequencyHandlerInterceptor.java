@@ -57,6 +57,8 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     private BlackChain blackChain;
     @Autowired
     private IMaxRunTimeBiz maxRunTimeBiz;
+    @Autowired
+    private RunCountTask runCountTask;
     private static final String BLACK_LIST_INFO = "{\"resultCode\":\"100010\",\"errorMsg\":\"Frequency limit\",\"data\":\"WaT+azid/F/83e1UpLc6ZA==\",\"errorType\":\"%s\",\"success\":false}";
 
     private final ThreadLocal<Long> startTime = new ThreadLocal<>();
@@ -84,7 +86,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             selectStrategyItems();
 
             Map<String, Object> params = RequestUtils.getParamsObject(request);
-            String deviceId =(String)params.get(RequestParams.DEVICE_ID);
+            String deviceId = (String) params.get(RequestParams.DEVICE_ID);
 
             RequestStrategyParamsVo strategyParams = new RequestStrategyParamsVo(lang, ip, deviceId, handlerMethod.getMethod().getName(), requestUri, curTime);
             String userId = (String) params.get(RequestParams.USER_ID);
@@ -96,6 +98,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
                 return true;
             }
 
+            //黑名单处理
             blackChain.setStrategyParams(strategyParams);
             blackChain.clearLimit();
             boolean isBlack = blackChain.doCheckLimit(blackChain);
@@ -112,6 +115,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             }
 
 
+            //白名单处理
             whiteChain.setStrategyParams(strategyParams);
             whiteChain.clearLimit();
             boolean isWhite = whiteChain.doCheckLimit(whiteChain);
@@ -126,8 +130,10 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             freqLimitChain.setStrategyParams(strategyParams);
             frequencyVo = new FrequencyVo();
             frequencyVo.setRequestUri(requestUri);
+            //基于注解的频率限制
             boolean isAllNull = this.limitByFrequency(handlerMethod, frequencyVo, strategyParams, params, response);
             if (isAllNull) {
+                //基于yml配置的频率限制处理
                 this.limitByRequestConfig(requestVo, frequencyVo, strategyParams, params, response);
             }
 
@@ -149,6 +155,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
 
     /**
      * 结束处理
+     *
      * @param requestVo RequestVo
      */
     private void frequencyReturn(RequestVo requestVo, boolean isFail) {
@@ -179,11 +186,11 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     /**
      * 基于@Frequency注释的限制
      *
-     * @param handlerMethod HandlerMethod
-     * @param frequencyVo FrequencyVo
+     * @param handlerMethod  HandlerMethod
+     * @param frequencyVo    FrequencyVo
      * @param strategyParams RequestStrategyParamsVo
-     * @param params Map<String, Object>
-     * @param response HttpServletResponse
+     * @param params         Map<String, Object>
+     * @param response       HttpServletResponse
      * @return boolean
      */
     private boolean limitByFrequency(HandlerMethod handlerMethod, FrequencyVo frequencyVo, RequestStrategyParamsVo strategyParams, Map<String, Object> params, HttpServletResponse response) {
@@ -209,11 +216,11 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     /**
      * 基于uri地址的频率限制
      *
-     * @param requestVo RequestVo
-     * @param frequencyVo FrequencyVo
+     * @param requestVo      RequestVo
+     * @param frequencyVo    FrequencyVo
      * @param strategyParams RequestStrategyParamsVo
-     * @param params Map<String, Object>
-     * @param response HttpServletResponse
+     * @param params         Map<String, Object>
+     * @param response       HttpServletResponse
      */
     private void limitByRequestConfig(RequestVo requestVo, FrequencyVo frequencyVo, RequestStrategyParamsVo strategyParams, Map<String, Object> params, HttpServletResponse response) {
         frequencyConfigBiz.limitBySysconfigUri(requestVo);
@@ -254,25 +261,59 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         String key = requestKey.get();
         startTime.remove();
         requestKey.remove();
-        Long runTime = System.currentTimeMillis() - requestStartTime;
+        //最大时长处理间隔
+        final long runTimeInterval = frequencyConfiguration.getMaxRunTimeInterval() * FrequencyConstant.TIME_MILLISECOND_TO_SECOND;
+        //接口调用时长记录
+        requestRunTime(key, requestStartTime, runTimeInterval);
+        //保存调用次数
+        saveRunTaskCount(requestStartTime, runTimeInterval);
+    }
+
+    /**
+     * 记录更新统计时间(用于减少调用次数)
+     */
+    public static Long updateDateTime = 0L;
+
+    /**
+     * 通过单线程，每runTimeInterval，如30秒把执行次数更新到redis，缓存3天
+     *
+     * @param requestTime     请求时间
+     * @param runTimeInterval 周期
+     */
+    private void saveRunTaskCount(Long requestTime, final long runTimeInterval) {
+        //判断是否需要落库
+        if (requestTime - updateDateTime > runTimeInterval) {
+            //更新刷新时间
+            updateDateTime = requestTime;
+            runCountTask.notifyRun();
+        }
+    }
+
+    /**
+     * 接口调用时长记录
+     * @param requestKey uri+":"+method
+     * @param requestTime Long
+     * @param runTimeInterval Long
+     */
+    private void requestRunTime(String requestKey, final Long requestTime, final long runTimeInterval){
+        Long runTime = System.currentTimeMillis() - requestTime;
         //记录超出最小执行时间的最大值
         if (runTime > frequencyConfiguration.getMinRunTime()) {
-            RequestVo requestVo = requestVoMap.get(key);
+            RequestVo requestVo = requestVoMap.get(requestKey);
             //排除等一次请求
             if (requestVo != null && requestVo.getCounter().get() > 1) {
                 //上次时间如果超过30秒，则清空，以便于重算
-                if (requestVo.getMaxRunTimeCreateTime() < requestStartTime - frequencyConfiguration.getMaxRunTimeInterval()* FrequencyConstant.TIME_MILLISECOND_TO_SECOND) {
+                if (requestVo.getMaxRunTimeCreateTime() < requestTime - runTimeInterval) {
                     requestVo.setMaxRunTime(0L);
                     requestVo.setMaxRunTimeCreateTime(0L);
                 }
                 if (requestVo.getMaxRunTime() < runTime) {
                     requestVo.setMaxRunTime(runTime);
-                    requestVo.setMaxRunTimeCreateTime(requestStartTime);
-                    maxRunTimeBiz.addMaxRunTime(requestVo.getRequestUri(), requestStartTime, runTime);
+                    requestVo.setMaxRunTimeCreateTime(requestTime);
+                    maxRunTimeBiz.addMaxRunTime(requestVo.getRequestUri(), requestTime, runTime);
                 }
             }
         }
-
     }
 
 
@@ -299,7 +340,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         }
 
         String userId = strategyParams.getUserId();
-        if(frequency.isNeedLogin()){
+        if (frequency.isNeedLogin()) {
             userBiz.checkUser(userId);
         }
         String attrName = RequestParams.USER_ID;
@@ -330,7 +371,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     public static final Map<String, RequestVo> requestVoMap = new ConcurrentHashMap<>(100);
 
     /**
-     * 首次加载日志一下
+     * 频纱限制配置，首次加载日志一下
      *
      * @param frequency FrequencyVo
      */

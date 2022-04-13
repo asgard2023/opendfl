@@ -34,6 +34,13 @@ public class RedisTemplateUtil {
         }
     }
 
+    public static void expireTimeHashCacheString(RedisTemplate<String, String> redisTemplate, String redisKey, int hour) {
+        if (redisKeyMap.getIfPresent(redisKey) == null) {
+            redisKeyMap.put(redisKey, System.currentTimeMillis());
+            redisTemplate.expire(redisKey, hour, TimeUnit.HOURS);
+        }
+    }
+
     public static void expireTimeTTL(RedisTemplate<String, Object> redisTemplate, String redisKey, int seconds) {
         Long v = redisTemplate.getExpire(redisKey);
         if (v == -1L) {
