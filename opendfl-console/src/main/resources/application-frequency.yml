@@ -10,6 +10,8 @@ frequency:
   maxRunTimeInterval: 30
   #是否支持接口监控，允许monitor接口返回最近接口执行时间
   runTimeMonitor: '1'
+  #接口调用次数缓存zset保存天数
+  runCountCacheDay: 7
   #接口级用户白名单
   whiteCodeUsers:
     #管理员白名单

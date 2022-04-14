@@ -62,8 +62,27 @@
                     </td>
                     <td>
                         Package name:
-                        <input type="text" class="input_query" style="width: 300px" name="pkg" id="query_pkg" value="org.ccs.opendfl"/>
+                        <input type="text" class="input_query" style="width: 300px" name="pkg" id="query_pkg"
+                               value="org.ccs.opendfl"/>
                     </td>
+                    <td>
+                        <label>时间类型(最长时长,执行次数)</label>
+                        <select class="easyui-combobox" name="day" id="day" style="width:100px;"
+                                data-options="valueField: 'id', textField: 'text'
+                                ,url: '/frequency/getRunDays'
+                                ,onSelect: function(rec){
+                                    var url = '/frequency/getRunCountTypeByDay?day='+rec.id;
+                                    $('#type').combobox('reload', url);
+                                }">
+                        </select>
+                    </td>
+                    <td>
+                        <label>统计次数类型</label>
+                        <select class="easyui-combobox" name="type" id="type" style="width:150px;"
+                                data-options="valueField: 'id', textField: 'text',url: '/frequency/getRunCountTypeByDay'">
+                        </select>
+                    </td>
+
                     <td>
                         <a class="easyui-linkbutton"
                            data-options="iconCls:'icon-search'" id="search-btn">查询</a>
@@ -91,11 +110,13 @@
                 <th field="attrName" width="50" sortable="true">attrName(默认userId)</th>
                 <th field="otherInfo" width="50" sortable="true">其他注解配置</th>
                 <th field="limitTypes" width="50" sortable="true">限制类型</th>
-                <th field="counter" width="50" sortable="true">counter</th>
-                <th field="limitCounter" width="50" sortable="true">Limited counter</th>
+                <th field="counter" width="50" sortable="true">调用次数</th>
+                <th field="limitCounter" width="50" sortable="true">超限次数</th>
                 <th field="maxRunTime" width="50" sortable="true">maxRunTime</th>
-                <th field="maxRunTimeCreateTime" width="50" sortable="true" formatter="timestampFormatDateTime">maxRunCreateTime</th>
-                <th field="createTime" width="50" sortable="true" formatter="timestampFormatDateTime">加载时间</th>
+                <th field="maxRunTimeCreateTime" width="50" sortable="true" formatter="timestampFormatDateTime">
+                    maxRunCreateTime
+                </th>
+                <th field="createTime" width="50" sortable="true" formatter="timestampFormatDateTime">首次加载时间</th>
             </tr>
             </thead>
         </table>

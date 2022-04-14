@@ -6,10 +6,11 @@ import org.ccs.opendfl.console.config.vo.RolePermitVo;
 import org.ccs.opendfl.console.config.vo.UserVo;
 import org.ccs.opendfl.console.constant.UserOperType;
 import org.ccs.opendfl.console.utils.AuditLogUtils;
-import org.ccs.opendfl.core.biz.IFrequencyDataBiz;
-import org.ccs.opendfl.core.biz.IMaxRunTimeBiz;
-import org.ccs.opendfl.core.biz.IRequestLockDataBiz;
-import org.ccs.opendfl.core.biz.IUserBiz;
+import org.ccs.opendfl.core.biz.*;
+import org.ccs.opendfl.core.config.FrequencyConfiguration;
+import org.ccs.opendfl.core.constants.FreqLimitType;
+import org.ccs.opendfl.core.constants.FrequencyConstant;
+import org.ccs.opendfl.core.constants.RunCountType;
 import org.ccs.opendfl.core.exception.PermissionDeniedException;
 import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.limitfrequency.FrequencyHandlerInterceptor;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -48,6 +50,13 @@ public class FrequencyController {
     private IFrequencyLoginBiz frequencyLoginBiz;
     @Autowired
     private IMaxRunTimeBiz maxRunTimeBiz;
+    @Autowired
+    private IRunCountBiz runCountBiz;
+    @Autowired
+    private IOutLimitCountBiz outLimitCountBiz;
+    @Autowired
+    private FrequencyConfiguration frequencyConfiguration;
+
     private static final Integer TIME_NULL = null;
 
     /**
@@ -66,6 +75,40 @@ public class FrequencyController {
         }
         return RequestUtils.getIpConvertNum(ip);
     }
+
+    /**
+     * 日期选择下拉框
+     *
+     * @param request
+     * @return List<ComboxItemVo>
+     */
+    @ResponseBody
+    @RequestMapping(value = "/getRunDays", method = {RequestMethod.GET, RequestMethod.POST})
+    public List<ComboxItemVo> getRunDays(HttpServletRequest request) {
+        return runCountBiz.getRunDays();
+    }
+
+    /**
+     * 限制次数类型
+     *
+     * @param request
+     * @return List<ComboxItemVo>
+     */
+    @ResponseBody
+    @RequestMapping(value = "/getRunCountTypeByDay", method = {RequestMethod.GET, RequestMethod.POST})
+    public List<ComboxItemVo> getRunCountTypeByDay(HttpServletRequest request
+            , @RequestParam(value = "day", required = false, defaultValue = "0") Integer day) {
+        List<ComboxItemVo> list = new ArrayList<>();
+        if (frequencyConfiguration.getRunCountCacheDay() == 0) {
+            list.add(new ComboxItemVo("current", "frequency.runCountCacheDay=0未启用历史缓存", false));
+            return list;
+        }
+        list.add(new ComboxItemVo("current", "当前本机", true));
+        list.addAll(runCountBiz.getRunCountTypeByDay(day));
+        list.addAll(outLimitCountBiz.getRunCountTypeByDay(day));
+        return list;
+    }
+
 
     /**
      * 有调用的接口信息
@@ -99,6 +142,84 @@ public class FrequencyController {
         return ResultData.success(showList);
     }
 
+    private void requestRunCount(String type, Integer day, List<RequestShowVo> showList) {
+        if (StringUtils.equals("current", type) && day == -1) {
+            return;
+        }
+        if (StringUtils.equals("current", type)) {
+            type = RunCountType.COUNT.getCode();
+        }
+        Long curTime = System.currentTimeMillis();
+        if (day > 0) {
+            curTime = curTime - day * FrequencyConstant.TIME_MILLISECOND_TO_HOUR * 24;
+        }
+
+        RunCountType countType = RunCountType.parse(type);
+        if (countType != null) {
+            requestRunCount(countType, showList, curTime);
+        } else {
+            FreqLimitType limitType = FreqLimitType.parseCode(type);
+            requestOutLimitCount(limitType, showList, curTime);
+        }
+    }
+
+    private void requestRunCount(RunCountType countType, List<RequestShowVo> showList, Long curTime) {
+        if (countType == null) {
+            return;
+        }
+        List<RequestShowVo> tmpList = new ArrayList<>();
+        List<RunCountVo> countList = runCountBiz.getNewlyRunCount(countType, curTime, 100);
+        List<RunCountVo> outLimitList = runCountBiz.getNewlyRunCount(RunCountType.OUT_LIMIT, curTime, 100);
+
+        for (RequestShowVo showVo : showList) {
+            for (RunCountVo countVo : countList) {
+                if (StringUtils.equals(showVo.getRequestUri(), countVo.getUri())) {
+                    showVo.setCounter(new AtomicInteger(countVo.getCount()));
+                    showVo.setLimitCounter(new AtomicInteger(0));
+                    tmpList.add(showVo);
+                    break;
+                }
+            }
+            for (RunCountVo countVo : outLimitList) {
+                if (StringUtils.equals(showVo.getRequestUri(), countVo.getUri())) {
+                    showVo.setLimitCounter(new AtomicInteger(countVo.getCount()));
+                    break;
+                }
+            }
+        }
+        showList.clear();
+        showList.addAll(tmpList);
+    }
+
+    private void requestOutLimitCount(FreqLimitType limitType, List<RequestShowVo> showList, Long curTime) {
+        if (limitType == null) {
+            return;
+        }
+        List<RequestShowVo> tmpList = new ArrayList<>();
+
+        List<RunCountVo> countList = runCountBiz.getNewlyRunCount(RunCountType.COUNT, curTime, 100);
+        List<RunCountVo> outLimitList = outLimitCountBiz.getNewlyRunCount(limitType, curTime, 100);
+
+        for (RequestShowVo showVo : showList) {
+            for (RunCountVo countVo : countList) {
+                if (StringUtils.equals(showVo.getRequestUri(), countVo.getUri())) {
+                    showVo.setCounter(new AtomicInteger(countVo.getCount()));
+                    showVo.setLimitCounter(new AtomicInteger(0));
+                    break;
+                }
+            }
+            for (RunCountVo countVo : outLimitList) {
+                if (StringUtils.equals(showVo.getRequestUri(), countVo.getUri())) {
+                    showVo.setLimitCounter(new AtomicInteger(countVo.getCount()));
+                    tmpList.add(showVo);
+                    break;
+                }
+            }
+        }
+        showList.clear();
+        showList.addAll(tmpList);
+    }
+
     /**
      * 从类中直接加载所有controller类的接口信息
      * 并可与正在运行的接口关联
@@ -109,7 +230,9 @@ public class FrequencyController {
      */
     @ResponseBody
     @RequestMapping(value = "/requestScans", method = {RequestMethod.POST, RequestMethod.GET})
-    public ResultData requestScans(HttpServletRequest request, RequestVo requestVo) {
+    public ResultData requestScans(HttpServletRequest request, RequestVo requestVo
+            , @RequestParam(value = "type", required = false) String type
+            , @RequestParam(value = "day", required = false, defaultValue = "0") Integer day) {
         String token = RequestUtils.getToken(request);
         UserVo userVo = frequencyLoginBiz.getUserByToken(token);
         checkUserPermission(userVo, UserOperType.VIEW);
@@ -117,13 +240,14 @@ public class FrequencyController {
         pkg = (String) CommUtils.nvl(pkg, "org.ccs.opendfl");
         List<RequestVo> list = AnnotationControllerUtils.getControllerRequests(pkg);
         List<RequestShowVo> showList = addRequestRunTime(list);
+        requestRunCount(type, day, showList);
         return ResultData.success(showList);
     }
 
     private List<RequestShowVo> addRequestRunTime(List<RequestVo> list) {
         //把接口调用情况更新过来
         final Collection<RequestVo> requestList = FrequencyHandlerInterceptor.requestVoMap.values();
-        List<RequestShowVo> showList = list.stream().map(t -> {
+        return list.stream().map(t -> {
             RequestShowVo showVo = (RequestShowVo) t;
             for (RequestVo req : requestList) {
                 if (StringUtils.equals(t.getRequestUri(), req.getRequestUri())) {
@@ -137,11 +261,9 @@ public class FrequencyController {
             }
             return showVo;
         }).collect(Collectors.toList());
-        return showList;
     }
 
     /**
-     *
      * 查询最近时间内接口调后时间最大的数据
      *
      * @param request   HttpServletRequest
@@ -151,20 +273,20 @@ public class FrequencyController {
     @ResponseBody
     @RequestMapping(value = "/requestMaxRunTimes", method = {RequestMethod.POST, RequestMethod.GET})
     public ResultData requestMaxRunTimes(HttpServletRequest request, RequestVo requestVo
-            ,@RequestParam(name="second", defaultValue ="10") Integer second, @RequestParam(name="count", defaultValue="20") Integer count) {
+            , @RequestParam(name = "second", defaultValue = "10") Integer second, @RequestParam(name = "count", defaultValue = "20") Integer count) {
         String token = RequestUtils.getToken(request);
         UserVo userVo = frequencyLoginBiz.getUserByToken(token);
         checkUserPermission(userVo, UserOperType.VIEW);
         String pkg = request.getParameter("pkg");
         pkg = (String) CommUtils.nvl(pkg, "org.ccs.opendfl");
-        List<MaxRunTimeVo> maxRunTimes=this.maxRunTimeBiz.getNewlyMaxRunTime(second, count);
+        List<MaxRunTimeVo> maxRunTimes = this.maxRunTimeBiz.getNewlyMaxRunTime(second, count);
 
         List<RequestVo> list = AnnotationControllerUtils.getControllerRequests(pkg);
         List<RequestShowVo> showList = addRequestRunTime(list);
-        List<RequestShowVo> showMaxList=new ArrayList<>();
-        for(RequestShowVo showVo:showList){
-            for(MaxRunTimeVo maxRunTimeVo:maxRunTimes){
-                if(StringUtils.equals(showVo.getRequestUri(), maxRunTimeVo.getUri())){
+        List<RequestShowVo> showMaxList = new ArrayList<>();
+        for (RequestShowVo showVo : showList) {
+            for (MaxRunTimeVo maxRunTimeVo : maxRunTimes) {
+                if (StringUtils.equals(showVo.getRequestUri(), maxRunTimeVo.getUri())) {
                     showVo.setMaxRunTime(maxRunTimeVo.getMaxRunTime());
                     showVo.setMaxRunTimeCreateTime(maxRunTimeVo.getCreateTime());
                     showMaxList.add(showVo);
@@ -172,6 +294,8 @@ public class FrequencyController {
                 }
             }
         }
+//        Long curTime = System.currentTimeMillis()-second*FrequencyConstant.TIME_MILLISECOND_TO_SECOND;
+//        requestRunCount(RunCountType.COUNT, null, showMaxList,curTime);
         return ResultData.success(showMaxList);
     }
 
@@ -194,6 +318,8 @@ public class FrequencyController {
             StringBuilder attrNames = new StringBuilder();
             relFrequencys(frequencyListSorted, t, showVo, limitTypes, attrNames);
             relLocks(lockList, t, showVo, limitTypes, attrNames);
+            showVo.setCounter(new AtomicInteger(t.getCounter().get()));
+            showVo.setLimitCounter(new AtomicInteger(t.getLimitCounter().get()));
             showVo.setAttrName(CommUtils.removeEndComma(attrNames.toString()));
             String limitTypeStr = CommUtils.removeEndComma(limitTypes.toString());
             showVo.setLimitTypes(limitTypeStr);

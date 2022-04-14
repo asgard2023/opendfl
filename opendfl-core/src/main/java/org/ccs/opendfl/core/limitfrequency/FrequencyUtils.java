@@ -50,7 +50,7 @@ public class FrequencyUtils {
     }
 
     @Autowired
-    public void setRsaBiz(IRsaBiz rsaBiz){
+    public void setRsaBiz(IRsaBiz rsaBiz) {
         FrequencyUtils.rsaBiz = rsaBiz;
     }
 
@@ -67,6 +67,7 @@ public class FrequencyUtils {
      * @param type           limit type
      */
     public static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, FreqLimitType type) {
+        outLimitCount(strategyParams, type);
         Integer logTime = frequencyConfiguration.getLimit().getOutLimitLogTime();
         FrequencyVo frequency = strategyParams.getFrequency();
         if (!(logTime > 0 && frequency.getTime() >= logTime)) {
@@ -80,6 +81,31 @@ public class FrequencyUtils {
             countLimit = limit;
         }
         logger.info("----addFreqLog--type={} uri={} limit={} attrData={} reqCount={} ip={}", type.getCode(), uri, countLimit, userId, v, ip);
+    }
+
+    public static final Map<String, Map<String, AtomicInteger>> outLimitCountMap = new ConcurrentHashMap<>();
+
+    /**
+     * 按接口记录超限次数
+     *
+     * @param strategyParams RequestStrategyParamsVo
+     * @param type           FreqLimitType
+     */
+    private static void outLimitCount(RequestStrategyParamsVo strategyParams, FreqLimitType type) {
+        if (frequencyConfiguration.getRunCountCacheDay().intValue() == 0) {
+            return;
+        }
+        Map<String, AtomicInteger> typeCountMap = outLimitCountMap.get(type.getCode());
+        if (typeCountMap == null) {
+            typeCountMap = new ConcurrentHashMap<>();
+            outLimitCountMap.put(type.getCode(), typeCountMap);
+        }
+        AtomicInteger counter = typeCountMap.get(strategyParams.getRequestUri());
+        if (counter == null) {
+            counter = new AtomicInteger();
+            typeCountMap.put(strategyParams.getRequestUri(), counter);
+        }
+        counter.incrementAndGet();
     }
 
 
@@ -154,7 +180,7 @@ public class FrequencyUtils {
         if (attrValue == null) {
             return null;
         }
-        return decryptValue(clientIdRsa, ""+attrValue);
+        return decryptValue(clientIdRsa, "" + attrValue);
     }
 
     /**

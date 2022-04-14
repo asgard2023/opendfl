@@ -35,13 +35,14 @@ public class MaxRunTimeRedisBiz implements IMaxRunTimeBiz {
     public String getRedisKey(Long curTime, String type) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(curTime);
-        return frequencyConfiguration.getRedisPrefix() + ":" + REDIS_MAX_RUN_TIME + ":" + type + ":" + calendar.get(Calendar.DAY_OF_WEEK);
+        return frequencyConfiguration.getRedisPrefix() + ":" + REDIS_MAX_RUN_TIME + ":" + type + ":" + calendar.get(Calendar.DAY_OF_MONTH);
     }
 
     /**
      * 接口慢执行记录到redis
-     * @param uri 接口uri(不含参数)
-     * @param curTime 发生时间
+     *
+     * @param uri        接口uri(不含参数)
+     * @param curTime    发生时间
      * @param maxRunTime 执行时长
      */
     @Override
@@ -57,17 +58,19 @@ public class MaxRunTimeRedisBiz implements IMaxRunTimeBiz {
 
     /**
      * 找出当前second时间内执行最慢的近count个接口
+     *
      * @param second 秒
      * @return
      */
     @Override
-    public List<MaxRunTimeVo> getNewlyMaxRunTime(Integer second, Integer count){
+    public List<MaxRunTimeVo> getNewlyMaxRunTime(Integer second, Integer count) {
         Long curTime = System.currentTimeMillis();
         return getNewlyMaxRunTime(curTime, second, count);
     }
 
     /**
      * 找出second时间内执行最慢的近count个接口
+     *
      * @param second 秒
      * @return
      */

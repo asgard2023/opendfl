@@ -25,4 +25,5 @@ public class FrequencyConstant {
     public static final int TIME_MILLISECOND_TO_SECOND=1000;
     public static final int TIME_MILLISECOND_TO_MINUTE=TIME_MILLISECOND_TO_SECOND*60;
     public static final int TIME_MILLISECOND_TO_HOUR=TIME_MILLISECOND_TO_SECOND*3600;
+    public static final int TIME_MILLISECOND_TO_DAY=TIME_MILLISECOND_TO_HOUR*24;
 }

@@ -1,5 +1,6 @@
 package org.ccs.opendfl.core.limitfrequency;
 
+import org.ccs.opendfl.core.biz.IOutLimitCountBiz;
 import org.ccs.opendfl.core.biz.IRunCountBiz;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,9 +15,11 @@ public class RunCountThread implements Runnable {
     private volatile static long saveTime = 0L;
     private Object lock = new Object();
     private final IRunCountBiz runCountBiz;
+    private final IOutLimitCountBiz outLimitCountBiz;
 
-    public RunCountThread(IRunCountBiz runCountBiz) {
+    public RunCountThread(IRunCountBiz runCountBiz, IOutLimitCountBiz outLimitCountBiz) {
         this.runCountBiz = runCountBiz;
+        this.outLimitCountBiz = outLimitCountBiz;
     }
 
     /**
@@ -28,8 +31,11 @@ public class RunCountThread implements Runnable {
             synchronized (lock) {
                 saveTime = time;
                 try {
-                    logger.debug("----saveRunCountJob----");
+                    //每个接口调用次数写到redis
                     runCountBiz.saveRunCount();
+                    //每个接口调用超限次数写到redis
+                    outLimitCountBiz.saveLimitCount();
+                    logger.debug("----saveRunCountJob----runTime={}", System.currentTimeMillis()-time);
                     lock.wait();
                 } catch (InterruptedException e) {
                     logger.error("----saveRunCountJob error={}", e.getMessage(), e);

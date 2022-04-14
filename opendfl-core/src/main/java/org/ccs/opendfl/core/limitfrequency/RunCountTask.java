@@ -1,5 +1,6 @@
 package org.ccs.opendfl.core.limitfrequency;
 
+import org.ccs.opendfl.core.biz.IOutLimitCountBiz;
 import org.ccs.opendfl.core.biz.IRunCountBiz;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,11 +24,13 @@ public class RunCountTask {
     private boolean isLog = true;
     @Autowired
     private IRunCountBiz runCountBiz;
+    @Autowired
+    private IOutLimitCountBiz outLimitCountBiz;
 
     @PostConstruct
     public void init() {
         if (runCountThread == null) {
-            runCountThread = new RunCountThread(runCountBiz);
+            runCountThread = new RunCountThread(runCountBiz, outLimitCountBiz);
         }
         if (cacheThread == null) {
             cacheThread = new Thread(runCountThread);

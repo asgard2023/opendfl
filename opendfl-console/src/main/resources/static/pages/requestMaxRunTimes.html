@@ -62,15 +62,21 @@
                     </td>
                     <td>
                         Package name:
-                        <input type="text" class="input_query" style="width: 300px" name="pkg" id="query_pkg" value="org.ccs.opendfl"/>
+                        <input type="text" class="input_query" style="width: 300px" name="pkg" id="query_pkg"
+                               value="org.ccs.opendfl"/>
                     </td>
                     <td>
-                        最近时间(秒):
-                        <input type="text" class="input_query" name="second" id="query_second" value="60"/>
+                        <label>最近时间</label>
+                        <select class="easyui-combobox" name="second" id="second" style="width:100px;">
+                            <option value="60">1分钟</option>
+                            <option value="3600">1小时</option>
+                            <option value="7200">2小时</option>
+                            <option value="43200">12小时</option>
+                        </select>
                     </td>
                     <td>
                         记录数:
-                        <input type="text" class="input_query"  name="count" id="query_count" value="20"/>
+                        <input type="text" class="input_query" name="count" id="query_count" value="20"/>
                     </td>
                     <td>
                         <a class="easyui-linkbutton"
@@ -99,10 +105,10 @@
                 <th field="attrName" width="50" sortable="true">attrName(默认userId)</th>
                 <th field="otherInfo" width="50" sortable="true">其他注解配置</th>
                 <th field="limitTypes" width="50" sortable="true">限制类型</th>
-                <th field="counter" width="50" sortable="true">counter</th>
-                <th field="limitCounter" width="50" sortable="true">Limited counter</th>
                 <th field="maxRunTime" width="50" sortable="true">maxRunTime</th>
-                <th field="maxRunTimeCreateTime" width="50" sortable="true" formatter="timestampFormatDateTime">maxRunCreateTime</th>
+                <th field="maxRunTimeCreateTime" width="50" sortable="true" formatter="timestampFormatDateTime">
+                    maxRunCreateTime
+                </th>
                 <th field="createTime" width="50" sortable="true" formatter="timestampFormatDateTime">加载时间</th>
             </tr>
             </thead>

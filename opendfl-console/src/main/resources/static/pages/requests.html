@@ -65,15 +65,6 @@
                         <input type="text" class="input_query" name="method" id="query_method"/>
                     </td>
                     <td>
-                        <label>时间类型(最长时长,执行次数)</label>
-                        <select class="easyui-combobox"  name="type" id="type" style="width:100px;">
-                            <option value ="0">当前</option>
-                            <option value ="1">今天</option>
-                            <option value="2">昨天</option>
-                            <option value="3">前天</option>
-                        </select>
-                    </td>
-                    <td>
                         <a class="easyui-linkbutton"
                            data-options="iconCls:'icon-search'" id="search-btn">查询</a>
                         <a class="easyui-linkbutton"
@@ -103,7 +94,9 @@
                 <th field="counter" width="50" sortable="true">counter</th>
                 <th field="limitCounter" width="50" sortable="true">Limited counter</th>
                 <th field="maxRunTime" width="50" sortable="true">maxRunTime</th>
-                <th field="maxRunTimeCreateTime" width="50" sortable="true" formatter="timestampFormatDateTime">maxRunCreateTime</th>
+                <th field="maxRunTimeCreateTime" width="50" sortable="true" formatter="timestampFormatDateTime">
+                    maxRunCreateTime
+                </th>
                 <th field="createTime" width="50" sortable="true" formatter="timestampFormatDateTime">加载时间</th>
             </tr>
             </thead>

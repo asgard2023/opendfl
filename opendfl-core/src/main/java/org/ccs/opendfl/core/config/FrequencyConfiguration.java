@@ -36,11 +36,16 @@ public class FrequencyConfiguration {
     /**
      * 记录慢接口时间(毫秒)
      */
-    private Integer maxRunTimeInterval=30;
+    private Integer maxRunTimeInterval = 30;
     /**
      * 是否启动执行时长监控
      */
-    private Character runTimeMonitor='0';
+    private Character runTimeMonitor = '0';
+    /**
+     * 接口调用次数缓存zset保存天数
+     * 为0不保存
+     */
+    private Integer runCountCacheDay = 7;
     /**
      * 黑名单配置
      */
