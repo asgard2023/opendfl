@@ -16,7 +16,7 @@ public class RequestStrategyParamsVo{
     private final String methodName;
 
     private FrequencyVo frequency;
-    private Long curTime;
+    private long curTime;
     private final String ip;
     /**
      * 可以从url参数或者header参数取值
@@ -29,7 +29,7 @@ public class RequestStrategyParamsVo{
      */
     private String userId;
 
-    public RequestStrategyParamsVo(String lang, String ip, String deviceId, String methodName, String requestUri, Long curTime) {
+    public RequestStrategyParamsVo(String lang, String ip, String deviceId, String methodName, String requestUri, long curTime) {
         this.lang = lang;
         this.ip = ip;
         this.deviceId = deviceId;

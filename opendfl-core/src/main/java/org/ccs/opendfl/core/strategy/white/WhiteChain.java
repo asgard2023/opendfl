@@ -60,6 +60,16 @@ public class WhiteChain {
         return strategyParams;
     }
 
+    private WhiteStrategy whiteStrategy;
+
+    public void setWhiteStrategy(WhiteStrategy whiteStrategy) {
+        this.whiteStrategy = whiteStrategy;
+    }
+
+    public WhiteStrategy getWhiteStrategy() {
+        return whiteStrategy;
+    }
+
     public void clearLimit() {
         pos = 0;
     }

@@ -1,6 +1,7 @@
 package org.ccs.opendfl.core.utils;
 
 
+import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.exception.BaseException;
@@ -124,47 +125,10 @@ public class RequestUtils {
     }
 
     public static String getIpAddress(HttpServletRequest request) {
-        String ip = request.getHeader("x-forwarded-for");
-        if (isEmptyIp(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (isEmptyIp(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (isEmptyIp(ip)) {
-            ip = request.getHeader("HTTP_CLIENT_IP");
-        }
-        if (isEmptyIp(ip)) {
-            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-        }
-        if (isEmptyIp(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        if (isEmptyIp(ip)) {
-            //最后都取不到ip
-            return null;
-        }
+        String ip= ServletUtil.getClientIP(request);
         if (LOCALHOST_IP.equals(ip) || LOCALHOST_IPV6.equals(ip)) {
             ip = LOCALHOST_HOST;
-        } else {
-            ip = getIpFirst(ip);
-            if (!isIpAddress(ip)) {
-                ip = request.getRemoteAddr();
-            }
         }
-        return ip;
-    }
-
-    public static String getIpFirst(String ip) {
-        if (ip != null && ip.indexOf(',') > 0) {
-            ip = ip.substring(0, ip.indexOf(','));
-        }
-        return ip;
-    }
-
-    public static String getIpAddressFirst(HttpServletRequest request) {
-        String ip = getIpAddress(request);
-        ip = getIpFirst(ip);
         return ip;
     }
 

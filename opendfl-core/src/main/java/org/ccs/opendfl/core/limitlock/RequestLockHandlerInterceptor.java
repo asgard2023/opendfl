@@ -49,7 +49,7 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
     private final ThreadLocal<String> lockRandomId = new ThreadLocal<>();
     private final ThreadLocal<String> lockDataId = new ThreadLocal<>();
 
-    private RequestLockVo newRequestLockVo(RequestLock requestLimit, String requestUri, Long curTime) {
+    private RequestLockVo newRequestLockVo(RequestLock requestLimit, String requestUri, long curTime) {
         RequestLockVo lockVo = RequestLockVo.toLockVo(requestLimit);
         lockVo.setRequestUri(requestUri);
         lockVo.setCreateTime(curTime);
@@ -84,7 +84,7 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
                 return true;
             }
 
-            Long curTime = System.currentTimeMillis();
+            long curTime = System.currentTimeMillis();
             String requestUri = RequestUtils.getRequestUri(request);
             RequestLockVo requestLockVo = newRequestLockVo(reqLimit, requestUri, curTime);
             requestLockConfigBiz.loadLockConfig(requestLockVo, curTime);
@@ -105,11 +105,10 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
                 Integer count = counter.incrementAndGet();
                 String rndId = count + "-" + random.nextInt(1000);
                 String redisKey = FrequencyUtils.getRedisKeyLock(reqLimit.name(), dataId);
-                boolean isLimit = redisTemplateString.opsForValue().setIfAbsent(redisKey, rndId);
+                boolean isLimit = redisTemplateString.opsForValue().setIfAbsent(redisKey, rndId, time, TimeUnit.SECONDS);
                 if (isLimit) {
                     logger.debug("----preHandle--name={} time={} dataId={}, rndId={}", reqLimit.name(), time, dataId, rndId);
                     lockRandomId.set(rndId);
-                    redisTemplateString.expire(redisKey, time, TimeUnit.SECONDS);
                 } else {
                     logger.warn("----preHandle--redisKey={} time={} dataId={} ip={} limited", redisKey, time, dataId, ip);
                     String title = "frequency:lock";

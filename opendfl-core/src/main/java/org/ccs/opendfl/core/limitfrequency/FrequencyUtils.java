@@ -85,13 +85,19 @@ public class FrequencyUtils {
 
     public static final Map<String, Map<String, AtomicInteger>> outLimitCountMap = new ConcurrentHashMap<>();
 
+    public static void outLimitCount(RequestStrategyParamsVo strategyParams, String limitType) {
+        FreqLimitType freqLimitType=FreqLimitType.parseCode(limitType);
+        if(freqLimitType!=null) {
+            outLimitCount(strategyParams, freqLimitType);
+        }
+    }
     /**
      * 按接口记录超限次数
      *
      * @param strategyParams RequestStrategyParamsVo
      * @param type           FreqLimitType
      */
-    private static void outLimitCount(RequestStrategyParamsVo strategyParams, FreqLimitType type) {
+    public static void outLimitCount(RequestStrategyParamsVo strategyParams, FreqLimitType type) {
         if (frequencyConfiguration.getRunCountCacheDay().intValue() == 0) {
             return;
         }

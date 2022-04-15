@@ -74,13 +74,14 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         String requestUri = RequestUtils.getRequestUri(request);
         FrequencyVo frequencyVo = null;
         RequestVo requestVo = null;
+        RequestStrategyParamsVo strategyParams = null;
         try {
 
             HandlerMethod handlerMethod = (HandlerMethod) handler;
             String remoteIp = RequestUtils.getIpAddress(request);
             String ip = getConvertIp(remoteIp);
             String lang = RequestUtils.getLang(request);
-            Long curTime = System.currentTimeMillis();
+            long curTime = System.currentTimeMillis();
             startTime.set(curTime);
 
             selectStrategyItems();
@@ -88,7 +89,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             Map<String, Object> params = RequestUtils.getParamsObject(request);
             String deviceId = (String) params.get(RequestParams.DEVICE_ID);
 
-            RequestStrategyParamsVo strategyParams = new RequestStrategyParamsVo(lang, ip, deviceId, handlerMethod.getMethod().getName(), requestUri, curTime);
+            strategyParams = new RequestStrategyParamsVo(lang, ip, deviceId, handlerMethod.getMethod().getName(), requestUri, curTime);
             String userId = (String) params.get(RequestParams.USER_ID);
             strategyParams.setUserId(userId);
 
@@ -102,13 +103,16 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             blackChain.setStrategyParams(strategyParams);
             blackChain.clearLimit();
             boolean isBlack = blackChain.doCheckLimit(blackChain);
+            String limitType=null;
             if (isBlack) {
                 log.warn("----preHandle--uri={} blackIp={} ", request.getRequestURI(), remoteIp);
                 String title = "frequency:black";
                 if (blackChain.getBlackStrategy() != null) {
+                    limitType=blackChain.getBlackStrategy().getLimitType();
                     title = "frequency:" + blackChain.getBlackStrategy().getLimitType();
                 }
                 this.frequencyReturn(requestVo, true);
+                FrequencyUtils.outLimitCount(strategyParams, limitType);
                 response.getWriter().println(String.format(BLACK_LIST_INFO, title));
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return false;
@@ -120,10 +124,12 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             whiteChain.clearLimit();
             boolean isWhite = whiteChain.doCheckLimit(whiteChain);
             if (isWhite) {
+                limitType=whiteChain.getWhiteStrategy().getLimitType();
                 if (FrequencyUtils.isInitLog("preHandle")) {
-                    log.info("----preHandle--white-uri={}", requestUri);
+                    log.info("----preHandle--white:{}-uri={}", limitType, requestUri);
                 }
                 this.frequencyReturn(requestVo, false);
+                FrequencyUtils.outLimitCount(strategyParams, limitType);
                 return true;
             }
 
@@ -272,7 +278,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     /**
      * 记录更新统计时间(用于减少调用次数)
      */
-    public static Long updateDateTime = 0L;
+    private static long updateDateTime = 0L;
 
     /**
      * 通过单线程，每runTimeInterval，如30秒把执行次数更新到redis，缓存3天
@@ -280,7 +286,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
      * @param requestTime     请求时间
      * @param runTimeInterval 周期
      */
-    private void saveRunTaskCount(Long requestTime, final long runTimeInterval) {
+    private void saveRunTaskCount(long requestTime, final long runTimeInterval) {
         //判断是否需要落库
         if (requestTime - updateDateTime > runTimeInterval) {
             //更新刷新时间
@@ -291,12 +297,13 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
 
     /**
      * 接口调用时长记录
-     * @param requestKey uri+":"+method
-     * @param requestTime Long
+     *
+     * @param requestKey      uri+":"+method
+     * @param requestTime     Long
      * @param runTimeInterval Long
      */
-    private void requestRunTime(String requestKey, final Long requestTime, final long runTimeInterval){
-        Long runTime = System.currentTimeMillis() - requestTime;
+    private void requestRunTime(String requestKey, final long requestTime, final long runTimeInterval) {
+        long runTime = System.currentTimeMillis() - requestTime;
         //记录超出最小执行时间的最大值
         if (runTime > frequencyConfiguration.getMinRunTime()) {
             RequestVo requestVo = requestVoMap.get(requestKey);
@@ -322,7 +329,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         if (frequency == null) {
             return going;
         }
-        Long curTime = strategyParams.getCurTime();
+        long curTime = strategyParams.getCurTime();
 
 
         frequencyConfigBiz.limitBySysconfigLoad(frequency, curTime);
@@ -375,7 +382,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
      *
      * @param frequency FrequencyVo
      */
-    private void logFirstload(FrequencyVo frequency, Long curTime) {
+    private void logFirstload(FrequencyVo frequency, long curTime) {
         String key = frequency.getName() + ":" + frequency.getTime();
         if (!freqMap.containsKey(key)) {
             frequency.setCreateTime(curTime);
@@ -404,9 +411,6 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     }
 
     private boolean isNoLimit(Object handler) {
-        if (!(handler instanceof HandlerMethod)) {
-            return true;
-        }
-        return false;
+        return !(handler instanceof HandlerMethod);
     }
 }
