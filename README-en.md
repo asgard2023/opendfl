@@ -23,7 +23,7 @@
 * Support performance monitoring interface and query
 
 ## Full road map
-<img src="doc/opendfl_roadmap.png" width="80%" syt height="80%" />
+<img src="https://raw.githubusercontent.com/asgard2023/opendfl/master/doc/opendfl_roadmap.png" width="80%" syt height="80%" />
 
 
 ## Simple to use:
