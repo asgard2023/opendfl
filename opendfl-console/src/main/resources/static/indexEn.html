@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>opendfl-console</title>
+</head>
+<body>
+<b>OpenDFL Console</b><br/>
+<br/>
+<p>
+    <a href="/index.html">中文</a> <br/>
+    <a href="/login.html">Login</a> <br/>
+</p>
+
+<p>
+    <b>Query function</b><br/>
+    <a href="/pages/requestScans.html">Requests from class</a> <br/>
+    <a href="/pages/requests.html">Requests from request</a> <br/>
+    <a href="/pages/frequencys.html">Frequencys</a><br/>
+    <a href="/pages/locks.html">Locks</a><br/>
+    <a href="/pages/captcha.html">Captcha reset limit</a><br/>
+</p>
+
+
+<p>
+    <b>Interface Test</b><br/>
+    <a href="/frequencyTest/monitor?userId=123">/frequencyTest/monitor</a> <br/>
+    <a href="/frequencyTest/serverTime?userId=123">/frequencyTest/serverTime</a> <br/>
+    <a href="/frequencyTest/serverTimeFreq?userId=123">/frequencyTest/serverTimeFreq @Frequency</a> <br/>
+    <a href="/frequencyTest/serverTimeFreqIp?userId=123">/frequencyTest/serverTimeFreqIp @Frequency</a> <br/>
+    <a href="/frequencyTest/serverTimeNeedLogin">/frequencyTest/serverTimeNeedLogin @Frequency</a> <br/>
+    <a href="/frequencyTest/serverTimeNeedLogin?userId=123">/frequencyTest/serverTimeNeedLogin @Frequency</a> <br/>
+    <a href="/frequencyTest/serverTimeUri?account=123">/frequencyTest/serverTimeUri uriConfig</a> <br/>
+    <a href="/frequencyTest/serverTimeFreqDevice?deviceId=blackDevice123">/frequencyTest/serverTimeFreqDevice blackDevice</a> <br/>
+    <a href="/frequencyTest/serverTimeFreq?userId=5103">/frequencyTest/serverTimeFreq blackUser</a> <br/>
+    <a href="/frequencyTest/waitLockTestUser?userId=123&sleepTime=1">/frequencyTest/waitLockTestUser @RequestLock lock by user</a> <br/>
+    <a href="/frequencyTest/waitLockTestOrder?userId=123&orderId=order123&sleepTime=1">/frequencyTest/waitLockTestOrder @RequestLock lock by orderId</a> <br/>
+</p>
+</body>
+</html>
