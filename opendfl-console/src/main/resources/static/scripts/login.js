@@ -55,7 +55,8 @@ function login_req(data) {
             console.log(res);
             if (res.success) { // 登录成功
                 submitflage = false;
-                var cookieTime = 7 * 24 * 60 * 60 * 1000;
+                var tokenExpireTime=res.data.tokenExpireTime;
+                var cookieTime = tokenExpireTime * 1000;
                 sessionStorage.access_token = res.data.access_token;
                 sessionStorage.time = new Date().getTime();
 

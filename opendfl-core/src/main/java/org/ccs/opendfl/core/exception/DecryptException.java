@@ -2,16 +2,14 @@ package org.ccs.opendfl.core.exception;
 
 public class DecryptException extends BaseException {
 
-    /**
-     *
-     */
+    private static final ResultCode resultCode = ResultCode.DECRYPT_ERROR;
     private static final long serialVersionUID = 1L;
 
     public DecryptException(String errorMsg) {
-        super(ResultCode.DECRYPT_ERROR, errorMsg);
+        super(resultCode.getCode(), errorMsg);
     }
 
     public DecryptException() {
-        super(ResultCode.DECRYPT_ERROR, ResultCode.DECRYPT_ERROR_MSG);
+        super(resultCode.getCode(), resultCode.getMsg());
     }
 }

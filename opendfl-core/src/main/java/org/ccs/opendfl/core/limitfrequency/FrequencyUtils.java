@@ -131,7 +131,7 @@ public class FrequencyUtils {
             } else if (StringUtils.isNotBlank(errMsgEn)) {
                 exception = new FrequencyException("Frequency limit" + ":" + errMsgEn);
             } else {
-                exception = new FrequencyException(ResultCode.USER_FREQUENCY_ERROR_MSG + ":" + errMsg);
+                exception = new FrequencyException(ResultCode.USER_FREQUENCY_ERROR.getMsg() + ":" + errMsg);
             }
         }
         exception.setTitle(title);

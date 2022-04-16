@@ -7,4 +7,5 @@ import org.ccs.opendfl.console.config.vo.UserVo;
 public class LoginVo {
     private String access_token;
     private UserVo user;
+    private Integer tokenExpireTime;
 }

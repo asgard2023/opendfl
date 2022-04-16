@@ -5,17 +5,14 @@ package org.ccs.opendfl.core.exception;
  * @author chenjh
  */
 public class NeedLoginException extends BaseException {
-
-	/**
-	 *
-	 */
+	private static final ResultCode resultCode = ResultCode.NEED_LOGIN;
 	private static final long serialVersionUID = 1L;
 
 	public NeedLoginException(String errorMsg) {
-		super(ResultCode.NEED_LOGIN, errorMsg);
+		super(resultCode.getCode(), errorMsg);
 	}
 
 	public NeedLoginException() {
-		super(ResultCode.NEED_LOGIN, ResultCode.NEED_LOGIN_MSG);
+		super(resultCode.getCode(), resultCode.getMsg());
 	}
 }

@@ -3,15 +3,16 @@ package org.ccs.opendfl.core.captcha.biz.impl;
 import com.wf.captcha.ArithmeticCaptcha;
 import com.wf.captcha.base.Captcha;
 import lombok.extern.slf4j.Slf4j;
-import org.ccs.opendfl.core.config.FrequencyConfiguration;
-import org.ccs.opendfl.core.exception.BaseException;
-import org.ccs.opendfl.core.exception.ParamNullException;
-import org.ccs.opendfl.core.exception.ResultCode;
-import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.captcha.biz.IVerificateBiz;
 import org.ccs.opendfl.core.captcha.constant.CaptchaType;
+import org.ccs.opendfl.core.captcha.exception.CaptchaImageErrorException;
+import org.ccs.opendfl.core.captcha.exception.CaptchaImageExpireException;
+import org.ccs.opendfl.core.captcha.exception.CaptchaRetryFrequencyException;
 import org.ccs.opendfl.core.captcha.utils.CaptchaCreator;
 import org.ccs.opendfl.core.captcha.vo.VerificationVo;
+import org.ccs.opendfl.core.config.FrequencyConfiguration;
+import org.ccs.opendfl.core.exception.ParamNullException;
+import org.ccs.opendfl.core.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -56,7 +57,7 @@ public class VerificateBiz implements IVerificateBiz {
         VerificationVo verificationCache = this.setVerifictionCode(clientId, captchaCode);
         if (StringUtils.equals(verificationCache.getIsValid(), "2")) {
             //重试频繁
-            throw new BaseException(ResultCode.USER_CAPTCHA_RETRY_FREQUENT, ResultCode.USER_CAPTCHA_RETRY_FREQUENT_MSG);
+            throw new CaptchaRetryFrequencyException();
         }
         return captchaCode;
     }
@@ -65,13 +66,13 @@ public class VerificateBiz implements IVerificateBiz {
     public void captchaOutputStream(CaptchaType type, String clientId, HttpServletResponse response) throws IOException, FontFormatException {
         VerificationVo verificationCache = null;
 
-        if (CaptchaType.NUM == type ||CaptchaType.STRING == type) {
+        if (CaptchaType.NUM == type || CaptchaType.STRING == type) {
             //数字验证码
             CaptchaCreator captcha = new CaptchaCreator(100, 30, 4, 10, type.getCode());
             verificationCache = this.setVerifictionCode(clientId, captcha.getCode());
             if (StringUtils.equals(verificationCache.getIsValid(), "2")) {
                 //重试频繁
-                throw new BaseException(ResultCode.USER_CAPTCHA_RETRY_FREQUENT, ResultCode.USER_CAPTCHA_RETRY_FREQUENT_MSG);
+                throw new CaptchaRetryFrequencyException();
             }
             captcha.write(response.getOutputStream());
         } else if (CaptchaType.STRING == type) {
@@ -80,7 +81,7 @@ public class VerificateBiz implements IVerificateBiz {
             verificationCache = this.setVerifictionCode(clientId, captcha.getCode());
             if (StringUtils.equals(verificationCache.getIsValid(), "2")) {
                 //重试频繁
-                throw new BaseException(ResultCode.USER_CAPTCHA_RETRY_FREQUENT, ResultCode.USER_CAPTCHA_RETRY_FREQUENT_MSG);
+                throw new CaptchaRetryFrequencyException();
             }
             captcha.write(response.getOutputStream());
         } else {
@@ -91,7 +92,7 @@ public class VerificateBiz implements IVerificateBiz {
             verificationCache = this.setVerifictionCode(clientId, captcha.text());
             if (StringUtils.equals(verificationCache.getIsValid(), "2")) {
                 //重试频繁
-                throw new BaseException(ResultCode.USER_CAPTCHA_RETRY_FREQUENT, ResultCode.USER_CAPTCHA_RETRY_FREQUENT_MSG);
+                throw new CaptchaRetryFrequencyException();
             }
             captcha.setFont(Captcha.FONT_2);
             captcha.out(response.getOutputStream());
@@ -187,15 +188,15 @@ public class VerificateBiz implements IVerificateBiz {
         VerificationVo verificationCache = getUserVerifictionCodeCahce(clientId);
         if (null == verificationCache || StringUtils.equals(verificationCache.getIsValid(), "0")) {
             //验证码过期
-            throw new BaseException(ResultCode.USER_IMAGE_CAPTCHA_EXPIRE, ResultCode.USER_IMAGE_CAPTCHA_EXPIRE_MSG);
+            throw new CaptchaImageExpireException();
         } else if (StringUtils.equals(verificationCache.getIsValid(), "2")) {
             //重试频繁
-            throw new BaseException(ResultCode.USER_CAPTCHA_RETRY_FREQUENT, ResultCode.USER_CAPTCHA_RETRY_FREQUENT_MSG);
+            throw new CaptchaRetryFrequencyException();
         }
         String serverVerificationCode = verificationCache.getVerificationCode();
         if (!StringUtils.equals(verificationCode, serverVerificationCode)) {
             //验证码错误,
-            throw new BaseException(ResultCode.USER_IMAGE_CAPTCHA_ERROR, ResultCode.USER_IMAGE_CAPTCHA_ERROR_MSG);
+            throw new CaptchaImageErrorException();
         }
         //试过后把用户所有验证码设置无效
         setVerficationCodeInvalid(clientId);

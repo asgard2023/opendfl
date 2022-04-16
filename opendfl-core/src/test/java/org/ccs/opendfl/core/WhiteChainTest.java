@@ -41,8 +41,8 @@ class WhiteChainTest {
         frequencyVo.setRequestUri(requestUri);
         frequencyVo.setName("serverTimeFreq");
         frequencyVo.setTime(5);
-        frequencyVo.setErrMsg(ResultCode.USER_FREQUENCY_ERROR_MSG);
-        frequencyVo.setErrMsgEn(ResultCode.USER_FREQUENCY_ERROR_MSG);
+        frequencyVo.setErrMsg(ResultCode.USER_FREQUENCY_ERROR.getMsg());
+        frequencyVo.setErrMsgEn(ResultCode.USER_FREQUENCY_ERROR.getMsg());
         return frequencyVo;
     }
 

@@ -17,12 +17,10 @@ public class BaseException extends RuntimeException {
 
     static {
         errorCodeMap = new ConcurrentHashMap<>();
-        errorCodeMap.put(ResultCode.PARAMS_NULL, ResultCode.PARAMS_NULL_MSG);
-        errorCodeMap.put(ResultCode.PARAMS_ERROR, ResultCode.PARAMS_ERROR_MSG);
-        errorCodeMap.put(ResultCode.DEFAULT_FAILED_CODE, ResultCode.DEFAULT_FAILED_CODE_MSG);
-        errorCodeMap.put(ResultCode.DATA_NOT_EXIST, ResultCode.DATA_NOT_EXIST_MSG);
-        errorCodeMap.put(ResultCode.DATA_EXIST, ResultCode.DATA_EXIST_MSG);
-        errorCodeMap.put(ResultCode.USER_FREQUENCY_ERROR, ResultCode.USER_FREQUENCY_ERROR_MSG);
+        ResultCode[] resultCodes=ResultCode.values();
+        for(ResultCode resultCode: resultCodes){
+            errorCodeMap.put(resultCode.getCode(), resultCode.getMsg());
+        }
     }
 
 

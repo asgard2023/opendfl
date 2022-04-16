@@ -40,11 +40,11 @@ public class ResultData {
     }
 
     public static ResultData success() {
-        return new ResultData(ResultCode.DEFAULT_SUCCESS_CODE, ResultCode.DEFAULT_SUCCESS_CODE_MSG, null, "no");
+        return new ResultData(ResultCode.DEFAULT_SUCCESS.getCode(), ResultCode.DEFAULT_SUCCESS.getMsg(), null, "no");
     }
 
     public static ResultData success(Object data) {
-        return new ResultData(ResultCode.DEFAULT_SUCCESS_CODE, ResultCode.DEFAULT_SUCCESS_CODE_MSG, data, "no");
+        return new ResultData(ResultCode.DEFAULT_SUCCESS.getCode(), ResultCode.DEFAULT_SUCCESS.getMsg(), data, "no");
     }
 
 
@@ -65,7 +65,7 @@ public class ResultData {
     }
 
     public Boolean getSuccess() {
-        return ResultCode.DEFAULT_SUCCESS_CODE.equals(resultCode);
+        return ResultCode.DEFAULT_SUCCESS.getCode().equals(resultCode);
     }
 
     public Object getData() {

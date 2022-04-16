@@ -4,15 +4,15 @@ package org.ccs.opendfl.core.captcha.exception;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.ResultCode;
 
-public class CaptchaErrorException extends BaseException {
-    private static final ResultCode resultCode = ResultCode.USER_CAPTCHA_ERROR;
+public class CaptchaExpireException extends BaseException {
+    private static final ResultCode resultCode = ResultCode.USER_CAPTCHA_EXPIRE;
     private static final long serialVersionUID = 1L;
 
-    public CaptchaErrorException(String errorMsg) {
+    public CaptchaExpireException(String errorMsg) {
         super(resultCode.getCode(), errorMsg);
     }
 
-    public CaptchaErrorException() {
+    public CaptchaExpireException() {
         super(resultCode.getCode(), resultCode.getMsg());
     }
 }

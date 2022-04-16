@@ -1,17 +1,14 @@
 package org.ccs.opendfl.core.exception;
 
 public class ParamNullException extends BaseException {
-
-	/**
-	 * 
-	 */
+	private static final ResultCode resultCode = ResultCode.PARAMS_NULL;
 	private static final long serialVersionUID = 1L;
 
 	public ParamNullException(String errorMsg) {
-		super(ResultCode.PARAMS_NULL, errorMsg);
+		super(resultCode.getCode(), errorMsg);
 	}
-	
+
 	public ParamNullException() {
-		super(ResultCode.PARAMS_NULL, ResultCode.PARAMS_NULL_MSG);
+		super(resultCode.getCode(), resultCode.getMsg());
 	}
 }
