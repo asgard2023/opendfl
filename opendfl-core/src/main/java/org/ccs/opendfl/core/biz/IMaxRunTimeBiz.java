@@ -27,5 +27,5 @@ public interface IMaxRunTimeBiz {
      */
     List<MaxRunTimeVo> getNewlyMaxRunTime(Integer second, Integer count);
 
-    public List<MaxRunTimeVo> getNewlyMaxRunTime(Long dateTime, Integer second, Integer count);
+    List<MaxRunTimeVo> getNewlyMaxRunTime(Long dateTime, Integer second, Integer count);
 }

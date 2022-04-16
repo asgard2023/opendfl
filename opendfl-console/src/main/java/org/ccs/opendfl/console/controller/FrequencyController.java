@@ -153,6 +153,7 @@ public class FrequencyController {
         if (day > 0) {
             curTime = curTime - day * FrequencyConstant.TIME_MILLISECOND_TO_HOUR * 24;
         }
+        requestMaxRunTimeByDay(showList, curTime);
 
         RunCountType countType = RunCountType.parse(type);
         if (countType != null) {
@@ -160,6 +161,24 @@ public class FrequencyController {
         } else {
             FreqLimitType limitType = FreqLimitType.parseCode(type);
             requestOutLimitCount(limitType, showList, curTime);
+        }
+    }
+
+    /**
+     * 接口访问最大执行时间查询
+     * @param showList
+     * @param curTime
+     */
+    private void requestMaxRunTimeByDay(List<RequestShowVo> showList, Long curTime) {
+        List<MaxRunTimeVo> list = maxRunTimeBiz.getNewlyMaxRunTime(curTime, 24 * 3600, 100);
+        for (RequestShowVo showVo : showList) {
+            for (MaxRunTimeVo runTimeVo : list) {
+                if (StringUtils.equals(showVo.getRequestUri(), runTimeVo.getUri())) {
+                    showVo.setMaxRunTime(runTimeVo.getMaxRunTime());
+                    showVo.setMaxRunTimeCreateTime(runTimeVo.getCreateTime());
+                    break;
+                }
+            }
         }
     }
 
