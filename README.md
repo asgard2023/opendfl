@@ -23,7 +23,7 @@
 * 支持性能监控接口，及查询(每30秒内记录执行时间最大的接口)
 
 ## 完整路线图(红色字体部份表示有支持的计划)
-<img src="https://raw.githubusercontent.com/asgard2023/opendfl/master/doc/opendfl_roadmap.png" width="80%" syt height="80%" />
+<img src="https://raw.githubusercontent.com/asgard2023/opendfl/master/doc/opendfl_roadmap2.png" width="80%" syt height="80%" />
 
 
 ## 简单使用：
