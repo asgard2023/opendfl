@@ -105,12 +105,12 @@ public class RunCountRedisBiz implements IRunCountBiz {
     public List<ComboxItemVo> getRunDays() {
         Long curTime = System.currentTimeMillis();
         List<ComboxItemVo> list = new ArrayList<>();
-        if (frequencyConfiguration.getRunCountCacheDay() == 0) {
-            list.add(new ComboxItemVo("0", "frequency.runCountCacheDay=0未启用历史缓存", false));
-            return list;
-        }
 
         list.add(new ComboxItemVo("-1", "当前(近30s)", true));
+        if (frequencyConfiguration.getRunCountCacheDay() == 0) {
+            list.add(new ComboxItemVo("-1", "frequency.runCountCacheDay=0 Closed", false));
+            return list;
+        }
         for (int i = 0; i < frequencyConfiguration.getRunCountCacheDay(); i++) {
             Long curTimeBefore = curTime - i * TIME_MILLISECOND_TO_DAY;
             if (existRun(curTimeBefore)) {

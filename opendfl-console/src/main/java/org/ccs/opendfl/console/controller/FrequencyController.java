@@ -99,11 +99,11 @@ public class FrequencyController {
     public List<ComboxItemVo> getRunCountTypeByDay(HttpServletRequest request
             , @RequestParam(value = "day", required = false, defaultValue = "0") Integer day) {
         List<ComboxItemVo> list = new ArrayList<>();
+        list.add(new ComboxItemVo("current", "当前本机", true));
         if (frequencyConfiguration.getRunCountCacheDay() == 0) {
-            list.add(new ComboxItemVo("current", "frequency.runCountCacheDay=0未启用历史缓存", false));
+            list.add(new ComboxItemVo("current", "frequency.runCountCacheDay=0 Closed", false));
             return list;
         }
-        list.add(new ComboxItemVo("current", "当前本机", true));
         list.addAll(runCountBiz.getRunCountTypeByDay(day));
         list.addAll(outLimitCountBiz.getRunCountTypeByDay(day));
         return list;
