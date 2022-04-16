@@ -49,7 +49,7 @@ public class ConsoleInterceptor extends WebMvcConfigurationSupport {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         log.info("----addResourceHandlers--");
         registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
-        registry.addResourceHandler("/scripts/**").addResourceLocations("classpath:/scripts/");
+//        registry.addResourceHandler("/scripts/**").addResourceLocations("classpath:/scripts/");
         super.addResourceHandlers(registry);
     }
 }
