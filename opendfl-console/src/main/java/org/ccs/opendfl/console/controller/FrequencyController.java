@@ -1,5 +1,6 @@
 package org.ccs.opendfl.console.controller;
 
+
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.console.biz.IFrequencyLoginBiz;
 import org.ccs.opendfl.console.config.vo.RolePermitVo;
@@ -138,6 +139,9 @@ public class FrequencyController {
 
         AuditLogUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
         Collection<RequestVo> list = FrequencyHandlerInterceptor.requestVoMap.values();
+        if(StringUtils.isNotBlank(requestVo.getRequestUri())){
+            list=list.stream().filter(t->t.getRequestUri().contains(requestVo.getRequestUri())).collect(Collectors.toList());
+        }
         List<RequestShowVo> showList = toRequestShowList(list, requestVo);
         return ResultData.success(showList);
     }
@@ -250,14 +254,18 @@ public class FrequencyController {
     @ResponseBody
     @RequestMapping(value = "/requestScans", method = {RequestMethod.POST, RequestMethod.GET})
     public ResultData requestScans(HttpServletRequest request, RequestVo requestVo
-            , @RequestParam(value = "type", required = false) String type
-            , @RequestParam(value = "day", required = false, defaultValue = "0") Integer day) {
+            , @RequestParam(value = "type", required = false, defaultValue ="current") String type
+            , @RequestParam(value = "day", required = false, defaultValue = "-1") Integer day) {
         String token = RequestUtils.getToken(request);
         UserVo userVo = frequencyLoginBiz.getUserByToken(token);
         checkUserPermission(userVo, UserOperType.VIEW);
         String pkg = request.getParameter("pkg");
         pkg = (String) CommUtils.nvl(pkg, "org.ccs.opendfl");
+        AuditLogUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
         List<RequestVo> list = AnnotationControllerUtils.getControllerRequests(pkg);
+        if(StringUtils.isNotBlank(requestVo.getRequestUri())){
+            list=list.stream().filter(t->t.getRequestUri().contains(requestVo.getRequestUri())).collect(Collectors.toList());
+        }
         List<RequestShowVo> showList = addRequestRunTime(list);
         requestRunCount(type, day, showList);
         return ResultData.success(showList);
@@ -268,6 +276,8 @@ public class FrequencyController {
         final Collection<RequestVo> requestList = FrequencyHandlerInterceptor.requestVoMap.values();
         return list.stream().map(t -> {
             RequestShowVo showVo = (RequestShowVo) t;
+            showVo.setMaxRunTime(0L);
+            showVo.setMaxRunTimeCreateTime(null);
             for (RequestVo req : requestList) {
                 if (StringUtils.equals(t.getRequestUri(), req.getRequestUri())) {
                     showVo.setCounter(req.getCounter());

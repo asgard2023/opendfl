@@ -56,8 +56,6 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     @Autowired
     private BlackChain blackChain;
     @Autowired
-    private IMaxRunTimeBiz maxRunTimeBiz;
-    @Autowired
     private RunCountTask runCountTask;
     private static final String BLACK_LIST_INFO = "{\"resultCode\":\"100010\",\"errorMsg\":\"Frequency limit\",\"data\":\"WaT+azid/F/83e1UpLc6ZA==\",\"errorType\":\"%s\",\"success\":false}";
 
@@ -317,7 +315,6 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
                 if (requestVo.getMaxRunTime() < runTime) {
                     requestVo.setMaxRunTime(runTime);
                     requestVo.setMaxRunTimeCreateTime(requestTime);
-                    maxRunTimeBiz.addMaxRunTime(requestVo.getRequestUri(), requestTime, runTime);
                 }
             }
         }

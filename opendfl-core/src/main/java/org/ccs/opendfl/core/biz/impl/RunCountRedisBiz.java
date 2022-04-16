@@ -1,6 +1,7 @@
 package org.ccs.opendfl.core.biz.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.ccs.opendfl.core.biz.IMaxRunTimeBiz;
 import org.ccs.opendfl.core.biz.IRunCountBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.constants.RunCountType;
@@ -29,10 +30,12 @@ import static org.ccs.opendfl.core.constants.FrequencyConstant.TIME_MILLISECOND_
 public class RunCountRedisBiz implements IRunCountBiz {
     private final RedisTemplate<String, String> redisTemplateString;
     private final FrequencyConfiguration frequencyConfiguration;
+    private final IMaxRunTimeBiz maxRunTimeBiz;
 
-    public RunCountRedisBiz(RedisTemplate<String, String> redisTemplateString, FrequencyConfiguration frequencyConfiguration) {
+    public RunCountRedisBiz(RedisTemplate<String, String> redisTemplateString, FrequencyConfiguration frequencyConfiguration, IMaxRunTimeBiz maxRunTimeBiz) {
         this.redisTemplateString = redisTemplateString;
         this.frequencyConfiguration = frequencyConfiguration;
+        this.maxRunTimeBiz = maxRunTimeBiz;
     }
 
     public String getRedisKeyCount(RunCountType type, Long curTime) {
@@ -149,6 +152,12 @@ public class RunCountRedisBiz implements IRunCountBiz {
             reqCount += saveRunCount(redisKeyCount, requestVo.getRequestUri(), requestVo.getCounter(), isLog);
             //保存接口调用限制次数
             limitCount += saveRunCount(redisKeyLimitCount, requestVo.getRequestUri(), requestVo.getLimitCounter(), isLog);
+            if(requestVo.getMaxRunTime()>0) {
+                //保存成功后，重置maxRun信息
+                this.maxRunTimeBiz.addMaxRunTime(requestVo.getRequestUri(), requestVo.getMaxRunTime(), requestVo.getMaxRunTimeCreateTime());
+                requestVo.setMaxRunTime(0L);
+                requestVo.setMaxRunTimeCreateTime(null);
+            }
         }
         log.info("-----saveRunCount--reqCount={} limitCount={} runTime={}", reqCount, limitCount, System.currentTimeMillis() - curTime);
     }
