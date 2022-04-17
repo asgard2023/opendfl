@@ -22,7 +22,7 @@
 * 支持通过验证码重置用户所有限制
 * 支持性能监控接口，及查询(每30秒内记录执行时间最大的接口)
 
-## 完整路线图(红色字体部份表示有支持的计划)
+## 完整路线图(<img src="https://opendfl-1259373829.file.myqcloud.com/doc/ok.webp" width="6%" syt height="6%" />表示已完成，红色字体表示计划中)
 <img src="https://opendfl-1259373829.file.myqcloud.com/doc/opendfl_roadmap2.png" width="80%" syt height="80%" />
 
 
