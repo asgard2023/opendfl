@@ -17,6 +17,7 @@ import org.ccs.opendfl.core.utils.ValidateUtils;
 import org.ccs.opendfl.core.vo.MaxRunTimeVo;
 import org.ccs.opendfl.core.vo.RequestTestVo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +35,8 @@ import java.util.List;
 @RequestMapping("/frequencyTest")
 @Slf4j
 public class FrequencyTestController {
+    @Value("${spring.redis.host}")
+    private String redisHost;
     @Autowired
     private IMaxRunTimeBiz maxRunTimeBiz;
     @Autowired
@@ -63,7 +66,7 @@ public class FrequencyTestController {
     @GetMapping("/serverTime")
     @ResponseBody
     public Object serverTime(HttpServletRequest request) {
-        log.info("----serverTime--userId={}", request.getParameter(RequestParams.USER_ID));
+        log.info("----serverTime--userId={} {}", request.getParameter(RequestParams.USER_ID), redisHost);
         return System.currentTimeMillis();
     }
 

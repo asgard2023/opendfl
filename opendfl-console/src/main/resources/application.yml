@@ -3,6 +3,7 @@ info:
   app:
     name: OpenDFL console
     version: 0.1
+  redis: ${spring.redis.host}
 
 spring:
   profiles:
@@ -19,4 +20,11 @@ spring:
       pool:
         max-idle: 100
         max-wait: 1000ms
-
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    info:
+      enabled: true

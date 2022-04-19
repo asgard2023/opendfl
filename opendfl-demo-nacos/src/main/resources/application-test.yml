@@ -1,16 +1,10 @@
+# /info端点信息配置
 info:
   app:
     name: OpenDFL Open Ddstributed frequency limitation
     version: 0.1
 
 spring:
-  profiles:
-    active: dev
-    include:
-      - opendfl
-      - frequency
-      - requestlock
-      - console
   redis:
     host: localhost
     password: ''
@@ -20,3 +14,9 @@ spring:
         max-idle: 100
         max-wait: 1000ms
 
+logging:
+  level:
+    root: INFO
+    com:
+      ccs:
+        m3u8end: DEBUG

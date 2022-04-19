@@ -1,16 +1,14 @@
 # /info端点信息配置
 info:
   app:
-    name: OpenDFL console dev
-  version: 0.1
-  redis: ${spring.redis.host}
+    name: OpenDFL Open Ddstributed frequency limitation
+    version: 0.1
 
 spring:
   redis:
-    host: 10.0.8.3
+    host: localhost
     password: ''
     port: 6379
-    database: 1
     jedis:
       pool:
         max-idle: 100
@@ -22,6 +20,6 @@ logging:
     root: INFO
     org:
       ccs:
-        opendfl: DEBUG
+        frequency: DEBUG
   pattern:
     console: "%clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(-){faint} %clr([%14.14t]){faint} %clr(%-40.40logger.%13.13M){cyan} %clr(%3.3L) %clr(:){faint} %msg%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"

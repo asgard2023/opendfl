@@ -12,13 +12,14 @@
         <module>opendfl-core</module>
         <module>opendfl-console</module>
         <module>opendfl-demo-web</module>
+        <module>opendfl-demo-nacos</module>
     </modules>
 
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.4</version>
+        <version>2.6.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 </project>
