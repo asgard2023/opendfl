@@ -26,6 +26,7 @@ public class FrequencyDemoController {
     @ResponseBody
     @Frequency(limit = 5, name = "serverTimeFreq")
     public Object serverTimeFreq(HttpServletRequest request) {
+        log.debug("----serverTimeFreq--");
         return System.currentTimeMillis();
     }
 

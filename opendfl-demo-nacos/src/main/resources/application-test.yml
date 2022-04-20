@@ -19,4 +19,4 @@ logging:
     root: INFO
     com:
       ccs:
-        m3u8end: DEBUG
+        opendfl: DEBUG
