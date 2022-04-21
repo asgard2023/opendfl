@@ -47,13 +47,17 @@ public class MaxRunTimeRedisBiz implements IMaxRunTimeBiz {
      */
     @Override
     public void addMaxRunTime(String uri, Long maxRunTimeCreateTime, Long maxRunTime) {
-        String redisKeyMaxTime = getRedisKey(maxRunTimeCreateTime, "time");
-        redisTemplateString.opsForZSet().add(redisKeyMaxTime, uri, maxRunTimeCreateTime);
-        RedisTemplateUtil.expireTimeHashCacheString(redisTemplateString, redisKeyMaxTime, 72);
-
         String redisKeyMaxRunTime = getRedisKey(maxRunTimeCreateTime, "run");
-        redisTemplateString.opsForZSet().add(redisKeyMaxRunTime, uri, maxRunTime);
-        RedisTemplateUtil.expireTimeHashCacheString(redisTemplateString, redisKeyMaxRunTime, 72);
+        Double score=this.redisTemplateString.opsForZSet().score(redisKeyMaxRunTime, uri);
+        //maxRunTime>已有的值才更新，否则不处理
+        if(score==null||score.longValue()<maxRunTime){
+            redisTemplateString.opsForZSet().add(redisKeyMaxRunTime, uri, maxRunTime);
+            RedisTemplateUtil.expireTimeHashCacheString(redisTemplateString, redisKeyMaxRunTime, 72);
+
+            String redisKeyMaxTime = getRedisKey(maxRunTimeCreateTime, "time");
+            redisTemplateString.opsForZSet().add(redisKeyMaxTime, uri, maxRunTimeCreateTime);
+            RedisTemplateUtil.expireTimeHashCacheString(redisTemplateString, redisKeyMaxTime, 72);
+        }
     }
 
     /**
