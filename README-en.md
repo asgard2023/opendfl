@@ -7,6 +7,12 @@
 * The core code adopts the responsibility chain mode, and the function has good scalability
 * Support function can be configured, and unnecessary functions can be turned off
 
+## Principle and characteristics
+* Based on spring interceptor, all interfaces of the controller can be intercepted
+* The frequency limit of processing the interface of the service itself
+* You can provide external service restrictions according to your own service capabilities
+* To prevent abnormal traffic from killing the service
+
 ## Features
 * Support distributed lock, the same data ID can only have one access in the same period
 * Support IP whitelist, user whitelist
