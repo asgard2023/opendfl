@@ -14,10 +14,10 @@ public interface IMaxRunTimeBiz {
      * 增加最大执行时行
      *
      * @param uri 接口uri(不含参数)
-     * @param curTime 发生时间
+     * @param maxRunTimeCreateTime 发生时间
      * @param maxRunTime 执行时长
      */
-    void addMaxRunTime(String uri, Long curTime, Long maxRunTime);
+    void addMaxRunTime(String uri, Long maxRunTimeCreateTime, Long maxRunTime);
 
     /**
      * 找出second时间内执行最慢的近count个接口

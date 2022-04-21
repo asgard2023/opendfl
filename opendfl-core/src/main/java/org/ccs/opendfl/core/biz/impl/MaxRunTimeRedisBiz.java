@@ -42,16 +42,16 @@ public class MaxRunTimeRedisBiz implements IMaxRunTimeBiz {
      * 接口慢执行记录到redis
      *
      * @param uri        接口uri(不含参数)
-     * @param curTime    发生时间
+     * @param maxRunTimeCreateTime    发生时间
      * @param maxRunTime 执行时长
      */
     @Override
-    public void addMaxRunTime(String uri, Long curTime, Long maxRunTime) {
-        String redisKeyMaxTime = getRedisKey(curTime, "time");
-        redisTemplate.opsForZSet().add(redisKeyMaxTime, uri, curTime);
+    public void addMaxRunTime(String uri, Long maxRunTimeCreateTime, Long maxRunTime) {
+        String redisKeyMaxTime = getRedisKey(maxRunTimeCreateTime, "time");
+        redisTemplate.opsForZSet().add(redisKeyMaxTime, uri, maxRunTimeCreateTime);
         RedisTemplateUtil.expireTimeHashCache(redisTemplate, redisKeyMaxTime, 72);
 
-        String redisKeyMaxRunTime = getRedisKey(curTime, "run");
+        String redisKeyMaxRunTime = getRedisKey(maxRunTimeCreateTime, "run");
         redisTemplate.opsForZSet().add(redisKeyMaxRunTime, uri, maxRunTime);
         RedisTemplateUtil.expireTimeHashCache(redisTemplate, redisKeyMaxRunTime, 72);
     }
@@ -78,6 +78,7 @@ public class MaxRunTimeRedisBiz implements IMaxRunTimeBiz {
     public List<MaxRunTimeVo> getNewlyMaxRunTime(Long dateTime, Integer second, Integer count) {
         Long curTime = dateTime;
         String redisKeyMaxTime = getRedisKey(curTime, "time");
+     log.debug("------getNewlyMaxRunTime--redisKeyMaxTime={}", redisKeyMaxTime);
         Set<ZSetOperations.TypedTuple<Object>> setsTime = redisTemplate.opsForZSet().reverseRangeByScoreWithScores(redisKeyMaxTime, curTime - second * 1000, curTime);
         String redisKeyMaxRunTime = getRedisKey(curTime, "run");
         Set<ZSetOperations.TypedTuple<Object>> setsRunTime = redisTemplate.opsForZSet().reverseRangeWithScores(redisKeyMaxRunTime, 0, count);

@@ -154,9 +154,9 @@ public class RunCountRedisBiz implements IRunCountBiz {
             limitCount += saveRunCount(redisKeyLimitCount, requestVo.getRequestUri(), requestVo.getLimitCounter(), isLog);
             if(requestVo.getMaxRunTime()>0) {
                 //保存成功后，重置maxRun信息
-                this.maxRunTimeBiz.addMaxRunTime(requestVo.getRequestUri(), requestVo.getMaxRunTime(), requestVo.getMaxRunTimeCreateTime());
+                this.maxRunTimeBiz.addMaxRunTime(requestVo.getRequestUri(), requestVo.getMaxRunTimeCreateTime(), requestVo.getMaxRunTime());
                 requestVo.setMaxRunTime(0L);
-                requestVo.setMaxRunTimeCreateTime(null);
+                requestVo.setMaxRunTimeCreateTime(0L);
             }
         }
         log.info("-----saveRunCount--reqCount={} limitCount={} runTime={}", reqCount, limitCount, System.currentTimeMillis() - curTime);
