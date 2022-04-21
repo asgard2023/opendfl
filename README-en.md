@@ -9,9 +9,10 @@
 
 ## Principle and characteristics
 * Based on spring interceptor, all interfaces of the controller can be intercepted
-* The frequency limit of processing the interface of the service itself
-* You can provide external service restrictions according to your own service capabilities
-* To prevent abnormal traffic from killing the service
+* Frequency limit: every interface call the redis incr key, an exception is thrown when the limit is exceeded: the frequency out of limit.
+* Distributed lock: setnx key value (with a timeout), if successful, it will be locked, if unsuccessful, an exception will be thrown: the task is being executed.
+* You can limit external services according to your own service capabilities
+* To prevent the service from being killed by abnormal traffic
 
 ## Features
 * Support distributed lock, the same data ID can only have one access in the same period
