@@ -25,8 +25,8 @@ import java.util.Set;
 @Service(value = "maxRunTimeRedisBiz")
 @Slf4j
 public class MaxRunTimeRedisBiz implements IMaxRunTimeBiz {
-    @Resource(name = "redisTemplate")
-    private RedisTemplate<String, Object> redisTemplate;
+    @Resource(name = "redisTemplateString")
+    private RedisTemplate<String, String> redisTemplateString;
     @Autowired
     private FrequencyConfiguration frequencyConfiguration;
 
@@ -48,12 +48,12 @@ public class MaxRunTimeRedisBiz implements IMaxRunTimeBiz {
     @Override
     public void addMaxRunTime(String uri, Long maxRunTimeCreateTime, Long maxRunTime) {
         String redisKeyMaxTime = getRedisKey(maxRunTimeCreateTime, "time");
-        redisTemplate.opsForZSet().add(redisKeyMaxTime, uri, maxRunTimeCreateTime);
-        RedisTemplateUtil.expireTimeHashCache(redisTemplate, redisKeyMaxTime, 72);
+        redisTemplateString.opsForZSet().add(redisKeyMaxTime, uri, maxRunTimeCreateTime);
+        RedisTemplateUtil.expireTimeHashCacheString(redisTemplateString, redisKeyMaxTime, 72);
 
         String redisKeyMaxRunTime = getRedisKey(maxRunTimeCreateTime, "run");
-        redisTemplate.opsForZSet().add(redisKeyMaxRunTime, uri, maxRunTime);
-        RedisTemplateUtil.expireTimeHashCache(redisTemplate, redisKeyMaxRunTime, 72);
+        redisTemplateString.opsForZSet().add(redisKeyMaxRunTime, uri, maxRunTime);
+        RedisTemplateUtil.expireTimeHashCacheString(redisTemplateString, redisKeyMaxRunTime, 72);
     }
 
     /**
@@ -79,16 +79,16 @@ public class MaxRunTimeRedisBiz implements IMaxRunTimeBiz {
         Long curTime = dateTime;
         String redisKeyMaxTime = getRedisKey(curTime, "time");
      log.debug("------getNewlyMaxRunTime--redisKeyMaxTime={}", redisKeyMaxTime);
-        Set<ZSetOperations.TypedTuple<Object>> setsTime = redisTemplate.opsForZSet().reverseRangeByScoreWithScores(redisKeyMaxTime, curTime - second * 1000, curTime);
+        Set<ZSetOperations.TypedTuple<String>> setsTime = redisTemplateString.opsForZSet().reverseRangeByScoreWithScores(redisKeyMaxTime, curTime - second * 1000, curTime);
         String redisKeyMaxRunTime = getRedisKey(curTime, "run");
-        Set<ZSetOperations.TypedTuple<Object>> setsRunTime = redisTemplate.opsForZSet().reverseRangeWithScores(redisKeyMaxRunTime, 0, count);
+        Set<ZSetOperations.TypedTuple<String>> setsRunTime = redisTemplateString.opsForZSet().reverseRangeWithScores(redisKeyMaxRunTime, 0, count);
         List<MaxRunTimeVo> voList = new ArrayList<>();
         MaxRunTimeVo vo = null;
-        for (ZSetOperations.TypedTuple<Object> tupleTime : setsTime) {
-            String uri = (String) tupleTime.getValue();
+        for (ZSetOperations.TypedTuple<String> tupleTime : setsTime) {
+            String uri =tupleTime.getValue();
             Long time = tupleTime.getScore().longValue();
-            for (ZSetOperations.TypedTuple<Object> tupleRunTime : setsRunTime) {
-                String uriRun = (String) tupleRunTime.getValue();
+            for (ZSetOperations.TypedTuple<String> tupleRunTime : setsRunTime) {
+                String uriRun = tupleRunTime.getValue();
                 Long timeRun = tupleRunTime.getScore().longValue();
                 if (StringUtils.equals(uri, uriRun)) {
                     vo = new MaxRunTimeVo(uri, time, timeRun);
