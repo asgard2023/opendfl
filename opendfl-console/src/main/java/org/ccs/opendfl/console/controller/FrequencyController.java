@@ -24,10 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -148,6 +145,7 @@ public class FrequencyController {
 
     private void requestRunCount(String type, Integer day, List<RequestShowVo> showList) {
         if (StringUtils.equals("current", type) && day == -1) {
+            addRequestRunTime(showList);
             return;
         }
         if (StringUtils.equals("current", type)) {
@@ -263,23 +261,25 @@ public class FrequencyController {
         pkg = (String) CommUtils.nvl(pkg, "org.ccs.opendfl");
         AuditLogUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
         List<RequestVo> list = AnnotationControllerUtils.getControllerRequests(pkg);
+        List<RequestShowVo> showList=list.stream().map(t->{
+            return (RequestShowVo) t;
+        }).collect(Collectors.toList());
+
         if(StringUtils.isNotBlank(requestVo.getRequestUri())){
-            list=list.stream().filter(t->t.getRequestUri().contains(requestVo.getRequestUri())).collect(Collectors.toList());
+            showList=showList.stream().filter(t->t.getRequestUri().contains(requestVo.getRequestUri())).collect(Collectors.toList());
         }
-        List<RequestShowVo> showList = addRequestRunTime(list);
+
         requestRunCount(type, day, showList);
         return ResultData.success(showList);
     }
 
-    private List<RequestShowVo> addRequestRunTime(List<RequestVo> list) {
+    private void addRequestRunTime(List<RequestShowVo> list) {
         //把接口调用情况更新过来
         final Collection<RequestVo> requestList = FrequencyHandlerInterceptor.requestVoMap.values();
-        return list.stream().map(t -> {
-            RequestShowVo showVo = (RequestShowVo) t;
-            showVo.setMaxRunTime(0L);
-            showVo.setMaxRunTimeCreateTime(null);
+        list.stream().forEach(t -> {
+            RequestShowVo showVo =t;
             for (RequestVo req : requestList) {
-                if (StringUtils.equals(t.getRequestUri(), req.getRequestUri())) {
+                if (StringUtils.equals(showVo.getRequestUri(), req.getRequestUri())) {
                     showVo.setCounter(req.getCounter());
                     showVo.setLimitCounter(req.getLimitCounter());
                     showVo.setMaxRunTime(req.getMaxRunTime());
@@ -288,8 +288,7 @@ public class FrequencyController {
                     break;
                 }
             }
-            return showVo;
-        }).collect(Collectors.toList());
+        });
     }
 
     /**
@@ -311,7 +310,10 @@ public class FrequencyController {
         List<MaxRunTimeVo> maxRunTimes = this.maxRunTimeBiz.getNewlyMaxRunTime(second, count);
 
         List<RequestVo> list = AnnotationControllerUtils.getControllerRequests(pkg);
-        List<RequestShowVo> showList = addRequestRunTime(list);
+        List<RequestShowVo> showList=list.stream().map(t->{
+            return (RequestShowVo) t;
+        }).collect(Collectors.toList());
+        addRequestRunTime(showList);
         List<RequestShowVo> showMaxList = new ArrayList<>();
         for (RequestShowVo showVo : showList) {
             for (MaxRunTimeVo maxRunTimeVo : maxRunTimes) {

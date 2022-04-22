@@ -41,22 +41,26 @@ public class MaxRunTimeRedisBiz implements IMaxRunTimeBiz {
     /**
      * 接口慢执行记录到redis
      *
-     * @param uri        接口uri(不含参数)
-     * @param maxRunTimeCreateTime    发生时间
-     * @param maxRunTime 执行时长
+     * @param uri                  接口uri(不含参数)
+     * @param maxRunTimeCreateTime 发生时间
+     * @param maxRunTime           执行时长
      */
     @Override
     public void addMaxRunTime(String uri, Long maxRunTimeCreateTime, Long maxRunTime) {
+        Integer cacheDay = frequencyConfiguration.getRunCountCacheDay();
+        if (cacheDay == 0) {
+            return;
+        }
         String redisKeyMaxRunTime = getRedisKey(maxRunTimeCreateTime, "run");
-        Double score=this.redisTemplateString.opsForZSet().score(redisKeyMaxRunTime, uri);
+        Double score = this.redisTemplateString.opsForZSet().score(redisKeyMaxRunTime, uri);
         //maxRunTime>已有的值才更新，否则不处理
-        if(score==null||score.longValue()<maxRunTime){
+        if (score == null || score.longValue() < maxRunTime) {
             redisTemplateString.opsForZSet().add(redisKeyMaxRunTime, uri, maxRunTime);
-            RedisTemplateUtil.expireTimeHashCacheString(redisTemplateString, redisKeyMaxRunTime, 72);
+            RedisTemplateUtil.expireTimeHashCacheString(redisTemplateString, redisKeyMaxRunTime, cacheDay * 24);
 
             String redisKeyMaxTime = getRedisKey(maxRunTimeCreateTime, "time");
             redisTemplateString.opsForZSet().add(redisKeyMaxTime, uri, maxRunTimeCreateTime);
-            RedisTemplateUtil.expireTimeHashCacheString(redisTemplateString, redisKeyMaxTime, 72);
+            RedisTemplateUtil.expireTimeHashCacheString(redisTemplateString, redisKeyMaxTime, cacheDay * 24);
         }
     }
 
@@ -82,22 +86,32 @@ public class MaxRunTimeRedisBiz implements IMaxRunTimeBiz {
     public List<MaxRunTimeVo> getNewlyMaxRunTime(Long dateTime, Integer second, Integer count) {
         Long curTime = dateTime;
         String redisKeyMaxTime = getRedisKey(curTime, "time");
-     log.debug("------getNewlyMaxRunTime--redisKeyMaxTime={}", redisKeyMaxTime);
-        Set<ZSetOperations.TypedTuple<String>> setsTime = redisTemplateString.opsForZSet().reverseRangeByScoreWithScores(redisKeyMaxTime, curTime - second * 1000, curTime);
+        log.debug("------getNewlyMaxRunTime--redisKeyMaxTime={}", redisKeyMaxTime);
+        Set<ZSetOperations.TypedTuple<String>> setsTime = redisTemplateString.opsForZSet().reverseRangeWithScores(redisKeyMaxTime, 0, count);
         String redisKeyMaxRunTime = getRedisKey(curTime, "run");
         Set<ZSetOperations.TypedTuple<String>> setsRunTime = redisTemplateString.opsForZSet().reverseRangeWithScores(redisKeyMaxRunTime, 0, count);
         List<MaxRunTimeVo> voList = new ArrayList<>();
         MaxRunTimeVo vo = null;
-        for (ZSetOperations.TypedTuple<String> tupleTime : setsTime) {
-            String uri =tupleTime.getValue();
-            Long time = tupleTime.getScore().longValue();
-            for (ZSetOperations.TypedTuple<String> tupleRunTime : setsRunTime) {
-                String uriRun = tupleRunTime.getValue();
-                Long timeRun = tupleRunTime.getScore().longValue();
+        for (ZSetOperations.TypedTuple<String> tupleRunTime : setsRunTime) {
+            String uriRun = tupleRunTime.getValue();
+            Long timeRun = tupleRunTime.getScore().longValue();
+            vo = null;
+            for (ZSetOperations.TypedTuple<String> tupleTime : setsTime) {
+                String uri = tupleTime.getValue();
+                Long time = tupleTime.getScore().longValue();
                 if (StringUtils.equals(uri, uriRun)) {
-                    vo = new MaxRunTimeVo(uri, time, timeRun);
-                    voList.add(vo);
+                    vo = new MaxRunTimeVo(uriRun, time, timeRun);
                 }
+            }
+            if (vo == null) {
+                //search time by uri again
+                Double scoreTime = redisTemplateString.opsForZSet().score(redisKeyMaxTime, uriRun);
+                if (scoreTime != null && scoreTime > 0) {
+                    vo = new MaxRunTimeVo(uriRun, scoreTime.longValue(), timeRun);
+                }
+            }
+            if (vo != null) {
+                voList.add(vo);
             }
         }
         return voList;
