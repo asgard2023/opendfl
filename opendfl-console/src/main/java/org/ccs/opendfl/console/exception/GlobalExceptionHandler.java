@@ -76,7 +76,7 @@ public class GlobalExceptionHandler {
         String messageError = ex != null ? ex.getMessage() : null;
         logger.error("---handleException method={} error={} \n request={}", request.getMethod(), messageError, this.getRequestMap(request), ex);
 
-        ResultData resultData = ResultData.error(new UnknownException());
+        ResultData resultData = ResultData.error(new UnknownException(ex.getMessage()));
         resultData.setErrorType("sys");
         return resultData;
     }
