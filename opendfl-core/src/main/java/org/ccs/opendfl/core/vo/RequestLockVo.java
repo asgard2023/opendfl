@@ -17,10 +17,12 @@ public class RequestLockVo{
         lockVo.setTime(lock.time());
         lockVo.setAttrName(lock.attrName());
         lockVo.setErrMsg(lock.errMsg());
+        lockVo.setLockType(lock.lockType().getType());
         return lockVo;
     }
     private String requestUri;
     private String name;
+    private String lockType;
     private int time;
     private String attrName;
     private String errMsg;

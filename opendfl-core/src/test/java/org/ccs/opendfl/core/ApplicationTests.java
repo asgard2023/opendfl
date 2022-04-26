@@ -1,6 +1,7 @@
 package org.ccs.opendfl.core;
 
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
+import org.ccs.opendfl.core.utils.EtcdUtil;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,13 @@ class ApplicationTests {
         System.out.println("unexit key ttl="+redisTemplate.getExpire("testabcd"));
         System.out.println("foreraver key ttl="+redisTemplate.getExpire("test"));
     }
+
+    @Test
+    public void etcdTest() throws Exception {
+        String v= EtcdUtil.getEtcdValueByKey("/test/foo");
+        System.out.println(v);
+    }
+
 
 
 

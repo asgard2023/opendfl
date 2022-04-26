@@ -1,11 +1,16 @@
 package org.ccs.opendfl.core.limitlock;
 
 
+import io.etcd.jetcd.ByteSequence;
+import io.etcd.jetcd.Client;
+import io.etcd.jetcd.lease.LeaseGrantResponse;
 import org.ccs.opendfl.core.biz.IRequestLockConfigBiz;
 import org.ccs.opendfl.core.config.RequestLockConfiguration;
+import org.ccs.opendfl.core.constants.ReqLockType;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.FrequencyException;
 import org.ccs.opendfl.core.limitfrequency.FrequencyUtils;
+import org.ccs.opendfl.core.utils.EtcdUtil;
 import org.ccs.opendfl.core.utils.RequestParams;
 import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.utils.StringUtils;
@@ -21,8 +26,10 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -43,11 +50,16 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
     private IRequestLockConfigBiz requestLockConfigBiz;
     @Resource(name = "redisTemplateString")
     private RedisTemplate<String, String> redisTemplateString;
+    // etcl客户端链接
+    @Autowired
+    private Client etcdClient = null;
     public static final Map<String, RequestLockVo> locksMap = new ConcurrentHashMap<>();
     private final Random random = new Random();
     private final AtomicInteger counter = new AtomicInteger();
     private final ThreadLocal<String> lockRandomId = new ThreadLocal<>();
     private final ThreadLocal<String> lockDataId = new ThreadLocal<>();
+    private final ThreadLocal<String> etcdLockKey = new ThreadLocal<>();
+    private final ThreadLocal<Long> etcdReleaseKey = new ThreadLocal<>();
 
     private RequestLockVo newRequestLockVo(RequestLock requestLimit, String requestUri, long curTime) {
         RequestLockVo lockVo = RequestLockVo.toLockVo(requestLimit);
@@ -104,8 +116,20 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
                 String ip = RequestUtils.getIpAddress(request);
                 Integer count = counter.incrementAndGet();
                 String rndId = count + "-" + random.nextInt(1000);
-                String redisKey = FrequencyUtils.getRedisKeyLock(reqLimit.name(), dataId);
-                boolean isLimit = redisTemplateString.opsForValue().setIfAbsent(redisKey, rndId, time, TimeUnit.SECONDS);
+                String redisKey=null;
+                boolean isLimit=false;
+                if(ReqLockType.ETCD==reqLimit.lockType()) {
+                    redisKey = FrequencyUtils.getEtcdKeyLock(reqLimit.name(), dataId);
+                    long leaseId = grantLease(time);
+                    etcdReleaseKey.set(leaseId);
+                    String lockKeyStr=EtcdUtil.lock(redisKey, leaseId);
+                    isLimit=true;
+                    etcdLockKey.set(lockKeyStr);
+                }
+                else{
+                    redisKey = FrequencyUtils.getRedisKeyLock(reqLimit.name(), dataId);
+                    isLimit = redisTemplateString.opsForValue().setIfAbsent(redisKey, rndId, time, TimeUnit.SECONDS);
+                }
                 if (isLimit) {
                     logger.debug("----preHandle--name={} time={} dataId={}, rndId={}", reqLimit.name(), time, dataId, rndId);
                     lockRandomId.set(rndId);
@@ -125,7 +149,11 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
         }
         return true;
     }
-
+    private long grantLease(long ttl) throws Exception {
+        CompletableFuture<LeaseGrantResponse> feature = etcdClient.getLeaseClient().grant(ttl);
+        LeaseGrantResponse response = feature.get();
+        return response.getID();
+    }
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
@@ -145,12 +173,20 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
             if (rndId != null) {
                 lockRandomId.remove();
             }
-
-            String redisKey = FrequencyUtils.getRedisKeyLock(reqLimit.name(), dataId);
-            String v = redisTemplateString.opsForValue().get(redisKey);
-            logger.debug("----afterCompletion--dataId={} rndId={} v={}", dataId, rndId, v);
-            if (StringUtils.equals(rndId, v)) {
-                redisTemplateString.delete(redisKey);
+            if(ReqLockType.REDIS==reqLimit.lockType()){
+                String redisKey = FrequencyUtils.getRedisKeyLock(reqLimit.name(), dataId);
+                String v = redisTemplateString.opsForValue().get(redisKey);
+                logger.debug("----afterCompletion--dataId={} rndId={} v={}", dataId, rndId, v);
+                if (StringUtils.equals(rndId, v)) {
+                    redisTemplateString.delete(redisKey);
+                }
+            }
+            else if(ReqLockType.ETCD==reqLimit.lockType()) {
+                String lockKey = etcdLockKey.get();
+                if (lockKey != null) {
+                    etcdClient.getLeaseClient().revoke(etcdReleaseKey.get());
+                    etcdClient.getLockClient().unlock(ByteSequence.from(lockKey, StandardCharsets.UTF_8));
+                }
             }
         }
     }

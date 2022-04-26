@@ -33,14 +33,14 @@ public class ConsoleInterceptor extends WebMvcConfigurationSupport {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        if (StringUtils.ifYes(requestLockConfiguration.getIfActive())) {
-            log.info("----addInterceptors--RequestLock");
-            registry.addInterceptor(requestLockHandlerInterceptor)
-                    .addPathPatterns("/**");
-        }
         if (StringUtils.ifYes(frequencyConfiguration.getIfActive())) {
             log.info("----addInterceptors--Frequency");
             registry.addInterceptor(frequencyHandlerInterceptor)
+                    .addPathPatterns("/**");
+        }
+        if (StringUtils.ifYes(requestLockConfiguration.getIfActive())) {
+            log.info("----addInterceptors--RequestLock");
+            registry.addInterceptor(requestLockHandlerInterceptor)
                     .addPathPatterns("/**");
         }
     }

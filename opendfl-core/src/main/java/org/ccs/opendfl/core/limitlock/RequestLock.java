@@ -1,12 +1,12 @@
 package org.ccs.opendfl.core.limitlock;
 
+import org.ccs.opendfl.core.constants.ReqLockType;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.*;
 
 /**
  * 接口访问频率控制，用于controller
- * 不支持json参数，因为基于流处理时，不能在拦截器中读流，否则接口本身就读不了
  * @author chenjh
  *
  */
@@ -23,4 +23,6 @@ public @interface RequestLock {
 	String attrName() default "";
 
 	String errMsg() default "";
+
+	ReqLockType lockType() default ReqLockType.REDIS;
 }

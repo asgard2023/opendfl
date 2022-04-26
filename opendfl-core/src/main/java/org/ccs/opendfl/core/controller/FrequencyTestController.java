@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IMaxRunTimeBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
+import org.ccs.opendfl.core.constants.ReqLockType;
 import org.ccs.opendfl.core.exception.FailedException;
 import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.limitfrequency.Frequency;
@@ -219,7 +220,7 @@ public class FrequencyTestController {
      */
     @GetMapping("/waitLockTestOrder")
     @ResponseBody
-    @RequestLock(name = "waitLockTestOrder", attrName = "orderId", time = 5, errMsg = "任务%s正在执行")
+    @RequestLock(name = "waitLockTestOrder", attrName = "orderId", time = 5, errMsg = "任务%s正在执行", lockType = ReqLockType.ETCD)
     public Object waitLockTestOrder(@RequestParam(name = "sleepTime", required = false) Integer sleepTime, HttpServletRequest request) {
         String orderId = request.getParameter("orderId");
         log.info("----waitLockTestOrder--userId={} orderId={} ip={}", request.getParameter(RequestParams.USER_ID), orderId, RequestUtils.getIpAddress(request));

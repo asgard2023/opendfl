@@ -13,12 +13,18 @@
     <description>opendfl:Open distributed frequency limitation</description>
     <properties>
         <java.version>1.8</java.version>
+        <jetcd.version>0.7.0</jetcd.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
             <version>5.7.16</version>
+        </dependency>
+        <dependency>
+            <groupId>io.etcd</groupId>
+            <artifactId>jetcd-core</artifactId>
+            <version>${jetcd.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.whvcse</groupId>

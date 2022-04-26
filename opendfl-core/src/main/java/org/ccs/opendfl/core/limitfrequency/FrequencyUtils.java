@@ -58,6 +58,10 @@ public class FrequencyUtils {
         return requestLockConfiguration.getRedisPrefix() + ":" + lockName + ":" + dataId;
     }
 
+    public static String getEtcdKeyLock(String lockName, String dataId) {
+        return requestLockConfiguration.getRedisPrefix() + "/" + lockName + "/" + dataId;
+    }
+
 
     /**
      * 频率超限日志，超出部分才记录
