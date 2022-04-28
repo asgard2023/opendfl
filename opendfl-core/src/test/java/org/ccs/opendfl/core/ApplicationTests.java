@@ -32,7 +32,7 @@ class ApplicationTests {
 
     @Test
     public void etcdTest() throws Exception {
-        String v= EtcdUtil.getEtcdValueByKey("/test/foo");
+        String v= EtcdUtil.getKV("/test/foo");
         System.out.println(v);
     }
 

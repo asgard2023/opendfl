@@ -120,11 +120,7 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
                 boolean isLimit=false;
                 if(ReqLockType.ETCD==reqLimit.lockType()) {
                     redisKey = FrequencyUtils.getEtcdKeyLock(reqLimit.name(), dataId);
-                    long leaseId = grantLease(time);
-                    etcdReleaseKey.set(leaseId);
-                    String lockKeyStr=EtcdUtil.lock(redisKey, leaseId);
-                    isLimit=true;
-                    etcdLockKey.set(lockKeyStr);
+                    isLimit = lockEtcd(redisKey, time, rndId);
                 }
                 else{
                     redisKey = FrequencyUtils.getRedisKeyLock(reqLimit.name(), dataId);
@@ -149,6 +145,62 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
         }
         return true;
     }
+
+    /**
+     * 请前前etcd加索
+     * @param redisKey
+     * @param time
+     * @param rndId
+     * @return
+     * @throws Exception
+     */
+    private boolean lockEtcd(String redisKey, Integer time, String rndId) throws Exception {
+        boolean isLimit;
+        long leaseId = grantLease(time);
+        etcdReleaseKey.set(leaseId);
+        if(StringUtils.ifYes(requestLockConfiguration.getIfEtcdSyncLock())){
+            String lockKeyStr=EtcdUtil.lock(redisKey, leaseId);
+            isLimit=true;
+            etcdLockKey.set(lockKeyStr);
+        }
+        else {
+            isLimit = EtcdUtil.putKVIfAbsent(redisKey, rndId, leaseId);
+        }
+        return isLimit;
+    }
+
+
+    /**
+     * 请求完成后etcd释放锁
+     * @param reqLimit
+     * @param dataId
+     * @param rndId
+     * @throws Exception
+     */
+    private void unlockEtcd(RequestLock reqLimit, String dataId, String rndId) throws Exception {
+        logger.debug("-----unlockEtcd--ifEtcdSyncLock={}", requestLockConfiguration.getIfEtcdSyncLock());
+        if (StringUtils.ifYes(requestLockConfiguration.getIfEtcdSyncLock())) {
+            String lockKey = etcdLockKey.get();
+            if (lockKey != null) {
+//                etcdClient.getLeaseClient().revoke(etcdReleaseKey.get());
+                etcdClient.getLockClient().unlock(ByteSequence.from(lockKey, StandardCharsets.UTF_8));
+            }
+        }
+        else{
+            String redisKey = FrequencyUtils.getEtcdKeyLock(reqLimit.name(), dataId);
+            String v = EtcdUtil.getKV(redisKey);
+            if (StringUtils.equals(rndId, v)) {
+                EtcdUtil.deleteKV(redisKey);
+            }
+        }
+    }
+
+    /**
+     * etcd租约
+     * @param ttl
+     * @return
+     * @throws Exception
+     */
     private long grantLease(long ttl) throws Exception {
         CompletableFuture<LeaseGrantResponse> feature = etcdClient.getLeaseClient().grant(ttl);
         LeaseGrantResponse response = feature.get();
@@ -173,33 +225,27 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
             if (rndId != null) {
                 lockRandomId.remove();
             }
+            logger.debug("----afterCompletion--dataId={} rndId={}", dataId, rndId);
             if(ReqLockType.REDIS==reqLimit.lockType()){
                 String redisKey = FrequencyUtils.getRedisKeyLock(reqLimit.name(), dataId);
                 String v = redisTemplateString.opsForValue().get(redisKey);
-                logger.debug("----afterCompletion--dataId={} rndId={} v={}", dataId, rndId, v);
                 if (StringUtils.equals(rndId, v)) {
                     redisTemplateString.delete(redisKey);
                 }
             }
             else if(ReqLockType.ETCD==reqLimit.lockType()) {
-                String lockKey = etcdLockKey.get();
-                if (lockKey != null) {
-                    etcdClient.getLeaseClient().revoke(etcdReleaseKey.get());
-                    etcdClient.getLockClient().unlock(ByteSequence.from(lockKey, StandardCharsets.UTF_8));
-                }
+                unlockEtcd(reqLimit, dataId, rndId);
             }
         }
     }
+
 
     private boolean isNoLimit(Object handler) {
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
         //支持关闭频率限制，可用于测试环境，ST环境
-        if (!StringUtils.ifYes(requestLockConfiguration.getIfActive())) {
-            return true;
-        }
-        return false;
+        return !StringUtils.ifYes(requestLockConfiguration.getIfActive());
     }
 
 }

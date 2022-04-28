@@ -5,14 +5,15 @@ import io.etcd.jetcd.ByteSequence;
 import io.etcd.jetcd.Client;
 import io.etcd.jetcd.Watch.Watcher;
 import io.etcd.jetcd.kv.GetResponse;
+import io.etcd.jetcd.kv.PutResponse;
 import io.etcd.jetcd.lock.LockResponse;
-import io.etcd.jetcd.options.GetOption;
+import io.etcd.jetcd.options.PutOption;
 import io.etcd.jetcd.options.WatchOption;
 import io.etcd.jetcd.watch.WatchEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -22,7 +23,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * etcd 操作工具，包括启动监听和操作etcd v3 版本协议
  *
- * @version 1.0
+ * @author chenjh
  */
 @Component
 @Slf4j
@@ -30,7 +31,7 @@ public class EtcdUtil {
     // etcl客户端链接
     private static Client etcdClient = null;
 
-    @Resource(name = "etcdClient")
+    @Autowired
     public void setEtcdClient(Client etcdClient) {
         EtcdUtil.etcdClient = etcdClient;
     }
@@ -45,15 +46,49 @@ public class EtcdUtil {
      *
      * @param key
      * @param value
+     * @param leaseId 租约ID
      * @throws Exception
-     * @author zhangyanhua
-     * @date 2019年10月29日 下午4:41:06
      */
-    public static void putEtcdValueByKey(String key, String value) throws Exception {
-        Client client = EtcdUtil.getEtclClient();
-        client.getKVClient().put(ByteSequence.from(key, StandardCharsets.UTF_8), ByteSequence.from(value, StandardCharsets.UTF_8)).get();
-        client.close();
-        etcdClient = null;
+    public static boolean putKVIfAbsent(String key, String value, Long leaseId) throws Exception {
+        String v = getKV(key);
+        if (v != null) {
+            return false;
+        }
+        putKV(key, value, leaseId);
+        return true;
+    }
+
+    /**
+     * 新增或者修改指定的配置
+     *
+     * @param key
+     * @param value
+     * @throws Exception
+     */
+    public static void putKV(String key, String value) throws Exception {
+        putKV(key, value, null);
+    }
+
+    /**
+     * 新增或者修改指定的配置
+     *
+     * @param key
+     * @param value
+     * @throws Exception
+     */
+    public static void putKV(String key, String value, Long leaseId) throws Exception {
+        PutOption putOption = null;
+        PutResponse putResp = null;
+        if (leaseId != null) {
+            putOption = PutOption.newBuilder().withLeaseId(leaseId).build();
+            putResp = etcdClient.getKVClient().put(ByteSequence.from(key, StandardCharsets.UTF_8), ByteSequence.from(value, StandardCharsets.UTF_8), putOption).get();
+        } else {
+            CompletableFuture<PutResponse> putResponse = etcdClient.getKVClient().put(ByteSequence.from(key, StandardCharsets.UTF_8), ByteSequence.from(value, StandardCharsets.UTF_8));
+            if (putResponse != null) {
+                putResp = putResponse.get();
+            }
+        }
+        log.debug("----putKV--key={} leaseId={} putResp={}", key, leaseId, putResp);
     }
 
     /**
@@ -62,15 +97,11 @@ public class EtcdUtil {
      * @param key
      * @return value值
      * @throws Exception
-     * @author zhangyanhua
-     * @date 2019年10月29日 下午4:35:44
      */
-    public static String getEtcdValueByKey(String key) throws Exception {
+    public static String getKV(String key) throws Exception {
         Client client = EtcdUtil.getEtclClient();
         GetResponse getResponse = client.getKVClient()
-                .get(ByteSequence.from(key, StandardCharsets.UTF_8), GetOption.newBuilder().build()).get();
-        client.close();
-        etcdClient = null;
+                .get(ByteSequence.from(key, StandardCharsets.UTF_8)).get();
 
         // key does not exist
         if (getResponse.getKvs().isEmpty()) {
@@ -89,19 +120,16 @@ public class EtcdUtil {
      * @author zhangyanhua
      * @date 2019年10月29日 下午4:53:24
      */
-    public static void deleteEtcdValueByKey(String key) throws InterruptedException, ExecutionException {
+    public static void deleteKV(String key) throws InterruptedException, ExecutionException {
         Client client = EtcdUtil.getEtclClient();
         client.getKVClient().delete(ByteSequence.from(key, StandardCharsets.UTF_8)).get();
-        //System.out.println("delete etcd key \"" + key + "\" success");
-        client.close();
-        etcdClient = null;
     }
 
     /**
      * 持续监控某个key变化的方法，执行后如果key有变化会被监控到，输入结果如下
-     *  watch type= "PUT", key= "zyh1", value= "zyh1-value"
-     *  watch type= "PUT", key= "zyh1", value= "zyh1-value111"
-     *  watch type= "DELETE", key= "zyh1", value= ""
+     * watch type= "PUT", key= "zyh1", value= "zyh1-value"
+     * watch type= "PUT", key= "zyh1", value= "zyh1-value111"
+     * watch type= "DELETE", key= "zyh1", value= ""
      *
      * @param key
      * @throws Exception
@@ -134,8 +162,7 @@ public class EtcdUtil {
         } catch (Exception e) {
             if (watcher != null) {
                 watcher.close();
-                client.close();
-                etcdClient = null;
+//                client.close();
             }
             throw e;
         }
@@ -146,8 +173,8 @@ public class EtcdUtil {
         CompletableFuture<LockResponse> feature = etcdClient.getLockClient().lock(ByteSequence.from(redisKey, StandardCharsets.UTF_8), leaseId);
         LockResponse lockResponse = feature.get();
         ByteSequence lockKey = lockResponse.getKey();
-        long runTime=System.currentTimeMillis()-curTime;
-        if(runTime>500L){
+        long runTime = System.currentTimeMillis() - curTime;
+        if (runTime > 500L) {
             log.info("----lock--time={}", runTime);
         }
         return new String(lockKey.getBytes());

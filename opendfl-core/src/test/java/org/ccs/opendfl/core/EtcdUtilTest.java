@@ -26,6 +26,9 @@ public class EtcdUtilTest {
     private static final Logger logger = LoggerFactory.getLogger(EtcdUtilTest.class);
     @Autowired
     private Client etcdClient = null;
+
+
+
     private long grantLease(long ttl) throws Exception {
         CompletableFuture<LeaseGrantResponse> feature = etcdClient.getLeaseClient().grant(ttl);
         LeaseGrantResponse response = feature.get();
@@ -96,6 +99,19 @@ public class EtcdUtilTest {
         logger.info("----time={}", System.currentTimeMillis()-time);
     }
 
+    @Test
+    public void testEtcdValue() throws Exception {
+        System.out.println("etcdClient="+etcdClient+" "+EtcdUtil.getEtclClient());
+        String key="/foot/value";
+        EtcdUtil.deleteKV(key);
+        String value=EtcdUtil.getKV(key);
+        System.out.println(value);
+
+        EtcdUtil.putKV(key, "123");
+        value=EtcdUtil.getKV(key);
+        System.out.println(value);
+    }
+
     /**
      * @throws Exception
      */
@@ -108,8 +124,8 @@ public class EtcdUtilTest {
         String newValue = "zyh-value-new";
 
         System.out.println("**** 测试方法开始 ****");
-        EtcdUtil.putEtcdValueByKey(key, value);
-        String retValue = EtcdUtil.getEtcdValueByKey(key);
+        EtcdUtil.putKV(key, value);
+        String retValue = EtcdUtil.getKV(key);
         // System.out.println("查询key " + key + " 对应的值是 " + retValue);
         if (value.equals(retValue)) {
             System.out.println("数据插入成功。");
@@ -119,8 +135,8 @@ public class EtcdUtilTest {
             System.out.println("数据插入或查询失败！");
         }
 
-        EtcdUtil.putEtcdValueByKey(key, newValue);
-        retValue = EtcdUtil.getEtcdValueByKey(key);
+        EtcdUtil.putKV(key, newValue);
+        retValue = EtcdUtil.getKV(key);
         // System.out.println("查询key " + key + " 对应的值是 " + retValue);
         if (newValue.equals(retValue)) {
             System.out.println("数据更新成功。");
@@ -129,8 +145,8 @@ public class EtcdUtilTest {
             System.out.println("数据更新失败！");
         }
 
-        EtcdUtil.deleteEtcdValueByKey(key);
-        retValue = EtcdUtil.getEtcdValueByKey(key);
+        EtcdUtil.deleteKV(key);
+        retValue = EtcdUtil.getKV(key);
         // System.out.println("查询key " + key + " 对应的值是 " + retValue);
         if (retValue == null) {
             System.out.println("数据删除成功。");
