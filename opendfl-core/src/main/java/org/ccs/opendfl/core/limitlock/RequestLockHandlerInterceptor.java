@@ -167,7 +167,7 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
             isLimit = EtcdUtil.putKVIfAbsent(redisKey, rndId, leaseId);
         }
         else{
-            logger.warn("-----lockEtcd--invalid lockType={}", reqLimit.lockType());
+            logger.warn("-----lockEtcd--invalid name={} lockType={}", reqLimit.name(), reqLimit.lockType());
         }
         return isLimit;
     }
@@ -181,11 +181,11 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
      * @throws Exception
      */
     private void unlockEtcd(RequestLock reqLimit, String dataId, String rndId) throws Exception {
+        logger.debug("----unlockEtcd--lockType={} lockKey={}", reqLimit.lockType(), etcdLockKey.get());
         if(ReqLockType.ETCD_SYNC==reqLimit.lockType()){
             String lockKey = etcdLockKey.get();
             if (lockKey != null) {
-//                etcdClient.getLeaseClient().revoke(etcdReleaseKey.get());
-                etcdClient.getLockClient().unlock(ByteSequence.from(lockKey, StandardCharsets.UTF_8));
+                EtcdUtil.unlock(lockKey);
             }
         }
         else  if(ReqLockType.ETCD==reqLimit.lockType()){
@@ -196,7 +196,7 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
             }
         }
         else{
-            logger.warn("-----unlockEtcd--invalid lockType={}", reqLimit.lockType());
+            logger.warn("-----unlockEtcd--invalid name={} lockType={}", reqLimit.name(), reqLimit.lockType());
         }
     }
 
@@ -238,7 +238,7 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
                     redisTemplateString.delete(redisKey);
                 }
             }
-            else if(ReqLockType.ETCD==reqLimit.lockType()) {
+            else if(StringUtils.equals(ReqLockType.ETCD.getSource(), reqLimit.lockType().getSource())) {
                 unlockEtcd(reqLimit, dataId, rndId);
             }
         }

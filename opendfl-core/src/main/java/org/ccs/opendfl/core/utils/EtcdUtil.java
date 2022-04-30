@@ -7,6 +7,7 @@ import io.etcd.jetcd.Watch.Watcher;
 import io.etcd.jetcd.kv.GetResponse;
 import io.etcd.jetcd.kv.PutResponse;
 import io.etcd.jetcd.lock.LockResponse;
+import io.etcd.jetcd.lock.UnlockResponse;
 import io.etcd.jetcd.options.PutOption;
 import io.etcd.jetcd.options.WatchOption;
 import io.etcd.jetcd.watch.WatchEvent;
@@ -175,9 +176,19 @@ public class EtcdUtil {
         ByteSequence lockKey = lockResponse.getKey();
         long runTime = System.currentTimeMillis() - curTime;
         if (runTime > 500L) {
-            log.info("----lock--time={}", runTime);
+            log.info("----lock--redisKey={} time={}", redisKey, runTime);
         }
         return new String(lockKey.getBytes());
+    }
+
+    public static void unlock(String lockKey) throws ExecutionException, InterruptedException {
+        long curTime = System.currentTimeMillis();
+        CompletableFuture<UnlockResponse> feature = etcdClient.getLockClient().unlock(ByteSequence.from(lockKey, StandardCharsets.UTF_8));
+        UnlockResponse unlockResponse = feature.get();
+        long runTime = System.currentTimeMillis() - curTime;
+        if (runTime > 500L) {
+            log.info("----unlock--redisKey={} time={} response={}", runTime, lockKey, unlockResponse);
+        }
     }
 
 }
