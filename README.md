@@ -1,7 +1,7 @@
 # OpenDFL Open Distributed frequency limitation 
 * Springboot,Springcloud分布式访问频率限制
 * Distributed locks分布式锁
-* 基于Redis
+* 基于Redis，etcd
 * Spring boot, spring cloud，springmvc
 * 支持基于uri的限制，配置允许动态修改
 * 核心代码采用责任链模式，功能扩展性好

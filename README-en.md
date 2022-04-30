@@ -1,7 +1,7 @@
 # OpenDFL Open Distributed frequency limitation 
 * Springboot, Springcloud distributed access frequency limit
 * Distributed locks Distributed locks
-* Based on Redis
+* Based on Redis,etcd
 * Spring boot, spring cloud, springmvc
 * Support uri-based restrictions, dynamic configuration modification
 * The core code adopts the responsibility chain mode, and the function has good scalability

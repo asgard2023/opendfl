@@ -220,7 +220,7 @@ public class FrequencyTestController {
      */
     @GetMapping("/waitLockTestOrder")
     @ResponseBody
-    @RequestLock(name = "waitLockTestOrder", attrName = "orderId", time = 5, errMsg = "任务%s正在执行", lockType = ReqLockType.ETCD)
+    @RequestLock(name = "waitLockTestOrder", attrName = "orderId", time = 5, errMsg = "任务%s正在执行")
     public Object waitLockTestOrder(@RequestParam(name = "sleepTime", required = false) Integer sleepTime, HttpServletRequest request) {
         String orderId = request.getParameter("orderId");
         log.info("----waitLockTestOrder--userId={} orderId={} ip={}", request.getParameter(RequestParams.USER_ID), orderId, RequestUtils.getIpAddress(request));
@@ -229,6 +229,40 @@ public class FrequencyTestController {
             Thread.sleep(sleepTime * FrequencyConstant.TIME_MILLISECOND_TO_SECOND);
         } catch (InterruptedException e) {
             log.warn("---waitLockTestOrder--Interrupted!", e);
+            Thread.currentThread().interrupt();
+            throw new FailedException(e.getMessage());
+        }
+        return System.currentTimeMillis();
+    }
+
+    @GetMapping("/waitLockTestOrderEtcd")
+    @ResponseBody
+    @RequestLock(name = "waitLockTestOrderEtcd", attrName = "orderId", time = 5, errMsg = "任务%s正在执行", lockType = ReqLockType.ETCD)
+    public Object waitLockTestOrderEtcd(@RequestParam(name = "sleepTime", required = false) Integer sleepTime, HttpServletRequest request) {
+        String orderId = request.getParameter("orderId");
+        log.info("----waitLockTestOrderEtcd--userId={} orderId={} ip={}", request.getParameter(RequestParams.USER_ID), orderId, RequestUtils.getIpAddress(request));
+        sleepTime = getSleepTimeIfNull(sleepTime);
+        try {
+            Thread.sleep(sleepTime * FrequencyConstant.TIME_MILLISECOND_TO_SECOND);
+        } catch (InterruptedException e) {
+            log.warn("---waitLockTestOrderEtcd--Interrupted!", e);
+            Thread.currentThread().interrupt();
+            throw new FailedException(e.getMessage());
+        }
+        return System.currentTimeMillis();
+    }
+
+    @GetMapping("/waitLockTestOrderEtcdSync")
+    @ResponseBody
+    @RequestLock(name = "waitLockTestOrderEtcdSync", attrName = "orderId", time = 5, errMsg = "任务%s正在执行", lockType = ReqLockType.ETCD_SYNC)
+    public Object waitLockTestOrderEtcdSync(@RequestParam(name = "sleepTime", required = false) Integer sleepTime, HttpServletRequest request) {
+        String orderId = request.getParameter("orderId");
+        log.info("----waitLockTestOrderEtcdSync--userId={} orderId={} ip={}", request.getParameter(RequestParams.USER_ID), orderId, RequestUtils.getIpAddress(request));
+        sleepTime = getSleepTimeIfNull(sleepTime);
+        try {
+            Thread.sleep(sleepTime * FrequencyConstant.TIME_MILLISECOND_TO_SECOND);
+        } catch (InterruptedException e) {
+            log.warn("---waitLockTestOrderEtcdSync--Interrupted!", e);
             Thread.currentThread().interrupt();
             throw new FailedException(e.getMessage());
         }

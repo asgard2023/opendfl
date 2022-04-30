@@ -80,7 +80,7 @@ public class EtcdUtil {
         PutOption putOption = null;
         PutResponse putResp = null;
         if (leaseId != null) {
-            putOption = PutOption.newBuilder().withLeaseId(leaseId).build();
+            putOption = PutOption.newBuilder().withPrevKV().withLeaseId(leaseId).build();
             putResp = etcdClient.getKVClient().put(ByteSequence.from(key, StandardCharsets.UTF_8), ByteSequence.from(value, StandardCharsets.UTF_8), putOption).get();
         } else {
             CompletableFuture<PutResponse> putResponse = etcdClient.getKVClient().put(ByteSequence.from(key, StandardCharsets.UTF_8), ByteSequence.from(value, StandardCharsets.UTF_8));

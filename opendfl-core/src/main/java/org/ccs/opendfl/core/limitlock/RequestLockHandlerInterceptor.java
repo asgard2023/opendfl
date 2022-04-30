@@ -118,9 +118,9 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
                 String rndId = count + "-" + random.nextInt(1000);
                 String redisKey=null;
                 boolean isLimit=false;
-                if(ReqLockType.ETCD==reqLimit.lockType()) {
+                if(StringUtils.equals(ReqLockType.ETCD.getSource(), reqLimit.lockType().getSource())) {
                     redisKey = FrequencyUtils.getEtcdKeyLock(reqLimit.name(), dataId);
-                    isLimit = lockEtcd(redisKey, time, rndId);
+                    isLimit = lockEtcd(reqLimit, redisKey, time, rndId);
                 }
                 else{
                     redisKey = FrequencyUtils.getRedisKeyLock(reqLimit.name(), dataId);
@@ -154,17 +154,20 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
      * @return
      * @throws Exception
      */
-    private boolean lockEtcd(String redisKey, Integer time, String rndId) throws Exception {
-        boolean isLimit;
+    private boolean lockEtcd(RequestLock reqLimit, String redisKey, Integer time, String rndId) throws Exception {
+        boolean isLimit=false;
         long leaseId = grantLease(time);
         etcdReleaseKey.set(leaseId);
-        if(StringUtils.ifYes(requestLockConfiguration.getIfEtcdSyncLock())){
+        if(ReqLockType.ETCD_SYNC==reqLimit.lockType()){
             String lockKeyStr=EtcdUtil.lock(redisKey, leaseId);
             isLimit=true;
             etcdLockKey.set(lockKeyStr);
         }
-        else {
+        else  if(ReqLockType.ETCD==reqLimit.lockType()){
             isLimit = EtcdUtil.putKVIfAbsent(redisKey, rndId, leaseId);
+        }
+        else{
+            logger.warn("-----lockEtcd--invalid lockType={}", reqLimit.lockType());
         }
         return isLimit;
     }
@@ -178,20 +181,22 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
      * @throws Exception
      */
     private void unlockEtcd(RequestLock reqLimit, String dataId, String rndId) throws Exception {
-        logger.debug("-----unlockEtcd--ifEtcdSyncLock={}", requestLockConfiguration.getIfEtcdSyncLock());
-        if (StringUtils.ifYes(requestLockConfiguration.getIfEtcdSyncLock())) {
+        if(ReqLockType.ETCD_SYNC==reqLimit.lockType()){
             String lockKey = etcdLockKey.get();
             if (lockKey != null) {
 //                etcdClient.getLeaseClient().revoke(etcdReleaseKey.get());
                 etcdClient.getLockClient().unlock(ByteSequence.from(lockKey, StandardCharsets.UTF_8));
             }
         }
-        else{
+        else  if(ReqLockType.ETCD==reqLimit.lockType()){
             String redisKey = FrequencyUtils.getEtcdKeyLock(reqLimit.name(), dataId);
             String v = EtcdUtil.getKV(redisKey);
             if (StringUtils.equals(rndId, v)) {
                 EtcdUtil.deleteKV(redisKey);
             }
+        }
+        else{
+            logger.warn("-----unlockEtcd--invalid lockType={}", reqLimit.lockType());
         }
     }
 
