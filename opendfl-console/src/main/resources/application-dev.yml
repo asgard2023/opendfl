@@ -16,7 +16,17 @@ spring:
         max-idle: 100
         max-wait: 1000ms
   etcd:
-    endpoints: http://10.0.8.3:2379
+    endpoints: http://10.0.8.3:2379,http://10.0.8.3:2380,http://10.0.8.3:2381
+  zookeeper:
+    baseSleepTimeMs: 1000
+    #重试次数
+    maxRetries: 3
+    #zookeeper服务连接id与端口
+    address: 10.0.8.3:2181
+    #会话超时时间，单位毫秒
+    sessionTimeoutMs: 5000
+    #连接创建超时时间，单位毫秒
+    connection-timeout-ms: 5000
 
 
 logging:

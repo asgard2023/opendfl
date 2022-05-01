@@ -6,7 +6,7 @@ import io.etcd.jetcd.Client;
 import io.etcd.jetcd.Lock;
 import io.etcd.jetcd.lease.LeaseGrantResponse;
 import io.etcd.jetcd.lock.LockResponse;
-import org.ccs.opendfl.core.utils.EtcdUtil;
+import org.ccs.opendfl.core.utils.locktools.EtcdUtil;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -587,4 +587,118 @@ class FrequencyTestControllerTest {
         Assertions.assertEquals(1, successCounter.get(), "successCount:" + successCounter.get());
         Assertions.assertEquals(size - 1, lockedCounter.get(), "lockedCount:" + lockedCounter.get());
     }
+
+    /**
+     * 分布式气密-订单号
+     */
+    @Test
+    void waitLockTestOrderEtcd() {
+        AtomicInteger lockedCounter = new AtomicInteger();
+        AtomicInteger successCounter = new AtomicInteger();
+        Integer sleepTime = 2;//单位秒(s)
+        String errorLimitType = "frequency:lock";
+        String orderId = "testOrder123";
+
+        int size = 20;
+        ExecutorService executorService = Executors.newFixedThreadPool(20);
+        for (int i = 0; i < size; i++) {
+            final int iOper = i;
+            final String ip = "192.168.0." + i;
+            executorService.execute(new Runnable() {
+                public void run() {
+                    try {
+                        this.waitLockTest();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                private void waitLockTest() throws Exception {
+                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/waitLockTestOrderEtcd")
+                                    .param("userId", "123" + (iOper / 4))
+                                    .param("sleepTime", "" + sleepTime)
+                                    .param("orderId", orderId)
+                                    .header("x-forwarded-for", ip)
+                                    .accept(MediaType.APPLICATION_JSON))
+                            .andReturn();
+                    int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+                    String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+                    if (content.contains(errorLimitType)) {
+                        lockedCounter.incrementAndGet();
+                    } else {
+                        successCounter.incrementAndGet();
+                    }
+                    System.out.println("----waitLockTestOrderEtcd  status=" + status + " content=" + content);
+                }
+            });
+        }
+
+        executorService.shutdown();
+        try {
+            while (!executorService.awaitTermination(1, TimeUnit.SECONDS)) {
+                System.out.println("等待中");
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        Assertions.assertEquals(1, successCounter.get(), "successCount:" + successCounter.get());
+        Assertions.assertEquals(size - 1, lockedCounter.get(), "lockedCount:" + lockedCounter.get());
+    }
+
+    /**
+     * 分布式气密-订单号
+     */
+    @Test
+    void waitLockTestOrderZk() {
+        AtomicInteger lockedCounter = new AtomicInteger();
+        AtomicInteger successCounter = new AtomicInteger();
+        Integer sleepTime = 2;//单位秒(s)
+        String errorLimitType = "frequency:lock";
+        String orderId = "testOrder123";
+
+        int size = 20;
+        ExecutorService executorService = Executors.newFixedThreadPool(20);
+        for (int i = 0; i < size; i++) {
+            final int iOper = i;
+            final String ip = "192.168.0." + i;
+            executorService.execute(new Runnable() {
+                public void run() {
+                    try {
+                        this.waitLockTest();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                private void waitLockTest() throws Exception {
+                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/waitLockTestOrderZk")
+                                    .param("userId", "123" + (iOper / 4))
+                                    .param("sleepTime", "" + sleepTime)
+                                    .param("orderId", orderId)
+                                    .header("x-forwarded-for", ip)
+                                    .accept(MediaType.APPLICATION_JSON))
+                            .andReturn();
+                    int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+                    String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+                    if (content.contains(errorLimitType)) {
+                        lockedCounter.incrementAndGet();
+                    } else {
+                        successCounter.incrementAndGet();
+                    }
+                    System.out.println("----waitLockTestOrderZk  status=" + status + " content=" + content);
+                }
+            });
+        }
+
+        executorService.shutdown();
+        try {
+            while (!executorService.awaitTermination(1, TimeUnit.SECONDS)) {
+                System.out.println("等待中");
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        Assertions.assertEquals(1, successCounter.get(), "successCount:" + successCounter.get());
+        Assertions.assertEquals(size - 1, lockedCounter.get(), "lockedCount:" + lockedCounter.get());
+    }
 }

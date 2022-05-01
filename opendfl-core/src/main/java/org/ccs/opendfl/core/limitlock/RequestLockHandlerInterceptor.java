@@ -1,19 +1,19 @@
 package org.ccs.opendfl.core.limitlock;
 
 
-import io.etcd.jetcd.ByteSequence;
-import io.etcd.jetcd.Client;
-import io.etcd.jetcd.lease.LeaseGrantResponse;
 import org.ccs.opendfl.core.biz.IRequestLockConfigBiz;
 import org.ccs.opendfl.core.config.RequestLockConfiguration;
+import org.ccs.opendfl.core.constants.DataSourceType;
 import org.ccs.opendfl.core.constants.ReqLockType;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.FrequencyException;
 import org.ccs.opendfl.core.limitfrequency.FrequencyUtils;
-import org.ccs.opendfl.core.utils.EtcdUtil;
 import org.ccs.opendfl.core.utils.RequestParams;
 import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.utils.StringUtils;
+import org.ccs.opendfl.core.utils.locktools.EtcdUtil;
+import org.ccs.opendfl.core.utils.locktools.RedisLockUtils;
+import org.ccs.opendfl.core.utils.locktools.ZkLocker;
 import org.ccs.opendfl.core.vo.RequestLockVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,12 +26,9 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -50,9 +47,6 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
     private IRequestLockConfigBiz requestLockConfigBiz;
     @Resource(name = "redisTemplateString")
     private RedisTemplate<String, String> redisTemplateString;
-    // etcl客户端链接
-    @Autowired
-    private Client etcdClient = null;
     public static final Map<String, RequestLockVo> locksMap = new ConcurrentHashMap<>();
     private final Random random = new Random();
     private final AtomicInteger counter = new AtomicInteger();
@@ -60,6 +54,7 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
     private final ThreadLocal<String> lockDataId = new ThreadLocal<>();
     private final ThreadLocal<String> etcdLockKey = new ThreadLocal<>();
     private final ThreadLocal<Long> etcdReleaseKey = new ThreadLocal<>();
+    private final ThreadLocal<ZkLocker> zkLocker = new ThreadLocal<>();
 
     private RequestLockVo newRequestLockVo(RequestLock requestLimit, String requestUri, long curTime) {
         RequestLockVo lockVo = RequestLockVo.toLockVo(requestLimit);
@@ -116,15 +111,19 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
                 String ip = RequestUtils.getIpAddress(request);
                 Integer count = counter.incrementAndGet();
                 String rndId = count + "-" + random.nextInt(1000);
-                String redisKey=null;
-                boolean isLimit=false;
-                if(StringUtils.equals(ReqLockType.ETCD.getSource(), reqLimit.lockType().getSource())) {
+                String redisKey = null;
+                boolean isLimit = false;
+                if (StringUtils.equals(DataSourceType.ETCD.getType(), reqLimit.lockType().getSource())) {
                     redisKey = FrequencyUtils.getEtcdKeyLock(reqLimit.name(), dataId);
                     isLimit = lockEtcd(reqLimit, redisKey, time, rndId);
-                }
-                else{
+                } else if (ReqLockType.ZK == reqLimit.lockType()) {
+                    redisKey = FrequencyUtils.getEtcdKeyLock(reqLimit.name(), dataId);
+                    ZkLocker lock = new ZkLocker(reqLimit, redisKey);
+                    isLimit = lock.lock();
+                    zkLocker.set(lock);
+                } else {
                     redisKey = FrequencyUtils.getRedisKeyLock(reqLimit.name(), dataId);
-                    isLimit = redisTemplateString.opsForValue().setIfAbsent(redisKey, rndId, time, TimeUnit.SECONDS);
+                    isLimit = RedisLockUtils.lock(reqLimit, redisKey, rndId);
                 }
                 if (isLimit) {
                     logger.debug("----preHandle--name={} time={} dataId={}, rndId={}", reqLimit.name(), time, dataId, rndId);
@@ -148,6 +147,7 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
 
     /**
      * 请前前etcd加索
+     *
      * @param redisKey
      * @param time
      * @param rndId
@@ -155,18 +155,16 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
      * @throws Exception
      */
     private boolean lockEtcd(RequestLock reqLimit, String redisKey, Integer time, String rndId) throws Exception {
-        boolean isLimit=false;
-        long leaseId = grantLease(time);
+        boolean isLimit = false;
+        long leaseId = EtcdUtil.grantLease(time);
         etcdReleaseKey.set(leaseId);
-        if(ReqLockType.ETCD_SYNC==reqLimit.lockType()){
-            String lockKeyStr=EtcdUtil.lock(redisKey, leaseId);
-            isLimit=true;
+        if (ReqLockType.ETCD_SYNC == reqLimit.lockType()) {
+            String lockKeyStr = EtcdUtil.lock(redisKey, leaseId);
+            isLimit = true;
             etcdLockKey.set(lockKeyStr);
-        }
-        else  if(ReqLockType.ETCD==reqLimit.lockType()){
+        } else if (ReqLockType.ETCD == reqLimit.lockType()) {
             isLimit = EtcdUtil.putKVIfAbsent(redisKey, rndId, leaseId);
-        }
-        else{
+        } else {
             logger.warn("-----lockEtcd--invalid name={} lockType={}", reqLimit.name(), reqLimit.lockType());
         }
         return isLimit;
@@ -175,6 +173,7 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
 
     /**
      * 请求完成后etcd释放锁
+     *
      * @param reqLimit
      * @param dataId
      * @param rndId
@@ -182,35 +181,24 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
      */
     private void unlockEtcd(RequestLock reqLimit, String dataId, String rndId) throws Exception {
         logger.debug("----unlockEtcd--lockType={} lockKey={}", reqLimit.lockType(), etcdLockKey.get());
-        if(ReqLockType.ETCD_SYNC==reqLimit.lockType()){
+        if (ReqLockType.ETCD_SYNC == reqLimit.lockType()) {
+            etcdReleaseKey.remove();
             String lockKey = etcdLockKey.get();
             if (lockKey != null) {
+                etcdLockKey.remove();
                 EtcdUtil.unlock(lockKey);
             }
-        }
-        else  if(ReqLockType.ETCD==reqLimit.lockType()){
+        } else if (ReqLockType.ETCD == reqLimit.lockType()) {
             String redisKey = FrequencyUtils.getEtcdKeyLock(reqLimit.name(), dataId);
             String v = EtcdUtil.getKV(redisKey);
             if (StringUtils.equals(rndId, v)) {
                 EtcdUtil.deleteKV(redisKey);
             }
-        }
-        else{
+        } else {
             logger.warn("-----unlockEtcd--invalid name={} lockType={}", reqLimit.name(), reqLimit.lockType());
         }
     }
 
-    /**
-     * etcd租约
-     * @param ttl
-     * @return
-     * @throws Exception
-     */
-    private long grantLease(long ttl) throws Exception {
-        CompletableFuture<LeaseGrantResponse> feature = etcdClient.getLeaseClient().grant(ttl);
-        LeaseGrantResponse response = feature.get();
-        return response.getID();
-    }
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
@@ -231,14 +219,15 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
                 lockRandomId.remove();
             }
             logger.debug("----afterCompletion--dataId={} rndId={}", dataId, rndId);
-            if(ReqLockType.REDIS==reqLimit.lockType()){
+            if (ReqLockType.REDIS == reqLimit.lockType()) {
                 String redisKey = FrequencyUtils.getRedisKeyLock(reqLimit.name(), dataId);
-                String v = redisTemplateString.opsForValue().get(redisKey);
-                if (StringUtils.equals(rndId, v)) {
-                    redisTemplateString.delete(redisKey);
-                }
-            }
-            else if(StringUtils.equals(ReqLockType.ETCD.getSource(), reqLimit.lockType().getSource())) {
+                RedisLockUtils.unlock(redisKey, rndId);
+            } else if (ReqLockType.ZK == reqLimit.lockType()) {
+                ZkLocker lock = zkLocker.get();
+                lock.unlock();
+                zkLocker.remove();
+                logger.debug("----unlock--zk--redisKey={}", lock.getLockKey());
+            } else if (StringUtils.equals(DataSourceType.ETCD.getType(), reqLimit.lockType().getSource())) {
                 unlockEtcd(reqLimit, dataId, rndId);
             }
         }

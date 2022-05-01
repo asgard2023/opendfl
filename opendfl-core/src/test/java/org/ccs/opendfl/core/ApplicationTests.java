@@ -1,7 +1,7 @@
 package org.ccs.opendfl.core;
 
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
-import org.ccs.opendfl.core.utils.EtcdUtil;
+import org.ccs.opendfl.core.utils.locktools.EtcdUtil;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

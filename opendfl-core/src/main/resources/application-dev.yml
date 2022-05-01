@@ -15,6 +15,9 @@ spring:
         max-wait: 1000ms
   etcd:
     endpoints: http://192.168.0.101:2379
+  zookeeper:
+    address: 192.168.0.101:2181
+    timeout: 4000
 
 
 logging:

@@ -59,7 +59,7 @@ public class FrequencyUtils {
     }
 
     public static String getEtcdKeyLock(String lockName, String dataId) {
-        return requestLockConfiguration.getRedisPrefix() + "/" + lockName + "/" + dataId;
+        return "/"+requestLockConfiguration.getRedisPrefix() + "/" + lockName + "/" + dataId;
     }
 
 
@@ -202,7 +202,7 @@ public class FrequencyUtils {
      */
     private static String decryptValue(String clientIdRsa, String attrValue) {
         if (attrValue != null && StringUtils.isNotBlank(clientIdRsa)) {
-            attrValue = rsaBiz.checkRSAKey(clientIdRsa, (String) attrValue);
+            attrValue = rsaBiz.checkRSAKey(clientIdRsa, attrValue);
         }
         return attrValue;
     }

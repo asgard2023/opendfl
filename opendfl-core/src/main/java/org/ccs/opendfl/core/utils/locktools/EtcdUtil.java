@@ -1,4 +1,4 @@
-package org.ccs.opendfl.core.utils;
+package org.ccs.opendfl.core.utils.locktools;
 
 
 import io.etcd.jetcd.ByteSequence;
@@ -6,6 +6,7 @@ import io.etcd.jetcd.Client;
 import io.etcd.jetcd.Watch.Watcher;
 import io.etcd.jetcd.kv.GetResponse;
 import io.etcd.jetcd.kv.PutResponse;
+import io.etcd.jetcd.lease.LeaseGrantResponse;
 import io.etcd.jetcd.lock.LockResponse;
 import io.etcd.jetcd.lock.UnlockResponse;
 import io.etcd.jetcd.options.PutOption;
@@ -167,6 +168,18 @@ public class EtcdUtil {
             }
             throw e;
         }
+    }
+
+    /**
+     * etcd租约
+     * @param ttl
+     * @return
+     * @throws Exception
+     */
+    public static long grantLease(long ttl) throws Exception {
+        CompletableFuture<LeaseGrantResponse> feature = etcdClient.getLeaseClient().grant(ttl);
+        LeaseGrantResponse response = feature.get();
+        return response.getID();
     }
 
     public static String lock(String redisKey, Long leaseId) throws ExecutionException, InterruptedException {
