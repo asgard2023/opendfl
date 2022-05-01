@@ -114,6 +114,7 @@
     <logger name="org.apache.http" level="INFO"/>
     <logger name="org.springframework" level="INFO"/>
     <logger name="io.lettuce.core" level="INFO"/>
+    <logger name="org.apache.zookeeper.ClientCnxn" level="INFO"/>
 
     <!-- 日志输出级别 -->
     <root level="${LOG_LEVEL}">
