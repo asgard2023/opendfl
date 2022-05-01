@@ -1,7 +1,7 @@
 # OpenDFL Open Distributed frequency limitation 
 * Springboot, Springcloud distributed access frequency limit
 * Distributed locks Distributed locks
-* Based on Redis,etcd
+* Based on Redis,etcd,zookeeper
 * Spring boot, spring cloud, springmvc
 * Support uri-based restrictions, dynamic configuration modification
 * The core code adopts the responsibility chain mode, and the function has good scalability
@@ -40,7 +40,7 @@
  ```java
 @GetMapping("/waitLockTest")
 @ResponseBody
-@RequestLock(name = "waitLockTest", time=5, errMsg = "Task %s is running")
+@RequestLock(name = "waitLockTest", time=5, errMsg = "Task %s is running", logType=ReqLockType.ETCD)
  ```
 
 2. Distributed frequency limit, @Frequency annotation mode, and supports dynamic modification of frequency limit times through yml

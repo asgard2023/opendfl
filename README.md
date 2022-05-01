@@ -1,7 +1,7 @@
 # OpenDFL Open Distributed frequency limitation 
 * Springboot,Springcloud分布式访问频率限制
 * Distributed locks分布式锁
-* 基于Redis，etcd
+* 基于Redis，etcd,zookeeper
 * Spring boot, spring cloud，springmvc
 * 支持基于uri的限制，配置允许动态修改
 * 核心代码采用责任链模式，功能扩展性好
@@ -39,7 +39,7 @@
  ```java
 @GetMapping("/waitLockTest")
 @ResponseBody
-@RequestLock(name = "waitLockTest", time=5, errMsg = "任务%s正在执行")
+@RequestLock(name = "waitLockTest", time=5, errMsg = "任务%s正在执行", logType=ReqLockType.ETCD)
  ```
 
 2，分布式频率限制，@Frequency注解模式，并支持通过yml动态修改频率限制次数
