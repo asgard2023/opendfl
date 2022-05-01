@@ -2,8 +2,8 @@ package org.ccs.opendfl.core.biz.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IRequestLockDataBiz;
-import org.ccs.opendfl.core.limitfrequency.FrequencyUtils;
 import org.ccs.opendfl.core.limitlock.RequestLockHandlerInterceptor;
+import org.ccs.opendfl.core.utils.locktools.LockUtils;
 import org.ccs.opendfl.core.vo.RequestLockVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,7 +32,7 @@ public class RequestLockDataRedisBiz implements IRequestLockDataBiz {
         Collection<RequestLockVo> limits = RequestLockHandlerInterceptor.locksMap.values();
         List<RequestLockVo> tmpList = new ArrayList<>();
         for (RequestLockVo lockVo : limits) {
-            String redisKey = FrequencyUtils.getRedisKeyLock(lockVo.getName(), data);
+            String redisKey = LockUtils.getLockRedisKey(lockVo.getName(), data);
             boolean isExist = redisTemplate.hasKey(redisKey);
             if (isExist) {
                 long second = redisTemplate.getExpire(redisKey, TimeUnit.SECONDS);
@@ -47,7 +47,7 @@ public class RequestLockDataRedisBiz implements IRequestLockDataBiz {
 
     @Override
     public String lockEvict(String name, String data) {
-        String redisKey = FrequencyUtils.getRedisKeyLock(name, data);
+        String redisKey = LockUtils.getLockRedisKey(name, data);
         long expireSec = redisTemplate.getExpire(redisKey, TimeUnit.SECONDS);
         log.info("-----lockEvict--redisKey={} expireSec={}", redisKey, expireSec);
         redisTemplate.delete(redisKey);

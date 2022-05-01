@@ -12,6 +12,7 @@ import org.ccs.opendfl.core.utils.RequestParams;
 import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.utils.locktools.EtcdUtil;
+import org.ccs.opendfl.core.utils.locktools.LockUtils;
 import org.ccs.opendfl.core.utils.locktools.RedisLockUtils;
 import org.ccs.opendfl.core.utils.locktools.ZkLocker;
 import org.ccs.opendfl.core.vo.RequestLockVo;
@@ -111,25 +112,22 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
                 String ip = RequestUtils.getIpAddress(request);
                 Integer count = counter.incrementAndGet();
                 String rndId = count + "-" + random.nextInt(1000);
-                String redisKey = null;
                 boolean isLimit = false;
+                String lockKey = LockUtils.getLockKey(reqLimit, dataId);
                 if (StringUtils.equals(DataSourceType.ETCD.getType(), reqLimit.lockType().getSource())) {
-                    redisKey = FrequencyUtils.getEtcdKeyLock(reqLimit.name(), dataId);
-                    isLimit = lockEtcd(reqLimit, redisKey, time, rndId);
+                    isLimit = lockEtcd(reqLimit, lockKey, time, rndId);
                 } else if (ReqLockType.ZK == reqLimit.lockType()) {
-                    redisKey = FrequencyUtils.getEtcdKeyLock(reqLimit.name(), dataId);
-                    ZkLocker lock = new ZkLocker(reqLimit, redisKey);
+                    ZkLocker lock = new ZkLocker(reqLimit, lockKey);
                     isLimit = lock.lock();
                     zkLocker.set(lock);
                 } else {
-                    redisKey = FrequencyUtils.getRedisKeyLock(reqLimit.name(), dataId);
-                    isLimit = RedisLockUtils.lock(reqLimit, redisKey, rndId);
+                    isLimit = RedisLockUtils.lock(reqLimit, lockKey, rndId);
                 }
                 if (isLimit) {
                     logger.debug("----preHandle--name={} time={} dataId={}, rndId={}", reqLimit.name(), time, dataId, rndId);
                     lockRandomId.set(rndId);
                 } else {
-                    logger.warn("----preHandle--redisKey={} time={} dataId={} ip={} limited", redisKey, time, dataId, ip);
+                    logger.warn("----preHandle--lockKey={} time={} dataId={} ip={} limited", lockKey, time, dataId, ip);
                     String title = "frequency:lock";
                     BaseException baseException = new FrequencyException("重复任务限制:" + String.format(errMsg, dataId));
                     baseException.setTitle(title);
@@ -189,10 +187,10 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
                 EtcdUtil.unlock(lockKey);
             }
         } else if (ReqLockType.ETCD == reqLimit.lockType()) {
-            String redisKey = FrequencyUtils.getEtcdKeyLock(reqLimit.name(), dataId);
-            String v = EtcdUtil.getKV(redisKey);
+            String lockKey = LockUtils.getLockKey(reqLimit, dataId);
+            String v = EtcdUtil.getKV(lockKey);
             if (StringUtils.equals(rndId, v)) {
-                EtcdUtil.deleteKV(redisKey);
+                EtcdUtil.deleteKV(lockKey);
             }
         } else {
             logger.warn("-----unlockEtcd--invalid name={} lockType={}", reqLimit.name(), reqLimit.lockType());
@@ -220,8 +218,8 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
             }
             logger.debug("----afterCompletion--dataId={} rndId={}", dataId, rndId);
             if (ReqLockType.REDIS == reqLimit.lockType()) {
-                String redisKey = FrequencyUtils.getRedisKeyLock(reqLimit.name(), dataId);
-                RedisLockUtils.unlock(redisKey, rndId);
+                String lockKey = LockUtils.getLockKey(reqLimit, dataId);
+                RedisLockUtils.unlock(lockKey, rndId);
             } else if (ReqLockType.ZK == reqLimit.lockType()) {
                 ZkLocker lock = zkLocker.get();
                 lock.unlock();

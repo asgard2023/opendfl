@@ -1,6 +1,7 @@
 package org.ccs.opendfl.core.config;
 
 import io.etcd.jetcd.Client;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "spring.etcd")
 @Slf4j
+@Data
 public class EtcdConfiguration {
     private String endpoints = "http://localhost:2379";
 

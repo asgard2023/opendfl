@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.ccs.opendfl.core.biz.IRsaBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
-import org.ccs.opendfl.core.config.RequestLockConfiguration;
 import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.FrequencyException;
@@ -37,29 +36,16 @@ public class FrequencyUtils {
 
     private static IRsaBiz rsaBiz;
     private static FrequencyConfiguration frequencyConfiguration;
-    private static RequestLockConfiguration requestLockConfiguration;
 
     @Autowired
     public void setFrequencyConfiguration(FrequencyConfiguration frequencyConfiguration) {
         FrequencyUtils.frequencyConfiguration = frequencyConfiguration;
     }
 
-    @Autowired
-    public void setRequestLockConfiguration(RequestLockConfiguration requestLockConfiguration) {
-        FrequencyUtils.requestLockConfiguration = requestLockConfiguration;
-    }
 
     @Autowired
     public void setRsaBiz(IRsaBiz rsaBiz) {
         FrequencyUtils.rsaBiz = rsaBiz;
-    }
-
-    public static String getRedisKeyLock(String lockName, String dataId) {
-        return requestLockConfiguration.getRedisPrefix() + ":" + lockName + ":" + dataId;
-    }
-
-    public static String getEtcdKeyLock(String lockName, String dataId) {
-        return "/"+requestLockConfiguration.getRedisPrefix() + "/" + lockName + "/" + dataId;
     }
 
 

@@ -3,6 +3,7 @@ package org.ccs.opendfl.core.utils.locktools;
 import org.ccs.opendfl.core.limitlock.RequestLock;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
@@ -11,6 +12,7 @@ import java.util.concurrent.TimeUnit;
  * redis lock
  * @author chenjh
  */
+@Component
 public class RedisLockUtils {
 
     private static RedisTemplate<String, String> redisTemplateString;
