@@ -25,7 +25,7 @@ public class ZkLocker {
     private RequestLock reqLimit;
     private String lockKey;
 
-    @Autowired
+    @Autowired(required = false)
     public void setCuratorFramework(CuratorFramework curatorFramework) {
         ZkLocker.curatorFramework = curatorFramework;
     }

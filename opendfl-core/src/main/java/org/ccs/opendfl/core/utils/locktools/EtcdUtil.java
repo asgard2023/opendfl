@@ -33,7 +33,7 @@ public class EtcdUtil {
     // etcl客户端链接
     private static Client etcdClient = null;
 
-    @Autowired
+    @Autowired(required = false)
     public void setEtcdClient(Client etcdClient) {
         EtcdUtil.etcdClient = etcdClient;
     }

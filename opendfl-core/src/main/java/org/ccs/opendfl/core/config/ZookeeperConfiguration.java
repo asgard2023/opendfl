@@ -10,6 +10,7 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
+import org.ccs.opendfl.core.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +23,6 @@ import java.util.concurrent.CountDownLatch;
  * 支持zookeeper
  *
  * @author chenjh
- *
  */
 @Configuration
 @Slf4j
@@ -36,10 +36,14 @@ public class ZookeeperConfiguration {
     public ZooKeeper zkClient() {
         ZooKeeper zooKeeper = null;
         try {
+            log.info("----zkClient--zookeeper.address={}", zookeeperProperties.getAddress());
+            if (StringUtils.isBlank(zookeeperProperties.getAddress())) {
+                log.warn("----zkClient-zk-disabled");
+                return zooKeeper;
+            }
             final CountDownLatch countDownLatch = new CountDownLatch(1);
             //连接成功后，会回调watcher监听，此连接操作是异步的，执行完new语句后，直接调用后续代码
             //  可指定多台服务地址 127.0.0.1:2181,127.0.0.1:2182,127.0.0.1:2183
-            log.info("----etcdClient--zookeeper.address={}", zookeeperProperties.getAddress());
             zooKeeper = new ZooKeeper(zookeeperProperties.getAddress(), zookeeperProperties.getConnectionTimeoutMs(), new Watcher() {
                 @Override
                 public void process(WatchedEvent event) {
@@ -61,11 +65,16 @@ public class ZookeeperConfiguration {
 
     /**
      * Zookeeper开源客户端框架Curator简介
-     * @document https://www.iteye.com/blog/macrochen-1366136
+     *
      * @return
+     * @document https://www.iteye.com/blog/macrochen-1366136
      */
     @Bean
     public CuratorFramework curatorFramework() {
+        if (StringUtils.isBlank(zookeeperProperties.getAddress())) {
+            log.warn("----curatorFramework-zk-disabled");
+            return null;
+        }
         //配置zookeeper连接的重试策略
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(zookeeperProperties.getBaseSleepTimeMs(), zookeeperProperties.getMaxRetries());
 
