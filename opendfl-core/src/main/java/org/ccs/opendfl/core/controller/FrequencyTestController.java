@@ -224,12 +224,12 @@ public class FrequencyTestController {
         return System.currentTimeMillis();
     }
 
-    @GetMapping("/waitLockTestOrderEtcd")
+    @GetMapping("/waitLockTestOrderEtcdKv")
     @ResponseBody
-    @RequestLock(name = "waitLockTestOrderEtcd", attrName = "orderId", time = 5, errMsg = "任务%s正在执行", lockType = ReqLockType.ETCD)
+    @RequestLock(name = "waitLockTestOrderEtcdKv", attrName = "orderId", time = 5, errMsg = "任务%s正在执行", lockType = ReqLockType.ETCD_KV)
     public Object waitLockTestOrderEtcd(@RequestParam(name = "sleepTime", required = false) Integer sleepTime, HttpServletRequest request) {
         String orderId = request.getParameter("orderId");
-        log.info("----waitLockTestOrderEtcd--userId={} orderId={} ip={}", request.getParameter(RequestParams.USER_ID), orderId, RequestUtils.getIpAddress(request));
+        log.info("----waitLockTestOrderEtcdKv--userId={} orderId={} ip={}", request.getParameter(RequestParams.USER_ID), orderId, RequestUtils.getIpAddress(request));
         sleepByTime(sleepTime);
         return System.currentTimeMillis();
     }
@@ -247,9 +247,9 @@ public class FrequencyTestController {
         }
     }
 
-    @GetMapping("/waitLockTestOrderEtcdSync")
+    @GetMapping("/waitLockTestOrderEtcdLock")
     @ResponseBody
-    @RequestLock(name = "waitLockTestOrderEtcdSync", attrName = "orderId", time = 5, errMsg = "任务%s正在执行", lockType = ReqLockType.ETCD_SYNC)
+    @RequestLock(name = "waitLockTestOrderEtcdLock", attrName = "orderId", time = 5, errMsg = "任务%s正在执行", lockType = ReqLockType.ETCD_LOCK)
     public Object waitLockTestOrderEtcdSync(@RequestParam(name = "sleepTime", required = false) Integer sleepTime, HttpServletRequest request) {
         String orderId = request.getParameter("orderId");
         log.info("----waitLockTestOrderEtcdSync--userId={} orderId={} ip={}", request.getParameter(RequestParams.USER_ID), orderId, RequestUtils.getIpAddress(request));

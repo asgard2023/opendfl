@@ -592,7 +592,7 @@ class FrequencyTestControllerTest {
      * 分布式气密-订单号
      */
     @Test
-    void waitLockTestOrderEtcd() {
+    void waitLockTestOrderEtcdKv() {
         AtomicInteger lockedCounter = new AtomicInteger();
         AtomicInteger successCounter = new AtomicInteger();
         Integer sleepTime = 2;//单位秒(s)
@@ -614,7 +614,7 @@ class FrequencyTestControllerTest {
                 }
 
                 private void waitLockTest() throws Exception {
-                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/waitLockTestOrderEtcd")
+                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/waitLockTestOrderEtcdKv")
                                     .param("userId", "123" + (iOper / 4))
                                     .param("sleepTime", "" + sleepTime)
                                     .param("orderId", orderId)
@@ -628,7 +628,7 @@ class FrequencyTestControllerTest {
                     } else {
                         successCounter.incrementAndGet();
                     }
-                    System.out.println("----waitLockTestOrderEtcd  status=" + status + " content=" + content);
+                    System.out.println("----waitLockTestOrderEtcdKv  status=" + status + " content=" + content);
                 }
             });
         }

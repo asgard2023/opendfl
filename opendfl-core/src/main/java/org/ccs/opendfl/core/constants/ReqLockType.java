@@ -12,11 +12,11 @@ public enum ReqLockType {
     /**
      * ETCD分布式锁，ifAbsent已存在时快速失败
      */
-    ETCD("etcd", DataSourceType.ETCD.getType()),
+    ETCD_KV("etcdKv", DataSourceType.ETCD.getType()),
     /**
      * ETCD分布式锁，同步模式，等待前面任务锁消失或完成，然后取到锁
      */
-    ETCD_SYNC("etcdSync", DataSourceType.ETCD.getType()),
+    ETCD_LOCK("etcdLock", DataSourceType.ETCD.getType()),
     /**
      * ETCD分布式锁，异步模式，暂时觉得没有必要，未实现
      * @Deprecated

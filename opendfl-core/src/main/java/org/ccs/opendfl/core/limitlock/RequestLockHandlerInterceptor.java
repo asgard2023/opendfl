@@ -156,11 +156,11 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
         boolean isLimit = false;
         long leaseId = EtcdUtil.grantLease(time);
         etcdReleaseKey.set(leaseId);
-        if (ReqLockType.ETCD_SYNC == reqLimit.lockType()) {
+        if (ReqLockType.ETCD_LOCK == reqLimit.lockType()) {
             String lockKeyStr = EtcdUtil.lock(redisKey, leaseId);
             isLimit = true;
             etcdLockKey.set(lockKeyStr);
-        } else if (ReqLockType.ETCD == reqLimit.lockType()) {
+        } else if (ReqLockType.ETCD_KV == reqLimit.lockType()) {
             isLimit = EtcdUtil.putKVIfAbsent(redisKey, rndId, leaseId);
         } else {
             logger.warn("-----lockEtcd--invalid name={} lockType={}", reqLimit.name(), reqLimit.lockType());
@@ -179,14 +179,14 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
      */
     private void unlockEtcd(RequestLock reqLimit, String dataId, String rndId) throws Exception {
         logger.debug("----unlockEtcd--lockType={} lockKey={}", reqLimit.lockType(), etcdLockKey.get());
-        if (ReqLockType.ETCD_SYNC == reqLimit.lockType()) {
+        if (ReqLockType.ETCD_LOCK == reqLimit.lockType()) {
             etcdReleaseKey.remove();
             String lockKey = etcdLockKey.get();
             if (lockKey != null) {
                 etcdLockKey.remove();
                 EtcdUtil.unlock(lockKey);
             }
-        } else if (ReqLockType.ETCD == reqLimit.lockType()) {
+        } else if (ReqLockType.ETCD_KV == reqLimit.lockType()) {
             String lockKey = LockUtils.getLockKey(reqLimit, dataId);
             String v = EtcdUtil.getKV(lockKey);
             if (StringUtils.equals(rndId, v)) {
