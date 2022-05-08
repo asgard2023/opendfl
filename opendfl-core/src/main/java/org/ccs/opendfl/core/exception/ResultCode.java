@@ -23,7 +23,8 @@ public enum ResultCode {
     USER_CAPTCHA_RETRY_FREQUENT("101003", "验证码重试频繁"),
     USER_SMS_CAPTCHA_EXPIRE("101004", "短信验证码过期"),
     USER_CAPTCHA_EXPIRE("101005", "图片验证码过期"),
-    USER_CAPTCHA_ERROR("101006", "验证码错误");
+    USER_CAPTCHA_ERROR("101006", "验证码错误"),
+    USER_PASSWORD_INVALID("101007", "密码错误");
 
     private String code;
     private String msg;
