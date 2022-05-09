@@ -279,7 +279,7 @@
                     });
                 }
             },
-            error: function () {
+            error: function (d, e) {
                 $.messager.show({
                     title: e,
                     msg: d.responseJSON.errorMsg,
