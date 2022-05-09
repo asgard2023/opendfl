@@ -7,6 +7,7 @@ import org.ccs.opendfl.core.biz.IMaxRunTimeBiz;
 import org.ccs.opendfl.core.biz.IUserBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
+import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.strategy.black.BlackChain;
@@ -107,7 +108,9 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
                 String title = "frequency:black";
                 if (blackChain.getBlackStrategy() != null) {
                     limitType=blackChain.getBlackStrategy().getLimitType();
-                    title = "frequency:" + blackChain.getBlackStrategy().getLimitType();
+                    title = "frequency:" + limitType;
+                    FreqLimitType freqLimitType = FreqLimitType.valueOf(limitType);
+                    FrequencyUtils.addFreqLog(strategyParams, 1, 0, freqLimitType);
                 }
                 this.frequencyReturn(requestVo, true);
                 FrequencyUtils.outLimitCount(strategyParams, limitType);
@@ -128,6 +131,8 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
                 }
                 this.frequencyReturn(requestVo, false);
                 FrequencyUtils.outLimitCount(strategyParams, limitType);
+                FreqLimitType freqLimitType = FreqLimitType.valueOf(limitType);
+                FrequencyUtils.addFreqLog(strategyParams, 1, 0, freqLimitType);
                 return true;
             }
 
