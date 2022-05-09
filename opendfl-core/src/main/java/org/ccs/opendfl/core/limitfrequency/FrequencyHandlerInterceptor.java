@@ -109,7 +109,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
                 if (blackChain.getBlackStrategy() != null) {
                     limitType=blackChain.getBlackStrategy().getLimitType();
                     title = "frequency:" + limitType;
-                    FreqLimitType freqLimitType = FreqLimitType.valueOf(limitType);
+                    FreqLimitType freqLimitType = FreqLimitType.parseCode(limitType);
                     FrequencyUtils.addFreqLog(strategyParams, 1, 0, freqLimitType);
                 }
                 this.frequencyReturn(requestVo, true);
@@ -131,7 +131,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
                 }
                 this.frequencyReturn(requestVo, false);
                 FrequencyUtils.outLimitCount(strategyParams, limitType);
-                FreqLimitType freqLimitType = FreqLimitType.valueOf(limitType);
+                FreqLimitType freqLimitType = FreqLimitType.parseCode(limitType);
                 FrequencyUtils.addFreqLog(strategyParams, 1, 0, freqLimitType);
                 return true;
             }
