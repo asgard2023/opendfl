@@ -4,7 +4,7 @@ package org.ccs.opendfl.core.config;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.ccs.opendfl.core.constants.RedisTimeType;
+import org.ccs.opendfl.core.constants.CacheTimeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
@@ -79,16 +79,16 @@ public class RedisConfiguration extends CachingConfigurerSupport {
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
         return new RedisCacheManager(
                 RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory),
-                this.getRedisCacheConfigurationWithTtl(RedisTimeType.CACHE_DEFAULT.getSecond()), // 默认策略，未配置的 key 会使用这个
+                this.getRedisCacheConfigurationWithTtl(CacheTimeType.CACHE_DEFAULT.getSecond()), // 默认策略，未配置的 key 会使用这个
                 this.getRedisCacheConfigurationMap() // 指定 key 策略
         );
     }
 
     private Map<String, RedisCacheConfiguration> getRedisCacheConfigurationMap() {
         Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>();
-        RedisTimeType[] timeTypes = RedisTimeType.values();
-        for (RedisTimeType timeType : timeTypes) {
-            if (timeType == RedisTimeType.CACHE_DEFAULT) {
+        CacheTimeType[] timeTypes = CacheTimeType.values();
+        for (CacheTimeType timeType : timeTypes) {
+            if (timeType == CacheTimeType.CACHE_DEFAULT) {
                 continue;
             }
             redisCacheConfigurationMap.put(timeType.getCode(), this.getRedisCacheConfigurationWithTtl(timeType.getSecond()));

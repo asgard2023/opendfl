@@ -8,7 +8,7 @@ public enum ReqLockType {
     /**
      * Redis分布式锁，ifAbsent已存在时快速失败
      */
-    REDIS("reids", DataSourceType.REDIS.getType()),
+    REDIS("redis", DataSourceType.REDIS.getType()),
     /**
      * ETCD分布式锁，ifAbsent已存在时快速失败
      */
