@@ -33,7 +33,7 @@ public class RunCountTask {
             runCountThread = new RunCountThread(runCountBiz, outLimitCountBiz);
         }
         if (cacheThread == null) {
-            cacheThread = new Thread(runCountThread);
+            cacheThread = new Thread(runCountThread, RunCountThread.class.getSimpleName());
         }
         this.start();
     }

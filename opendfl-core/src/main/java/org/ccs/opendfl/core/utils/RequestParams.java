@@ -31,6 +31,7 @@ public final class RequestParams {
      */
     public static String USER_ID = "userId";
     public static String DEVICE_ID ="deviceId";
+    public static String SYS_TYPE ="sysType";
     /**
      * username
      */

@@ -4,6 +4,7 @@ package org.ccs.opendfl.core.utils;
 import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
+import org.ccs.opendfl.core.constants.ReqSysType;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.FailedException;
 
@@ -52,10 +53,10 @@ public class RequestUtils {
             params.put(RequestParams.DEVICE_ID, deviceId);
         }
 
-        for (Map.Entry<String, String[]> entry: requestParams.entrySet()) {
+        for (Map.Entry<String, String[]> entry : requestParams.entrySet()) {
             String[] values = entry.getValue();
             String valueStr = "";
-            int length=values.length;
+            int length = values.length;
             for (int i = 0; i < length; i++) {
                 valueStr = (i == length - 1) ? valueStr + values[i]
                         : valueStr + values[i] + ",";
@@ -75,6 +76,23 @@ public class RequestUtils {
     public static final String LOCALHOST_IP = "127.0.0.1";
     public static final String LOCALHOST_IPV6 = "0:0:0:0:0:0:0:1";
     public static final String LOCALHOST_HOST = "localhost";
+
+    public static String getSysType(HttpServletRequest request) {
+        return request.getHeader(RequestParams.SYS_TYPE);
+    }
+
+    public static Character getSysTypeId(HttpServletRequest request) {
+        String sysType = getSysType(request);
+        if (sysType == null) {
+            return null;
+        }
+        ReqSysType reqSysType = ReqSysType.parseCode(sysType);
+        if (reqSysType != null) {
+            return reqSysType.getType();
+        }
+        log.error("----getSysTypeId--sysType={} invalid", sysType);
+        return null;
+    }
 
 
     public static String getLang(HttpServletRequest request) {
@@ -98,18 +116,18 @@ public class RequestUtils {
     }
 
 
-    public static Integer getInt(Object obj) {
+    public static Integer getInt(Object obj, Integer defaultValue) {
         if (obj == null || "".equals(obj)) {
-            return null;
+            return defaultValue;
         } else if (obj instanceof Integer) {
             return (Integer) obj;
         }
         return Integer.parseInt("" + obj);
     }
 
-    public static Long getLong(Object obj) {
+    public static Long getLong(Object obj, Long defaultValue) {
         if (obj == null || "".equals(obj)) {
-            return null;
+            return defaultValue;
         } else if (obj instanceof Long) {
             return (Long) obj;
         }
@@ -125,7 +143,7 @@ public class RequestUtils {
     }
 
     public static String getIpAddress(HttpServletRequest request) {
-        String ip= ServletUtil.getClientIP(request);
+        String ip = ServletUtil.getClientIP(request);
         if (LOCALHOST_IP.equals(ip) || LOCALHOST_IPV6.equals(ip)) {
             ip = LOCALHOST_HOST;
         }

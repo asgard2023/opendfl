@@ -3,6 +3,7 @@ package org.ccs.opendfl.core.limitfrequency;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import org.ccs.opendfl.core.biz.IOutLogBiz;
 import org.ccs.opendfl.core.biz.IRsaBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.constants.FreqLimitType;
@@ -35,6 +36,7 @@ public class FrequencyUtils {
     }
 
     private static IRsaBiz rsaBiz;
+    private static IOutLogBiz outLogBiz;
     private static FrequencyConfiguration frequencyConfiguration;
 
     @Autowired
@@ -48,6 +50,15 @@ public class FrequencyUtils {
         FrequencyUtils.rsaBiz = rsaBiz;
     }
 
+    @Autowired
+    public void setOutLogBiz(IOutLogBiz outLogBiz) {
+        FrequencyUtils.outLogBiz = outLogBiz;
+    }
+
+    public static void outLogBiz(IOutLogBiz outLogBiz) {
+        FrequencyUtils.outLogBiz = outLogBiz;
+    }
+
 
     /**
      * 频率超限日志，超出部分才记录
@@ -58,9 +69,10 @@ public class FrequencyUtils {
      */
     public static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, FreqLimitType type) {
         outLimitCount(strategyParams, type);
+        outLogBiz.addFreqLog(strategyParams, limit, v, type);
         Integer logTime = frequencyConfiguration.getLimit().getOutLimitLogTime();
         FrequencyVo frequency = strategyParams.getFrequency();
-        if (!(logTime > 0 && frequency.getTime() >= logTime)) {
+        if (frequency==null || !(logTime > 0 && frequency.getTime() >= logTime)) {
             return;
         }
         String uri = strategyParams.getRequestUri();
@@ -76,11 +88,12 @@ public class FrequencyUtils {
     public static final Map<String, Map<String, AtomicInteger>> outLimitCountMap = new ConcurrentHashMap<>();
 
     public static void outLimitCount(RequestStrategyParamsVo strategyParams, String limitType) {
-        FreqLimitType freqLimitType=FreqLimitType.parseCode(limitType);
-        if(freqLimitType!=null) {
+        FreqLimitType freqLimitType = FreqLimitType.parseCode(limitType);
+        if (freqLimitType != null) {
             outLimitCount(strategyParams, freqLimitType);
         }
     }
+
     /**
      * 按接口记录超限次数
      *

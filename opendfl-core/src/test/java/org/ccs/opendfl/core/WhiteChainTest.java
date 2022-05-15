@@ -1,6 +1,7 @@
 package org.ccs.opendfl.core;
 
 import lombok.extern.slf4j.Slf4j;
+import org.ccs.opendfl.core.constants.ReqSysType;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.ResultCode;
 import org.ccs.opendfl.core.strategy.white.WhiteChain;
@@ -52,6 +53,7 @@ class WhiteChainTest {
         String ip = "192.168.5.105";
         ip= ""+ RequestUtils.getIpConvertNum(ip);
         String requestUri = "/frequencyTest/serverTime";
+        ReqSysType reqSysType =ReqSysType.PC;
         String methodName = "serverTime";
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo;
@@ -67,7 +69,7 @@ class WhiteChainTest {
         int failCount = 0;
         for (int i = 0; i < 20; i++) {
             try {
-                strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, curTime);
+                strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, "130" + i);
                 whiteChain.setStrategyParams(strategyParamsVo);
                 whiteChain.clearLimit();
@@ -90,6 +92,7 @@ class WhiteChainTest {
         String ip = "192.168.5.101";
         ip= ""+RequestUtils.getIpConvertNum(ip);
         String requestUri = "/frequencyTest/serverTime";
+        ReqSysType reqSysType =ReqSysType.PC;
         String methodName = "serverTime";
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo;
@@ -105,7 +108,7 @@ class WhiteChainTest {
         int failCount = 0;
         for (int i = 0; i < 20; i++) {
             try {
-                strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, curTime);
+                strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, "130" + i);
                 whiteChain.setStrategyParams(strategyParamsVo);
                 whiteChain.clearLimit();
@@ -125,6 +128,7 @@ class WhiteChainTest {
     void doCheckLimit_whiteUser() {
         String lang = null;
         String requestUri = "/frequencyTest/serverTime";
+        ReqSysType reqSysType =ReqSysType.PC;
         String methodName = "serverTime";
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo;
@@ -144,7 +148,7 @@ class WhiteChainTest {
             try {
                 String ip = "192.168.5.2" + i;
                 ip= ""+RequestUtils.getIpConvertNum(ip);
-                strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, curTime);
+                strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, whiteUser);
                 whiteChain.setStrategyParams(strategyParamsVo);
                 whiteChain.clearLimit();
