@@ -58,6 +58,15 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     private BlackChain blackChain;
     @Autowired
     private RunCountTask runCountTask;
+    public void setFreqLimitChain(FreqLimitChain freqLimitChain){
+        this.freqLimitChain = freqLimitChain;
+    }
+    public void setWhiteChain(WhiteChain white){
+        this.whiteChain = white;
+    }
+    private void setBlackChain(BlackChain black){
+        this.blackChain = black;
+    }
     private static final String BLACK_LIST_INFO = "{\"resultCode\":\"100010\",\"errorMsg\":\"Frequency limit\",\"data\":\"WaT+azid/F/83e1UpLc6ZA==\",\"errorType\":\"%s\",\"success\":false}";
 
     private final ThreadLocal<Long> startTime = new ThreadLocal<>();

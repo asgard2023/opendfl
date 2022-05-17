@@ -51,6 +51,9 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
     private RedisTemplate<String, String> redisTemplateString;
     @Resource(name = "outLogBiz")
     private IOutLogBiz outLogBiz;
+    private void setRequestLockConfigBiz(IRequestLockConfigBiz requestLockConfigBiz){
+        this.requestLockConfigBiz = requestLockConfigBiz;
+    }
 
     public void setOutLogBiz(IOutLogBiz outLogBiz) {
         this.outLogBiz = outLogBiz;
