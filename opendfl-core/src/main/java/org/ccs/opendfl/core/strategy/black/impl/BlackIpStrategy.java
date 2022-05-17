@@ -41,7 +41,7 @@ public class BlackIpStrategy implements BlackStrategy {
                     ip = RequestUtils.getNumConvertIp(Long.parseLong(ip));
                 }
                 logger.warn("----doCheckLimit-blackIp={} userId={} uri={}", ip, userId, strategyParams.getRequestUri());
-                strategyParams.setBlackStrategy(this);
+                strategyParams.getChainOper().setBlackStrategy(this);
                 return true;
             }
         }

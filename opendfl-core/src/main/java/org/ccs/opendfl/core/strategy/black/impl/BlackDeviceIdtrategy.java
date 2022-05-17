@@ -34,7 +34,7 @@ public class BlackDeviceIdtrategy implements BlackStrategy {
             String deviceId = strategyParams.getDeviceId();
             if (whiteBlackCheckBiz.isIncludeBlackId(deviceId, WhiteBlackCheckType.DEVICE)) {
                 logger.warn("-----doCheckLimit-blackDeviceId={} uri={}", deviceId, strategyParams.getRequestUri());
-                strategyParams.setBlackStrategy(this);
+                strategyParams.getChainOper().setBlackStrategy(this);
                 return true;
             }
         }

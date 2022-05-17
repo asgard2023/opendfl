@@ -16,6 +16,7 @@ import org.ccs.opendfl.core.utils.CommUtils;
 import org.ccs.opendfl.core.utils.RequestParams;
 import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.utils.StringUtils;
+import org.ccs.opendfl.core.vo.ChainOperVo;
 import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
 import org.ccs.opendfl.core.vo.RequestVo;
@@ -98,15 +99,16 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
                 return true;
             }
 
+            ChainOperVo chainOper = strategyParams.getChainOper();
             //黑名单处理
-            strategyParams.clearChain();
+            chainOper.clearChain();
             boolean isBlack = blackChain.doCheckLimit(blackChain, strategyParams);
             String limitType = null;
             if (isBlack) {
                 log.warn("----preHandle--uri={} blackIp={} ", request.getRequestURI(), remoteIp);
                 String title = "frequency:black";
-                if (strategyParams.getBlackStrategy() != null) {
-                    limitType = strategyParams.getBlackStrategy().getLimitType();
+                if (chainOper.getBlackStrategy() != null) {
+                    limitType = chainOper.getBlackStrategy().getLimitType();
                     title = "frequency:" + limitType;
                     FreqLimitType freqLimitType = FreqLimitType.parseCode(limitType);
                     FrequencyUtils.addFreqLog(strategyParams, 1, 0, freqLimitType);
@@ -120,10 +122,10 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
 
 
             //白名单处理
-            strategyParams.clearChain();
+            chainOper.clearChain();
             boolean isWhite = whiteChain.doCheckLimit(whiteChain, strategyParams);
             if (isWhite) {
-                limitType = strategyParams.getWhiteStrategy().getLimitType();
+                limitType = chainOper.getWhiteStrategy().getLimitType();
                 if (FrequencyUtils.isInitLog("preHandle")) {
                     log.info("----preHandle--white:{}-uri={}", limitType, requestUri);
                 }
@@ -365,7 +367,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         strategyParams.load(frequency, userId);
 
         //这里的顺序没有关系，主要由frequency.limit.items这个参数来控制是否启用及顺序
-        strategyParams.setPos(0);
+        strategyParams.getChainOper().setPos(0);
         freqLimitChain.doCheckLimit(freqLimitChain, strategyParams);
         return going;
     }

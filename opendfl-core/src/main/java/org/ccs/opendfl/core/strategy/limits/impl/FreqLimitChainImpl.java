@@ -105,9 +105,9 @@ public class FreqLimitChainImpl implements FreqLimitChain {
 
     @Override
     public void doCheckLimit(final FreqLimitChain limitChain, final RequestStrategyParamsVo strategyParams) {
-        int pos=strategyParams.getPos();
+        int pos=strategyParams.getChainOper().getPos();
         int v = pos++;
-        strategyParams.setPos(pos);
+        strategyParams.getChainOper().setPos(pos);
         if (v >= size) {
             return;
         }

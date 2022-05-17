@@ -31,20 +31,7 @@ public class RequestStrategyParamsVo {
      * 默认取userId也可以是接口注解指定的attrName参数
      */
     private String userId;
-
-    private Integer pos = 0;
-    private BlackStrategy blackStrategy;
-    private WhiteStrategy whiteStrategy;
-
-    public void setPos(Integer pos) {
-        this.pos = pos;
-    }
-
-    public void clearChain() {
-        this.pos = 0;
-        this.whiteStrategy = null;
-        this.blackStrategy = null;
-    }
+    private ChainOperVo chainOper = new ChainOperVo();
 
     public RequestStrategyParamsVo(String lang, String ip, String deviceId, String methodName, String requestUri, String sysType, long curTime) {
         this.lang = lang;

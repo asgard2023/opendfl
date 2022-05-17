@@ -97,9 +97,9 @@ public class WhiteChainImpl implements WhiteChain {
 
     @Override
     public boolean doCheckLimit(WhiteChain limitChain, final RequestStrategyParamsVo strategyParams) {
-        int pos = strategyParams.getPos();
+        int pos = strategyParams.getChainOper().getPos();
         int v = pos++;
-        strategyParams.setPos(pos);
+        strategyParams.getChainOper().setPos(pos);
         if (v >= size) {
             return false;
         }

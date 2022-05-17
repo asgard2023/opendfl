@@ -38,7 +38,7 @@ public class WhiteUserStrategy implements WhiteStrategy {
                 if (FrequencyUtils.isInitLog(getLimitType())) {
                     logger.info("----doCheckLimit-whiteUser={} uri={}", userId, strategyParams.getRequestUri());
                 }
-                strategyParams.setWhiteStrategy(this);
+                strategyParams.getChainOper().setWhiteStrategy(this);
                 return true;
             }
         }

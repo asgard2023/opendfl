@@ -44,7 +44,7 @@ public class WhiteIpStrategy implements WhiteStrategy {
                     }
                     logger.info("----doCheckLimit-whiteIp={} uri={}", ip, strategyParams.getRequestUri());
                 }
-                strategyParams.setWhiteStrategy(this);
+                strategyParams.getChainOper().setWhiteStrategy(this);
                 return true;
             }
         }

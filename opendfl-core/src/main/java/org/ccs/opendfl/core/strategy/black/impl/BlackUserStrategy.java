@@ -34,7 +34,7 @@ public class BlackUserStrategy implements BlackStrategy {
             String userId = strategyParams.getUserId();
             if (whiteBlackCheckBiz.isIncludeBlackId(userId, WhiteBlackCheckType.USER)) {
                 logger.warn("-----doCheckLimit-blackUser={} uri={}", userId, strategyParams.getRequestUri());
-                strategyParams.setBlackStrategy(this);
+                strategyParams.getChainOper().setBlackStrategy(this);
                 return true;
             }
         }

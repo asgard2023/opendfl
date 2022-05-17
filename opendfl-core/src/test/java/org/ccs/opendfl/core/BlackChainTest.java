@@ -67,7 +67,7 @@ class BlackChainTest {
             try {
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip, null, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, "130" + i);
-                strategyParamsVo.setPos(0);
+                strategyParamsVo.getChainOper().setPos(0);
                 boolean isBlack = this.blackChain.doCheckLimit(blackChain, strategyParamsVo);
                 if (isBlack) {
                     failCount++;
