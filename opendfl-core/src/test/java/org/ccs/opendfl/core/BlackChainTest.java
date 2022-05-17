@@ -67,9 +67,8 @@ class BlackChainTest {
             try {
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip, null, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, "130" + i);
-                blackChain.setStrategyParams(strategyParamsVo);
-                blackChain.clearLimit();
-                boolean isBlack = this.blackChain.doCheckLimit(blackChain);
+                strategyParamsVo.setPos(0);
+                boolean isBlack = this.blackChain.doCheckLimit(blackChain, strategyParamsVo);
                 if (isBlack) {
                     failCount++;
                 } else {
@@ -110,9 +109,7 @@ class BlackChainTest {
             try {
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip, null, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, "130" + i);
-                blackChain.setStrategyParams(strategyParamsVo);
-                blackChain.clearLimit();
-                boolean isBlack = this.blackChain.doCheckLimit(blackChain);
+                boolean isBlack = this.blackChain.doCheckLimit(blackChain, strategyParamsVo);
                 if (isBlack) {
                     failCount++;
                 } else {
@@ -154,9 +151,7 @@ class BlackChainTest {
                 ip= ""+RequestUtils.getIpConvertNum(ip);
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip, null, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, blackUser);
-                blackChain.setStrategyParams(strategyParamsVo);
-                blackChain.clearLimit();
-                boolean isBlack = this.blackChain.doCheckLimit(blackChain);
+                boolean isBlack = this.blackChain.doCheckLimit(blackChain, strategyParamsVo);
                 if (isBlack) {
                     failCount++;
                 } else {

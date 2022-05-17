@@ -51,9 +51,8 @@ public class FreqLimitUserIpStrategy implements FreqLimitStrategy {
     }
 
     @Override
-    public void doCheckLimit(String limitItems, FreqLimitChain limitChain) {
+    public void doCheckLimit(String limitItems, FreqLimitChain limitChain, RequestStrategyParamsVo strategyParams) {
         if (containLimit(limitItems, LIMIT_TYPE)) {
-            RequestStrategyParamsVo strategyParams = limitChain.getStrategyParams();
             FrequencyVo frequency = strategyParams.getFrequency();
             int limit = frequency.getUserIpCount();
             if (limit > 0) {
@@ -82,6 +81,6 @@ public class FreqLimitUserIpStrategy implements FreqLimitStrategy {
                 }
             }
         }
-        limitChain.doCheckLimit(limitChain);
+        limitChain.doCheckLimit(limitChain, strategyParams);
     }
 }

@@ -54,9 +54,8 @@ public class FreqLimitUserCountStrategy implements FreqLimitStrategy {
     }
 
     @Override
-    public void doCheckLimit(String limitItems, FreqLimitChain limitChain) {
+    public void doCheckLimit(String limitItems, FreqLimitChain limitChain, RequestStrategyParamsVo strategyParams) {
         if (containLimit(limitItems, LIMIT_TYPE)) {
-            RequestStrategyParamsVo strategyParams = limitChain.getStrategyParams();
             FrequencyVo frequency = strategyParams.getFrequency();
             int time = frequency.getTime();
             String redisKey = getRedisKey(frequency, strategyParams.getUserId(), strategyParams.getIp());
@@ -85,7 +84,7 @@ public class FreqLimitUserCountStrategy implements FreqLimitStrategy {
                 }
             }
         }
-        limitChain.doCheckLimit(limitChain);
+        limitChain.doCheckLimit(limitChain, strategyParams);
     }
 
 

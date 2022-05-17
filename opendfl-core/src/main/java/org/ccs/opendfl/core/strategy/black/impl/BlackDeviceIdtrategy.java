@@ -29,16 +29,15 @@ public class BlackDeviceIdtrategy implements BlackStrategy {
     }
 
     @Override
-    public boolean doCheckLimit(String limitItems, BlackChain limitChain) {
+    public boolean doCheckLimit(String limitItems, BlackChain limitChain, final RequestStrategyParamsVo strategyParams) {
         if (containLimit(limitItems, LIMIT_TYPE)) {
-            RequestStrategyParamsVo strategyParams = limitChain.getStrategyParams();
             String deviceId = strategyParams.getDeviceId();
             if (whiteBlackCheckBiz.isIncludeBlackId(deviceId, WhiteBlackCheckType.DEVICE)) {
                 logger.warn("-----doCheckLimit-blackDeviceId={} uri={}", deviceId, strategyParams.getRequestUri());
-                limitChain.setBlackStrategy(this);
+                strategyParams.setBlackStrategy(this);
                 return true;
             }
         }
-        return limitChain.doCheckLimit(limitChain);
+        return limitChain.doCheckLimit(limitChain, strategyParams);
     }
 }

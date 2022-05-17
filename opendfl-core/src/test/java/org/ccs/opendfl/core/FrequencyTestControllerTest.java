@@ -444,6 +444,7 @@ class FrequencyTestControllerTest {
             }
             System.out.println("----serverTimeFreqIpUser  status=" + status + " content=" + content);
         }
+        System.out.println("----serverTimeFreqIpUser  successCount=" + successCount + " limtCount=" + limtCount);
         Assertions.assertTrue(successCount > 0, "successCount:" + successCount);
         Assertions.assertTrue(limtCount > 0, "ipUserCount:" + limtCount);
     }

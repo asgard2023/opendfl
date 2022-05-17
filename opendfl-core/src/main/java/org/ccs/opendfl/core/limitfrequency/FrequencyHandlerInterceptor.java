@@ -3,7 +3,6 @@ package org.ccs.opendfl.core.limitfrequency;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IFrequencyConfigBiz;
-import org.ccs.opendfl.core.biz.IMaxRunTimeBiz;
 import org.ccs.opendfl.core.biz.IUserBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
@@ -88,7 +87,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             Map<String, Object> params = RequestUtils.getParamsObject(request);
             String deviceId = (String) params.get(RequestParams.DEVICE_ID);
 
-            String sysType=RequestUtils.getSysType(request);
+            String sysType = RequestUtils.getSysType(request);
             strategyParams = new RequestStrategyParamsVo(lang, ip, deviceId, handlerMethod.getMethod().getName(), requestUri, sysType, curTime);
             String userId = (String) params.get(RequestParams.USER_ID);
             strategyParams.setUserId(userId);
@@ -100,15 +99,14 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             }
 
             //黑名单处理
-            blackChain.setStrategyParams(strategyParams);
-            blackChain.clearLimit();
-            boolean isBlack = blackChain.doCheckLimit(blackChain);
-            String limitType=null;
+            strategyParams.clearChain();
+            boolean isBlack = blackChain.doCheckLimit(blackChain, strategyParams);
+            String limitType = null;
             if (isBlack) {
                 log.warn("----preHandle--uri={} blackIp={} ", request.getRequestURI(), remoteIp);
                 String title = "frequency:black";
-                if (blackChain.getBlackStrategy() != null) {
-                    limitType=blackChain.getBlackStrategy().getLimitType();
+                if (strategyParams.getBlackStrategy() != null) {
+                    limitType = strategyParams.getBlackStrategy().getLimitType();
                     title = "frequency:" + limitType;
                     FreqLimitType freqLimitType = FreqLimitType.parseCode(limitType);
                     FrequencyUtils.addFreqLog(strategyParams, 1, 0, freqLimitType);
@@ -122,11 +120,10 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
 
 
             //白名单处理
-            whiteChain.setStrategyParams(strategyParams);
-            whiteChain.clearLimit();
-            boolean isWhite = whiteChain.doCheckLimit(whiteChain);
+            strategyParams.clearChain();
+            boolean isWhite = whiteChain.doCheckLimit(whiteChain, strategyParams);
             if (isWhite) {
-                limitType=whiteChain.getWhiteStrategy().getLimitType();
+                limitType = strategyParams.getWhiteStrategy().getLimitType();
                 if (FrequencyUtils.isInitLog("preHandle")) {
                     log.info("----preHandle--white:{}-uri={}", limitType, requestUri);
                 }
@@ -137,7 +134,6 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
                 return true;
             }
 
-            freqLimitChain.setStrategyParams(strategyParams);
             frequencyVo = new FrequencyVo();
             frequencyVo.setRequestUri(requestUri);
             //基于注解的频率限制
@@ -369,8 +365,8 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         strategyParams.load(frequency, userId);
 
         //这里的顺序没有关系，主要由frequency.limit.items这个参数来控制是否启用及顺序
-        freqLimitChain.clearLimit();
-        freqLimitChain.doCheckLimit(freqLimitChain);
+        strategyParams.setPos(0);
+        freqLimitChain.doCheckLimit(freqLimitChain, strategyParams);
         return going;
     }
 

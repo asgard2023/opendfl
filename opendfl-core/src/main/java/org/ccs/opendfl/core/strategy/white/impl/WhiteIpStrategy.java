@@ -33,9 +33,8 @@ public class WhiteIpStrategy implements WhiteStrategy {
     }
 
     @Override
-    public boolean doCheckLimit(String limitItems, WhiteChain limitChain) {
+    public boolean doCheckLimit(String limitItems, WhiteChain limitChain, final RequestStrategyParamsVo strategyParams) {
         if (containLimit(limitItems, LIMIT_TYPE)) {
-            RequestStrategyParamsVo strategyParams = limitChain.getStrategyParams();
             String ip = strategyParams.getIp();
             if (whiteBlackCheckBiz.isIncludeWhiteId(ip, WhiteBlackCheckType.IP)) {
                 //方便测试，日志前1000条
@@ -45,10 +44,10 @@ public class WhiteIpStrategy implements WhiteStrategy {
                     }
                     logger.info("----doCheckLimit-whiteIp={} uri={}", ip, strategyParams.getRequestUri());
                 }
-                limitChain.setWhiteStrategy(this);
+                strategyParams.setWhiteStrategy(this);
                 return true;
             }
         }
-        return limitChain.doCheckLimit(limitChain);
+        return limitChain.doCheckLimit(limitChain, strategyParams);
     }
 }

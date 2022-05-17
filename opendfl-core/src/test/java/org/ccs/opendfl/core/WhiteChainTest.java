@@ -27,7 +27,7 @@ class WhiteChainTest {
     @Autowired
     private WhiteChain whiteChain;
 
-    private String deviceId="chainDeviceTest";
+    private String deviceId = "chainDeviceTest";
 
 
     @BeforeEach
@@ -51,9 +51,9 @@ class WhiteChainTest {
     void doCheckLimit_whiteIp_normal() {
         String lang = null;
         String ip = "192.168.5.105";
-        ip= ""+ RequestUtils.getIpConvertNum(ip);
+        ip = "" + RequestUtils.getIpConvertNum(ip);
         String requestUri = "/frequencyTest/serverTime";
-        ReqSysType reqSysType =ReqSysType.PC;
+        ReqSysType reqSysType = ReqSysType.PC;
         String methodName = "serverTime";
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo;
@@ -71,9 +71,7 @@ class WhiteChainTest {
             try {
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, "130" + i);
-                whiteChain.setStrategyParams(strategyParamsVo);
-                whiteChain.clearLimit();
-                this.whiteChain.doCheckLimit(whiteChain);
+                this.whiteChain.doCheckLimit(whiteChain, strategyParamsVo);
                 successCount++;
             } catch (BaseException e) {
                 failCount++;
@@ -90,9 +88,9 @@ class WhiteChainTest {
     void doCheckLimit_whiteIp() {
         String lang = null;
         String ip = "192.168.5.101";
-        ip= ""+RequestUtils.getIpConvertNum(ip);
+        ip = "" + RequestUtils.getIpConvertNum(ip);
         String requestUri = "/frequencyTest/serverTime";
-        ReqSysType reqSysType =ReqSysType.PC;
+        ReqSysType reqSysType = ReqSysType.PC;
         String methodName = "serverTime";
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo;
@@ -110,9 +108,7 @@ class WhiteChainTest {
             try {
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, "130" + i);
-                whiteChain.setStrategyParams(strategyParamsVo);
-                whiteChain.clearLimit();
-                this.whiteChain.doCheckLimit(whiteChain);
+                this.whiteChain.doCheckLimit(whiteChain, strategyParamsVo);
                 successCount++;
             } catch (BaseException e) {
                 failCount++;
@@ -128,7 +124,7 @@ class WhiteChainTest {
     void doCheckLimit_whiteUser() {
         String lang = null;
         String requestUri = "/frequencyTest/serverTime";
-        ReqSysType reqSysType =ReqSysType.PC;
+        ReqSysType reqSysType = ReqSysType.PC;
         String methodName = "serverTime";
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo;
@@ -147,12 +143,10 @@ class WhiteChainTest {
         for (int i = 0; i < 20; i++) {
             try {
                 String ip = "192.168.5.2" + i;
-                ip= ""+RequestUtils.getIpConvertNum(ip);
+                ip = "" + RequestUtils.getIpConvertNum(ip);
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, whiteUser);
-                whiteChain.setStrategyParams(strategyParamsVo);
-                whiteChain.clearLimit();
-                this.whiteChain.doCheckLimit(whiteChain);
+                this.whiteChain.doCheckLimit(whiteChain, strategyParamsVo);
                 successCount++;
             } catch (BaseException e) {
                 failCount++;

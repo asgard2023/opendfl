@@ -31,9 +31,8 @@ public class BlackIpStrategy implements BlackStrategy {
     }
 
     @Override
-    public boolean doCheckLimit(String limitItems, BlackChain limitChain) {
+    public boolean doCheckLimit(String limitItems, BlackChain limitChain, final RequestStrategyParamsVo strategyParams) {
         if (containLimit(limitItems, LIMIT_TYPE)) {
-            RequestStrategyParamsVo strategyParams = limitChain.getStrategyParams();
             String userId = strategyParams.getUserId();
             String ip = strategyParams.getIp();
 
@@ -42,10 +41,10 @@ public class BlackIpStrategy implements BlackStrategy {
                     ip = RequestUtils.getNumConvertIp(Long.parseLong(ip));
                 }
                 logger.warn("----doCheckLimit-blackIp={} userId={} uri={}", ip, userId, strategyParams.getRequestUri());
-                limitChain.setBlackStrategy(this);
+                strategyParams.setBlackStrategy(this);
                 return true;
             }
         }
-        return limitChain.doCheckLimit(limitChain);
+        return limitChain.doCheckLimit(limitChain, strategyParams);
     }
 }

@@ -2,15 +2,17 @@ package org.ccs.opendfl.core.vo;
 
 import lombok.Data;
 import lombok.Getter;
+import org.ccs.opendfl.core.strategy.black.BlackStrategy;
+import org.ccs.opendfl.core.strategy.white.WhiteStrategy;
 
 /**
  * 请求参数，用于限制处理
- * @author chenjh
  *
+ * @author chenjh
  */
 @Data
 @Getter
-public class RequestStrategyParamsVo{
+public class RequestStrategyParamsVo {
     private String requestUri;
     private final String lang;
     private final String methodName;
@@ -30,6 +32,20 @@ public class RequestStrategyParamsVo{
      */
     private String userId;
 
+    private Integer pos = 0;
+    private BlackStrategy blackStrategy;
+    private WhiteStrategy whiteStrategy;
+
+    public void setPos(Integer pos) {
+        this.pos = pos;
+    }
+
+    public void clearChain() {
+        this.pos = 0;
+        this.whiteStrategy = null;
+        this.blackStrategy = null;
+    }
+
     public RequestStrategyParamsVo(String lang, String ip, String deviceId, String methodName, String requestUri, String sysType, long curTime) {
         this.lang = lang;
         this.ip = ip;
@@ -41,7 +57,7 @@ public class RequestStrategyParamsVo{
     }
 
 
-    public void load(FrequencyVo frequency, String userId){
+    public void load(FrequencyVo frequency, String userId) {
         this.frequency = frequency;
         this.userId = userId;
     }

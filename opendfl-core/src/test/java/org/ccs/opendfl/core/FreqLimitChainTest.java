@@ -53,9 +53,7 @@ class FreqLimitChainTest {
             try {
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip + i, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, "130");
-                freqLimitChain.setStrategyParams(strategyParamsVo);
-                freqLimitChain.clearLimit();
-                this.freqLimitChain.doCheckLimit(freqLimitChain);
+                this.freqLimitChain.doCheckLimit(freqLimitChain, strategyParamsVo);
                 successCount++;
             } catch (BaseException e) {
                 failCount++;
@@ -94,7 +92,6 @@ class FreqLimitChainTest {
 
         String freqTypeItems = "limit,userCount,userIp,ipUser,";
 
-        freqLimitChain.setStrategyParams(strategyParamsVo);
         freqLimitChain.sortStrategies(freqTypeItems);
         long time = System.currentTimeMillis();
         int successCount = 0;
@@ -102,8 +99,7 @@ class FreqLimitChainTest {
         for (int i = 0; i < 20; i++) {
             try {
                 strategyParamsVo.load(frequencyVo, "130" + i);
-                freqLimitChain.clearLimit();
-                this.freqLimitChain.doCheckLimit(freqLimitChain);
+                this.freqLimitChain.doCheckLimit(freqLimitChain, strategyParamsVo);
                 successCount++;
             } catch (BaseException e) {
                 failCount++;
@@ -130,7 +126,6 @@ class FreqLimitChainTest {
 
         String freqTypeItems = "limit,userCount,userIp,ipUser,";
 
-        freqLimitChain.setStrategyParams(strategyParamsVo);
         freqLimitChain.sortStrategies(freqTypeItems);
         long time = System.currentTimeMillis();
         int successCount = 0;
@@ -138,8 +133,7 @@ class FreqLimitChainTest {
         for (int i = 0; i < 1020; i++) {
             try {
                 strategyParamsVo.load(frequencyVo, "131");
-                freqLimitChain.clearLimit();
-                this.freqLimitChain.doCheckLimit(freqLimitChain);
+                this.freqLimitChain.doCheckLimit(freqLimitChain, strategyParamsVo);
                 successCount++;
             } catch (BaseException e) {
                 failCount++;
@@ -167,7 +161,6 @@ class FreqLimitChainTest {
 
         String freqTypeItems = "limit,";
 
-        freqLimitChain.setStrategyParams(strategyParamsVo);
         freqLimitChain.sortStrategies(freqTypeItems);
         long time = System.currentTimeMillis();
         int successCount = 0;
@@ -175,8 +168,7 @@ class FreqLimitChainTest {
         for (int i = 0; i < 1020; i++) {
             try {
                 strategyParamsVo.load(frequencyVo, "132");
-                freqLimitChain.clearLimit();
-                this.freqLimitChain.doCheckLimit(freqLimitChain);
+                this.freqLimitChain.doCheckLimit(freqLimitChain, strategyParamsVo);
                 successCount++;
             } catch (BaseException e) {
                 failCount++;
@@ -204,7 +196,6 @@ class FreqLimitChainTest {
 
         String freqTypeItems = "userCount,userIp,ipUser,";
 
-        freqLimitChain.setStrategyParams(strategyParamsVo);
         freqLimitChain.sortStrategies(freqTypeItems);
         long time = System.currentTimeMillis();
         int successCount = 0;
@@ -212,8 +203,7 @@ class FreqLimitChainTest {
         for (int i = 0; i < 1020; i++) {
             try {
                 strategyParamsVo.load(frequencyVo, "133");
-                freqLimitChain.clearLimit();
-                this.freqLimitChain.doCheckLimit(freqLimitChain);
+                this.freqLimitChain.doCheckLimit(freqLimitChain, strategyParamsVo);
                 successCount++;
             } catch (BaseException e) {
                 failCount++;
