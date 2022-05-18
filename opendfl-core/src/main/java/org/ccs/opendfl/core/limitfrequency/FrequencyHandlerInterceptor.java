@@ -58,6 +58,9 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     private BlackChain blackChain;
     @Autowired
     private RunCountTask runCountTask;
+    public void setFrequencyConfigBiz(IFrequencyConfigBiz frequencyConfigBiz){
+        this.frequencyConfigBiz = frequencyConfigBiz;
+    }
     public void setFreqLimitChain(FreqLimitChain freqLimitChain){
         this.freqLimitChain = freqLimitChain;
     }
