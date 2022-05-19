@@ -7,4 +7,5 @@ public class RequestLockConfigVo {
     private String name;
     private Integer time;
     private String attrName;
+    private String errMsg;
 }
