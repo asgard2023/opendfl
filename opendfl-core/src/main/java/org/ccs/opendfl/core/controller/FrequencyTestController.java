@@ -53,7 +53,6 @@ public class FrequencyTestController {
      * @return
      */
     @GetMapping("/monitor")
-    @ResponseBody
     public ResultData monitor(HttpServletRequest request, @RequestParam(name = "second", defaultValue = "30") Integer second
             , @RequestParam(name = "count", defaultValue = "20") Integer count) {
         log.info("----monitor--userId={}", request.getParameter(RequestParams.USER_ID));
@@ -65,14 +64,12 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTime")
-    @ResponseBody
     public Object serverTime(HttpServletRequest request) {
         log.info("----serverTime--userId={} {}", request.getParameter(RequestParams.USER_ID), redisHost);
         return System.currentTimeMillis();
     }
 
     @GetMapping("/serverTimeFreq")
-    @ResponseBody
     @Frequency(time = 5, limit = 5, name = "serverTimeFreq")
     @Frequency2(time = 3600, limit = 100, name = "serverTimeFreq")
     public Object serverTimeFreq(HttpServletRequest request) {
@@ -81,7 +78,6 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTimeNeedLogin")
-    @ResponseBody
     @Frequency(time = 5, limit = 5, needLogin = true, name = "serverTimeNeedLogin")
     @Frequency2(time = 3600, needLogin = true, limit = 100, name = "serverTimeNeedLogin")
     public Object serverTimeNeedLogin(HttpServletRequest request) {
@@ -90,7 +86,6 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTimeFreq120")
-    @ResponseBody
     @Frequency(time = 120, limit = 5, name = "serverTimeFreq120")
     @Frequency2(time = 3600, limit = 100, name = "serverTimeFreq120")
     public Object serverTimeFreq120(HttpServletRequest request) {
@@ -99,7 +94,6 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTimeFreqIpUser")
-    @ResponseBody
     @Frequency(time = 5, limit = 5, ipUserCount = 7, name = "serverTimeFreqIpUser")
     public Object serverTimeFreqIpUser(HttpServletRequest request) {
         log.info("----serverTimeFreqIpUser--userId={}", request.getParameter(RequestParams.USER_ID));
@@ -107,7 +101,6 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTimeFreqUserIp")
-    @ResponseBody
     @Frequency(time = 5, limit = 100, userIpCount = 7, name = "serverTimeFreqUserIp")
     public Object serverTimeFreqUserIp(HttpServletRequest request) {
         log.info("----serverTimeFreqUserIp--userId={}", request.getParameter(RequestParams.USER_ID));
@@ -115,7 +108,6 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTimeFreqIp")
-    @ResponseBody
     @Frequency(time = 5, limit = 5, userIpCount = 7, ipUserCount = 7, name = "serverTimeFreqIp")
     public Object serverTimeFreqIp(HttpServletRequest request) {
         log.info("----serverTimeFreqIp--userId={}", request.getParameter(RequestParams.USER_ID));
@@ -123,7 +115,6 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTimeFreqDevice")
-    @ResponseBody
     public Object serverTimeFreqDevice(HttpServletRequest request) {
         String deviceId = request.getParameter(RequestParams.DEVICE_ID);
         if (deviceId == null) {
@@ -134,7 +125,6 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTimeUri")
-    @ResponseBody
     public Object serverTimeUri(HttpServletRequest request) {
         log.info("----serverTimeUri--account={}", request.getParameter("account"));
         return System.currentTimeMillis();
@@ -147,7 +137,6 @@ public class FrequencyTestController {
      * @return current time
      */
     @PostMapping("/serverTimeJsonFreq")
-    @ResponseBody
     @Frequency(time = 5, limit = 5, name = "serverTimeJsonFreq")
     public Object serverTimeJsonFreq(@RequestBody RequestTestVo requestTest) {
         ValidateUtils.notNull(requestTest.getUserId(), "userId is null");
@@ -162,7 +151,6 @@ public class FrequencyTestController {
      * @return current time
      */
     @PostMapping("/serverTimeStreamFreq")
-    @ResponseBody
     @Frequency(time = 5, limit = 5, name = "serverTimeStreamFreq")
     public Object serverTimeStreamFreq(HttpServletRequest request) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8));
@@ -199,7 +187,6 @@ public class FrequencyTestController {
      * @return currentTime
      */
     @GetMapping("/waitLockTestUser")
-    @ResponseBody
     @RequestLock(name = "waitLockTestUser", time = 5, errMsg = "任务%s正在执行")
     public Object waitLockTestUser(@RequestParam(name = "sleepTime", required = false) Integer sleepTime, HttpServletRequest request) {
         log.info("----waitLockTestUser--userId={} ip={}", request.getParameter(RequestParams.USER_ID), RequestUtils.getIpAddress(request));
@@ -215,7 +202,6 @@ public class FrequencyTestController {
      * @return currentTime
      */
     @GetMapping("/waitLockTestOrder")
-    @ResponseBody
     @RequestLock(name = "waitLockTestOrder", attrName = "orderId", time = 5, errMsg = "任务%s正在执行")
     public Object waitLockTestOrder(@RequestParam(name = "sleepTime", required = false) Integer sleepTime, HttpServletRequest request) {
         String orderId = request.getParameter("orderId");
@@ -225,7 +211,6 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/waitLockTestOrderEtcdKv")
-    @ResponseBody
     @RequestLock(name = "waitLockTestOrderEtcdKv", attrName = "orderId", time = 5, errMsg = "任务%s正在执行", lockType = ReqLockType.ETCD_KV)
     public Object waitLockTestOrderEtcdKv(@RequestParam(name = "sleepTime", required = false) Integer sleepTime, HttpServletRequest request) {
         String orderId = request.getParameter("orderId");
@@ -248,7 +233,6 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/waitLockTestOrderEtcdLock")
-    @ResponseBody
     @RequestLock(name = "waitLockTestOrderEtcdLock", attrName = "orderId", time = 5, errMsg = "任务%s正在执行", lockType = ReqLockType.ETCD_LOCK)
     public Object waitLockTestOrderEtcdLock(@RequestParam(name = "sleepTime", required = false) Integer sleepTime, HttpServletRequest request) {
         String orderId = request.getParameter("orderId");
@@ -258,7 +242,6 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/waitLockTestOrderZk")
-    @ResponseBody
     @RequestLock(name = "waitLockTestOrderZk", attrName = "orderId", time = 5, errMsg = "任务%s正在执行", lockType = ReqLockType.ZK)
     public Object waitLockTestOrderZk(@RequestParam(name = "sleepTime", required = false) Integer sleepTime, HttpServletRequest request) {
         String orderId = request.getParameter("orderId");

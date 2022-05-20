@@ -33,7 +33,6 @@ public class FrequencyResetController {
     /**
      * 图形验证码
      */
-    @ResponseBody
     @RequestMapping(value = "/imageCaptcha", method = {RequestMethod.GET, RequestMethod.POST})
     public void getImageCaptcha(HttpServletRequest request, HttpServletResponse response
             , @RequestParam(value = "clientId", required = false) String clientId
@@ -60,7 +59,6 @@ public class FrequencyResetController {
         }
     }
 
-    @ResponseBody
     @RequestMapping(value = "/resetLimits", method = {RequestMethod.GET, RequestMethod.POST})
     public ResultData resetLimits(HttpServletRequest request
             , @RequestParam(value = "clientId", required = false) String clientId
@@ -111,7 +109,6 @@ public class FrequencyResetController {
     /**
      * 用于支持在页面显示图片验证码，而不是后台生成
      */
-    @ResponseBody
     @RequestMapping(value = "captchaCode", method = {RequestMethod.GET, RequestMethod.POST})
     public ResultData getImageCaptchaCode(HttpServletRequest request) {
         String clientId = request.getParameter("clientId");
@@ -122,7 +119,6 @@ public class FrequencyResetController {
         return ResultData.success(captchaCode);
     }
 
-    @ResponseBody
     @GetMapping("/resetTicket")
     public ResultData getResetTicket(HttpServletRequest request, @RequestParam(value = "funcCode", required = false) String funcCode
             , @RequestParam(value = "type", required = false) String type) {

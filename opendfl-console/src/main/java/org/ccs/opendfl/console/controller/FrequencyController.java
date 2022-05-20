@@ -66,7 +66,6 @@ public class FrequencyController {
      * @param request
      * @return
      */
-    @ResponseBody
     @GetMapping("/ipConvert")
     public Object ipConvert(HttpServletRequest request) {
         String ip = request.getParameter("ip");
@@ -83,7 +82,6 @@ public class FrequencyController {
      * @param request
      * @return List<ComboxItemVo>
      */
-    @ResponseBody
     @RequestMapping(value = "/getRunDays", method = {RequestMethod.GET, RequestMethod.POST})
     public List<ComboxItemVo> getRunDays(HttpServletRequest request) {
         return runCountBiz.getRunDays();
@@ -95,7 +93,6 @@ public class FrequencyController {
      * @param request
      * @return List<ComboxItemVo>
      */
-    @ResponseBody
     @RequestMapping(value = "/getRunCountTypeByDay", method = {RequestMethod.GET, RequestMethod.POST})
     public List<ComboxItemVo> getRunCountTypeByDay(HttpServletRequest request
             , @RequestParam(value = "day", required = false, defaultValue = "0") Integer day) {
@@ -119,7 +116,6 @@ public class FrequencyController {
      * @param requestVo
      * @return
      */
-    @ResponseBody
     @RequestMapping(value = "/requests", method = {RequestMethod.POST, RequestMethod.GET})
     public ResultData requests(HttpServletRequest request, RequestVo requestVo) {
         String token = RequestUtils.getToken(request);
@@ -280,7 +276,6 @@ public class FrequencyController {
      * @param requestVo RequestVo
      * @return ResultData
      */
-    @ResponseBody
     @RequestMapping(value = "/requestScans", method = {RequestMethod.POST, RequestMethod.GET})
     public ResultData requestScans(HttpServletRequest request, RequestVo requestVo
             , @RequestParam(value = "type", required = false, defaultValue ="current") String type
@@ -327,7 +322,6 @@ public class FrequencyController {
      * @param requestVo RequestVo
      * @return ResultData
      */
-    @ResponseBody
     @RequestMapping(value = "/requestMaxRunTimes", method = {RequestMethod.POST, RequestMethod.GET})
     public ResultData requestMaxRunTimes(HttpServletRequest request, RequestVo requestVo
             , @RequestParam(name = "second", defaultValue = "10") Integer second, @RequestParam(name = "count", defaultValue = "20") Integer count) {
@@ -423,7 +417,6 @@ public class FrequencyController {
      * @param userId    用户ID
      * @return
      */
-    @ResponseBody
     @RequestMapping(value = "/limits", method = {RequestMethod.POST, RequestMethod.GET})
     public ResultData limits(HttpServletRequest request, FrequencyVo frequency
             , @RequestParam(value = "ip", required = false) String ip, @RequestParam(value = "userId", required = false) String userId) {
@@ -469,7 +462,6 @@ public class FrequencyController {
      * @param userId  String
      * @return
      */
-    @ResponseBody
     @RequestMapping(value = "/locks", method = {RequestMethod.POST, RequestMethod.GET})
     public ResultData locks(HttpServletRequest request, RequestLockVo lockVo, @RequestParam(value = "userId", required = false) String userId) {
         String token = RequestUtils.getToken(request);
@@ -504,7 +496,6 @@ public class FrequencyController {
         return ResultData.success(list);
     }
 
-    @ResponseBody
     @RequestMapping(value = "/evict", method = {RequestMethod.POST, RequestMethod.GET})
     public ResultData evict(HttpServletRequest request, FrequencyVo frequency) {
         String token = RequestUtils.getToken(request);
@@ -550,7 +541,6 @@ public class FrequencyController {
      * @param frequency 频率限制信息
      * @return ResultData
      */
-    @ResponseBody
     @RequestMapping(value = "/evictTimes", method = {RequestMethod.POST, RequestMethod.GET})
     public ResultData evictTimes(HttpServletRequest request, FrequencyVo frequency) {
         String token = RequestUtils.getToken(request);
@@ -588,7 +578,6 @@ public class FrequencyController {
      * @param frequency 频率限制信息
      * @return ResultData
      */
-    @ResponseBody
     @RequestMapping(value = "/evictIpUser", method = {RequestMethod.POST, RequestMethod.GET})
     public ResultData evictIpUser(HttpServletRequest request, FrequencyVo frequency) {
         String token = RequestUtils.getToken(request);
@@ -613,7 +602,6 @@ public class FrequencyController {
      * @param frequency FrequencyVo
      * @return ResultData
      */
-    @ResponseBody
     @RequestMapping(value = "/evictUserIp", method = {RequestMethod.POST, RequestMethod.GET})
     public ResultData evictUserIp(HttpServletRequest request, FrequencyVo frequency) {
         String token = RequestUtils.getToken(request);
@@ -633,7 +621,6 @@ public class FrequencyController {
         return ResultData.success(evictKey);
     }
 
-    @ResponseBody
     @RequestMapping(value = "/lockEvict", method = {RequestMethod.POST, RequestMethod.GET})
     public ResultData lockEvict(HttpServletRequest request, RequestLockVo lockVo) {
         String token = RequestUtils.getToken(request);

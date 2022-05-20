@@ -185,6 +185,7 @@ public class AnnotationControllerUtils {
         }
         String attrName = attrNameSb.toString();
         requestVo.setMethod(methodType);
+        requestVo.setPkg(c.getPackage().getName());
         requestVo.setMethodName(method.getName());
         requestVo.setBeanName(c.getSimpleName());
         requestVo.setAnnotations(CommUtils.concat(annotations, ","));

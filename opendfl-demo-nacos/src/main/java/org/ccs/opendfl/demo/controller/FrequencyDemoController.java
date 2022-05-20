@@ -17,13 +17,11 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class FrequencyDemoController {
     @GetMapping("/serverTime")
-    @ResponseBody
     public Object serverTime(HttpServletRequest request) {
         return System.currentTimeMillis();
     }
 
     @GetMapping("/serverTimeFreq")
-    @ResponseBody
     @Frequency(limit = 5, name = "serverTimeFreq")
     public Object serverTimeFreq(HttpServletRequest request) {
         log.debug("----serverTimeFreq--");
@@ -32,7 +30,6 @@ public class FrequencyDemoController {
 
 
     @GetMapping("/waitTimeTest")
-    @ResponseBody
     @RequestLock(name = "waitTimeTest", time = 5, errMsg = "任务%s正在执行")
     public Object waitTimeTest(@RequestParam(name = "sleepTime", required = false) Integer sleepTime, HttpServletRequest request) {
         int maxSecond = 100;

@@ -65,7 +65,6 @@ public class FrequencyLoginController {
      *
      * @author chenjh
      */
-    @ResponseBody
     @GetMapping(value = "/rsaKey")
     public ResultData getRsaKey(HttpServletRequest request, @RequestParam(value = "funcCode", required = false) String funcCode) {
         String clientIdRsa = request.getSession().getId();
@@ -89,7 +88,6 @@ public class FrequencyLoginController {
      * @return ResultData
      */
     @PostMapping("/login")
-    @ResponseBody
     @Frequency(time = 5, limit = 4, name = "frequencyLogin", attrName = "username")
     @Frequency2(time = 3600, limit = 30, name = "frequencyLogin", attrName = "username")
     public ResultData login(UserVo user, @RequestParam(value = "clientIdRsa", required = false) String clientIdRsa, HttpServletRequest request) {

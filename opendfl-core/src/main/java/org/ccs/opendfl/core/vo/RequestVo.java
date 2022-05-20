@@ -13,6 +13,10 @@ public class RequestVo {
      * Conttroller类名
      */
     private String beanName;
+    /**
+     * 包名
+     */
+    private String pkg;
     private String methodName;
     private String annotations;
 
