@@ -22,6 +22,9 @@ public class WhiteBlackCheckBiz implements IWhiteBlackCheckBiz {
     private IUserBiz userBiz;
     @Autowired
     private IWhiteBlackListBiz whiteBlackListBiz;
+    public void setWhiteBlackListBiz(IWhiteBlackListBiz whiteBlackListBiz){
+        this.whiteBlackListBiz = whiteBlackListBiz;
+    }
     private static final Map<String, Long> whiteCodeMap = new ConcurrentHashMap<>();
     private static final Map<String, String> whiteUserIdsMap = new ConcurrentHashMap<>();
 
@@ -93,7 +96,7 @@ public class WhiteBlackCheckBiz implements IWhiteBlackCheckBiz {
         } else if (WhiteBlackCheckType.IP == checkType) {
             check = this.isIncludeId(id, blackConfig.getIps());
         } else if (WhiteBlackCheckType.DEVICE == checkType) {
-            if (StringUtils.ifYes(blackConfig.getIfDeviceIdRequire()) && StringUtils.isEmpty(id)) {
+            if (!StringUtils.ifYes(blackConfig.getIfDeviceIdRequire()) || StringUtils.isEmpty(id)) {
                 return false;
             }
             check = this.isIncludeId(id, blackConfig.getDeviceIds());
