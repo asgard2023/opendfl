@@ -1,5 +1,9 @@
 package org.ccs.opendfl.core.constants;
 
+/**
+ * Redis缓存时间间隔类型
+ * @author chenjh
+ */
 public enum CacheTimeType {
     CACHE_DEFAULT(CacheTimeType.DEFAULT, 600, "10分钟"),
     CACHE_30_SEC(CacheTimeType.CACHE30S, 30, "30秒"),

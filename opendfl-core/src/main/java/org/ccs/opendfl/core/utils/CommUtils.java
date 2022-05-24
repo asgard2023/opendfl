@@ -1,5 +1,6 @@
 package org.ccs.opendfl.core.utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -148,5 +149,13 @@ public final class CommUtils {
             return str;
         }
         return str+",";
+    }
+
+    public static List newList(Object ...objects){
+        List list = new ArrayList();
+        for(Object obj:objects){
+            list.add(obj);
+        }
+        return list;
     }
 }

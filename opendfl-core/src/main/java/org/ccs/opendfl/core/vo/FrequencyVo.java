@@ -2,6 +2,7 @@ package org.ccs.opendfl.core.vo;
 
 import lombok.Data;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
+import org.ccs.opendfl.core.constants.FrequencyLimitType;
 import org.ccs.opendfl.core.limitfrequency.Frequency;
 import org.ccs.opendfl.core.limitfrequency.Frequency2;
 import org.ccs.opendfl.core.limitfrequency.Frequency3;
@@ -10,7 +11,7 @@ import org.springframework.beans.BeanUtils;
 import java.util.Objects;
 
 @Data
-public class FrequencyVo{
+public class FrequencyVo {
     private String name;
     private String aliasName;
     private String requestUri;
@@ -46,7 +47,7 @@ public class FrequencyVo{
         if(frequency==null){
             vo=FrequencyVo.newInstance();
         }
-        vo.setLimitType("uriConfig");
+        vo.setLimitType(FrequencyLimitType.URI_CONFIG.getType());
         vo.name= uriConfigVo.getUri();
         vo.aliasName= uriConfigVo.getAliasName();
         vo.time= uriConfigVo.getTime();
@@ -63,7 +64,7 @@ public class FrequencyVo{
         if(frequency==null){
             return null;
         }
-        vo.setLimitType("frequency");
+        vo.setLimitType(FrequencyLimitType.FREQUENCY.getType());
         vo.name=frequency.name();
         vo.aliasName=frequency.aliasName();
         vo.time=frequency.time();
@@ -89,7 +90,7 @@ public class FrequencyVo{
         if(frequency==null){
             return null;
         }
-        vo.setLimitType("frequency2");
+        vo.setLimitType(FrequencyLimitType.FREQUENCY2.getType());
         vo.name=frequency.name();
         vo.aliasName=frequency.aliasName();
         vo.time=frequency.time();
@@ -115,7 +116,7 @@ public class FrequencyVo{
         if(frequency==null){
             return null;
         }
-        vo.setLimitType("frequency3");
+        vo.setLimitType(FrequencyLimitType.FREQUENCY3.getType());
         vo.name=frequency.name();
         vo.aliasName=frequency.aliasName();
         vo.time=frequency.time();
@@ -143,15 +144,15 @@ public class FrequencyVo{
 //                ", pageReachLog=" + pageReachLog +
 //                ", freqAttrName='" + freqAttrName + '\'' +
                 ", whiteCode=" + whiteCode +
-//                ", errMsg='" + errMsg + '\'' +
-//                ", errMsgEn='" + errMsgEn + '\'' +
+                ", errMsg='" + errMsg + '\'' +
+                ", errMsgEn='" + errMsgEn + '\'' +
                 ", sysconfig=" + sysconfig +
                 '}';
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, time, limit, userIpCount, ipUserCount);
+        return Objects.hash(name, time, limit, userIpCount, ipUserCount, errMsg, errMsgEn);
     }
 
 
