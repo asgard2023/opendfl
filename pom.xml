@@ -11,6 +11,7 @@
     <modules>
         <module>opendfl-core</module>
         <module>opendfl-console</module>
+        <module>opendfl-mysql</module>
         <module>opendfl-demo-web</module>
         <module>opendfl-demo-nacos</module>
     </modules>

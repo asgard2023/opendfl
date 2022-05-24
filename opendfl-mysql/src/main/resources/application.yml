@@ -1,0 +1,24 @@
+info:
+  app:
+    name: OpenDFL test demo
+    version: 0.1
+
+spring:
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled=true:
+  profiles:
+    include:
+      - frequency
+      - requestlock
+      - opendfl
+  redis:
+    host: localhost
+    password: ''
+    port: 6379
+    jedis:
+      pool:
+        max-idle: 100
+        max-wait: 1000ms
+

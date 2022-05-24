@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ccs.opendfl.mysql.dflbasedata.mapper.DflTypeItemMapper">
+    <resultMap id="dflTypeItemMap" type="org.ccs.opendfl.mysql.dflbasedata.po.DflTypeItemPo">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="type_id" property="typeId" jdbcType="INTEGER"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="value" property="value" jdbcType="VARCHAR"/>
+        <result column="value2" property="value2" jdbcType="VARCHAR"/>
+        <result column="order_count" property="orderCount" jdbcType="NUMERIC"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="modify_user" property="modifyUser" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="field">
+        id
+        ,
+		type_id, 
+		code, 
+		name, 
+		value, 
+		value2, 
+		order_count, 
+		remark, 
+		create_time, 
+		modify_time, 
+		create_user, 
+		modify_user
+    </sql>
+
+    <sql id="findByPage_where">
+        <where>
+            <trim suffixOverrides="and | or">
+                <if test="id != null">id = #{id, jdbcType = INTEGER} and</if>
+                <if test="typeId != null">type_id = #{typeId, jdbcType = INTEGER} and</if>
+                <if test="code != null">code = #{code, jdbcType = VARCHAR} and</if>
+                <if test="name != null">name = #{name, jdbcType = VARCHAR} and</if>
+                <if test="value != null">value = #{value, jdbcType = VARCHAR} and</if>
+                <if test="value2 != null">value2 = #{value2, jdbcType = VARCHAR} and</if>
+                <if test="orderCount != null">order_count = #{orderCount, jdbcType = NUMERIC} and</if>
+                <if test="remark != null">remark = #{remark, jdbcType = VARCHAR} and</if>
+                <if test="createTime != null">create_time = #{createTime, jdbcType = TIMESTAMP} and</if>
+                <if test="modifyTime != null">modify_time = #{modifyTime, jdbcType = TIMESTAMP} and</if>
+                <if test="createUser != null">create_user = #{createUser, jdbcType = INTEGER} and</if>
+                <if test="modifyUser != null">modify_user = #{modifyUser, jdbcType = INTEGER} and</if>
+                <if test="keywords != null and keywords != ''">
+                    and (
+                    id like concat(concat('%', #{keywords}),'%')
+                    or type_id like concat(concat('%', #{keywords}),'%')
+                    or code like concat(concat('%', #{keywords}),'%')
+                    or name like concat(concat('%', #{keywords}),'%')
+                    or value like concat(concat('%', #{keywords}),'%')
+                    or value2 like concat(concat('%', #{keywords}),'%')
+                    or order_count like concat(concat('%', #{keywords}),'%')
+                    or remark like concat(concat('%', #{keywords}),'%')
+                    or create_time like concat(concat('%', #{keywords}),'%')
+                    or modify_time like concat(concat('%', #{keywords}),'%')
+                    or create_user like concat(concat('%', #{keywords}),'%')
+                    or modify_user like concat(concat('%', #{keywords}),'%')
+                    )
+                </if>
+            </trim>
+        </where>
+    </sql>
+
+    <select id="findByPageXML" parameterType="java.util.Map" resultMap="dflTypeItemMap">
+        select
+        <include refid="field"></include>
+        from dfl_type_item
+        <include refid="findByPage_where"></include>
+        <choose>
+            <when test="sidx != null">
+                order by ${sidx} ${sord}, id desc
+            </when>
+            <otherwise>
+                order by id desc
+            </otherwise>
+        </choose>
+        <if test="page != null and rows != null">
+            limit ${startRows}, ${rows}
+        </if>
+    </select>
+
+    <select id="findCountXML" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select
+        count(1)
+        from dfl_type_item
+        <include refid="findByPage_where"></include>
+    </select>
+
+    <select id="findAllXML" parameterType="java.util.Map" resultMap="dflTypeItemMap">
+        select
+        <include refid="field"></include>
+        from dfl_type_item
+        <where>
+            <trim suffixOverrides="and | or">
+                <if test="id != null">id = #{id, jdbcType = INTEGER} and</if>
+                <if test="typeId != null">type_id = #{typeId, jdbcType = INTEGER} and</if>
+                <if test="code != null">code = #{code, jdbcType = VARCHAR} and</if>
+                <if test="name != null">name = #{name, jdbcType = VARCHAR} and</if>
+                <if test="value != null">value = #{value, jdbcType = VARCHAR} and</if>
+                <if test="value2 != null">value2 = #{value2, jdbcType = VARCHAR} and</if>
+                <if test="orderCount != null">order_count = #{orderCount, jdbcType = NUMERIC} and</if>
+                <if test="remark != null">remark = #{remark, jdbcType = VARCHAR} and</if>
+                <if test="createTime != null">create_time = #{createTime, jdbcType = TIMESTAMP} and</if>
+                <if test="modifyTime != null">modify_time = #{modifyTime, jdbcType = TIMESTAMP} and</if>
+                <if test="createUser != null">create_user = #{createUser, jdbcType = INTEGER} and</if>
+                <if test="modifyUser != null">modify_user = #{modifyUser, jdbcType = INTEGER} and</if>
+            </trim>
+        </where>
+    </select>
+
+    <select id="findByIdXML" parameterType="java.lang.String" resultMap="dflTypeItemMap">
+        select
+        <include refid="field"></include>
+        from dfl_type_item
+        <where>
+            id = #{id}
+        </where>
+    </select>
+
+    <insert id="insertXML" parameterType="org.ccs.opendfl.mysql.dflbasedata.po.DflTypeItemPo" useGeneratedKeys="true"
+            keyProperty="id" flushCache="true">
+        insert dfl_type_item
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="typeId != null">type_id,</if>
+            <if test="code != null">code,</if>
+            <if test="name != null">name,</if>
+            <if test="value != null">value,</if>
+            <if test="value2 != null">value2,</if>
+            <if test="orderCount != null">order_count,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="modifyTime != null">modify_time,</if>
+            <if test="createUser != null">create_user,</if>
+            <if test="modifyUser != null">modify_user,</if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType = INTEGER},</if>
+            <if test="typeId != null">#{typeId, jdbcType = INTEGER},</if>
+            <if test="code != null">#{code, jdbcType = VARCHAR},</if>
+            <if test="name != null">#{name, jdbcType = VARCHAR},</if>
+            <if test="value != null">#{value, jdbcType = VARCHAR},</if>
+            <if test="value2 != null">#{value2, jdbcType = VARCHAR},</if>
+            <if test="orderCount != null">#{orderCount, jdbcType = NUMERIC},</if>
+            <if test="remark != null">#{remark, jdbcType = VARCHAR},</if>
+            <if test="createTime != null">#{createTime, jdbcType = TIMESTAMP},</if>
+            <if test="modifyTime != null">#{modifyTime, jdbcType = TIMESTAMP},</if>
+            <if test="createUser != null">#{createUser, jdbcType = INTEGER},</if>
+            <if test="modifyUser != null">#{modifyUser, jdbcType = INTEGER},</if>
+        </trim>
+    </insert>
+
+    <update id="updateXML" parameterType="org.ccs.opendfl.mysql.dflbasedata.po.DflTypeItemPo" keyProperty="id">
+        update dfl_type_item
+        <set>
+            <trim suffixOverrides=",">
+                <if test="id != null">id = #{id},</if>
+                <if test="typeId != null">type_id = #{typeId},</if>
+                <if test="code != null">code = #{code},</if>
+                <if test="name != null">name = #{name},</if>
+                <if test="value != null">value = #{value},</if>
+                <if test="value2 != null">value2 = #{value2},</if>
+                <if test="orderCount != null">order_count = #{orderCount},</if>
+                <if test="remark != null">remark = #{remark},</if>
+                <if test="createTime != null">create_time = #{createTime},</if>
+                <if test="modifyTime != null">modify_time = #{modifyTime},</if>
+                <if test="createUser != null">create_user = #{createUser},</if>
+                <if test="modifyUser != null">modify_user = #{modifyUser},</if>
+            </trim>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <delete id="deleteXML" parameterType="java.lang.String">
+        delete from dfl_type_item
+        <where>
+            id = #{id}
+        </where>
+    </delete>
+</mapper>

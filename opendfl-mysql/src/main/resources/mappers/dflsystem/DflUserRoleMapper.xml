@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ccs.opendfl.mysql.dflsystem.mapper.DflUserRoleMapper">
+    <resultMap id="dflUserRoleMap" type="org.ccs.opendfl.mysql.dflsystem.po.DflUserRolePo">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+        <result column="role_id" property="roleId" jdbcType="INTEGER"/>
+        <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+        <result column="end_time" property="endTime" jdbcType="TIMESTAMP"/>
+        <result column="ext_config" property="extConfig" jdbcType="VARCHAR"/>
+        <result column="if_del" property="ifDel" jdbcType="NUMERIC"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="modify_user" property="modifyUser" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="field">
+        id
+        ,
+		user_id, 
+		role_id, 
+		start_time, 
+		end_time, 
+		ext_config, 
+		if_del, 
+		create_time, 
+		modify_time, 
+		create_user, 
+		modify_user
+    </sql>
+
+    <sql id="findByPage_where">
+        <where>
+            <trim suffixOverrides="and | or">
+                <if test="id != null">id = #{id, jdbcType = INTEGER} and</if>
+                <if test="userId != null">user_id = #{userId, jdbcType = INTEGER} and</if>
+                <if test="roleId != null">role_id = #{roleId, jdbcType = INTEGER} and</if>
+                <if test="startTime != null">start_time = #{startTime, jdbcType = TIMESTAMP} and</if>
+                <if test="endTime != null">end_time = #{endTime, jdbcType = TIMESTAMP} and</if>
+                <if test="extConfig != null">ext_config = #{extConfig, jdbcType = VARCHAR} and</if>
+                <if test="ifDel != null">if_del = #{ifDel, jdbcType = NUMERIC} and</if>
+                <if test="createTime != null">create_time = #{createTime, jdbcType = TIMESTAMP} and</if>
+                <if test="modifyTime != null">modify_time = #{modifyTime, jdbcType = TIMESTAMP} and</if>
+                <if test="createUser != null">create_user = #{createUser, jdbcType = INTEGER} and</if>
+                <if test="modifyUser != null">modify_user = #{modifyUser, jdbcType = INTEGER} and</if>
+                <if test="keywords != null and keywords != ''">
+                    and (
+                    id like concat(concat('%', #{keywords}),'%')
+                    or user_id like concat(concat('%', #{keywords}),'%')
+                    or role_id like concat(concat('%', #{keywords}),'%')
+                    or start_time like concat(concat('%', #{keywords}),'%')
+                    or end_time like concat(concat('%', #{keywords}),'%')
+                    or ext_config like concat(concat('%', #{keywords}),'%')
+                    or if_del like concat(concat('%', #{keywords}),'%')
+                    or create_time like concat(concat('%', #{keywords}),'%')
+                    or modify_time like concat(concat('%', #{keywords}),'%')
+                    or create_user like concat(concat('%', #{keywords}),'%')
+                    or modify_user like concat(concat('%', #{keywords}),'%')
+                    )
+                </if>
+            </trim>
+        </where>
+    </sql>
+
+    <select id="findByPageXML" parameterType="java.util.Map" resultMap="dflUserRoleMap">
+        select
+        <include refid="field"></include>
+        from dfl_user_role
+        <include refid="findByPage_where"></include>
+        <choose>
+            <when test="sidx != null">
+                order by ${sidx} ${sord}, id desc
+            </when>
+            <otherwise>
+                order by id desc
+            </otherwise>
+        </choose>
+        <if test="page != null and rows != null">
+            limit ${startRows}, ${rows}
+        </if>
+    </select>
+
+    <select id="findCountXML" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select
+        count(1)
+        from dfl_user_role
+        <include refid="findByPage_where"></include>
+    </select>
+
+    <select id="findAllXML" parameterType="java.util.Map" resultMap="dflUserRoleMap">
+        select
+        <include refid="field"></include>
+        from dfl_user_role
+        <where>
+            <trim suffixOverrides="and | or">
+                <if test="id != null">id = #{id, jdbcType = INTEGER} and</if>
+                <if test="userId != null">user_id = #{userId, jdbcType = INTEGER} and</if>
+                <if test="roleId != null">role_id = #{roleId, jdbcType = INTEGER} and</if>
+                <if test="startTime != null">start_time = #{startTime, jdbcType = TIMESTAMP} and</if>
+                <if test="endTime != null">end_time = #{endTime, jdbcType = TIMESTAMP} and</if>
+                <if test="extConfig != null">ext_config = #{extConfig, jdbcType = VARCHAR} and</if>
+                <if test="ifDel != null">if_del = #{ifDel, jdbcType = NUMERIC} and</if>
+                <if test="createTime != null">create_time = #{createTime, jdbcType = TIMESTAMP} and</if>
+                <if test="modifyTime != null">modify_time = #{modifyTime, jdbcType = TIMESTAMP} and</if>
+                <if test="createUser != null">create_user = #{createUser, jdbcType = INTEGER} and</if>
+                <if test="modifyUser != null">modify_user = #{modifyUser, jdbcType = INTEGER} and</if>
+            </trim>
+        </where>
+    </select>
+
+    <select id="findByIdXML" parameterType="java.lang.String" resultMap="dflUserRoleMap">
+        select
+        <include refid="field"></include>
+        from dfl_user_role
+        <where>
+            id = #{id}
+        </where>
+    </select>
+
+    <insert id="insertXML" parameterType="org.ccs.opendfl.mysql.dflsystem.po.DflUserRolePo" useGeneratedKeys="true"
+            keyProperty="id" flushCache="true">
+        insert dfl_user_role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="roleId != null">role_id,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="extConfig != null">ext_config,</if>
+            <if test="ifDel != null">if_del,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="modifyTime != null">modify_time,</if>
+            <if test="createUser != null">create_user,</if>
+            <if test="modifyUser != null">modify_user,</if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType = INTEGER},</if>
+            <if test="userId != null">#{userId, jdbcType = INTEGER},</if>
+            <if test="roleId != null">#{roleId, jdbcType = INTEGER},</if>
+            <if test="startTime != null">#{startTime, jdbcType = TIMESTAMP},</if>
+            <if test="endTime != null">#{endTime, jdbcType = TIMESTAMP},</if>
+            <if test="extConfig != null">#{extConfig, jdbcType = VARCHAR},</if>
+            <if test="ifDel != null">#{ifDel, jdbcType = NUMERIC},</if>
+            <if test="createTime != null">#{createTime, jdbcType = TIMESTAMP},</if>
+            <if test="modifyTime != null">#{modifyTime, jdbcType = TIMESTAMP},</if>
+            <if test="createUser != null">#{createUser, jdbcType = INTEGER},</if>
+            <if test="modifyUser != null">#{modifyUser, jdbcType = INTEGER},</if>
+        </trim>
+    </insert>
+
+    <update id="updateXML" parameterType="org.ccs.opendfl.mysql.dflsystem.po.DflUserRolePo" keyProperty="id">
+        update dfl_user_role
+        <set>
+            <trim suffixOverrides=",">
+                <if test="id != null">id = #{id},</if>
+                <if test="userId != null">user_id = #{userId},</if>
+                <if test="roleId != null">role_id = #{roleId},</if>
+                <if test="startTime != null">start_time = #{startTime},</if>
+                <if test="endTime != null">end_time = #{endTime},</if>
+                <if test="extConfig != null">ext_config = #{extConfig},</if>
+                <if test="ifDel != null">if_del = #{ifDel},</if>
+                <if test="createTime != null">create_time = #{createTime},</if>
+                <if test="modifyTime != null">modify_time = #{modifyTime},</if>
+                <if test="createUser != null">create_user = #{createUser},</if>
+                <if test="modifyUser != null">modify_user = #{modifyUser},</if>
+            </trim>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <delete id="deleteXML" parameterType="java.lang.String">
+        delete from dfl_user_role
+        <where>
+            id = #{id}
+        </where>
+    </delete>
+</mapper>

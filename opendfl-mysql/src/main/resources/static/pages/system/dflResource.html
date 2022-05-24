@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script type="text/javascript" src="../../scripts/easyui1.7.0/jquery.min.js"></script>
+    <script type="text/javascript" src="../../scripts/easyui1.7.0/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../../scripts/easyui1.7.0/easyui.comm.valid.js"></script>
+    <script type="text/javascript" src="../../scripts/easyui1.7.0/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="../../scripts/easyui.grid.hide.js"></script>
+    <script type="text/javascript" src="../../scripts/Common.js"></script>
+    <script type="text/javascript" src="../../scripts/comm.dict.js"></script>
+    <script type="text/javascript" src="../../scripts/DateUtils.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../scripts/easyui1.7.0/themes/bootstrap/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../../scripts/easyui1.7.0/themes/icon.css">
+
+    <style type="text/css">
+        #fm {
+            margin: 0;
+            padding: 10px 20px;
+        }
+
+        .ftitle {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 5px 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .fitem {
+            margin-bottom: 5px;
+        }
+
+        .fitem label {
+            display: inline-block;
+            width: 60px;
+        }
+
+        .input_query {
+            width: 80px;
+        }
+
+        input, textarea {
+            width: 160px;
+            border: 1px solid #ccc;
+            padding: 2px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="easyui-layout" data-options="fit:true">
+    <!-- 查询条件  -->
+    <div data-options="region:'north', title:'-条件'"
+         style="height: 80px; padding: 5px 80px;display:none;">
+        <form id="search-form">
+            <table class="search-table">
+                <tr>
+                    <td>
+                        <a class="easyui-linkbutton"
+                           data-options="iconCls:'icon-search'" id="search-btn">查询</a>
+                        <a class="easyui-linkbutton"
+                           data-options="iconCls:'icon-reload'" id="reset-btn">重置</a>
+                    </td>
+
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    <!-- 查询结果 center -->
+    <div data-options="region:'center', title:'查询结果'">
+        <div id="toolbar" style="display:none;">
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true"
+               onclick="onAdd()">新增</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="onEdit()">修改</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+               onclick="onDestroy()">删除</a>
+        </div>
+        <table id="dg" class="easyui-datagrid"
+               data-options="headers:app.headers, onDblClickRow:onDblClick, onClickRow:onClick, onLoadError:loadError, onLoadSuccess:function(){$('.datagrid-btable').find('div.datagrid-cell').css('text-align','left');}"
+               url="/dflSystem/dflResource/list2"
+               toolbar="#toolbar" pagination="true"
+               rownumbers="true" fitColumns="true" singleSelect="true" style="display:none;">
+            <thead>
+            <tr>
+                <th align="center" field="id" width="50" sortable="true" hidden="true"></th>
+                <th align="center" field="serviceId" width="50" sortable="true">所属服务ID</th>
+                <th align="center" field="uri" width="50" sortable="true">接口uri</th>
+                <th align="center" field="uriId" width="50" sortable="true"></th>
+                <th align="center" field="method" width="50" sortable="true">请求类型(GET/POST/PUT)</th>
+                <th align="center" field="resType" width="50" sortable="true">资源类型，0接口,1功能</th>
+                <th align="center" field="ifDel" width="50" sortable="true">是否删除</th>
+                <th align="center" field="createTime" width="50" sortable="true" formatter="timestampFormatDateTime">
+                    创建时间
+                </th>
+                <th align="center" field="modifyTime" width="50" sortable="true" formatter="timestampFormatDateTime">
+                    修改时间
+                </th>
+                <th align="center" field="createUser" width="50" sortable="true">创建人</th>
+                <th align="center" field="modifyUser" width="50" sortable="true">修改人</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<div id="dlg" class="easyui-dialog" style="width:400px;height:500px;padding:5px 10px;display:none;"
+     closed="true" buttons="#dlg-buttons">
+    <form id="fm" method="post" novalidate>
+        <input type="hidden" name="id">
+        <div class="fitem">
+            <label>所属服务ID:</label>
+            <input name="serviceId" class="easyui-validatebox" required="true">
+        </div>
+        <div class="fitem">
+            <label>接口uri:</label>
+            <input name="uri" class="easyui-validatebox" required="true">
+        </div>
+        <div class="fitem">
+            <label>:</label>
+            <input name="uriId" class="easyui-validatebox" required="true">
+        </div>
+        <div class="fitem">
+            <label>请求类型(GET/POST/PUT):</label>
+            <input name="method" class="easyui-validatebox" required="true">
+        </div>
+        <div class="fitem">
+            <label>资源类型，0接口,1功能:</label>
+            <input name="resType" class="easyui-validatebox" required="true">
+        </div>
+        <div class="fitem">
+            <label>是否删除:</label>
+            <input name="ifDel" class="easyui-validatebox" required="true">
+        </div>
+        <div class="fitem">
+            <label>创建时间:</label>
+            <input name="createTime" class="easyui-datebox" required="true">
+        </div>
+        <div class="fitem">
+            <label>修改时间:</label>
+            <input name="modifyTime" class="easyui-datebox" required="true">
+        </div>
+        <div class="fitem">
+            <label>创建人:</label>
+            <input name="createUser" class="easyui-validatebox" required="true">
+        </div>
+        <div class="fitem">
+            <label>修改人:</label>
+            <input name="modifyUser" class="easyui-validatebox" required="true">
+        </div>
+    </form>
+    <div id="dlg-buttons">
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-ok" onclick="onSave()">Save</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel"
+           onclick="javascript:$('#dlg').dialog('close')">Cancel</a>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $('#search-btn').click(function () {
+        doSearch();
+    });
+    $('#reset-btn').click(function () {
+        $('#search-form')[0].reset();
+    });
+
+    function doSearch() {
+        var jsonParam = $('#search-form').serializeJson();
+        $('#dg').datagrid('load', jsonParam);
+    }
+
+
+    function doSearchReload() {
+        var jsonParam = $('#search-form').serializeJson();
+        $('#dg').datagrid('reload', jsonParam);
+    }
+
+    function onDblClick(rowIndex, rowData) {
+        //alert('---onDblClick--rowIndex='+rowIndex+' row.id='+rowData.id);
+        onEdit();
+    }
+
+    function onClick(rowIndex, rowData) {
+
+    }
+
+    function listenerName(ex) {
+        if (ex.keyCode == 13) {
+            doSearch();
+        }
+    }
+
+    $('#query_code').keydown(listenerName);
+    $('#query_name').keydown(listenerName);
+
+    var url;
+
+    function onAdd() {
+        $('#dlg').dialog('open').dialog('setTitle', 'New DflResource');
+        $('#fm').form('clear');
+        $('#dflResource_status').combobox('select', '1');
+        //$("#dflResource_remark").val('test');
+    }
+
+    function getRowData(entityName, row) {
+        var tmp;
+        var obj = {}
+        obj[entityName] = {};
+        for (i in row) {
+            tmp = row[i];
+            obj[i] = tmp;
+        }
+        return obj;
+    }
+
+    function onEdit() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row) {
+            var entityName = 'dflResource';
+            $('#fm').form('clear');
+            var obj = getRowData(entityName, row);
+            $('#dlg').dialog('open').dialog('setTitle', 'Edit DflResource');
+            $('#fm').form('load', obj);
+        }
+
+    }
+
+    function onSave() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row) {
+            if (row.canModify == 0) {
+                $.messager.show({
+                    title: 'Error',
+                    msg: '不可修改，禁止操作'
+                });
+                return;
+            }
+        }
+        var url = '/dflSystem/dflResource/save';
+        var jsonParam = $('#fm').serializeJson();
+        if ($('#fm').form('validate')) {
+            $.ajax({
+                method: 'post',
+                url: url,
+                data: jsonParam,
+                headers: app.headers,
+                dataType: 'json',
+                success: function (result) {
+                    if (result.success) {
+                        $('#dlg').dialog('close');        // close the dialog
+                        $.messager.show({
+                            title: '系统消息',
+                            msg: result.errorMsg
+                        });
+                        doSearchReload();    // reload the user data
+                    } else {
+                        $.messager.show({
+                            title: '错误消息:' + result.resultCode,
+                            msg: result.errorMsg
+                        });
+                    }
+                },
+                error: function (d, e) {
+                    $.messager.show({
+                        title: e,
+                        msg: d.responseJSON.errorMsg,
+                        timeout: 3000,
+                        showType: 'slide'
+                    });
+                }
+            });
+        }
+    }
+
+    function onDestroy() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row) {
+            $.messager.confirm('删除确认', '你确定删除此记录?', function (r) {
+                if (r) {
+                    $.ajax({
+                        type: 'post',
+                        data: {id: row.id},
+                        headers: app.headers,
+                        dataType: 'json',
+                        url: '/dflSystem/dflResource/delete',
+                        success: function (data, textStatus, jqXHR) {
+                            if (data.success) {
+                                $.messager.show({    // show error message
+                                    title: '系统消息',
+                                    msg: '删除成功'
+                                });
+                                doSearchReload();    // reload the user data
+                            } else {
+                                $.messager.show({    // show error message
+                                    title: 'Error',
+                                    msg: data.errorMsg
+                                });
+                            }
+                        },
+                        error(d, e){
+                            $.messager.show({    // show error message
+                                title: 'Error',
+                                msg: d.responseJSON.errorMsg
+                            });
+                        }
+                    });
+                }
+            });
+        } else {
+            $.messager.show({
+                title: '系统提示',
+                msg: '请先选择要删除的记录'
+            });
+        }
+    }
+</script>
+</body>
+</html>

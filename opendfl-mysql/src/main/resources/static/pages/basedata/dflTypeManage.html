@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>数据字典</title>
+    <script type="text/javascript" src="../../scripts/easyui1.7.0/jquery.min.js"></script>
+    <script type="text/javascript" src="../../scripts/easyui1.7.0/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../../scripts/easyui1.7.0/easyui.comm.valid.js"></script>
+    <script type="text/javascript" src="../../scripts/easyui1.7.0/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="../../scripts/easyui.grid.hide.js"></script>
+    <script type="text/javascript" src="../../scripts/Common.js"></script>
+    <script type="text/javascript" src="../../scripts/DateUtils.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../scripts/easyui1.7.0/themes/bootstrap/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../../scripts/easyui1.7.0/themes/icon.css">
+
+    <script type="text/javascript">
+        function iframeCenterSearch(options) {
+            if (document.getElementById("iframeCenter")) {
+                try {
+                    document.getElementById("iframeCenter").contentWindow.iframeCenterSearch(options);
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>
+
+<div class="easyui-layout" data-options="fit:true">
+    <div region="west" split="true" title="Navigator" style="width:350px;">
+        <iframe id="iframeLeft" width="100%" height="100%" frameborder="0" src="dflType.html">
+        </iframe>
+    </div>
+    <div id="content" region="center" title="Language" style="padding:5px;">
+        <iframe id="iframeCenter" width="100%" height="100%" frameborder="0" src="dflTypeItem.html">
+        </iframe>
+    </div>
+</div>
+
+</body>
+</html>

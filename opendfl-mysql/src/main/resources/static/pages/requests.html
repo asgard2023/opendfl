@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>服务接口</title>
+    <script type="text/javascript" src="../scripts/easyui1.7.0/jquery.min.js"></script>
+    <script type="text/javascript" src="../scripts/easyui1.7.0/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../scripts/easyui1.7.0/easyui.comm.valid.js"></script>
+    <script type="text/javascript" src="../scripts/easyui1.7.0/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="../scripts/easyui.grid.hide.js"></script>
+    <script type="text/javascript" src="../scripts/Common.js"></script>
+    <script type="text/javascript" src="../scripts/DateUtils.js"></script>
+    <link rel="stylesheet" type="text/css" href="../scripts/easyui1.7.0/themes/bootstrap/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../scripts/easyui1.7.0/themes/icon.css">
+
+    <style type="text/css">
+        #fm {
+            margin: 0;
+            padding: 10px 30px;
+        }
+
+        .ftitle {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 5px 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .fitem {
+            margin-bottom: 5px;
+        }
+
+        .fitem label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        .input_query {
+            width: 100px;
+        }
+
+        input, textarea {
+            width: 250px;
+            border: 1px solid #ccc;
+            padding: 2px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="mainWindow" class="easyui-layout" data-options="fit:true" style="display:none">
+    <div data-options="region:'north', title:'info-所有接口首次调用时，会产生相应的接口信息记录'"
+         style="height: 80px; padding: 5px 40px;display:none;">
+        <form id="search-form">
+            <table class="search-table">
+                <tr>
+                    <td>
+                        Request Uri:
+                        <input type="text" class="input_query" name="requestUri" id="query_requestUri"/>
+                    </td>
+                    <td>
+                        method:
+                        <input type="text" class="input_query" name="method" id="query_method"/>
+                    </td>
+                    <td>
+                        <a class="easyui-linkbutton"
+                           data-options="iconCls:'icon-search'" id="search-btn">查询</a>
+                        <a class="easyui-linkbutton"
+                           data-options="iconCls:'icon-reload'" id="reset-btn">重置</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <!-- 查询结果 center -->
+    <div data-options="region:'center', title:'有请求的接口'" id="dataInfo">
+        <div id="toolbar">
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="onEdit()">Edit</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+               onclick="onClear()">Clear list</a>
+        </div>
+        <table id="dg" class="easyui-datagrid" data-options="onDblClickRow:onDblClick"
+               toolbar="#toolbar"
+               rownumbers="true" fitColumns="true" singleSelect="true" remoteSort="false">
+            <thead>
+            <tr>
+                <th field="requestUri" width="50" sortable="true">Request Uri</th>
+                <th field="methodName" width="50" sortable="true">methodName</th>
+                <th field="method" width="30" sortable="true">method</th>
+                <th field="attrName" width="50" sortable="true">attrName(默认userId)</th>
+                <th field="limitTypes" width="50" sortable="true">限制类型</th>
+                <th field="counter" width="50" sortable="true">counter</th>
+                <th field="limitCounter" width="50" sortable="true">Limited counter</th>
+                <th field="maxRunTime" width="50" sortable="true">maxRunTime(ms)</th>
+                <th field="maxRunTimeCreateTime" width="50" sortable="true" formatter="timestampFormatDateTime">
+                    maxRunCreateTime
+                </th>
+                <th field="createTime" width="50" sortable="true" formatter="timestampFormatDateTime">加载时间</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<div id="dlg" class="easyui-dialog" style="width:500px;height:600px;padding:5px 10px;display:none"
+     closed="true" buttons="#dlg-buttons">
+    <form id="fm" method="post" novalidate>
+        <div class="fitem">
+            <label>Request Uri:</label>
+            <input name="requestUri" class="easyui-validatebox">
+        </div>
+        <div class="fitem">
+            <label>methodName:</label>
+            <input name="methodName" class="easyui-validatebox">
+        </div>
+        <div class="fitem">
+            <label>method:</label>
+            <input name="method" class="easyui-validatebox">
+        </div>
+        <div class="fitem">
+            <label>attrName(默认userId):</label>
+            <input name="attrName" class="easyui-validatebox">
+        </div>
+        <div class="fitem">
+            <label>limitTypes:</label>
+            <input name="limitTypes" class="easyui-validatebox">
+        </div>
+        <fieldset>
+            <legend>
+                限制类型
+            </legend>
+            <table id="dg-frequency" class="easyui-datagrid"
+                   rownumbers="true" fitColumns="true" singleSelect="true" remoteSort="false">
+                <thead>
+                <tr>
+                    <th field="limitType" width="50" sortable="true">limitType</th>
+                    <th field="time" width="40" sortable="true">time</th>
+                    <th field="limit" width="40" sortable="true">limit</th>
+                    <th field="userIp" width="40" sortable="true">userIp</th>
+                    <th field="ipUser" width="40" sortable="true">ipUser</th>
+                </tr>
+                </thead>
+            </table>
+        </fieldset>
+        <fieldset>
+            <legend>
+                分布式锁
+            </legend>
+            <table id="dg-locks" class="easyui-datagrid"
+                   rownumbers="true" fitColumns="true" singleSelect="true" remoteSort="false">
+                <thead>
+                <tr>
+                    <th field="name" width="50" sortable="true">name</th>
+                    <th field="time" width="50" sortable="true">time</th>
+                    <th field="attrName" width="50" sortable="true">attrName</th>
+                </tr>
+                </thead>
+            </table>
+        </fieldset>
+    </form>
+    <div id="dlg-buttons">
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel"
+           onclick="javascript:$('#dlg').dialog('close')">Cancel</a>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $('#mainWindow').css('display', 'block');//用于避免chrome下页面刚打开时，画面会有一小会的格式不好的问题
+    $('#search-btn').click(function () {
+        doSearch();
+    });
+    $('#reset-btn').click(function () {
+        $('#search-form')[0].reset();
+    });
+
+    function getRowData(entityName, row) {
+        var tmp;
+        var obj = {}
+        obj[entityName] = {};
+        for (i in row) {
+            tmp = row[i];
+            obj[i] = tmp;
+        }
+        return obj;
+    }
+
+    function onEdit() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row) {
+            var entityName = 'role';
+            var obj = getRowData(entityName, row);
+            $('#dlg').dialog('open').dialog('setTitle', 'Edit Request');
+            $('#fm').form('clear');
+            $('#fm').form('load', obj);
+            $('#dg-frequency').datagrid('loadData', []);
+            $('#dg-locks').datagrid('loadData', []);
+            var limitFrequencys = row.limitFrequencys;
+            if (limitFrequencys) {
+                var datas = limitFrequencys;
+                for (var d in datas) {
+                    $('#dg-frequency').datagrid('appendRow', datas[d]);
+                }
+            }
+            var locks = row.locks;
+            if (locks) {
+                var datas = locks;
+                for (var d in datas) {
+                    $('#dg-locks').datagrid('appendRow', datas[d]);
+                }
+            }
+        }
+    }
+
+    function gridLoadError(e, d) {
+        console.log('-----gridLoadError--e=' + e + ' d=' + d)
+    }
+
+    function gridLoadSuccess(e, d) {
+        console.log('-----gridLoadSuccess--e=' + e + ' d=' + d)
+    }
+
+    function openIpLogs() {
+        $('#ipLogs').dialog('open').dialog('setTitle', 'Ip logs');
+    }
+
+    function doSearch() {
+        doSearchReload();
+    }
+
+    function loadData() {
+        var jsonParam = $('#search-form').serializeJson();
+        var url = '/frequency/requests';
+        $.ajax({
+            method: 'post',
+            url: url,
+            data: jsonParam,
+            headers: app.headers,
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+                if (data.success) {
+                    $('#dg').datagrid('loadData', []);
+                    if (data.data) {
+                        var datas = data.data;
+                        for (var d in datas) {
+                            //console.log(d);
+                            $('#dg').datagrid('appendRow', datas[d]);
+                        }
+                    }
+                } else {
+                    $.messager.show({
+                        title: 'Error',
+                        msg: data.errorMsg,
+                        timeout: 3000,
+                        showType: 'slide'
+                    });
+                }
+            },
+            error: function (d, e) {
+                $.messager.show({
+                    title: e,
+                    msg: d.responseJSON.errorMsg,
+                    timeout: 3000,
+                    showType: 'slide'
+                });
+            }
+        });
+    }
+
+    function onClear() {
+        $.messager.confirm('Confirm', '确定要清空当前的数据，以便于再次首次加载吗?', function (r) {
+            if (r) {
+                var url = '/frequency/requests?clearRequestType=clearRequest';
+                $.ajax({
+                    type: "delete",
+                    headers: app.headers,
+                    url: url,
+                    success: function (data) {
+                        if (data.success) {
+                            doSearchReload();    // reload the user data
+                        } else {
+                            showToastmessage('Error', data.errorMsg)
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function doSearchReload() {
+        loadData();
+    }
+
+    function onDblClick(rowIndex, rowData) {
+        //alert('---onDblClick--rowIndex='+rowIndex+' row.id='+rowData.id);
+        onEdit();
+    }
+
+    function listenerName(ex) {
+        if (ex.keyCode == 13) {
+            doSearch();
+        }
+    }
+
+    $('#query_code').keydown(listenerName);
+    $('#query_name').keydown(listenerName);
+
+    $(function () {
+        doSearch();
+    });
+</script>
+<script type="text/javascript">
+    //        $(top.hangge());
+</script>
+</body>
+</html>

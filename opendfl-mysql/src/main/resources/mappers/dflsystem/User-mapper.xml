@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ccs.opendfl.mysql.dflsystem.mapper.UserMapper">
+    <resultMap id="userMap" type="org.ccs.opendfl.mysql.dflsystem.po.UserPo">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="username" property="username" jdbcType="VARCHAR" />
+		<result column="pwd" property="pwd" jdbcType="VARCHAR" />
+		<result column="role" property="role" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="create_user" property="createUser" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="update_user" property="updateUser" jdbcType="VARCHAR" />
+		<result column="if_del" property="ifDel" jdbcType="NUMERIC" />
+		<result column="status" property="status" jdbcType="NUMERIC" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+    </resultMap>
+	
+	<sql id="field">
+		id, 
+		username, 
+		pwd, 
+		role, 
+		create_time, 
+		create_user, 
+		update_time, 
+		update_user, 
+		if_del, 
+		status, 
+		remark
+	</sql>
+	
+	<sql id="findByPage_where">
+		<where>
+            <trim suffixOverrides="and | or">
+				<if test="id != null">id = #{id, jdbcType = INTEGER} and</if>
+				<if test="username != null">username = #{username, jdbcType = VARCHAR} and</if>
+				<if test="pwd != null">pwd = #{pwd, jdbcType = VARCHAR} and</if>
+				<if test="role != null">role = #{role, jdbcType = VARCHAR} and</if>
+				<if test="createTime != null">create_time = #{createTime, jdbcType = TIMESTAMP} and</if>
+				<if test="createUser != null">create_user = #{createUser, jdbcType = VARCHAR} and</if>
+				<if test="updateTime != null">update_time = #{updateTime, jdbcType = TIMESTAMP} and</if>
+				<if test="updateUser != null">update_user = #{updateUser, jdbcType = VARCHAR} and</if>
+				<if test="ifDel != null">if_del = #{ifDel, jdbcType = NUMERIC} and</if>
+				<if test="status != null">status = #{status, jdbcType = NUMERIC} and</if>
+				<if test="remark != null">remark = #{remark, jdbcType = VARCHAR} and</if>
+            <if test="keywords != null and keywords != ''">
+				and (
+					id like concat(concat('%', #{keywords}),'%')
+					or username like concat(concat('%', #{keywords}),'%')
+					or pwd like concat(concat('%', #{keywords}),'%')
+					or role like concat(concat('%', #{keywords}),'%')
+					or create_time like concat(concat('%', #{keywords}),'%')
+					or create_user like concat(concat('%', #{keywords}),'%')
+					or update_time like concat(concat('%', #{keywords}),'%')
+					or update_user like concat(concat('%', #{keywords}),'%')
+					or if_del like concat(concat('%', #{keywords}),'%')
+					or status like concat(concat('%', #{keywords}),'%')
+					or remark like concat(concat('%', #{keywords}),'%')
+				)
+			</if>
+            </trim>
+        </where>
+	</sql>
+    
+    <select id="findByPageXML" parameterType="java.util.Map" resultMap="userMap">
+        select
+        <include refid="field"></include>
+        from dfl_user
+        <include refid="findByPage_where"></include>
+        <choose>
+	        <when test="sidx != null">
+	        	order by ${sidx} ${sord}, id desc
+	        </when>
+	        <otherwise>
+	        	order by id desc
+	        </otherwise>
+        </choose>
+        <if test="page != null and rows != null">
+			limit ${startRows}, ${rows}      
+        </if>
+    </select>
+    
+    <select id="findCountXML" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select
+        count(1)
+        from dfl_user
+        <include refid="findByPage_where"></include>
+    </select>
+    
+    <select id="findAllXML" parameterType="java.util.Map" resultMap="userMap">
+        select
+        <include refid="field"></include>
+        from dfl_user
+        <where>
+            <trim suffixOverrides="and | or">
+					<if test="id != null">id = #{id, jdbcType = INTEGER} and</if>
+					<if test="username != null">username = #{username, jdbcType = VARCHAR} and</if>
+					<if test="pwd != null">pwd = #{pwd, jdbcType = VARCHAR} and</if>
+					<if test="role != null">role = #{role, jdbcType = VARCHAR} and</if>
+					<if test="createTime != null">create_time = #{createTime, jdbcType = TIMESTAMP} and</if>
+					<if test="createUser != null">create_user = #{createUser, jdbcType = VARCHAR} and</if>
+					<if test="updateTime != null">update_time = #{updateTime, jdbcType = TIMESTAMP} and</if>
+					<if test="updateUser != null">update_user = #{updateUser, jdbcType = VARCHAR} and</if>
+					<if test="ifDel != null">if_del = #{ifDel, jdbcType = NUMERIC} and</if>
+					<if test="status != null">status = #{status, jdbcType = NUMERIC} and</if>
+					<if test="remark != null">remark = #{remark, jdbcType = VARCHAR} and</if>
+            </trim>
+        </where>
+    </select>
+    
+    <select id="findByIdXML" parameterType="java.lang.String" resultMap="userMap">
+        select
+        <include refid="field"></include>
+        from dfl_user
+        <where>
+            id = #{id}
+        </where>
+    </select>
+
+    <insert id="insertXML" parameterType="org.ccs.opendfl.mysql.dflsystem.po.UserPo" useGeneratedKeys="true" keyProperty="id" flushCache="true">
+        insert dfl_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+        	<if test="id != null">id,</if>
+        	<if test="username != null">username,</if>
+        	<if test="pwd != null">pwd,</if>
+        	<if test="role != null">role,</if>
+        	<if test="createTime != null">create_time,</if>
+        	<if test="createUser != null">create_user,</if>
+        	<if test="updateTime != null">update_time,</if>
+        	<if test="updateUser != null">update_user,</if>
+        	<if test="ifDel != null">if_del,</if>
+        	<if test="status != null">status,</if>
+        	<if test="remark != null">remark,</if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+        	<if test="id != null">#{id, jdbcType = INTEGER},</if>
+        	<if test="username != null">#{username, jdbcType = VARCHAR},</if>
+        	<if test="pwd != null">#{pwd, jdbcType = VARCHAR},</if>
+        	<if test="role != null">#{role, jdbcType = VARCHAR},</if>
+        	<if test="createTime != null">#{createTime, jdbcType = TIMESTAMP},</if>
+        	<if test="createUser != null">#{createUser, jdbcType = VARCHAR},</if>
+        	<if test="updateTime != null">#{updateTime, jdbcType = TIMESTAMP},</if>
+        	<if test="updateUser != null">#{updateUser, jdbcType = VARCHAR},</if>
+        	<if test="ifDel != null">#{ifDel, jdbcType = NUMERIC},</if>
+        	<if test="status != null">#{status, jdbcType = NUMERIC},</if>
+        	<if test="remark != null">#{remark, jdbcType = VARCHAR},</if>
+        </trim>
+    </insert>
+
+    <update id="updateXML" parameterType="org.ccs.opendfl.mysql.dflsystem.po.UserPo" keyProperty="id">
+        update dfl_user 
+        <set>
+            <trim suffixOverrides=",">
+        		<if test="id != null">id = #{id},</if>
+        		<if test="username != null">username = #{username},</if>
+        		<if test="pwd != null">pwd = #{pwd},</if>
+        		<if test="role != null">role = #{role},</if>
+        		<if test="createTime != null">create_time = #{createTime},</if>
+        		<if test="createUser != null">create_user = #{createUser},</if>
+        		<if test="updateTime != null">update_time = #{updateTime},</if>
+        		<if test="updateUser != null">update_user = #{updateUser},</if>
+        		<if test="ifDel != null">if_del = #{ifDel},</if>
+        		<if test="status != null">status = #{status},</if>
+        		<if test="remark != null">remark = #{remark},</if>
+            </trim>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <delete id="deleteXML" parameterType="java.lang.String">
+        delete from dfl_user
+        <where>
+            id = #{id}
+        </where>
+    </delete>
+</mapper>

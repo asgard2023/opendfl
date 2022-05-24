@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ccs.opendfl.mysql.dfllogs.mapper.DflLogUserMapper">
+    <resultMap id="dflLogUserMap" type="org.ccs.opendfl.mysql.dfllogs.po.DflLogUserPo">
+        <id column="id" property="id" jdbcType="DECIMAL"/>
+        <result column="userId" property="userid" jdbcType="VARCHAR"/>
+        <result column="user_type" property="userType" jdbcType="NUMERIC"/>
+        <result column="nickname" property="nickname" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="if_del" property="ifDel" jdbcType="NUMERIC"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="field">
+        id
+        ,
+		userId, 
+		user_type, 
+		nickname, 
+		remark, 
+		if_del, 
+		create_time
+    </sql>
+
+    <sql id="findByPage_where">
+        <where>
+            <trim suffixOverrides="and | or">
+                <if test="id != null">id = #{id, jdbcType = DECIMAL} and</if>
+                <if test="userid != null">userId = #{userid, jdbcType = VARCHAR} and</if>
+                <if test="userType != null">user_type = #{userType, jdbcType = NUMERIC} and</if>
+                <if test="nickname != null">nickname = #{nickname, jdbcType = VARCHAR} and</if>
+                <if test="remark != null">remark = #{remark, jdbcType = VARCHAR} and</if>
+                <if test="ifDel != null">if_del = #{ifDel, jdbcType = NUMERIC} and</if>
+                <if test="createTime != null">create_time = #{createTime, jdbcType = TIMESTAMP} and</if>
+                <if test="keywords != null and keywords != ''">
+                    and (
+                    id like concat(concat('%', #{keywords}),'%')
+                    or userId like concat(concat('%', #{keywords}),'%')
+                    or user_type like concat(concat('%', #{keywords}),'%')
+                    or nickname like concat(concat('%', #{keywords}),'%')
+                    or remark like concat(concat('%', #{keywords}),'%')
+                    or if_del like concat(concat('%', #{keywords}),'%')
+                    or create_time like concat(concat('%', #{keywords}),'%')
+                    )
+                </if>
+            </trim>
+        </where>
+    </sql>
+
+    <select id="findByPageXML" parameterType="java.util.Map" resultMap="dflLogUserMap">
+        select
+        <include refid="field"></include>
+        from dfl_log_user
+        <include refid="findByPage_where"></include>
+        <choose>
+            <when test="sidx != null">
+                order by ${sidx} ${sord}, id desc
+            </when>
+            <otherwise>
+                order by id desc
+            </otherwise>
+        </choose>
+        <if test="page != null and rows != null">
+            limit ${startRows}, ${rows}
+        </if>
+    </select>
+
+    <select id="findCountXML" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select
+        count(1)
+        from dfl_log_user
+        <include refid="findByPage_where"></include>
+    </select>
+
+    <select id="findAllXML" parameterType="java.util.Map" resultMap="dflLogUserMap">
+        select
+        <include refid="field"></include>
+        from dfl_log_user
+        <where>
+            <trim suffixOverrides="and | or">
+                <if test="id != null">id = #{id, jdbcType = DECIMAL} and</if>
+                <if test="userid != null">userId = #{userid, jdbcType = VARCHAR} and</if>
+                <if test="userType != null">user_type = #{userType, jdbcType = NUMERIC} and</if>
+                <if test="nickname != null">nickname = #{nickname, jdbcType = VARCHAR} and</if>
+                <if test="remark != null">remark = #{remark, jdbcType = VARCHAR} and</if>
+                <if test="ifDel != null">if_del = #{ifDel, jdbcType = NUMERIC} and</if>
+                <if test="createTime != null">create_time = #{createTime, jdbcType = TIMESTAMP} and</if>
+            </trim>
+        </where>
+    </select>
+
+    <select id="findByIdXML" parameterType="java.lang.String" resultMap="dflLogUserMap">
+        select
+        <include refid="field"></include>
+        from dfl_log_user
+        <where>
+            id = #{id}
+        </where>
+    </select>
+
+    <insert id="insertXML" parameterType="org.ccs.opendfl.mysql.dfllogs.po.DflLogUserPo" useGeneratedKeys="true"
+            keyProperty="id" flushCache="true">
+        insert dfl_log_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="userid != null">userId,</if>
+            <if test="userType != null">user_type,</if>
+            <if test="nickname != null">nickname,</if>
+            <if test="remark != null">remark,</if>
+            <if test="ifDel != null">if_del,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType = DECIMAL},</if>
+            <if test="userid != null">#{userid, jdbcType = VARCHAR},</if>
+            <if test="userType != null">#{userType, jdbcType = NUMERIC},</if>
+            <if test="nickname != null">#{nickname, jdbcType = VARCHAR},</if>
+            <if test="remark != null">#{remark, jdbcType = VARCHAR},</if>
+            <if test="ifDel != null">#{ifDel, jdbcType = NUMERIC},</if>
+            <if test="createTime != null">#{createTime, jdbcType = TIMESTAMP},</if>
+        </trim>
+    </insert>
+
+    <update id="updateXML" parameterType="org.ccs.opendfl.mysql.dfllogs.po.DflLogUserPo" keyProperty="id">
+        update dfl_log_user
+        <set>
+            <trim suffixOverrides=",">
+                <if test="id != null">id = #{id},</if>
+                <if test="userid != null">userId = #{userid},</if>
+                <if test="userType != null">user_type = #{userType},</if>
+                <if test="nickname != null">nickname = #{nickname},</if>
+                <if test="remark != null">remark = #{remark},</if>
+                <if test="ifDel != null">if_del = #{ifDel},</if>
+                <if test="createTime != null">create_time = #{createTime},</if>
+            </trim>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <delete id="deleteXML" parameterType="java.lang.String">
+        delete from dfl_log_user
+        <where>
+            id = #{id}
+        </where>
+    </delete>
+</mapper>

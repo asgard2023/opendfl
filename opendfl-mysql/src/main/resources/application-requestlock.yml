@@ -1,0 +1,6 @@
+requestlock:
+  redisPrefix: 'limitLock'
+  ifActive: '1'
+  lockConfigs:
+    - name: waitLockTestUser
+      time: 20

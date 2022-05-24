@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ccs.opendfl.mysql.dfllogs.mapper.DflAuditLogMapper">
+    <resultMap id="dflAuditLogMap" type="org.ccs.opendfl.mysql.dfllogs.po.DflAuditLogPo">
+        <id column="id" property="id" jdbcType="DECIMAL"/>
+        <result column="uri" property="uri" jdbcType="VARCHAR"/>
+        <result column="uri_id" property="uriId" jdbcType="INTEGER"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+        <result column="role_id" property="roleId" jdbcType="INTEGER"/>
+        <result column="ip" property="ip" jdbcType="VARCHAR"/>
+        <result column="sys_type" property="sysType" jdbcType="NUMERIC"/>
+        <result column="oper_type" property="operType" jdbcType="VARCHAR"/>
+        <result column="attr_data" property="attrData" jdbcType="VARCHAR"/>
+        <result column="times" property="times" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="field">
+        id
+        ,
+		uri, 
+		uri_id, 
+		user_id, 
+		role_id, 
+		ip, 
+		sys_type, 
+		oper_type, 
+		attr_data, 
+		times, 
+		create_time
+    </sql>
+
+    <sql id="findByPage_where">
+        <where>
+            <trim suffixOverrides="and | or">
+                <if test="id != null">id = #{id, jdbcType = DECIMAL} and</if>
+                <if test="uri != null">uri = #{uri, jdbcType = VARCHAR} and</if>
+                <if test="uriId != null">uri_id = #{uriId, jdbcType = INTEGER} and</if>
+                <if test="userId != null">user_id = #{userId, jdbcType = INTEGER} and</if>
+                <if test="roleId != null">role_id = #{roleId, jdbcType = INTEGER} and</if>
+                <if test="ip != null">ip = #{ip, jdbcType = VARCHAR} and</if>
+                <if test="sysType != null">sys_type = #{sysType, jdbcType = NUMERIC} and</if>
+                <if test="operType != null">oper_type = #{operType, jdbcType = VARCHAR} and</if>
+                <if test="attrData != null">attr_data = #{attrData, jdbcType = VARCHAR} and</if>
+                <if test="times != null">times = #{times, jdbcType = VARCHAR} and</if>
+                <if test="createTime != null">create_time = #{createTime, jdbcType = TIMESTAMP} and</if>
+                <if test="keywords != null and keywords != ''">
+                    and (
+                    id like concat(concat('%', #{keywords}),'%')
+                    or uri like concat(concat('%', #{keywords}),'%')
+                    or uri_id like concat(concat('%', #{keywords}),'%')
+                    or user_id like concat(concat('%', #{keywords}),'%')
+                    or role_id like concat(concat('%', #{keywords}),'%')
+                    or ip like concat(concat('%', #{keywords}),'%')
+                    or sys_type like concat(concat('%', #{keywords}),'%')
+                    or oper_type like concat(concat('%', #{keywords}),'%')
+                    or attr_data like concat(concat('%', #{keywords}),'%')
+                    or times like concat(concat('%', #{keywords}),'%')
+                    or create_time like concat(concat('%', #{keywords}),'%')
+                    )
+                </if>
+            </trim>
+        </where>
+    </sql>
+
+    <select id="findByPageXML" parameterType="java.util.Map" resultMap="dflAuditLogMap">
+        select
+        <include refid="field"></include>
+        from dfl_audit_log
+        <include refid="findByPage_where"></include>
+        <choose>
+            <when test="sidx != null">
+                order by ${sidx} ${sord}, id desc
+            </when>
+            <otherwise>
+                order by id desc
+            </otherwise>
+        </choose>
+        <if test="page != null and rows != null">
+            limit ${startRows}, ${rows}
+        </if>
+    </select>
+
+    <select id="findCountXML" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select
+        count(1)
+        from dfl_audit_log
+        <include refid="findByPage_where"></include>
+    </select>
+
+    <select id="findAllXML" parameterType="java.util.Map" resultMap="dflAuditLogMap">
+        select
+        <include refid="field"></include>
+        from dfl_audit_log
+        <where>
+            <trim suffixOverrides="and | or">
+                <if test="id != null">id = #{id, jdbcType = DECIMAL} and</if>
+                <if test="uri != null">uri = #{uri, jdbcType = VARCHAR} and</if>
+                <if test="uriId != null">uri_id = #{uriId, jdbcType = INTEGER} and</if>
+                <if test="userId != null">user_id = #{userId, jdbcType = INTEGER} and</if>
+                <if test="roleId != null">role_id = #{roleId, jdbcType = INTEGER} and</if>
+                <if test="ip != null">ip = #{ip, jdbcType = VARCHAR} and</if>
+                <if test="sysType != null">sys_type = #{sysType, jdbcType = NUMERIC} and</if>
+                <if test="operType != null">oper_type = #{operType, jdbcType = VARCHAR} and</if>
+                <if test="attrData != null">attr_data = #{attrData, jdbcType = VARCHAR} and</if>
+                <if test="times != null">times = #{times, jdbcType = VARCHAR} and</if>
+                <if test="createTime != null">create_time = #{createTime, jdbcType = TIMESTAMP} and</if>
+            </trim>
+        </where>
+    </select>
+
+    <select id="findByIdXML" parameterType="java.lang.String" resultMap="dflAuditLogMap">
+        select
+        <include refid="field"></include>
+        from dfl_audit_log
+        <where>
+            id = #{id}
+        </where>
+    </select>
+
+    <insert id="insertXML" parameterType="org.ccs.opendfl.mysql.dfllogs.po.DflAuditLogPo" useGeneratedKeys="true"
+            keyProperty="id" flushCache="true">
+        insert dfl_audit_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="uri != null">uri,</if>
+            <if test="uriId != null">uri_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="roleId != null">role_id,</if>
+            <if test="ip != null">ip,</if>
+            <if test="sysType != null">sys_type,</if>
+            <if test="operType != null">oper_type,</if>
+            <if test="attrData != null">attr_data,</if>
+            <if test="times != null">times,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType = DECIMAL},</if>
+            <if test="uri != null">#{uri, jdbcType = VARCHAR},</if>
+            <if test="uriId != null">#{uriId, jdbcType = INTEGER},</if>
+            <if test="userId != null">#{userId, jdbcType = INTEGER},</if>
+            <if test="roleId != null">#{roleId, jdbcType = INTEGER},</if>
+            <if test="ip != null">#{ip, jdbcType = VARCHAR},</if>
+            <if test="sysType != null">#{sysType, jdbcType = NUMERIC},</if>
+            <if test="operType != null">#{operType, jdbcType = VARCHAR},</if>
+            <if test="attrData != null">#{attrData, jdbcType = VARCHAR},</if>
+            <if test="times != null">#{times, jdbcType = VARCHAR},</if>
+            <if test="createTime != null">#{createTime, jdbcType = TIMESTAMP},</if>
+        </trim>
+    </insert>
+
+    <update id="updateXML" parameterType="org.ccs.opendfl.mysql.dfllogs.po.DflAuditLogPo" keyProperty="id">
+        update dfl_audit_log
+        <set>
+            <trim suffixOverrides=",">
+                <if test="id != null">id = #{id},</if>
+                <if test="uri != null">uri = #{uri},</if>
+                <if test="uriId != null">uri_id = #{uriId},</if>
+                <if test="userId != null">user_id = #{userId},</if>
+                <if test="roleId != null">role_id = #{roleId},</if>
+                <if test="ip != null">ip = #{ip},</if>
+                <if test="sysType != null">sys_type = #{sysType},</if>
+                <if test="operType != null">oper_type = #{operType},</if>
+                <if test="attrData != null">attr_data = #{attrData},</if>
+                <if test="times != null">times = #{times},</if>
+                <if test="createTime != null">create_time = #{createTime},</if>
+            </trim>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <delete id="deleteXML" parameterType="java.lang.String">
+        delete from dfl_audit_log
+        <where>
+            id = #{id}
+        </where>
+    </delete>
+</mapper>

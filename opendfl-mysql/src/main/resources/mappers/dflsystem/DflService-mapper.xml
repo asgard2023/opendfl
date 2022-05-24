@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ccs.opendfl.mysql.dflsystem.mapper.DflServiceMapper">
+    <resultMap id="dflServiceMap" type="org.ccs.opendfl.mysql.dflsystem.po.DflServicePo">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="service_type" property="serviceType" jdbcType="VARCHAR"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="descs" property="descs" jdbcType="VARCHAR"/>
+        <result column="author" property="author" jdbcType="VARCHAR"/>
+        <result column="url" property="url" jdbcType="VARCHAR"/>
+        <result column="wiki_url" property="wikiUrl" jdbcType="VARCHAR"/>
+        <result column="if_del" property="ifDel" jdbcType="NUMERIC"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="modify_user" property="modifyUser" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="field">
+        id
+        ,
+		service_type, 
+		code, 
+		name, 
+		descs, 
+		author, 
+		url, 
+		wiki_url, 
+		if_del, 
+		create_time, 
+		modify_time, 
+		create_user, 
+		modify_user
+    </sql>
+
+    <sql id="findByPage_where">
+        <where>
+            <trim suffixOverrides="and | or">
+                <if test="id != null">id = #{id, jdbcType = INTEGER} and</if>
+                <if test="serviceType != null">service_type = #{serviceType, jdbcType = VARCHAR} and</if>
+                <if test="code != null">code = #{code, jdbcType = VARCHAR} and</if>
+                <if test="name != null">name = #{name, jdbcType = VARCHAR} and</if>
+                <if test="descs != null">descs = #{descs, jdbcType = VARCHAR} and</if>
+                <if test="author != null">author = #{author, jdbcType = VARCHAR} and</if>
+                <if test="url != null">url = #{url, jdbcType = VARCHAR} and</if>
+                <if test="wikiUrl != null">wiki_url = #{wikiUrl, jdbcType = VARCHAR} and</if>
+                <if test="ifDel != null">if_del = #{ifDel, jdbcType = NUMERIC} and</if>
+                <if test="createTime != null">create_time = #{createTime, jdbcType = TIMESTAMP} and</if>
+                <if test="modifyTime != null">modify_time = #{modifyTime, jdbcType = TIMESTAMP} and</if>
+                <if test="createUser != null">create_user = #{createUser, jdbcType = INTEGER} and</if>
+                <if test="modifyUser != null">modify_user = #{modifyUser, jdbcType = INTEGER} and</if>
+                <if test="keywords != null and keywords != ''">
+                    and (
+                    id like concat(concat('%', #{keywords}),'%')
+                    or service_type like concat(concat('%', #{keywords}),'%')
+                    or code like concat(concat('%', #{keywords}),'%')
+                    or name like concat(concat('%', #{keywords}),'%')
+                    or descs like concat(concat('%', #{keywords}),'%')
+                    or author like concat(concat('%', #{keywords}),'%')
+                    or url like concat(concat('%', #{keywords}),'%')
+                    or wiki_url like concat(concat('%', #{keywords}),'%')
+                    or if_del like concat(concat('%', #{keywords}),'%')
+                    or create_time like concat(concat('%', #{keywords}),'%')
+                    or modify_time like concat(concat('%', #{keywords}),'%')
+                    or create_user like concat(concat('%', #{keywords}),'%')
+                    or modify_user like concat(concat('%', #{keywords}),'%')
+                    )
+                </if>
+            </trim>
+        </where>
+    </sql>
+
+    <select id="findByPageXML" parameterType="java.util.Map" resultMap="dflServiceMap">
+        select
+        <include refid="field"></include>
+        from dfl_service
+        <include refid="findByPage_where"></include>
+        <choose>
+            <when test="sidx != null">
+                order by ${sidx} ${sord}, id desc
+            </when>
+            <otherwise>
+                order by id desc
+            </otherwise>
+        </choose>
+        <if test="page != null and rows != null">
+            limit ${startRows}, ${rows}
+        </if>
+    </select>
+
+    <select id="findCountXML" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select
+        count(1)
+        from dfl_service
+        <include refid="findByPage_where"></include>
+    </select>
+
+    <select id="findAllXML" parameterType="java.util.Map" resultMap="dflServiceMap">
+        select
+        <include refid="field"></include>
+        from dfl_service
+        <where>
+            <trim suffixOverrides="and | or">
+                <if test="id != null">id = #{id, jdbcType = INTEGER} and</if>
+                <if test="serviceType != null">service_type = #{serviceType, jdbcType = VARCHAR} and</if>
+                <if test="code != null">code = #{code, jdbcType = VARCHAR} and</if>
+                <if test="name != null">name = #{name, jdbcType = VARCHAR} and</if>
+                <if test="descs != null">descs = #{descs, jdbcType = VARCHAR} and</if>
+                <if test="author != null">author = #{author, jdbcType = VARCHAR} and</if>
+                <if test="url != null">url = #{url, jdbcType = VARCHAR} and</if>
+                <if test="wikiUrl != null">wiki_url = #{wikiUrl, jdbcType = VARCHAR} and</if>
+                <if test="ifDel != null">if_del = #{ifDel, jdbcType = NUMERIC} and</if>
+                <if test="createTime != null">create_time = #{createTime, jdbcType = TIMESTAMP} and</if>
+                <if test="modifyTime != null">modify_time = #{modifyTime, jdbcType = TIMESTAMP} and</if>
+                <if test="createUser != null">create_user = #{createUser, jdbcType = INTEGER} and</if>
+                <if test="modifyUser != null">modify_user = #{modifyUser, jdbcType = INTEGER} and</if>
+            </trim>
+        </where>
+    </select>
+
+    <select id="findByIdXML" parameterType="java.lang.String" resultMap="dflServiceMap">
+        select
+        <include refid="field"></include>
+        from dfl_service
+        <where>
+            id = #{id}
+        </where>
+    </select>
+
+    <insert id="insertXML" parameterType="org.ccs.opendfl.mysql.dflsystem.po.DflServicePo" useGeneratedKeys="true"
+            keyProperty="id" flushCache="true">
+        insert dfl_service
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="serviceType != null">service_type,</if>
+            <if test="code != null">code,</if>
+            <if test="name != null">name,</if>
+            <if test="descs != null">descs,</if>
+            <if test="author != null">author,</if>
+            <if test="url != null">url,</if>
+            <if test="wikiUrl != null">wiki_url,</if>
+            <if test="ifDel != null">if_del,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="modifyTime != null">modify_time,</if>
+            <if test="createUser != null">create_user,</if>
+            <if test="modifyUser != null">modify_user,</if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType = INTEGER},</if>
+            <if test="serviceType != null">#{serviceType, jdbcType = VARCHAR},</if>
+            <if test="code != null">#{code, jdbcType = VARCHAR},</if>
+            <if test="name != null">#{name, jdbcType = VARCHAR},</if>
+            <if test="descs != null">#{descs, jdbcType = VARCHAR},</if>
+            <if test="author != null">#{author, jdbcType = VARCHAR},</if>
+            <if test="url != null">#{url, jdbcType = VARCHAR},</if>
+            <if test="wikiUrl != null">#{wikiUrl, jdbcType = VARCHAR},</if>
+            <if test="ifDel != null">#{ifDel, jdbcType = NUMERIC},</if>
+            <if test="createTime != null">#{createTime, jdbcType = TIMESTAMP},</if>
+            <if test="modifyTime != null">#{modifyTime, jdbcType = TIMESTAMP},</if>
+            <if test="createUser != null">#{createUser, jdbcType = INTEGER},</if>
+            <if test="modifyUser != null">#{modifyUser, jdbcType = INTEGER},</if>
+        </trim>
+    </insert>
+
+    <update id="updateXML" parameterType="org.ccs.opendfl.mysql.dflsystem.po.DflServicePo" keyProperty="id">
+        update dfl_service
+        <set>
+            <trim suffixOverrides=",">
+                <if test="id != null">id = #{id},</if>
+                <if test="serviceType != null">service_type = #{serviceType},</if>
+                <if test="code != null">code = #{code},</if>
+                <if test="name != null">name = #{name},</if>
+                <if test="descs != null">descs = #{descs},</if>
+                <if test="author != null">author = #{author},</if>
+                <if test="url != null">url = #{url},</if>
+                <if test="wikiUrl != null">wiki_url = #{wikiUrl},</if>
+                <if test="ifDel != null">if_del = #{ifDel},</if>
+                <if test="createTime != null">create_time = #{createTime},</if>
+                <if test="modifyTime != null">modify_time = #{modifyTime},</if>
+                <if test="createUser != null">create_user = #{createUser},</if>
+                <if test="modifyUser != null">modify_user = #{modifyUser},</if>
+            </trim>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <delete id="deleteXML" parameterType="java.lang.String">
+        delete from dfl_service
+        <where>
+            id = #{id}
+        </where>
+    </delete>
+</mapper>

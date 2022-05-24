@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>频率限制属性表</title>
+    <script type="text/javascript" src="../scripts/easyui1.7.0/jquery.min.js"></script>
+    <script type="text/javascript" src="../scripts/easyui1.7.0/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../scripts/easyui1.7.0/easyui.comm.valid.js"></script>
+    <script type="text/javascript" src="../scripts/easyui1.7.0/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="../scripts/easyui.grid.hide.js"></script>
+    <script type="text/javascript" src="../scripts/Common.js"></script>
+    <script type="text/javascript" src="../scripts/DateUtils.js"></script>
+    <link rel="stylesheet" type="text/css" href="../scripts/easyui1.7.0/themes/bootstrap/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../scripts/easyui1.7.0/themes/icon.css">
+    <style type="text/css">
+        #fm {
+            margin: 0;
+            padding: 10px 30px;
+        }
+
+        .ftitle {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 5px 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .fitem {
+            margin-bottom: 5px;
+        }
+
+        .fitem label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        .input_query {
+            width: 100px;
+        }
+
+        input, textarea {
+            width: 250px;
+            border: 1px solid #ccc;
+            padding: 2px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="mainWindow" class="easyui-layout" data-options="fit:true" style="display:none">
+    <div data-options="region:'north', title:'info-频率限制接口首次调用时，会产生相应的接口信息记录'"
+         style="height: 80px; padding: 5px 40px;display:none;">
+        <form id="search-form">
+            <table class="search-table">
+                <tr>
+                    <td>
+                        Request Uri:
+                        <input type="text" class="input_query" name="requestUri" id="query_requestUri"/>
+                    </td>
+                    <td>
+                        time(秒):
+                        <input type="text" class="input_query" name="time" id="query_time"/>
+                    </td>
+                    <td>&nbsp;&nbsp;&nbsp;已限制的数据:</td>
+                    <td>
+                        attrValue(userId):
+                        <input type="text" class="input_query" name="userId" id="query_userId"/>
+                    </td>
+                    <td>
+                        IP:
+                        <input type="text" class="input_query" name="ip" id="query_ip"/>
+                    </td>
+                    <td>
+                        <a class="easyui-linkbutton"
+                           data-options="iconCls:'icon-search'" id="search-btn">查询</a>
+                        <a class="easyui-linkbutton"
+                           data-options="iconCls:'icon-reload'" id="reset-btn">重置</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <!-- 查询结果 center -->
+    <div data-options="region:'center', title:'频率限制@Frequency'" id="dataInfo">
+        <div id="toolbar">
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="onEdit()">Edit</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+               onclick="onClear()">Clear list</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="onEvict()">Evict</a>
+        </div>
+        <table id="dg" class="easyui-datagrid" data-options="onDblClickRow:onDblClick"
+               toolbar="#toolbar"
+               rownumbers="true" fitColumns="true" singleSelect="true" remoteSort="false">
+            <thead>
+            <tr>
+                <th field="requestUri" width="70" sortable="true">Request Uri</th>
+                <th field="name" width="50" sortable="true">name</th>
+                <th field="aliasName" width="30" sortable="true">别名</th>
+                <th field="attrName" width="50" sortable="true">attrName(默认userId)</th>
+                <th field="time" width="30" sortable="true">time(秒)</th>
+                <th field="needLogin" width="50" sortable="true">是否需要登入</th>
+                <th field="limit" width="30" sortable="true">上限</th>
+                <th field="userIpCount" width="30" sortable="true">userIp</th>
+                <th field="ipUserCount" width="30" sortable="true">ipUser</th>
+                <th field="sysconfig" width="30" sortable="true">动态配置参数</th>
+                <th field="whiteCode" width="30" sortable="true">白名单</th>
+                <th field="errMsg" width="70" sortable="true">errMsg</th>
+                <th field="errMsgEn" width="40" sortable="true">errMsgEn</th>
+                <th field="createTime" width="60" sortable="true" formatter="timestampFormatDateTime">加载时间</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<div id="dlg" class="easyui-dialog" style="width:500px;height:600px;padding:5px 10px;display:none"
+     closed="true" buttons="#dlg-buttons">
+    <form id="fm" method="post" novalidate>
+        <fieldset>
+            <legend>
+                基本信息
+            </legend>
+            <div class="fitem">
+                <label>Request Uri:</label>
+                <input name="requestUri" class="easyui-validatebox">
+            </div>
+            <div class="fitem">
+                <label>name:</label>
+                <input name="name" class="easyui-validatebox">
+            </div>
+            <div class="fitem">
+                <label>aliasName:</label>
+                <input name="aliasName" class="easyui-validatebox">
+            </div>
+            <div class="fitem">
+                <label>attrName(默认userId):</label>
+                <input name="attrName" class="easyui-validatebox">
+            </div>
+            <div class="fitem">
+                <label>time(秒):</label>
+                <input name="time" class="easyui-validatebox">
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>
+                限制
+            </legend>
+            <div class="fitem">
+                <label>上限:</label>
+                <input name="limit" class="easyui-validatebox">
+            </div>
+            <div class="fitem">
+                <label>NeedLogin:</label>
+                <input name="needLogin" class="easyui-validatebox">
+            </div>
+            <div class="fitem">
+                <label>userIp:</label>
+                <input name="userIpCount" class="easyui-validatebox">
+            </div>
+            <div class="fitem">
+                <label>ipUser:</label>
+                <input name="ipUserCount" class="easyui-validatebox">
+            </div>
+            <div class="fitem">
+                <label>sysconfig:</label>
+                <input name="sysconfig" class="easyui-validatebox">
+            </div>
+            <div class="fitem">
+                <label>whiteCode:</label>
+                <input name="whiteCode" class="easyui-validatebox">
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>
+                其他
+            </legend>
+            <div class="fitem">
+                <label>errMsg:</label>
+                <textarea name="errMsg" id="role_remark" style="height:60px;width:250px"></textarea>
+            </div>
+            <div class="fitem">
+                <label>errMsgEn:</label>
+                <input name="errMsgEn" class="easyui-validatebox">
+            </div>
+
+            <div class="fitem">
+                <label>createTime:</label>
+                <input name="createTime" class="easyui-validatebox">
+            </div>
+        </fieldset>
+    </form>
+    <div id="dlg-buttons">
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel"
+           onclick="javascript:$('#dlg').dialog('close')">Cancel</a>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $('#mainWindow').css('display', 'block');//用于避免chrome下页面刚打开时，画面会有一小会的格式不好的问题
+    $('#search-btn').click(function () {
+        doSearch();
+    });
+    $('#reset-btn').click(function () {
+        $('#search-form')[0].reset();
+    });
+
+    function getRowData(entityName, row) {
+        var tmp;
+        var obj = {}
+        obj[entityName] = {};
+        for (i in row) {
+            tmp = row[i];
+            obj[i] = tmp;
+        }
+        return obj;
+    }
+
+    function onEdit() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row) {
+            var entityName = 'role';
+            var obj = getRowData(entityName, row);
+            $('#dlg').dialog('open').dialog('setTitle', 'Edit Frequency');
+            $('#fm').form('clear');
+            $('#fm').form('load', obj);
+        }
+    }
+
+
+    function gridLoadError(e, d) {
+        console.log('-----gridLoadError--e=' + e + ' d=' + d)
+    }
+
+    function gridLoadSuccess(e, d) {
+        console.log('-----gridLoadSuccess--e=' + e + ' d=' + d)
+    }
+
+    function doSearch() {
+        doSearchReload();
+    }
+
+    function loadData() {
+        var jsonParam = $('#search-form').serializeJson();
+        var url = '/frequency/limits';
+        $.ajax({
+            method: 'post',
+            url: url,
+            data: jsonParam,
+            headers: app.headers,
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+                if (data.success) {
+                    $('#dg').datagrid('loadData', []);
+                    if (data.data) {
+                        var datas = data.data;
+                        for (var d in datas) {
+                            //console.log(d);
+                            $('#dg').datagrid('appendRow', datas[d]);
+                        }
+                    }
+                } else {
+                    $.messager.show({
+                        title: 'Error',
+                        msg: data.errorMsg,
+                        timeout: 3000,
+                        showType: 'slide'
+                    });
+                }
+            },
+            error: function (d, e) {
+                $.messager.show({
+                    title: e,
+                    msg: d.responseJSON.errorMsg,
+                    timeout: 3000,
+                    showType: 'slide'
+                });
+            }
+        });
+    }
+
+    function onClear() {
+        $.messager.confirm('Confirm', '确定要清空当前的数据，以便于再次首次加载吗?', function (r) {
+            if (r) {
+                var url = '/frequency/limits?clearFreqType=clearFreq';
+                $.ajax({
+                    type: "delete",
+                    headers: app.headers,
+                    url: url,
+                    success: function (data) {
+                        if (data.success) {
+                            doSearchReload();    // reload the user data
+                        } else {
+                            showToastmessage('Error', data.errorMsg)
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function onEvict(){
+        var row = $('#dg').datagrid('getSelected');
+        if(!row){
+            showToastmessage('Error', '请先选中行')
+        }
+        var errMsg=row.errMsg;
+        if(!errMsg){
+            showToastmessage('Error', '选中行无效，请先输入attrValue(userId)值或IP值查询一下');
+            return;
+        }
+        var jsonParam = $('#search-form').serializeJson();
+        if(errMsg.indexOf('limit:')==0 || errMsg.indexOf('userIp:')==0){
+            if(!jsonParam.userId){
+                showToastmessage('Error', 'attrValue(userId)值为空')
+                return;
+            }
+        }
+        else if(errMsg.indexOf('ipUser:')==0){
+            if(!jsonParam.ip){
+                showToastmessage('Error', 'IP值为空')
+                return;
+            }
+        }
+
+
+        if (row){
+            $.messager.confirm('Confirm', '确定要清空当前的数据，以便于再次首次加载吗?', function (r) {
+                if(r){
+                    var errMsg=row.errMsg;
+                    if(errMsg){
+                        if(errMsg.indexOf('limit:')==0){
+                            evict(row.name, row.time, jsonParam.userId)
+                        }
+                        else if(errMsg.indexOf('userIp:')==0){
+                            evictUserIp(row.name, row.time, jsonParam.userId)
+                        }
+                        else if(errMsg.indexOf('ipUser:')==0){
+                            evictIpUser(row.name, row.time, jsonParam.ip)
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    function evictUserIp(name, time, userId){
+        var data={name: name, time: time, userId: userId}
+        var url = '/frequency/evictUserIp';
+        $.ajax({
+            type: "post",
+            headers: {'source': app.source, 'Authorization': app.authorToken()},
+            url: url,
+            data: data,
+            success: function (data) {
+                if (data.success) {
+                    doSearchReload();    // reload the user data
+                } else {
+                    showToastmessage('Error', data.errorMsg)
+                }
+            }
+        });
+    }
+
+    function evictIpUser(name, time, ip){
+        var data={name: name, time: time, ip: ip}
+        var url = '/frequency/evictIpUser';
+        $.ajax({
+            type: "post",
+            headers: {'source': app.source, 'Authorization': app.authorToken()},
+            url: url,
+            data: data,
+            success: function (data) {
+                if (data.success) {
+                    doSearchReload();    // reload the user data
+                } else {
+                    showToastmessage('Error', data.errorMsg)
+                }
+            }
+        });
+    }
+
+    function evict(name, time, userId){
+        var data={name: name, time: time, userId: userId}
+        var url = '/frequency/evict';
+        $.ajax({
+            type: "post",
+            headers: {'source': app.source, 'Authorization': app.authorToken()},
+            url: url,
+            data: data,
+            success: function (data) {
+                if (data.success) {
+                    doSearchReload();    // reload the user data
+                } else {
+                    showToastmessage('Error', data.errorMsg)
+                }
+            }
+        });
+    }
+
+
+    function doSearchReload() {
+        loadData();
+    }
+
+    function onDblClick(rowIndex, rowData) {
+        //alert('---onDblClick--rowIndex='+rowIndex+' row.id='+rowData.id);
+        onEdit();
+    }
+
+    function listenerName(ex) {
+        if (ex.keyCode == 13) {
+            doSearch();
+        }
+    }
+
+    $('#query_code').keydown(listenerName);
+    $('#query_name').keydown(listenerName);
+
+
+    $(function () {
+        doSearch();
+    });
+</script>
+<script type="text/javascript">
+    //        $(top.hangge());
+</script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ccs.opendfl.mysql.dfllogs.mapper.DflOutLockLogMapper">
+    <resultMap id="dflOutLockLogMap" type="org.ccs.opendfl.mysql.dfllogs.po.DflOutLockLogPo">
+        <id column="id" property="id" jdbcType="DECIMAL"/>
+        <result column="uri" property="uri" jdbcType="VARCHAR"/>
+        <result column="uri_id" property="uriId" jdbcType="INTEGER"/>
+        <result column="uid" property="uid" jdbcType="INTEGER"/>
+        <result column="attr_value" property="attrValue" jdbcType="VARCHAR"/>
+        <result column="lock_type" property="lockType" jdbcType="VARCHAR"/>
+        <result column="time_second" property="timeSecond" jdbcType="INTEGER"/>
+        <result column="sys_type" property="sysType" jdbcType="NUMERIC"/>
+        <result column="ip" property="ip" jdbcType="VARCHAR"/>
+        <result column="device_id" property="deviceId" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="field">
+        id,
+		uri, 
+		uri_id, 
+		uid, 
+		attr_value, 
+		lock_type, 
+		time_second, 
+		sys_type, 
+		ip, 
+		device_id, 
+		create_time
+    </sql>
+
+    <sql id="findByPage_where">
+        <where>
+            <trim suffixOverrides="and | or">
+                <if test="id != null">id = #{id, jdbcType = DECIMAL} and</if>
+                <if test="uri != null">uri = #{uri, jdbcType = VARCHAR} and</if>
+                <if test="uriId != null">uri_id = #{uriId, jdbcType = INTEGER} and</if>
+                <if test="uid != null">uid = #{uid, jdbcType = INTEGER} and</if>
+                <if test="attrValue != null">attr_value = #{attrValue, jdbcType = VARCHAR} and</if>
+                <if test="lockType != null">lock_type = #{lockType, jdbcType = VARCHAR} and</if>
+                <if test="timeSecond != null">time_second = #{timeSecond, jdbcType = INTEGER} and</if>
+                <if test="sysType != null">sys_type = #{sysType, jdbcType = NUMERIC} and</if>
+                <if test="ip != null">ip = #{ip, jdbcType = VARCHAR} and</if>
+                <if test="deviceId != null">device_id = #{deviceId, jdbcType = VARCHAR} and</if>
+                <if test="createTime != null">create_time = #{createTime, jdbcType = TIMESTAMP} and</if>
+                <if test="keywords != null and keywords != ''">
+                    and (
+                    id like concat(concat('%', #{keywords}),'%')
+                    or uri like concat(concat('%', #{keywords}),'%')
+                    or uri_id like concat(concat('%', #{keywords}),'%')
+                    or uid like concat(concat('%', #{keywords}),'%')
+                    or attr_value like concat(concat('%', #{keywords}),'%')
+                    or lock_type like concat(concat('%', #{keywords}),'%')
+                    or time_second like concat(concat('%', #{keywords}),'%')
+                    or sys_type like concat(concat('%', #{keywords}),'%')
+                    or ip like concat(concat('%', #{keywords}),'%')
+                    or device_id like concat(concat('%', #{keywords}),'%')
+                    or create_time like concat(concat('%', #{keywords}),'%')
+                    )
+                </if>
+            </trim>
+        </where>
+    </sql>
+
+    <select id="findByPageXML" parameterType="java.util.Map" resultMap="dflOutLockLogMap">
+        select
+        <include refid="field"></include>
+        from dfl_out_lock_log
+        <include refid="findByPage_where"></include>
+        <choose>
+            <when test="sidx != null">
+                order by ${sidx} ${sord}, id desc
+            </when>
+            <otherwise>
+                order by id desc
+            </otherwise>
+        </choose>
+        <if test="page != null and rows != null">
+            limit ${startRows}, ${rows}
+        </if>
+    </select>
+
+    <select id="findCountXML" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select
+        count(1)
+        from dfl_out_lock_log
+        <include refid="findByPage_where"></include>
+    </select>
+
+    <select id="findAllXML" parameterType="java.util.Map" resultMap="dflOutLockLogMap">
+        select
+        <include refid="field"></include>
+        from dfl_out_lock_log
+        <where>
+            <trim suffixOverrides="and | or">
+                <if test="id != null">id = #{id, jdbcType = DECIMAL} and</if>
+                <if test="uri != null">uri = #{uri, jdbcType = VARCHAR} and</if>
+                <if test="uriId != null">uri_id = #{uriId, jdbcType = INTEGER} and</if>
+                <if test="uid != null">uid = #{uid, jdbcType = INTEGER} and</if>
+                <if test="attrValue != null">attr_value = #{attrValue, jdbcType = VARCHAR} and</if>
+                <if test="lockType != null">lock_type = #{lockType, jdbcType = VARCHAR} and</if>
+                <if test="timeSecond != null">time_second = #{timeSecond, jdbcType = INTEGER} and</if>
+                <if test="sysType != null">sys_type = #{sysType, jdbcType = NUMERIC} and</if>
+                <if test="ip != null">ip = #{ip, jdbcType = VARCHAR} and</if>
+                <if test="deviceId != null">device_id = #{deviceId, jdbcType = VARCHAR} and</if>
+                <if test="createTime != null">create_time = #{createTime, jdbcType = TIMESTAMP} and</if>
+            </trim>
+        </where>
+    </select>
+
+    <select id="findByIdXML" parameterType="java.lang.String" resultMap="dflOutLockLogMap">
+        select
+        <include refid="field"></include>
+        from dfl_out_lock_log
+        <where>
+            id = #{id}
+        </where>
+    </select>
+
+    <insert id="insertXML" parameterType="org.ccs.opendfl.mysql.dfllogs.po.DflOutLockLogPo" useGeneratedKeys="true"
+            keyProperty="id" flushCache="true">
+        insert dfl_out_lock_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="uri != null">uri,</if>
+            <if test="uriId != null">uri_id,</if>
+            <if test="uid != null">uid,</if>
+            <if test="attrValue != null">attr_value,</if>
+            <if test="lockType != null">lock_type,</if>
+            <if test="timeSecond != null">time_second,</if>
+            <if test="sysType != null">sys_type,</if>
+            <if test="ip != null">ip,</if>
+            <if test="deviceId != null">device_id,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType = DECIMAL},</if>
+            <if test="uri != null">#{uri, jdbcType = VARCHAR},</if>
+            <if test="uriId != null">#{uriId, jdbcType = INTEGER},</if>
+            <if test="uid != null">#{uid, jdbcType = INTEGER},</if>
+            <if test="attrValue != null">#{attrValue, jdbcType = VARCHAR},</if>
+            <if test="lockType != null">#{lockType, jdbcType = VARCHAR},</if>
+            <if test="timeSecond != null">#{timeSecond, jdbcType = INTEGER},</if>
+            <if test="sysType != null">#{sysType, jdbcType = NUMERIC},</if>
+            <if test="ip != null">#{ip, jdbcType = VARCHAR},</if>
+            <if test="deviceId != null">#{deviceId, jdbcType = VARCHAR},</if>
+            <if test="createTime != null">#{createTime, jdbcType = TIMESTAMP},</if>
+        </trim>
+    </insert>
+
+    <update id="updateXML" parameterType="org.ccs.opendfl.mysql.dfllogs.po.DflOutLockLogPo" keyProperty="id">
+        update dfl_out_lock_log
+        <set>
+            <trim suffixOverrides=",">
+                <if test="id != null">id = #{id},</if>
+                <if test="uri != null">uri = #{uri},</if>
+                <if test="uriId != null">uri_id = #{uriId},</if>
+                <if test="uid != null">uid = #{uid},</if>
+                <if test="attrValue != null">attr_value = #{attrValue},</if>
+                <if test="lockType != null">lock_type = #{lockType},</if>
+                <if test="timeSecond != null">time_second = #{timeSecond},</if>
+                <if test="sysType != null">sys_type = #{sysType},</if>
+                <if test="ip != null">ip = #{ip},</if>
+                <if test="deviceId != null">device_id = #{deviceId},</if>
+                <if test="createTime != null">create_time = #{createTime},</if>
+            </trim>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <delete id="deleteXML" parameterType="java.lang.String">
+        delete from dfl_out_lock_log
+        <where>
+            id = #{id}
+        </where>
+    </delete>
+</mapper>

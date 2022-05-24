@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ccs.opendfl.mysql.dfllogs.mapper.DflOutLimitLogMapper">
+    <resultMap id="dflOutLimitLogMap" type="org.ccs.opendfl.mysql.dfllogs.po.DflOutLimitLogPo">
+        <id column="id" property="id" jdbcType="DECIMAL"/>
+        <result column="uri" property="uri" jdbcType="VARCHAR"/>
+        <result column="uri_id" property="uriId" jdbcType="INTEGER"/>
+        <result column="uid" property="uid" jdbcType="VARCHAR"/>
+        <result column="lang" property="lang" jdbcType="VARCHAR"/>
+        <result column="limit_count" property="limitCount" jdbcType="INTEGER"/>
+        <result column="time_second" property="timeSecond" jdbcType="INTEGER"/>
+        <result column="attr_value" property="attrValue" jdbcType="VARCHAR"/>
+        <result column="limit_type" property="limitType" jdbcType="VARCHAR"/>
+        <result column="sys_type" property="sysType" jdbcType="VARCHAR"/>
+        <result column="ip" property="ip" jdbcType="VARCHAR"/>
+        <result column="device_id" property="deviceId" jdbcType="VARCHAR"/>
+        <result column="req_count" property="reqCount" jdbcType="INTEGER"/>
+        <result column="err_msg" property="errMsg" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="user_type" property="userType" jdbcType="NUMERIC"/>
+        <result column="run_time" property="runTime" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="field">
+        id
+        ,
+		uri, 
+		uri_id, 
+		uid, 
+		lang, 
+		limit_count, 
+		time_second, 
+		attr_value, 
+		limit_type, 
+		sys_type, 
+		ip, 
+		device_id, 
+		req_count, 
+		err_msg, 
+		create_time, 
+		remark, 
+		user_type, 
+		run_time
+    </sql>
+
+    <sql id="findByPage_where">
+        <where>
+            <trim suffixOverrides="and | or">
+                <if test="id != null">id = #{id, jdbcType = DECIMAL} and</if>
+                <if test="uri != null">uri = #{uri, jdbcType = VARCHAR} and</if>
+                <if test="uriId != null">uri_id = #{uriId, jdbcType = INTEGER} and</if>
+                <if test="uid != null">uid = #{uid, jdbcType = VARCHAR} and</if>
+                <if test="lang != null">lang = #{lang, jdbcType = VARCHAR} and</if>
+                <if test="limitCount != null">limit_count = #{limitCount, jdbcType = INTEGER} and</if>
+                <if test="timeSecond != null">time_second = #{timeSecond, jdbcType = INTEGER} and</if>
+                <if test="attrValue != null">attr_value = #{attrValue, jdbcType = VARCHAR} and</if>
+                <if test="limitType != null">limit_type = #{limitType, jdbcType = VARCHAR} and</if>
+                <if test="sysType != null">sys_type = #{sysType, jdbcType = VARCHAR} and</if>
+                <if test="ip != null">ip = #{ip, jdbcType = VARCHAR} and</if>
+                <if test="deviceId != null">device_id = #{deviceId, jdbcType = VARCHAR} and</if>
+                <if test="reqCount != null">req_count = #{reqCount, jdbcType = INTEGER} and</if>
+                <if test="errMsg != null">err_msg = #{errMsg, jdbcType = VARCHAR} and</if>
+                <if test="createTime != null">create_time = #{createTime, jdbcType = TIMESTAMP} and</if>
+                <if test="remark != null">remark = #{remark, jdbcType = VARCHAR} and</if>
+                <if test="userType != null">user_type = #{userType, jdbcType = NUMERIC} and</if>
+                <if test="runTime != null">run_time = #{runTime, jdbcType = INTEGER} and</if>
+                <if test="keywords != null and keywords != ''">
+                    and (
+                    id like concat(concat('%', #{keywords}),'%')
+                    or uri like concat(concat('%', #{keywords}),'%')
+                    or uri_id like concat(concat('%', #{keywords}),'%')
+                    or uid like concat(concat('%', #{keywords}),'%')
+                    or lang like concat(concat('%', #{keywords}),'%')
+                    or limit_count like concat(concat('%', #{keywords}),'%')
+                    or time_second like concat(concat('%', #{keywords}),'%')
+                    or attr_value like concat(concat('%', #{keywords}),'%')
+                    or limit_type like concat(concat('%', #{keywords}),'%')
+                    or sys_type like concat(concat('%', #{keywords}),'%')
+                    or ip like concat(concat('%', #{keywords}),'%')
+                    or device_id like concat(concat('%', #{keywords}),'%')
+                    or req_count like concat(concat('%', #{keywords}),'%')
+                    or err_msg like concat(concat('%', #{keywords}),'%')
+                    or create_time like concat(concat('%', #{keywords}),'%')
+                    or remark like concat(concat('%', #{keywords}),'%')
+                    or user_type like concat(concat('%', #{keywords}),'%')
+                    or run_time like concat(concat('%', #{keywords}),'%')
+                    )
+                </if>
+            </trim>
+        </where>
+    </sql>
+
+    <select id="findByPageXML" parameterType="java.util.Map" resultMap="dflOutLimitLogMap">
+        select
+        <include refid="field"></include>
+        from dfl_out_limit_log
+        <include refid="findByPage_where"></include>
+        <choose>
+            <when test="sidx != null">
+                order by ${sidx} ${sord}, id desc
+            </when>
+            <otherwise>
+                order by id desc
+            </otherwise>
+        </choose>
+        <if test="page != null and rows != null">
+            limit ${startRows}, ${rows}
+        </if>
+    </select>
+
+    <select id="findCountXML" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select
+        count(1)
+        from dfl_out_limit_log
+        <include refid="findByPage_where"></include>
+    </select>
+
+    <select id="findAllXML" parameterType="java.util.Map" resultMap="dflOutLimitLogMap">
+        select
+        <include refid="field"></include>
+        from dfl_out_limit_log
+        <where>
+            <trim suffixOverrides="and | or">
+                <if test="id != null">id = #{id, jdbcType = DECIMAL} and</if>
+                <if test="uri != null">uri = #{uri, jdbcType = VARCHAR} and</if>
+                <if test="uriId != null">uri_id = #{uriId, jdbcType = INTEGER} and</if>
+                <if test="uid != null">uid = #{uid, jdbcType = VARCHAR} and</if>
+                <if test="lang != null">lang = #{lang, jdbcType = VARCHAR} and</if>
+                <if test="limitCount != null">limit_count = #{limitCount, jdbcType = INTEGER} and</if>
+                <if test="timeSecond != null">time_second = #{timeSecond, jdbcType = INTEGER} and</if>
+                <if test="attrValue != null">attr_value = #{attrValue, jdbcType = VARCHAR} and</if>
+                <if test="limitType != null">limit_type = #{limitType, jdbcType = VARCHAR} and</if>
+                <if test="sysType != null">sys_type = #{sysType, jdbcType = VARCHAR} and</if>
+                <if test="ip != null">ip = #{ip, jdbcType = VARCHAR} and</if>
+                <if test="deviceId != null">device_id = #{deviceId, jdbcType = VARCHAR} and</if>
+                <if test="reqCount != null">req_count = #{reqCount, jdbcType = INTEGER} and</if>
+                <if test="errMsg != null">err_msg = #{errMsg, jdbcType = VARCHAR} and</if>
+                <if test="createTime != null">create_time = #{createTime, jdbcType = TIMESTAMP} and</if>
+                <if test="remark != null">remark = #{remark, jdbcType = VARCHAR} and</if>
+                <if test="userType != null">user_type = #{userType, jdbcType = NUMERIC} and</if>
+                <if test="runTime != null">run_time = #{runTime, jdbcType = INTEGER} and</if>
+            </trim>
+        </where>
+    </select>
+
+    <select id="findByIdXML" parameterType="java.lang.String" resultMap="dflOutLimitLogMap">
+        select
+        <include refid="field"></include>
+        from dfl_out_limit_log
+        <where>
+            id = #{id}
+        </where>
+    </select>
+
+    <insert id="insertXML" parameterType="org.ccs.opendfl.mysql.dfllogs.po.DflOutLimitLogPo" useGeneratedKeys="true"
+            keyProperty="id" flushCache="true">
+        insert dfl_out_limit_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="uri != null">uri,</if>
+            <if test="uriId != null">uri_id,</if>
+            <if test="uid != null">uid,</if>
+            <if test="lang != null">lang,</if>
+            <if test="limitCount != null">limit_count,</if>
+            <if test="timeSecond != null">time_second,</if>
+            <if test="attrValue != null">attr_value,</if>
+            <if test="limitType != null">limit_type,</if>
+            <if test="sysType != null">sys_type,</if>
+            <if test="ip != null">ip,</if>
+            <if test="deviceId != null">device_id,</if>
+            <if test="reqCount != null">req_count,</if>
+            <if test="errMsg != null">err_msg,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+            <if test="userType != null">user_type,</if>
+            <if test="runTime != null">run_time,</if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType = DECIMAL},</if>
+            <if test="uri != null">#{uri, jdbcType = VARCHAR},</if>
+            <if test="uriId != null">#{uriId, jdbcType = INTEGER},</if>
+            <if test="uid != null">#{uid, jdbcType = VARCHAR},</if>
+            <if test="lang != null">#{lang, jdbcType = VARCHAR},</if>
+            <if test="limitCount != null">#{limitCount, jdbcType = INTEGER},</if>
+            <if test="timeSecond != null">#{timeSecond, jdbcType = INTEGER},</if>
+            <if test="attrValue != null">#{attrValue, jdbcType = VARCHAR},</if>
+            <if test="limitType != null">#{limitType, jdbcType = VARCHAR},</if>
+            <if test="sysType != null">#{sysType, jdbcType = VARCHAR},</if>
+            <if test="ip != null">#{ip, jdbcType = VARCHAR},</if>
+            <if test="deviceId != null">#{deviceId, jdbcType = VARCHAR},</if>
+            <if test="reqCount != null">#{reqCount, jdbcType = INTEGER},</if>
+            <if test="errMsg != null">#{errMsg, jdbcType = VARCHAR},</if>
+            <if test="createTime != null">#{createTime, jdbcType = TIMESTAMP},</if>
+            <if test="remark != null">#{remark, jdbcType = VARCHAR},</if>
+            <if test="userType != null">#{userType, jdbcType = NUMERIC},</if>
+            <if test="runTime != null">#{runTime, jdbcType = INTEGER},</if>
+        </trim>
+    </insert>
+
+    <update id="updateXML" parameterType="org.ccs.opendfl.mysql.dfllogs.po.DflOutLimitLogPo" keyProperty="id">
+        update dfl_out_limit_log
+        <set>
+            <trim suffixOverrides=",">
+                <if test="id != null">id = #{id},</if>
+                <if test="uri != null">uri = #{uri},</if>
+                <if test="uriId != null">uri_id = #{uriId},</if>
+                <if test="uid != null">uid = #{uid},</if>
+                <if test="lang != null">lang = #{lang},</if>
+                <if test="limitCount != null">limit_count = #{limitCount},</if>
+                <if test="timeSecond != null">time_second = #{timeSecond},</if>
+                <if test="attrValue != null">attr_value = #{attrValue},</if>
+                <if test="limitType != null">limit_type = #{limitType},</if>
+                <if test="sysType != null">sys_type = #{sysType},</if>
+                <if test="ip != null">ip = #{ip},</if>
+                <if test="deviceId != null">device_id = #{deviceId},</if>
+                <if test="reqCount != null">req_count = #{reqCount},</if>
+                <if test="errMsg != null">err_msg = #{errMsg},</if>
+                <if test="createTime != null">create_time = #{createTime},</if>
+                <if test="remark != null">remark = #{remark},</if>
+                <if test="userType != null">user_type = #{userType},</if>
+                <if test="runTime != null">run_time = #{runTime},</if>
+            </trim>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <delete id="deleteXML" parameterType="java.lang.String">
+        delete from dfl_out_limit_log
+        <where>
+            id = #{id}
+        </where>
+    </delete>
+
+
+    <select id="countFreqLogs" resultType="org.ccs.opendfl.mysql.dfllogs.vo.DflOutLimitLogCountVo">
+        select uri_id uriId, limit_type limitType, `time_second` timeSecond, `limit_count` limitCount,count(*) rowCount ,count(DISTINCT(ip)) ipCount,max(req_count) reqCountMax
+             ,max(run_time) maxRunTime,min(create_time) createTimeMin,max(create_time) createTimeMax
+        <if test='findType=="user"'>, `uid` </if>
+        <if test='findType=="userCount"'>, count(DISTINCT(uid))  userCount </if>
+        from `dfl_out_limit_log`
+        where create_time >=#{startTime} and create_time <![CDATA[<]]> #{endTime}
+        <if test="limitType != null">and limit_type=#{limitType}</if>
+        <if test="timeSecond != null">and time_second=#{timeSecond}</if>
+        <if test="limitCount != null">and limit_count=#{limitCount}</if>
+        <if test="uid != null">and uid=#{uid}</if>
+        <if test="uriId != null">and uri_id=#{uriId}</if>
+        GROUP BY uri_id,time_second, limit_count,limit_type
+        <if test='findType=="user"'> ,uid</if>
+    </select>
+</mapper>
