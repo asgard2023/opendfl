@@ -10,6 +10,7 @@
     <artifactId>opendfl-mysql</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>opendfl-mysql</name>
+    <packaging>war</packaging>
     <description>opendfl mysql support</description>
     <properties>
         <java.version>1.8</java.version>

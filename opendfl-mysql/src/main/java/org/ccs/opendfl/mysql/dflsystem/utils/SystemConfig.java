@@ -58,6 +58,7 @@ public class SystemConfig {
 
     private static <E> E getByCache(String configCode, ConfigValueType valueType, String defualt, String title, Integer parentId) {
         if (dflSystemConfigBiz == null) {
+            log.warn("-----getByCache--isINit=false--configCode={} use defaultValue", configCode);
             return ConfigValueType.getValue(valueType, defualt);
         }
         String cacheKey = configCode;
@@ -142,7 +143,7 @@ public class SystemConfig {
             return ConfigValueType.getValue(valueType, defualt);
         } catch (Exception e) {
             log.warn("configCode code={} defualt={} error={}", configCode, defualt, e.getMessage());
-            return (E) defualt;
+            return ConfigValueType.getValue(valueType, defualt);
         }
     }
 }
