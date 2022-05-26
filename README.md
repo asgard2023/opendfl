@@ -91,7 +91,7 @@ console(mysql版)示例见：http://175.178.252.112:8080/index.html
 * admin/admin
 * user/user
 
-console示例见：http://52.221.216.61:8080/index.html
+console示例见：http://52.221.216.61:8080/index.html  
 默认账号：
 * admin/admin
 * user/user
