@@ -6,6 +6,7 @@
 * 支持基于uri的限制，配置允许动态修改
 * 核心代码采用责任链模式，功能扩展性好
 * 支持功能可配置，不需要的功能可以关闭
+* 支持Mysql
 
 ## 原理及特性
 * 基于spring拦截器，可拦截controller的所有接口
@@ -30,7 +31,7 @@
 * 支持性能监控接口，及查询(每30秒内记录执行时间最大的接口)
 
 ## 完整路线图(<img src="https://opendfl-1259373829.file.myqcloud.com/doc/ok.webp" width="6%" syt height="6%" />表示已完成，红色字体表示计划中)
-<img src="https://opendfl-1259373829.file.myqcloud.com/doc/opendfl_roadmap6.png" width="80%" syt height="80%" />
+<img src="https://opendfl-1259373829.file.myqcloud.com/doc/opendfl_roadmap7.png" width="80%" syt height="80%" />
 
 
 ## 简单使用：
@@ -84,10 +85,13 @@ limit:
         attrName: account
 ```
 
-4，有控制台能方便查看接口信息，以及对应的限制
+4，有控制台能方便查看接口信息，以及对应的限制  
+console(mysql版)示例见：http://175.178.252.112:8080/index.html  
+默认账号：
+* admin/admin
+* user/user
 
-示例见：http://175.178.252.112:8080/index.html
-
+console示例见：http://52.221.216.61:8080/index.html
 默认账号：
 * admin/admin
 * user/user

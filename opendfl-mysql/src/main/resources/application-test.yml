@@ -5,11 +5,31 @@ info:
     version: 0.1
 
 spring:
+  redis:
+    host: 192.168.0.8
+    password: 'testjd2019'
+    port: 6379
+    jedis:
+      pool:
+        max-idle: 100
+        max-wait: 1000ms
+  etcd:
+    endpoints: http://192.168.0.8:2379,http://192.168.0.8:2380,http://192.168.0.8:2381
+  zookeeper:
+    baseSleepTimeMs: 1000
+    #重试次数
+    maxRetries: 3
+    #zookeeper服务连接id与端口
+    address: 192.168.0.8:2181
+    #会话超时时间，单位毫秒
+    sessionTimeoutMs: 5000
+    #连接创建超时时间，单位毫秒
+    connection-timeout-ms: 5000
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://192.168.0.101:3306/opendfl?characterEncoding=utf-8&serverTimezone=GMT%2B8
-    username: root
-    password: 123456
+    url: jdbc:mysql://192.168.0.8:3306/opendfl?characterEncoding=utf-8&serverTimezone=GMT%2B8
+    username: opendfl
+    password: jh@123456
     driver-class-name: com.mysql.cj.jdbc.Driver
     filters: stat,wall
     initial-size: 3
@@ -26,20 +46,7 @@ spring:
     web-stat-filter:
       enabled: true
       url-pattern: "/*"
-  #    stat-view-servlet:
-  #      enabled: true
-  #      url-pattern: /druid/*
-  #      reset-enable: false
-  #      login-username: admin
-  #      login-password: admin
-  redis:
-    host: 192.168.0.101
-    password: ''
-    port: 6379
-    jedis:
-      pool:
-        max-idle: 100
-        max-wait: 1000ms
+
 
 mybatis:
   configuration:

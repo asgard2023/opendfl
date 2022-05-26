@@ -196,7 +196,41 @@
     function loadData() {
         var jsonParam = $('#search-form').serializeJson();
         var url = '/frequency/locks';
-        app.loadDatas(url, jsonParam, '#dg');
+        $.ajax({
+            method: 'post',
+            url: url,
+            data: jsonParam,
+            headers: app.headers,
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+                if (data.success) {
+                    $('#dg').datagrid('loadData', []);
+                    if (data.data) {
+                        var datas = data.data;
+                        for (var d in datas) {
+                            //console.log(d);
+                            $('#dg').datagrid('appendRow', datas[d]);
+                        }
+                    }
+                } else {
+                    $.messager.show({
+                        title: 'Error',
+                        msg: data.errorMsg,
+                        timeout: 3000,
+                        showType: 'slide'
+                    });
+                }
+            },
+            error: function (d, e) {
+                $.messager.show({
+                    title: e,
+                    msg: d.responseJSON.errorMsg,
+                    timeout: 3000,
+                    showType: 'slide'
+                });
+            }
+        });
     }
 
     function onClear() {

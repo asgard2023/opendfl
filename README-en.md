@@ -6,6 +6,7 @@
 * Support uri-based restrictions, dynamic configuration modification
 * The core code adopts the responsibility chain mode, and the function has good scalability
 * Support function can be configured, and unnecessary functions can be turned off
+* Support mysql
 
 ## Principle and characteristics
 * Based on spring interceptor, all interfaces of the controller can be intercepted
@@ -31,7 +32,7 @@
 
 ## Full road map
 ## Full road map(<img src="https://opendfl-1259373829.file.myqcloud.com/doc/ok.webp" width="6%" syt height="6%" /> items are completed, The items in red are planned)
-<img src="https://opendfl-1259373829.file.myqcloud.com/doc/opendfl_roadmap6.png" width="80%" syt height="80%" />
+<img src="https://opendfl-1259373829.file.myqcloud.com/doc/opendfl_roadmap7.png" width="80%" syt height="80%" />
 
 
 ## Simple to use:
@@ -87,8 +88,12 @@ limit:
 
 4. There is a console to easily view interface information and corresponding restrictions
 
-For example see: http://175.178.252.112:8080/index.html
+console(Mysql) demo: http://175.178.252.112:8080/index.html  
+Default account:
+* admin/admin
+* user/user
 
+console demo: http://52.221.216.61:8080/index.html  
 Default account:
 * admin/admin
 * user/user
