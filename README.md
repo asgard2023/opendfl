@@ -85,13 +85,14 @@ limit:
         attrName: account
 ```
 
-4，有控制台能方便查看接口信息，以及对应的限制  
-console(mysql版)示例见：http://175.178.252.112:8080/index.html  
+## 演示demo:
+有控制台能方便查看接口信息，以及对应的限制  
+1，console(mysql版)示例见：http://175.178.252.112:8080/index.html  
 默认账号：
 * admin/admin
 * user/user
 
-console示例见：http://52.221.216.61:8080/index.html  
+2，console示例见：http://52.221.216.61:8080/index.html  
 默认账号：
 * admin/admin
 * user/user
