@@ -1,6 +1,7 @@
 package org.ccs.opendfl.core.utils;
 
 import com.alibaba.fastjson.JSON;
+import lombok.Data;
 import org.ccs.opendfl.core.limitfrequency.Frequency;
 import org.ccs.opendfl.core.limitfrequency.Frequency2;
 import org.ccs.opendfl.core.limitfrequency.Frequency3;
@@ -10,6 +11,7 @@ import org.ccs.opendfl.core.vo.RequestLockVo;
 import org.ccs.opendfl.core.vo.RequestShowVo;
 import org.ccs.opendfl.core.vo.RequestVo;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -19,10 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -196,11 +195,60 @@ public class AnnotationControllerUtils {
         String limitTypeStr = CommUtils.removeEndComma(limitTypes.toString());
         requestShowVo.setLimitTypes(limitTypeStr);
         requestShowVo.setAttrName(attrName);
-        requestShowVo.setOtherInfo(JSON.toJSONString(otherAnnotations));
+        requestShowVo.setOtherInfo(getAnnotationJson(otherAnnotations));
         if (uri != null) {
             requestVo.setRequestUri(CommUtils.appendUrl(basePath, uri));
         }
         return requestVo;
+    }
+
+    /**
+     * 支持从注解Annotation获取所有的属性值
+     *
+     * @param annotations
+     * @return String
+     * @author chenjh
+     */
+    public static String getAnnotationJson(List<Annotation> annotations) {
+        if (CollectionUtils.isEmpty(annotations)) {
+            return null;
+        }
+
+        List<AnnotationInfoVo> infoVos = new ArrayList<>();
+        for (Annotation annotation : annotations) {
+            infoVos.add(toAnnotationInfoVo(annotation));
+        }
+        return JSON.toJSONString(infoVos);
+    }
+
+    /**
+     * 支持从注解Annotation获取所有的属性值
+     *
+     * @param annotation
+     * @return AnnotationInfoVo
+     * @author chenjh
+     */
+    public static AnnotationInfoVo toAnnotationInfoVo(Annotation annotation) {
+        AnnotationInfoVo info = new AnnotationInfoVo();
+        info.setType(annotation.annotationType().getSimpleName());
+        Method[] methods = annotation.getClass().getDeclaredMethods();
+        Map<String, Object> paramMap = new HashMap<>();
+        String ignoreMethods = ",hashCode,equals,toString,annotationType,";
+        for (Method method : methods) {
+            String name = method.getName();
+            if (ignoreMethods.contains("," + name + ",")) {
+                continue;
+            }
+            Object value = null;
+            try {
+                value = method.invoke(annotation);
+            } catch (Exception e) {
+                value = e.getMessage();
+            }
+            paramMap.put(name, value);
+        }
+        info.setParams(paramMap);
+        return info;
     }
 
     /**
@@ -289,5 +337,11 @@ public class AnnotationControllerUtils {
         return null;
     }
 
+}
 
+
+@Data
+class AnnotationInfoVo {
+    private String type;
+    private Map<String, Object> params;
 }
