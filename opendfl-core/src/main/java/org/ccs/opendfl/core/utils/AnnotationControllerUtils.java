@@ -45,6 +45,11 @@ public class AnnotationControllerUtils {
     public static final Cache<String, List<RequestVo>> pkgRequestCache = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES)
             .maximumSize(10).build();
 
+    /**
+     * 加载后缓存10分钟
+     * @param packageName
+     * @return
+     */
     public static List<RequestVo> getControllerRequests(String packageName) {
         List<RequestVo> list=pkgRequestCache.getIfPresent(packageName);
         if(list==null){
