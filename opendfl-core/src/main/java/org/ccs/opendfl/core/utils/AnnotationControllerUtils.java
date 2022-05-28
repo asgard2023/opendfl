@@ -1,6 +1,8 @@
 package org.ccs.opendfl.core.utils;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.limitfrequency.Frequency;
@@ -11,13 +13,8 @@ import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestLockVo;
 import org.ccs.opendfl.core.vo.RequestShowVo;
 import org.ccs.opendfl.core.vo.RequestVo;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.SystemPropertyUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -28,6 +25,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -42,13 +40,27 @@ public class AnnotationControllerUtils {
     }
 
     /**
+     * 缓存10分钟，以免反复调用
+     */
+    public static final Cache<String, List<RequestVo>> pkgRequestCache = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES)
+            .maximumSize(10).build();
+
+    public static List<RequestVo> getControllerRequests(String packageName) {
+        List<RequestVo> list=pkgRequestCache.getIfPresent(packageName);
+        if(list==null){
+            list=getControllerRequestsRead(packageName);
+            pkgRequestCache.put(packageName, list);
+        }
+        return list;
+    }
+    /**
      * 找出Controller下的所有注解，以及频率限制、分布式锁配置参数
      *
      * @author chenjh
      * 异常对象:@param packageName
      * 异常对象:@return
      */
-    public static List<RequestVo> getControllerRequests(String packageName) {
+    public static List<RequestVo> getControllerRequestsRead(String packageName) {
         //第一个class类的集合
         List<Class<?>> classes = new ArrayList<>();
         //是否循环迭代
@@ -62,7 +74,6 @@ public class AnnotationControllerUtils {
             dirs = Thread.currentThread().getContextClassLoader().getResources(packageDirName);
             while (dirs.hasMoreElements()) {
                 URL url = dirs.nextElement();
-                log.info("-----getControllerRequests--url={}", url);
                 //得到协议的名称
                 String protocol = url.getProtocol();
                 //判断是否以文件的形式保存在服务器上
@@ -103,9 +114,8 @@ public class AnnotationControllerUtils {
      * @param classes     找到要加入的集合
      * @param recursive   是否递归
      * @param url         URL
-     * @throws MalformedURLException
      */
-    private static void findAndAddClassesInJar(String packageName, List<Class<?>> classes, boolean recursive, URL url) throws MalformedURLException {
+    private static void findAndAddClassesInJar(String packageName, List<Class<?>> classes, boolean recursive, URL url) {
         List<Class<?>> list = AnnotationClassUtils.getClassFromJars(new URL[]{url}, packageName, recursive);
         StringBuilder sb = new StringBuilder();
         for (Class<?> clazz : list) {

@@ -128,8 +128,8 @@ public class AnnotationClassUtils {
             if (classPath.endsWith(CLASSES_PATH_STR)) {
                 continue;
             }
-            if (classPath.startsWith("file:/")) {
-                classPath = classPath.substring("file:/".length());
+            if (classPath.startsWith("file:")) {
+                classPath = classPath.substring("file:".length());
             }
             classList.addAll(getClassFromWarJar(classPath, packageName, checkPathList, isRecursion));
         }
