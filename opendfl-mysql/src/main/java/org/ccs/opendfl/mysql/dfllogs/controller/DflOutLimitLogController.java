@@ -4,6 +4,7 @@ import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.utils.ValidateUtils;
+import org.ccs.opendfl.mysql.auth.CheckAuthorization;
 import org.ccs.opendfl.mysql.auth.CheckLogin;
 import org.ccs.opendfl.mysql.base.BaseController;
 import org.ccs.opendfl.mysql.base.MyPageInfo;
@@ -127,12 +128,13 @@ public class DflOutLimitLogController extends BaseController {
     public PageVO<DflOutLimitLogPo> queryPage2(HttpServletRequest request, DflOutLimitLogPo entity, MyPageInfo<DflOutLimitLogPo> pageInfo) {
         this.pageSortBy(pageInfo);
         pageInfo = queryPage(request, entity, pageInfo);
-        return new PageVO(pageInfo);
+        return new PageVO<>(pageInfo);
     }
 
-    @ResponseBody
+
     @RequestMapping(value = "/listCount", method = {RequestMethod.POST, RequestMethod.GET})
-    public PageVO listCount(HttpServletRequest request, DflOutLimitLogPo entity, MyPageInfo<DflOutLimitLogCountVo> pageInfo) {
+    @CheckLogin
+    public PageVO<DflOutLimitLogCountVo> listCount(HttpServletRequest request, DflOutLimitLogPo entity, MyPageInfo<DflOutLimitLogCountVo> pageInfo) {
         if (entity == null) {
             entity = new DflOutLimitLogPo();
         }
@@ -168,7 +170,7 @@ public class DflOutLimitLogController extends BaseController {
         });
         pageInfo.setList(list);
         pageInfo.setPages(100);
-        return new PageVO(pageInfo);
+        return new PageVO<>(pageInfo);
     }
 
     /**
@@ -182,6 +184,7 @@ public class DflOutLimitLogController extends BaseController {
      */
 
     @RequestMapping(value = "/save", method = {RequestMethod.POST, RequestMethod.GET})
+    @CheckAuthorization("admin")
     public ResultData edit(DflOutLimitLogPo entity, HttpServletRequest request) {
         if (entity.getId() != null && entity.getId() > 0) {
             return update(entity, request);
@@ -201,6 +204,7 @@ public class DflOutLimitLogController extends BaseController {
      */
 
     @RequestMapping(value = "/update", method = {RequestMethod.POST, RequestMethod.GET})
+    @CheckAuthorization("admin")
     public ResultData update(DflOutLimitLogPo entity, HttpServletRequest request) {
         int v = dflOutLimitLogBiz.updateDflOutLimitLog(entity);
         return ResultData.success(v);
@@ -215,8 +219,8 @@ public class DflOutLimitLogController extends BaseController {
      * @author chenjh
      * @date 2022-5-6 23:21:44
      */
-
     @RequestMapping(value = "/delete", method = {RequestMethod.POST, RequestMethod.GET})
+    @CheckAuthorization("admin")
     public ResultData delete(DflOutLimitLogPo dflOutLimitLog, HttpServletRequest request) {
         String id = request.getParameter("id");
         ValidateUtils.notNull(id, "id不能为空");

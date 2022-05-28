@@ -1,6 +1,8 @@
 package org.ccs.opendfl.mysql.dfllogs.controller;
 
 import org.ccs.opendfl.core.exception.ResultData;
+import org.ccs.opendfl.core.utils.RequestUtils;
+import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.utils.ValidateUtils;
 import org.ccs.opendfl.mysql.auth.CheckAuthorization;
 import org.ccs.opendfl.mysql.auth.CheckLogin;
@@ -8,7 +10,9 @@ import org.ccs.opendfl.mysql.base.BaseController;
 import org.ccs.opendfl.mysql.base.MyPageInfo;
 import org.ccs.opendfl.mysql.base.PageVO;
 import org.ccs.opendfl.mysql.dfllogs.biz.IDflAuditLogBiz;
+import org.ccs.opendfl.mysql.dfllogs.biz.IDflRequestScansBiz;
 import org.ccs.opendfl.mysql.dfllogs.po.DflAuditLogPo;
+import org.ccs.opendfl.mysql.dfllogs.po.DflRequestScansPo;
 import org.ccs.opendfl.mysql.dflsystem.biz.IDflUserBiz;
 import org.ccs.opendfl.mysql.vo.UserVo;
 import org.slf4j.Logger;
@@ -41,6 +45,8 @@ public class DflAuditLogController extends BaseController {
     private IDflAuditLogBiz dflAuditLogBiz;
     @Autowired
     private IDflUserBiz dflUserBiz;
+    @Autowired
+    private IDflRequestScansBiz dflRequestScansBiz;
 
     @GetMapping(value = {"/index"})
     public String index() {
@@ -68,12 +74,27 @@ public class DflAuditLogController extends BaseController {
         if (pageInfo.getPageSize() == 0) {
             pageInfo.setPageSize(getPageSize());
         }
-        pageInfo = dflAuditLogBiz.findPageBy(entity, pageInfo, this.createAllParams(request));
+        Map<String, Object> params = this.createAllParams(request);
+        if (StringUtils.isNotBlank(entity.getIp())) {
+            entity.setIp(RequestUtils.convertIpv4(entity.getIp()));
+            params.put("ip", entity.getIp());
+        }
+        pageInfo = dflAuditLogBiz.findPageBy(entity, pageInfo, params);
         List<DflAuditLogPo> list = pageInfo.getList();
         List<Integer> userIdList = list.stream().filter(t -> t.getUserId() != null).map(DflAuditLogPo::getUserId).distinct().collect(Collectors.toList());
         Map<Integer, UserVo> userMap = dflUserBiz.getUserMapByIds(userIdList);
+        List<Integer> uriIdList = list.stream().filter(t -> t.getUriId() != null).map(DflAuditLogPo::getUriId).distinct().collect(Collectors.toList());
+        Map<Integer, DflRequestScansPo> uriMap = dflRequestScansBiz.getUriPos(uriIdList);
+
         list.stream().forEach(t -> {
             t.setUser(userMap.get(t.getUserId()));
+            t.setUriPo(uriMap.get(t.getUriId()));
+            if (t.getUriPo() != null) {
+                t.setUri(t.getUriPo().getUri());
+            }
+            if (StringUtils.isNumeric(t.getIp())) {
+                t.setIp(RequestUtils.getNumConvertIp(Long.parseLong(t.getIp())));
+            }
         });
         return pageInfo;
     }

@@ -370,8 +370,6 @@ public class FrequencyController {
                 }
             }
         }
-//        Long curTime = System.currentTimeMillis()-second*FrequencyConstant.TIME_MILLISECOND_TO_SECOND;
-//        requestRunCount(RunCountType.COUNT, null, showMaxList,curTime);
         return ResultData.success(showMaxList);
     }
 

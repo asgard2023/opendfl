@@ -108,10 +108,10 @@
                 <th field="method" width="30" sortable="true">method</th>
                 <th field="annotations" width="30" sortable="true">annotations</th>
                 <th field="attrName" width="50" sortable="true">attrName(默认userId)</th>
-                <th field="otherInfo" width="50" sortable="true">其他注解配置</th>
-                <th field="limitTypes" width="50" sortable="true">限制类型</th>
-                <th field="counter" width="50" sortable="true">调用次数</th>
-                <th field="limitCounter" width="50" sortable="true">超限次数</th>
+                <th field="otherInfo" width="80" sortable="true">其他注解配置</th>
+                <th field="limitTypes" width="30" sortable="true">限制类型</th>
+                <th field="counter" width="30" sortable="true">调用次数</th>
+                <th field="limitCounter" width="30" sortable="true">超限次数</th>
                 <th field="maxRunTime" width="50" sortable="true">maxRunTime(ms)</th>
                 <th field="maxRunTimeCreateTime" width="50" sortable="true" formatter="timestampFormatDateTime">
                     maxRunCreateTime
@@ -148,7 +148,7 @@
         </div>
         <div class="fitem">
             <label>Other annotation config:</label>
-            <input name="otherInfo" class="easyui-validatebox">
+            <textarea name="otherInfo" style="height:70px;width:240px"></textarea>
         </div>
         <div class="fitem">
             <label>limitTypes:</label>

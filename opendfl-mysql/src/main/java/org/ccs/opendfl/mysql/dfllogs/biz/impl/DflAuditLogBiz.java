@@ -2,11 +2,12 @@ package org.ccs.opendfl.mysql.dfllogs.biz.impl;
 
 import com.github.pagehelper.PageHelper;
 import org.ccs.opendfl.core.utils.RequestUtils;
+import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.mysql.base.BaseService;
 import org.ccs.opendfl.mysql.base.ISelfInject;
 import org.ccs.opendfl.mysql.base.MyPageInfo;
-import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.mysql.dfllogs.biz.IDflAuditLogBiz;
+import org.ccs.opendfl.mysql.dfllogs.biz.IDflRequestScansBiz;
 import org.ccs.opendfl.mysql.dfllogs.mapper.DflAuditLogMapper;
 import org.ccs.opendfl.mysql.dfllogs.po.DflAuditLogPo;
 import org.ccs.opendfl.mysql.dflsystem.biz.IDflUserBiz;
@@ -50,6 +51,8 @@ public class DflAuditLogBiz extends BaseService<DflAuditLogPo> implements IDflAu
 
     @Autowired
     private IDflUserBiz dflUserBiz;
+    @Autowired
+    private IDflRequestScansBiz dflRequestScansBiz;
 
     @Override
     public Example createConditions(DflAuditLogPo entity, Map<String, Object> otherParams) {
@@ -71,12 +74,16 @@ public class DflAuditLogBiz extends BaseService<DflAuditLogPo> implements IDflAu
         }
 
         this.addEqualByKey(criteria, "id", otherParams);
+        this.addEqualByKey(criteria, "ip", otherParams);
+        this.addEqualByKey(criteria, "uriId", otherParams);
+        this.addEqualByKey(criteria, "uri", otherParams);
+        this.addEqualByKey(criteria, "roleId", otherParams);
 
-        String userNickname=(String)otherParams.get("user.nickname");
-        if(StringUtils.isNotBlank(userNickname)){
-            Integer userId=dflUserBiz.getUserIdByNickName(userNickname);
-            if(userId==null){
-                userId=-1;
+        String userNickname = (String) otherParams.get("user.nickname");
+        if (StringUtils.isNotBlank(userNickname)) {
+            Integer userId = dflUserBiz.getUserIdByNickName(userNickname);
+            if (userId == null) {
+                userId = -1;
             }
             criteria.andEqualTo("userId", userId);
         }
@@ -94,8 +101,8 @@ public class DflAuditLogBiz extends BaseService<DflAuditLogPo> implements IDflAu
         }
         PageHelper.startPage(pageInfo.getPageNum(), pageInfo.getPageSize());
         List<DflAuditLogPo> list = this.getMapper().selectByExample(example);
-        list.forEach(t->{
-            if(StringUtils.isNumeric(t.getIp())){
+        list.forEach(t -> {
+            if (StringUtils.isNumeric(t.getIp())) {
                 t.setIp(RequestUtils.getNumConvertIp(Long.parseLong(t.getIp())));
             }
         });
@@ -108,6 +115,11 @@ public class DflAuditLogBiz extends BaseService<DflAuditLogPo> implements IDflAu
             entity.setCreateTime(new Date());
         }
         entity.setIp(RequestUtils.convertIpv4(entity.getIp()));
+        entity.setUriId(dflRequestScansBiz.getUriId(entity.getUri()));
+        //uriId不为空时，uri不用保存
+        if (entity.getUriId() != null) {
+            entity.setUri(null);
+        }
         int v = this.mapper.insert(entity);
         return v;
     }
