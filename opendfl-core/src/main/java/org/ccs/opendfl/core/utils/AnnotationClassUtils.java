@@ -1,8 +1,8 @@
 package org.ccs.opendfl.core.utils;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -13,6 +13,7 @@ import java.util.jar.JarFile;
 /**
  * 注解类处理
  */
+@Slf4j
 public class AnnotationClassUtils {
     private AnnotationClassUtils() {
 
@@ -63,6 +64,8 @@ public class AnnotationClassUtils {
         }
     }
 
+    private static final String CLASSES_PATH_STR="/classes/";
+
     /**
      * 从jar包中扫码注解类
      *
@@ -71,22 +74,30 @@ public class AnnotationClassUtils {
      * @param isRecursion
      * @return
      */
-    private static List getClassFromJar(Enumeration<JarEntry> jarEntries, String packageName, boolean isRecursion) {
-        List<Class<?>> classNames = new ArrayList<>();
+    private static List<Class<?>> getClassFromJar(Enumeration<JarEntry> jarEntries, String packageName, boolean isRecursion) {
+        List<Class<?>> classList = new ArrayList<>();
+        final String CLASS_STR=".class";
         while (jarEntries.hasMoreElements()) {
             JarEntry jarEntry = jarEntries.nextElement();
             if (!jarEntry.isDirectory()) {
                 /*
                  * 这里是为了方便，先把"/" 转成 "." 再判断 ".class" 的做法可能会有bug
                  */
-                String entryName = jarEntry.getName().replace("/", ".");
-                if (entryName.endsWith(".class") && !entryName.contains("$") && entryName.startsWith(packageName)) {
-                    entryName = entryName.replace(".class", "");
+                String entryName = jarEntry.getName();
+                if (!entryName.endsWith(CLASS_STR)) {
+                    continue;
+                }
+                if (entryName.contains(CLASSES_PATH_STR)) {
+                    entryName = entryName.substring(entryName.indexOf(CLASSES_PATH_STR) + CLASSES_PATH_STR.length());
+                }
+                entryName = entryName.replace("/", ".");
+                if (!entryName.contains("$") && entryName.startsWith(packageName)) {
+                    entryName = entryName.replace(CLASS_STR, "");
                     if (isRecursion || !entryName.replace(packageName + ".", "").contains(".")) {
                         String className = entryName;
                         try {
                             //添加到集合中去
-                            classNames.add(Thread.currentThread().getContextClassLoader().loadClass(className));
+                            classList.add(Thread.currentThread().getContextClassLoader().loadClass(className));
                         } catch (ClassNotFoundException e) {
                             e.printStackTrace();
                         }
@@ -94,7 +105,7 @@ public class AnnotationClassUtils {
                 }
             }
         }
-        return classNames;
+        return classList;
     }
 
 
@@ -106,26 +117,86 @@ public class AnnotationClassUtils {
      * @param isRecursion 是否遍历子包
      * @return 类的完整名称
      */
-    public static List getClassFromJars(URL[] urls, String packageName, boolean isRecursion) {
-        List classNames = new ArrayList();
+    public static List<Class<?>> getClassFromJars(URL[] urls, String packageName, boolean isRecursion) {
+        List<Class<?>> classList = new ArrayList<>();
+        List<String> checkPathList = new ArrayList<>();
+        URL url;
         for (int i = 0; i < urls.length; i++) {
-            String classPath = urls[i].getPath();
+            url = urls[i];
+            String classPath = url.getPath();
             //不必搜索classes文件夹
-            if (classPath.endsWith("classes/")) {
+            if (classPath.endsWith(CLASSES_PATH_STR)) {
                 continue;
             }
-            JarFile jarFile = null;
+            if (classPath.startsWith("file:/")) {
+                classPath = classPath.substring("file:/".length());
+            }
+            classList.addAll(getClassFromWarJar(classPath, packageName, checkPathList, isRecursion));
+        }
+        return classList;
+    }
+
+    /**
+     * 支持从war中读jar的class: xxx/opendfl-mysql-1.0-SNAPSHOT.war!/WEB-INF/lib/xxx.jar
+     *
+     * @param jarPath
+     * @return List<Class>
+     * @author chenjh
+     */
+    public static List<Class<?>> getClassFromWarJar(String jarPath, String pkgName, List<String> checkPathList, boolean isRecursion) {
+        List<Class<?>> classList = new ArrayList<>();
+        int splitIndex = jarPath.indexOf("!/");
+        if (splitIndex > 0 && jarPath.contains(".jar")) {
+            String jarPath1 = jarPath.substring(0, splitIndex);
+            String jarPath2 = jarPath.substring(splitIndex + 2);
             try {
-                jarFile = new JarFile(classPath.substring(classPath.indexOf("/")));
+                File file = new File(jarPath1);
+                log.debug("----getClassFromWarJar--jarPath1={} fileExist={}", jarPath1, file.exists());
+                JarFile jarFile1 = new JarFile(jarPath1);
+                //避免重复读取war的class
+                if (!checkPathList.contains(jarPath1)) {
+                    checkPathList.add(jarPath1);
+                    log.debug("-----getClassFromWarJar--jarPath1={}", jarPath1);
+                    List<Class<?>> tmpList = getClassFromJar(jarFile1.entries(), pkgName, isRecursion);
+                    classList.addAll(tmpList);
+                }
+                splitIndex = jarPath2.indexOf("!/");
+                if (isRecursion && splitIndex > 0) {
+                    String jarPath21 = jarPath2.substring(0, splitIndex);
+                    log.debug("-----getClassFromWarJar--jarPath21={}", jarPath21);
+                    /**
+                     * 支持从war中读取jar的class列表
+                     */
+                    if (jarPath21.endsWith(".jar")) {
+                        JarEntry jarFile2 = jarFile1.getJarEntry(jarPath21);
+                        InputStream is = jarFile1.getInputStream(jarFile2);
+                        File tmpFile = asFile(is, "tmp");
+                        JarFile jarFile2Jar = new JarFile(tmpFile);
+
+                        List<Class<?>> tmpList = getClassFromJar(jarFile2Jar.entries(), pkgName, true);
+                        jarFile2Jar.close();
+                        tmpFile.deleteOnExit();
+                        classList.addAll(tmpList);
+                    }
+                }
+                jarFile1.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            if (jarFile != null) {
-                classNames.addAll(getClassFromJar(jarFile.entries(), packageName, isRecursion));
-            }
         }
-        return classNames;
+        return classList;
+    }
 
+    public static File asFile(InputStream inputStream, String fileName) throws IOException {
+        File tmp = File.createTempFile(fileName, ".jar");
+        OutputStream os = new FileOutputStream(tmp);
+        int bytesRead = 0;
+        byte[] buffer = new byte[8192];
+        while ((bytesRead = inputStream.read(buffer, 0, 8192)) != -1) {
+            os.write(buffer, 0, bytesRead);
+        }
+        os.close();
+        inputStream.close();
+        return tmp;
     }
 }

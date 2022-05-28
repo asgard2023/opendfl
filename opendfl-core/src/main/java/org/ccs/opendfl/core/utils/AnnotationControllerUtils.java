@@ -2,6 +2,7 @@ package org.ccs.opendfl.core.utils;
 
 import com.alibaba.fastjson.JSON;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.limitfrequency.Frequency;
 import org.ccs.opendfl.core.limitfrequency.Frequency2;
 import org.ccs.opendfl.core.limitfrequency.Frequency3;
@@ -10,8 +11,13 @@ import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestLockVo;
 import org.ccs.opendfl.core.vo.RequestShowVo;
 import org.ccs.opendfl.core.vo.RequestVo;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.SystemPropertyUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -29,6 +35,7 @@ import java.util.stream.Collectors;
  *
  * @author chenjh
  */
+@Slf4j
 public class AnnotationControllerUtils {
     private AnnotationControllerUtils() {
 
@@ -55,6 +62,7 @@ public class AnnotationControllerUtils {
             dirs = Thread.currentThread().getContextClassLoader().getResources(packageDirName);
             while (dirs.hasMoreElements()) {
                 URL url = dirs.nextElement();
+                log.info("-----getControllerRequests--url={}", url);
                 //得到协议的名称
                 String protocol = url.getProtocol();
                 //判断是否以文件的形式保存在服务器上
@@ -98,9 +106,6 @@ public class AnnotationControllerUtils {
      * @throws MalformedURLException
      */
     private static void findAndAddClassesInJar(String packageName, List<Class<?>> classes, boolean recursive, URL url) throws MalformedURLException {
-        if (url.getPath().contains("!")) {
-            url = new URL(url.getPath().substring(0, url.getPath().indexOf("!")));
-        }
         List<Class<?>> list = AnnotationClassUtils.getClassFromJars(new URL[]{url}, packageName, recursive);
         StringBuilder sb = new StringBuilder();
         for (Class<?> clazz : list) {
