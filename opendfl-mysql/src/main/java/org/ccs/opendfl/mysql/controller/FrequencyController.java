@@ -296,7 +296,6 @@ public class FrequencyController {
      * @param requestVo RequestVo
      * @return ResultData
      */
-
     @RequestMapping(value = "/requestScans", method = {RequestMethod.POST, RequestMethod.GET})
     @CheckLogin
     public ResultData requestScans(HttpServletRequest request, RequestVo requestVo
@@ -308,13 +307,16 @@ public class FrequencyController {
         String pkg = request.getParameter("pkg");
         pkg = (String) CommUtils.nvl(pkg, "org.ccs.opendfl");
         AuditLogUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
+        //找出Controller下的所有注解，以及频率限制、分布式锁配置参数
         List<RequestVo> list = AnnotationControllerUtils.getControllerRequests(pkg);
         List<RequestShowVo> showList = list.stream().map(RequestShowVo.class::cast).collect(Collectors.toList());
 
+        //支持按requestUri查询接口
         if (StringUtils.isNotBlank(requestVo.getRequestUri())) {
             showList = showList.stream().filter(t -> t.getRequestUri().contains(requestVo.getRequestUri())).collect(Collectors.toList());
         }
 
+        //显示从启动到现在各接口的调用情况（调用次数，调用时间超过1秒的最大时长，超限次数）
         requestRunCount(type, day, showList);
         return ResultData.success(showList);
     }
