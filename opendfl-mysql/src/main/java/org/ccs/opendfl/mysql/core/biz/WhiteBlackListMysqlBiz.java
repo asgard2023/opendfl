@@ -100,6 +100,7 @@ public class WhiteBlackListMysqlBiz implements IWhiteBlackListBiz {
             String ruleItems = SystemConfig.getByCache(SystemConfigCodes.BLACKLIST_RULE_ITEMS, SystemConfigCodes.PARENT_ID_BLACK);
             blackConfig.setIfDeviceIdRequire(ifDeviceIdRequire);
             blackConfig.setItems(ruleItems);
+            frequencyConfiguration.setBlack(blackConfig);
         } else if (blackWhiteType == BlackWhiteType.WHITE) {
 //            Character ifDeviceIdRequire = frequencyConfiguration.getWhite().getIfDeviceIdRequire();
 //            String ruleItems = frequencyConfiguration.getWhite().getItems();
@@ -107,6 +108,7 @@ public class WhiteBlackListMysqlBiz implements IWhiteBlackListBiz {
             String ruleItems = SystemConfig.getByCache(SystemConfigCodes.WHITELIST_RULE_ITEMS, SystemConfigCodes.PARENT_ID_WHITE);
             blackConfig.setIfDeviceIdRequire(ifDeviceIdRequire);
             blackConfig.setItems(ruleItems);
+            frequencyConfiguration.setWhite(blackConfig);
         }
         return blackConfig;
     }

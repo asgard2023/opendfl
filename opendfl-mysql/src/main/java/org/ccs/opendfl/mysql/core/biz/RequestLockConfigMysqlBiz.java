@@ -2,6 +2,7 @@ package org.ccs.opendfl.mysql.core.biz;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IRequestLockConfigBiz;
+import org.ccs.opendfl.core.config.RequestLockConfiguration;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.vo.RequestLockVo;
@@ -9,6 +10,8 @@ import org.ccs.opendfl.mysql.constant.CommonStatus;
 import org.ccs.opendfl.mysql.core.vo.RequestLockConfigMysqlVo;
 import org.ccs.opendfl.mysql.dflcore.biz.IDflLocksBiz;
 import org.ccs.opendfl.mysql.dflcore.po.DflLocksPo;
+import org.ccs.opendfl.mysql.dflsystem.constant.SystemConfigCodes;
+import org.ccs.opendfl.mysql.dflsystem.utils.SystemConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,10 +30,35 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RequestLockConfigMysqlBiz implements IRequestLockConfigBiz {
     @Autowired
     private IDflLocksBiz dflLocksBiz;
+    @Autowired
+    private RequestLockConfiguration requestLockConfiguration;
 
     private static final Map<String, Long> loadSysconfigTimeMap = new ConcurrentHashMap<>();
     private static final Map<String, RequestLockConfigMysqlVo> sysconfigLimitMap = new ConcurrentHashMap<>();
 
+    private static Long recoverLockConfigTime = 0L;
+
+    /**
+     * 把系统参数的配置覆盖到frequencyConfiguration的默认配置
+     * 也做频率限制，以减少调用次数
+     *
+     * @param curTime
+     */
+    private void recoverFLockConfig(Long curTime) {
+        if (curTime - recoverLockConfigTime > FrequencyConstant.LOAD_CONFIG_INTERVAL) {
+            if(recoverLockConfigTime==0){
+                log.info("-----recoverFLockConfig--");
+            }
+            recoverLockConfigTime = curTime;
+            try {
+                Integer ifActive= SystemConfig.getByCache(SystemConfigCodes.LOCK_IF_ACTIVE, SystemConfigCodes.PARENT_ID_LOCK);
+                requestLockConfiguration.setIfActive((""+ifActive).charAt(0));
+            } catch (Exception e) {
+                log.warn("-----recoverFLockConfig--error={}", e.getMessage(), e);
+            }
+//        frequencyConfiguration.setRedisPrefix(SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_REDIS_PREFIX));
+        }
+    }
 
     /**
      * 10秒一次，从application-requestlock.yml配置文件读取配置
@@ -46,6 +74,7 @@ public class RequestLockConfigMysqlBiz implements IRequestLockConfigBiz {
         Long time = loadSysconfigTimeMap.get(key);
         if (time == null || curTime - time > FrequencyConstant.LOAD_CONFIG_INTERVAL) {
             loadSysconfigTimeMap.put(key, curTime);
+            recoverFLockConfig(curTime);
             DflLocksPo locksPo = dflLocksBiz.getLockByCode(requestLockVo.getName());
             if (locksPo != null) {
                 lockConfigVo = new RequestLockConfigMysqlVo();

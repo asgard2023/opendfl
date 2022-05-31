@@ -2,6 +2,7 @@ package org.ccs.opendfl.mysql.core.biz;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IFrequencyConfigBiz;
+import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.constants.FrequencyLimitType;
@@ -13,6 +14,8 @@ import org.ccs.opendfl.mysql.constant.CommonStatus;
 import org.ccs.opendfl.mysql.core.vo.FrequencyMysqlVo;
 import org.ccs.opendfl.mysql.dflcore.biz.IDflFrequencyBiz;
 import org.ccs.opendfl.mysql.dflcore.po.DflFrequencyPo;
+import org.ccs.opendfl.mysql.dflsystem.constant.SystemConfigCodes;
+import org.ccs.opendfl.mysql.dflsystem.utils.SystemConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -35,6 +38,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
     @Autowired
     private IDflFrequencyBiz dflFrequencyBiz;
+    @Autowired
+    private FrequencyConfiguration frequencyConfiguration;
 
     /**
      * 有修改日志一下
@@ -72,6 +77,7 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
         //缓存10秒，10秒加载一次
         if (time == null || curTime - time > FrequencyConstant.LOAD_CONFIG_INTERVAL) {
             loadSysconfigTimeMap.put(key, curTime);
+            this.recoverFrequencyConfig(curTime);
             FrequencyMysqlVo frequencyNew = limitBySysconfig(frequency);
             if (frequencyNew != null && checkChange(frequencyExist, frequencyNew)) {
                 //因为FrequencyVo是可以共用的，存起来也可以发生变化，所以这里缓存时clone一下
@@ -81,7 +87,7 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
         }
 
         if (frequencyExist != null) {
-            if(frequencyExist.getStatus()!=null && frequencyExist.getStatus()==CommonStatus.VALID.getStatus()){
+            if (frequencyExist.getStatus() != null && frequencyExist.getStatus() == CommonStatus.VALID.getStatus()) {
                 frequency.setLimit(frequencyExist.getLimit());
                 frequency.setIpUserCount(frequencyExist.getIpUserCount());
                 frequency.setUserIpCount(frequencyExist.getUserIpCount());
@@ -89,6 +95,32 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
                 frequency.setErrMsgEn(frequencyExist.getErrMsgEn());
                 frequency.setSysconfig(frequencyExist.isSysconfig());
             }
+        }
+    }
+
+    private static Long recoverFrequencyConfigTime = 0L;
+
+    /**
+     * 把系统参数的配置覆盖到frequencyConfiguration的默认配置
+     * 也做频率限制，以减少调用次数
+     *
+     * @param curTime
+     */
+    private void recoverFrequencyConfig(Long curTime) {
+        if (curTime - recoverFrequencyConfigTime > FrequencyConstant.LOAD_CONFIG_INTERVAL) {
+            if(recoverFrequencyConfigTime==0){
+                log.info("-----recoverFrequencyConfig--");
+            }
+            recoverFrequencyConfigTime = curTime;
+            try {
+                Integer minRunTime=SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_MIN_RUN_TIME, SystemConfigCodes.PARENT_ID_FREQUENCY);
+                frequencyConfiguration.setMinRunTime(0L+minRunTime);
+                frequencyConfiguration.getLimit().setItems(SystemConfig.getByCache(SystemConfigCodes.LIMIT_RULE_ITEMS, SystemConfigCodes.PARENT_ID_FREQUENCY));
+                frequencyConfiguration.getLimit().setOutLimitLogTime(SystemConfig.getByCache(SystemConfigCodes.LIMIT_OUT_LIMIT_MIN_TIME, SystemConfigCodes.PARENT_ID_FREQUENCY));
+            } catch (Exception e) {
+                log.warn("-----recoverFrequencyConfig--error={}", e.getMessage(), e);
+            }
+//        frequencyConfiguration.setRedisPrefix(SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_REDIS_PREFIX));
         }
     }
 
@@ -106,7 +138,7 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
         String key = (String) CommUtils.nvl(aliasName, frequency.getName());
         DflFrequencyPo frequencyPo = dflFrequencyBiz.getFrequencyByCode(key, frequency.getTime());
         if (frequencyPo != null) {
-            FrequencyMysqlVo frequencyMysql=FrequencyMysqlVo.copy(frequency);
+            FrequencyMysqlVo frequencyMysql = FrequencyMysqlVo.copy(frequency);
             //如果数据状态无效，则用原来的默认值
             frequencyMysql.setLimit(frequencyPo.getLimitCount());
             frequencyMysql.setIpUserCount(frequencyPo.getIpUserCount());
@@ -177,6 +209,7 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
         List<LimitUriConfigVo> list = uriLimitConfigsMap.get(requestUri);
         if (time == null || curTime - time > FrequencyConstant.LOAD_CONFIG_INTERVAL) {
             loadSysconfigTimeMap.put(key, curTime);
+            this.recoverFrequencyConfig(curTime);
             Long loadTime = loadSysconfigTimeMap.get(keyLoad);
             Long maxUpdateTime = dflFrequencyBiz.getFrequencyByUriMaxUpdateTime(requestUri);
             if (maxUpdateTime == null) {

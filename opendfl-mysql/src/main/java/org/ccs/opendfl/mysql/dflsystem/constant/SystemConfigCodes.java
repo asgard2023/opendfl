@@ -19,14 +19,16 @@ public enum SystemConfigCodes {
     /**
      * 比如低于5秒的超限信息，不日志，以减少常规日志量
      */
-    FREQUENCY_OUT_LIMIT_MIN_TIME("frequency:outLimitMinTime", "频率限制日志记录间格时间最小值", ConfigValueType.INT, "3600"),
+    LIMIT_OUT_LIMIT_MIN_TIME("frequency:outLimitMinTime", "频率限制日志记录间格时间最小值", ConfigValueType.INT, "3600"),
+    LIMIT_RULE_ITEMS("limit:ruleItems", "频率限制策略", ConfigValueType.STRING, "limit,userCount,userIp,ipUser,"),
+    LIMIT_IP_SPLIT("limit:ipLimitSplitFunction", "IP限制是否区分功能，如果不区分功能，则缓存有效期相同，以及ip数或用户数共享", ConfigValueType.INT, "0"),
 
     BLACKLIST_IF_ACTIVE("blacklist:ifActive", "黑名单是否启用", ConfigValueType.INT, "1"),
     BLACKLIST_RULE_ITEMS("blacklist:ruleItems", "黑名单策略", ConfigValueType.STRING, "blackIp,blackUser,blackDeviceId,"),
     BLACKLIST_IF_DEVICE_REQUIRE("blacklist:ifDeviceRequire", "黑名单是否必须设备号", ConfigValueType.INT, "1"),
 
     WHITELIST_IF_ACTIVE("whitelist:ifActive", "白名单是否启用", ConfigValueType.INT, "1"),
-    WHITELIST_RULE_ITEMS("blacklist:ruleItems", "白名单策略", ConfigValueType.STRING, "whiteIp,whiteUser,"),
+    WHITELIST_RULE_ITEMS("whitelist:ruleItems", "白名单策略", ConfigValueType.STRING, "whiteIp,whiteUser,"),
     WHITELIST_IF_DEVICE_REQUIRE("whitelist:ifDeviceRequire", "白名单是否必须设备号", ConfigValueType.INT, "1");
 
     public static final Integer PARENT_ID_ROOT = 0;

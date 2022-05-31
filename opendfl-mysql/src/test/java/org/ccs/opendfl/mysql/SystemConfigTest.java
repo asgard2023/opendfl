@@ -13,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 public class SystemConfigTest {
     @Test
     void getByCache(){
-        Integer outLimitMinTime= SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_OUT_LIMIT_MIN_TIME, SystemConfigCodes.PARENT_ID_FREQUENCY);
+        Integer outLimitMinTime= SystemConfig.getByCache(SystemConfigCodes.LIMIT_OUT_LIMIT_MIN_TIME, SystemConfigCodes.PARENT_ID_FREQUENCY);
         System.out.println(outLimitMinTime);
         Integer minRunTime= SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_MIN_RUN_TIME, SystemConfigCodes.PARENT_ID_FREQUENCY);
         System.out.println(minRunTime);
@@ -25,7 +25,7 @@ public class SystemConfigTest {
 
     @Test
     void getByLang(){
-        Integer outLimitMinTime= SystemConfig.getByLang(SystemConfigCodes.FREQUENCY_OUT_LIMIT_MIN_TIME.getCode());
+        Integer outLimitMinTime= SystemConfig.getByLang(SystemConfigCodes.LIMIT_OUT_LIMIT_MIN_TIME.getCode());
         System.out.println(outLimitMinTime++);
     }
 }
