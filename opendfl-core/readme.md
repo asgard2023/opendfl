@@ -1,7 +1,12 @@
 # 基于Redis的频率限制
+ opendfl-core可以单独使用，缺点是没有console不方便查状态，查配置
+ 集成opendfl-console可以查配置中心的配置，并通过配置中心修改  
+ 集成Opendfl-mysql可以动态修改，直接在功能上修改
+ 推荐集成方式，一般服务用opendfl-core，查询服务用opendfl-console或opendfl-mysql
 ##1，支持RequestLock注解
 * 查看所有请求过的uri统计，见http://localhost:8080/frequency/locks?pwd=xxx
 * 对应的数据attrName属性具有全局唯一，如果本ID有请求未完成，后续同样的ID请求全部拒绝
+* 支持Redis,Zookeeper,ETCD
 ##2，支持基于Frequency注解的频率限制
 * 支持3级频率限制@Frequency,@Frequency2,@Frequency3
 * 查看所有请求过的uri统计，见http://localhost:8080/frequency/limits?pwd=xxx

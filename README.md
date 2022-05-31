@@ -36,10 +36,10 @@
 
 ## 简单使用：
 
-1，分布式交易锁，@RequestLock注解，并支持通过yml动态修改锁时长
+1，分布式交易锁，@RequestLock注解，并支持通过yml动态修改锁时长  
+Support type:Redis,Zookeeper,ETCD
  ```java
 @GetMapping("/waitLockTest")
-@ResponseBody
 @RequestLock(name = "waitLockTest", time=5, errMsg = "任务%s正在执行", logType=ReqLockType.ETCD)
  ```
 
@@ -50,7 +50,6 @@
  * 1小时限100次
  */
 @GetMapping("/serverTimeFreq")
-@ResponseBody
 @Frequency(time = 5, limit = 5, name = "serverTimeFreq")
 @Frequency2(time =3600, limit = 100, name = "serverTimeFreq")
 public Long serverTimeFreq(HttpServletRequest request){

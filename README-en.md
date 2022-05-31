@@ -38,9 +38,9 @@
 ## Simple to use:
 
 1. Distributed transaction lock, @RequestLock annotation, and supports dynamic modification of lock duration through yml
+Support type:Redis,Zookeeper,ETCD
  ```java
 @GetMapping("/waitLockTest")
-@ResponseBody
 @RequestLock(name = "waitLockTest", time=5, errMsg = "Task %s is running", logType=ReqLockType.ETCD)
  ```
 
@@ -51,7 +51,6 @@
  * 100 times per hour
  */
 @GetMapping("/serverTimeFreq")
-@ResponseBody
 @Frequency(time = 5, limit = 5, name = "serverTimeFreq")
 @Frequency2(time =3600, limit = 100, name = "serverTimeFreq")
 public Long serverTimeFreq(HttpServletRequest request){
