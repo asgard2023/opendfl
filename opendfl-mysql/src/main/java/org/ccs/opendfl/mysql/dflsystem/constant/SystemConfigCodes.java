@@ -19,7 +19,7 @@ public enum SystemConfigCodes {
     /**
      * 比如低于5秒的超限信息，不日志，以减少常规日志量
      */
-    LIMIT_OUT_LIMIT_MIN_TIME("frequency:outLimitMinTime", "频率限制日志记录间格时间最小值", ConfigValueType.INT, "3600"),
+    LIMIT_OUT_LIMIT_MIN_TIME("limit:outLimitMinTime", "频率限制日志记录间格时间最小值", ConfigValueType.INT, "3600"),
     LIMIT_RULE_ITEMS("limit:ruleItems", "频率限制策略", ConfigValueType.STRING, "limit,userCount,userIp,ipUser,"),
     LIMIT_IP_SPLIT("limit:ipLimitSplitFunction", "IP限制是否区分功能，如果不区分功能，则缓存有效期相同，以及ip数或用户数共享", ConfigValueType.INT, "0"),
 

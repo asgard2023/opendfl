@@ -96,8 +96,9 @@ public class DflSystemConfigController extends BaseController {
     }
 
     @RequestMapping(value = {"findSysconfigByParentId"})
+    @CheckAuthorization("admin")
     public List<HashMap<String, Object>> findSysconfigByParentId(Integer confType, Integer parentId) {
-        logger.info("-------findSysconfigByParentId--sysconfigId=" + parentId);
+        logger.info("-------findSysconfigByParentId--parentId={}" , parentId);
         if (parentId == null) {
             parentId = 0;
         }
@@ -107,12 +108,11 @@ public class DflSystemConfigController extends BaseController {
         for (DflSystemConfigPo m : list) {
             idList.add(m.getId());
         }
-//    	List<DflSystemConfigPo> mList=this.sysconfigService.findSysconfigByParentIds(confType, idList);//用于检查是否有子节点
-        List<Map<String, Object>> mCountMapList = this.dflSystemConfigBiz.findSysconfigByParentIdsCount(confType, idList);//用于检查是否有子节点
+        //用于检查是否有子节点
+        List<Map<String, Object>> mCountMapList = this.dflSystemConfigBiz.findSysconfigByParentIdsCount(confType, idList);
         List<HashMap<String, Object>> mapList = new ArrayList();
         HashMap<String, Object> map = null;
         boolean hasChild = false;
-        String status = null;
         Integer pId = null;
         Integer pCount = null;
         for (DflSystemConfigPo sysconfig : list) {
@@ -123,12 +123,6 @@ public class DflSystemConfigController extends BaseController {
             map.put("code", sysconfig.getCode());
             //检查是否有子节点
             hasChild = false;
-//    		for(DflSystemConfigPo m:mList){
-//    			if(m.getPid().longValue()==sysconfig.getCid().longValue()){
-//    				hasChild=true;
-//    				break;
-//    			}
-//    		}
             for (Map<String, Object> mCountMap : mCountMapList) {
                 pId = getIntValue(mCountMap.get("parentId"));
                 pCount = getIntValue(mCountMap.get("cout"));
