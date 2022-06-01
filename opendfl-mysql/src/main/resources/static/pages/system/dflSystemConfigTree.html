@@ -96,9 +96,9 @@
                onclick="onCollapseAll()">Collapse all</a>
         </div>
         <div class="easyui-panel" style="padding:5px" width="100%">
-            <ul id="menuTree" class="easyui-tree" data-options="url:'/dflSystem/dflSystemConfig/findSysconfigByParentId'
+            <ul id="menuTree" class="easyui-tree" data-options="headers:app.headers, url:'/dflSystem/dflSystemConfig/findSysconfigByParentId'
 					,animate:true,dnd:true,lines:true,formatter:formatter
-					,onDblClick:onDblClick,onClick:onClick,onDrop:onDrop,onBeforeDrop:onBeforeDrop
+					,onDblClick:onDblClick,onClick:onClick,onDrop:onDrop,onBeforeDrop:onBeforeDrop,onLoadError:loadError
 					,onAfterEdit:onAfterEdit,onBeforeExpand:onBeforeExpand,onLoadSuccess:onLoadSuccess
 					,onContextMenu: function(e,node){
 						e.preventDefault();

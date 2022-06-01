@@ -96,7 +96,7 @@ public class DflSystemConfigController extends BaseController {
     }
 
     @RequestMapping(value = {"findSysconfigByParentId"})
-    @CheckAuthorization("admin")
+//    @CheckAuthorization("admin")
     public List<HashMap<String, Object>> findSysconfigByParentId(Integer confType, Integer parentId) {
         logger.info("-------findSysconfigByParentId--parentId={}" , parentId);
         if (parentId == null) {

@@ -32,8 +32,8 @@ function doSearchTree() {
     var confType = $('#query_confType').combobox('getValue');
     $.ajax({
         type: 'post',
-        data: {confType: confType, name: $("#query_name").val()},
         headers: app.headers,
+        data: {confType: confType, name: $("#query_name").val()},
         dataType: 'json',
         url: '/dflSystem/dflSystemConfig/getSysconfigByName',
         success: function (data, textStatus, jqXHR) {
@@ -96,6 +96,7 @@ function operWidthData(oper) {
         cache: false,
         async: false,
         dataType: "json",
+        headers: app.headers,
         data: jsonParam,
         error: function () {
             alert("Error loading " + url);
@@ -213,8 +214,8 @@ function onSave() {
         $.ajax({
             method: 'post',
             url: url,
-            data: jsonParam,
             headers: app.headers,
+            data: jsonParam,
             dataType: 'json',
             success: function (result) {
                 if (result.success) {
@@ -249,8 +250,8 @@ function onDestroy() {
             if (r) {
                 $.ajax({
                     type: 'post',
-                    data: {id: selectNode.id},
                     headers: app.headers,
+                    data: {id: selectNode.id},
                     dataType: 'json',
                     url: '/dflSystem/dflSystemConfig/delete',
                     success: function (data, textStatus, jqXHR) {
@@ -354,6 +355,7 @@ function onBeforeDrop(target, source, point) {
     $.ajax({
         type: "post",
         url: '/dflSystem/dflSystemConfig/updateRel',
+        headers: app.headers,
         data: {id: source.id, oldParentId: source.parentId, newParentId: targetId},
         async: false,
         dataType: "json",
