@@ -6,7 +6,6 @@ import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.mysql.dflsystem.biz.IDflSystemConfigBiz;
 import org.ccs.opendfl.mysql.dflsystem.constant.ConfigValueType;
 import org.ccs.opendfl.mysql.dflsystem.constant.SystemConfigCodes;
-import org.ccs.opendfl.mysql.dflsystem.po.DflSystemConfigPo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,10 +52,9 @@ public class SystemConfig {
 
 
     public static <E> E getByCache(SystemConfigCodes sysConfigCodes, Integer parentId) {
-        return getByCache(sysConfigCodes.getCode(), sysConfigCodes.getValueType(), sysConfigCodes.getDefaultValue(), sysConfigCodes.getName(), parentId);
-    }
-
-    private static <E> E getByCache(String configCode, ConfigValueType valueType, String defualt, String title, Integer parentId) {
+        final String configCode = sysConfigCodes.getCode();
+        final ConfigValueType valueType = sysConfigCodes.getValueType();
+        final String defualt = sysConfigCodes.getDefaultValue();
         if (dflSystemConfigBiz == null) {
             log.warn("-----getByCache--isInit=false--configCode={} use defaultValue", configCode);
             return ConfigValueType.getValue(valueType, defualt);
@@ -71,7 +69,13 @@ public class SystemConfig {
         if (curTime - loadTime > FrequencyConstant.LOAD_CONFIG_INTERVAL || value == null) {
             loadTime = curTime;
             configLoadTimeMap.put(cacheKey, loadTime);
-            E value2 = getByLang(configCode, valueType, defualt, title, parentId);
+            E value2 = getByLang(configCode);
+            if (value2 == null) {
+                //首次未找到，则直接使用默认值
+                value2 = ConfigValueType.getValue(valueType, defualt);
+                //异步保存，不影响主要功能的性能
+                dflSystemConfigBiz.save(sysConfigCodes, parentId);
+            }
             if (!isEqual(valueType, value, value2)) {
                 value = value2;
                 configMap.put(cacheKey, value);
@@ -108,42 +112,5 @@ public class SystemConfig {
      */
     public static <E> E getByLang(String configCode) {
         return dflSystemConfigBiz.getConfigValue(configCode);
-    }
-
-    private static void save(String configCode, ConfigValueType valueType, String valueDefault, String title, Integer parentId) {
-        try {
-            DflSystemConfigPo sysConfig = new DflSystemConfigPo();
-            sysConfig.setCode(configCode);
-            sysConfig.setName(title);
-            sysConfig.setValueType(valueType.getType());
-            if (ConfigValueType.JSON == valueType) {
-                sysConfig.setValueJson(valueDefault);
-            } else {
-                sysConfig.setValue(valueDefault);
-            }
-            sysConfig.setValueDefault(valueDefault);
-            sysConfig.setStatus(1);
-            sysConfig.setParentId(parentId);
-            sysConfig.setOrderCount(0);
-            sysConfig.setRemark("code default");
-            dflSystemConfigBiz.saveDflSystemConfig(sysConfig);
-        } catch (Exception e) {
-            log.warn("------save--configCode={}, valueDefault={} title={} error={}", configCode, valueDefault, title, e.getMessage());
-        }
-    }
-
-    private static synchronized <E> E getByLang(String configCode, ConfigValueType valueType, String defualt, String title, Integer parentId) {
-        try {
-            E value = getByLang(configCode);
-            if (value != null) {
-                return value;
-            } else {
-                save(configCode, valueType, defualt, title, parentId);
-            }
-            return ConfigValueType.getValue(valueType, defualt);
-        } catch (Exception e) {
-            log.warn("configCode code={} defualt={} error={}", configCode, defualt, e.getMessage());
-            return ConfigValueType.getValue(valueType, defualt);
-        }
     }
 }

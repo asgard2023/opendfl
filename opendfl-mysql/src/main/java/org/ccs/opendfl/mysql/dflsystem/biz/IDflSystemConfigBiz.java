@@ -1,6 +1,7 @@
 package org.ccs.opendfl.mysql.dflsystem.biz;
 
 import org.ccs.opendfl.mysql.base.IBaseService;
+import org.ccs.opendfl.mysql.dflsystem.constant.SystemConfigCodes;
 import org.ccs.opendfl.mysql.dflsystem.po.DflSystemConfigPo;
 
 import java.util.List;
@@ -34,6 +35,14 @@ public interface IDflSystemConfigBiz extends IBaseService<DflSystemConfigPo> {
      * @date 2022-5-3 20:27:48
      */
     Integer updateDflSystemConfig(DflSystemConfigPo entity);
+
+    /**
+     * 将系统参数常量保存到数据库
+     * @param systemConfigCodes 系统参数
+     * @param parentId 要保存的父节点
+     * @return
+     */
+    public DflSystemConfigPo save(SystemConfigCodes systemConfigCodes, Integer parentId);
 
     /**
      * 系统参数配置(树形结构) 删除

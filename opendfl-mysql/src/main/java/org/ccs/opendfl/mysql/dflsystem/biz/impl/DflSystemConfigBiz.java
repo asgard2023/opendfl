@@ -1,6 +1,7 @@
 package org.ccs.opendfl.mysql.dflsystem.biz.impl;
 
 import com.github.pagehelper.PageHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.constants.CacheTimeType;
 import org.ccs.opendfl.core.utils.ValidateUtils;
 import org.ccs.opendfl.mysql.base.BaseService;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import tk.mybatis.mapper.common.Mapper;
@@ -35,7 +37,9 @@ import java.util.Map;
  * @Author: Created by chenjh
  * @Date: 2022-5-3 20:27:48
  */
+@Slf4j
 @Service(value = "dflSystemConfigBiz")
+@EnableAsync
 public class DflSystemConfigBiz extends BaseService<DflSystemConfigPo> implements IDflSystemConfigBiz, ISelfInject {
     @Autowired
     private DflSystemConfigMapper mapper;
@@ -168,16 +172,48 @@ public class DflSystemConfigBiz extends BaseService<DflSystemConfigPo> implement
         return this.mapper.selectByExample(example);
     }
 
-    public DflSystemConfigPo getConfigByCode(String code){
+    public DflSystemConfigPo getConfigByCode(String code) {
         ValidateUtils.notNull(code, "code is null");
-        DflSystemConfigPo search=new DflSystemConfigPo();
+        DflSystemConfigPo search = new DflSystemConfigPo();
         search.setCode(code);
         search.setIfDel(0);
-        List<DflSystemConfigPo> list= this.findBy(search);
-        if(CollectionUtils.isEmpty(list)){
+        List<DflSystemConfigPo> list = this.findBy(search);
+        if (CollectionUtils.isEmpty(list)) {
             return null;
         }
         return list.get(0);
+    }
+
+    @Override
+    public DflSystemConfigPo save(SystemConfigCodes systemConfigCodes, Integer parentId) {
+        String configCode = systemConfigCodes.getCode();
+        String title = systemConfigCodes.getName();
+        String valueDefault = systemConfigCodes.getDefaultValue();
+        try {
+            DflSystemConfigPo exist = getConfigByCode(configCode);
+            if (exist != null) {
+                return exist;
+            }
+            DflSystemConfigPo sysConfig = new DflSystemConfigPo();
+            sysConfig.setCode(configCode);
+            sysConfig.setName(title);
+            sysConfig.setValueType(systemConfigCodes.getValueType().getType());
+            if (ConfigValueType.JSON == systemConfigCodes.getValueType()) {
+                sysConfig.setValueJson(valueDefault);
+            } else {
+                sysConfig.setValue(valueDefault);
+            }
+            sysConfig.setValueDefault(valueDefault);
+            sysConfig.setStatus(1);
+            sysConfig.setParentId(parentId);
+            sysConfig.setOrderCount(0);
+            sysConfig.setRemark("code default");
+            this.saveDflSystemConfig(sysConfig);
+            return sysConfig;
+        } catch (Exception e) {
+            log.warn("------save--configCode={}, valueDefault={} title={} error={}", configCode, valueDefault, title, e.getMessage());
+            return null;
+        }
     }
 
     @Override
@@ -195,7 +231,7 @@ public class DflSystemConfigBiz extends BaseService<DflSystemConfigPo> implement
             SystemConfigCodes systemConfigCodes = SystemConfigCodes.parse(configCode);
             if (systemConfigCodes != null) {
                 //如果参数状态无效，返回默认值
-                if(po.getStatus().intValue()== CommonStatus.INVALID.getStatus()){
+                if (po.getStatus().intValue() == CommonStatus.INVALID.getStatus()) {
                     return ConfigValueType.getValue(systemConfigCodes.getValueType(), po.getValueDefault());
                 }
                 if (systemConfigCodes.getValueType() == ConfigValueType.INT) {
