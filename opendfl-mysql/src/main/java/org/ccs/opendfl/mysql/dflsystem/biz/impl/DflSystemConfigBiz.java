@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -185,7 +186,8 @@ public class DflSystemConfigBiz extends BaseService<DflSystemConfigPo> implement
     }
 
     @Override
-    public DflSystemConfigPo save(SystemConfigCodes systemConfigCodes, Integer parentId) {
+    @Async
+    public DflSystemConfigPo saveSysConfigAsync(SystemConfigCodes systemConfigCodes, Integer parentId) {
         String configCode = systemConfigCodes.getCode();
         String title = systemConfigCodes.getName();
         String valueDefault = systemConfigCodes.getDefaultValue();

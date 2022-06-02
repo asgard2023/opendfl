@@ -74,7 +74,7 @@ public class SystemConfig {
                 //首次未找到，则直接使用默认值
                 value2 = ConfigValueType.getValue(valueType, defualt);
                 //异步保存，不影响主要功能的性能
-                dflSystemConfigBiz.save(sysConfigCodes, parentId);
+                dflSystemConfigBiz.saveSysConfigAsync(sysConfigCodes, parentId);
             }
             if (!isEqual(valueType, value, value2)) {
                 value = value2;

@@ -42,7 +42,7 @@ public interface IDflSystemConfigBiz extends IBaseService<DflSystemConfigPo> {
      * @param parentId 要保存的父节点
      * @return
      */
-    public DflSystemConfigPo save(SystemConfigCodes systemConfigCodes, Integer parentId);
+    public DflSystemConfigPo saveSysConfigAsync(SystemConfigCodes systemConfigCodes, Integer parentId);
 
     /**
      * 系统参数配置(树形结构) 删除
