@@ -51,8 +51,9 @@ public class RequestLockConfigMysqlBiz implements IRequestLockConfigBiz {
             }
             recoverLockConfigTime = curTime;
             try {
-                Integer ifActive= SystemConfig.getByCache(SystemConfigCodes.LOCK_IF_ACTIVE, SystemConfigCodes.PARENT_ID_LOCK);
+                Integer ifActive= SystemConfig.getByCache(SystemConfigCodes.LOCK_IF_ACTIVE);
                 requestLockConfiguration.setIfActive((""+ifActive).charAt(0));
+                requestLockConfiguration.setRedisPrefix(SystemConfig.getByCache(SystemConfigCodes.LOCK_REDIS_PREFIX));
             } catch (Exception e) {
                 log.warn("-----recoverFLockConfig--error={}", e.getMessage(), e);
             }

@@ -10,32 +10,61 @@ package org.ccs.opendfl.mysql.dflsystem.constant;
  * @author chenjh
  */
 public enum SystemConfigCodes {
-    GLOBAL_DEFAULT_ATTR_NAME("global:defaultAttrName", "全局参数默认附加属性", ConfigValueType.STRING, "userId"),
-    LOCK_IF_ACTIVE("lock:ifActive", "分布式锁功能是否启用", ConfigValueType.INT, "1"),
-    LOCK_REDIS_PREFIX("lock:redisPrefix", "分布式锁redisKey前缀", ConfigValueType.STRING, "limitLock"),
-    FREQUENCY_REDIS_PREFIX("frequency:redisPrefix", "频率限制redisKey前缀", ConfigValueType.STRING, "limitFreq"),
-    FREQUENCY_INIT_LOG_DEBUG_COUNT("frequency:initLogDebugCount", "启动时前面部份多输出部份debug日志", ConfigValueType.INT, "100"),
-    FREQUENCY_MIN_RUN_TIME("frequency:minRunTime", "统计运行时间最小值(ms)", ConfigValueType.INT, "500"),
+    /**
+     * 全局参数默认附加属性
+     */
+    GLOBAL_DEFAULT_ATTR_NAME("global:defaultAttrName", "全局参数默认附加属性", ConfigValueType.STRING, "userId", Constants.PID_ROOT),
+
+    /**
+     * 分布式锁功能是否启用
+     */
+    LOCK_IF_ACTIVE("lock:ifActive", "分布式锁功能是否启用", ConfigValueType.INT, "1", Constants.PID_LOCK),
+    /**
+     * 分布式锁redisKey前缀
+     */
+    LOCK_REDIS_PREFIX("lock:redisPrefix", "分布式锁redisKey前缀", ConfigValueType.STRING, "limitLock", Constants.PID_LOCK),
+
+    /**
+     * 频率限制redisKey前缀
+     */
+    FREQUENCY_REDIS_PREFIX("frequency:redisPrefix", "频率限制redisKey前缀", ConfigValueType.STRING, "limitFreq", Constants.PID_FREQUENCY),
+    /**
+     * 是否支持接口监控，允许monitor接口返回最近接口执行时间
+     */
+    FREQUENCY_RUN_TIME_MONITOR("frequency:runTimeMonitor", "频率限制是否支持接口监控", ConfigValueType.INT, "1", Constants.PID_FREQUENCY),
+    /**
+     * 启动时前面部份多输出部份debug日志
+     */
+    FREQUENCY_INIT_LOG_DEBUG_COUNT("frequency:initLogDebugCount", "启动时前面部份多输出部份debug日志", ConfigValueType.INT, "100", Constants.PID_FREQUENCY),
+    /**
+     * 记录慢接口时间(毫秒)，为0关闭此功能
+     */
+    FREQUENCY_MIN_RUN_TIME("frequency:minRunTime", "统计运行时间最小值(ms)", ConfigValueType.INT, "500", Constants.PID_FREQUENCY),
     /**
      * 比如低于5秒的超限信息，不日志，以减少常规日志量
      */
-    LIMIT_OUT_LIMIT_MIN_TIME("limit:outLimitMinTime", "频率限制日志记录间格时间最小值", ConfigValueType.INT, "3600"),
-    LIMIT_RULE_ITEMS("limit:ruleItems", "频率限制策略", ConfigValueType.STRING, "limit,userCount,userIp,ipUser,"),
-    LIMIT_IP_SPLIT("limit:ipLimitSplitFunction", "IP限制是否区分功能，如果不区分功能，则缓存有效期相同，以及ip数或用户数共享", ConfigValueType.INT, "0"),
+    LIMIT_OUT_LIMIT_MIN_TIME("limit:outLimitMinTime", "频率限制日志记录间格时间最小值", ConfigValueType.INT, "3600", Constants.PID_FREQUENCY),
+    LIMIT_RULE_ITEMS("limit:ruleItems", "频率限制策略", ConfigValueType.STRING, "limit,userCount,userIp,ipUser,", Constants.PID_FREQUENCY),
+    LIMIT_IP_SPLIT("limit:ipLimitSplitFunction", "IP限制是否区分功能，如果不区分功能，则缓存有效期相同，以及ip数或用户数共享", ConfigValueType.INT, "0", Constants.PID_FREQUENCY),
 
-    BLACKLIST_IF_ACTIVE("blacklist:ifActive", "黑名单是否启用", ConfigValueType.INT, "1"),
-    BLACKLIST_RULE_ITEMS("blacklist:ruleItems", "黑名单策略", ConfigValueType.STRING, "blackIp,blackUser,blackDeviceId,"),
-    BLACKLIST_IF_DEVICE_REQUIRE("blacklist:ifDeviceRequire", "黑名单是否必须设备号", ConfigValueType.INT, "1"),
 
-    WHITELIST_IF_ACTIVE("whitelist:ifActive", "白名单是否启用", ConfigValueType.INT, "1"),
-    WHITELIST_RULE_ITEMS("whitelist:ruleItems", "白名单策略", ConfigValueType.STRING, "whiteIp,whiteUser,"),
-    WHITELIST_IF_DEVICE_REQUIRE("whitelist:ifDeviceRequire", "白名单是否必须设备号", ConfigValueType.INT, "1");
+    BLACKLIST_IF_ACTIVE("blacklist:ifActive", "黑名单是否启用", ConfigValueType.INT, "1", Constants.PID_BLACK),
+    BLACKLIST_RULE_ITEMS("blacklist:ruleItems", "黑名单策略", ConfigValueType.STRING, "blackIp,blackUser,blackDeviceId,", Constants.PID_BLACK),
+    BLACKLIST_IF_DEVICE_REQUIRE("blacklist:ifDeviceRequire", "黑名单是否必须设备号", ConfigValueType.INT, "1", Constants.PID_BLACK),
 
-    public static final Integer PARENT_ID_ROOT = 0;
-    public static final Integer PARENT_ID_LOCK = 2;
-    public static final Integer PARENT_ID_FREQUENCY = 3;
-    public static final Integer PARENT_ID_BLACK = 4;
-    public static final Integer PARENT_ID_WHITE = 5;
+
+    WHITELIST_IF_ACTIVE("whitelist:ifActive", "白名单是否启用", ConfigValueType.INT, "1", Constants.PID_WHITE),
+    WHITELIST_RULE_ITEMS("whitelist:ruleItems", "白名单策略", ConfigValueType.STRING, "whiteIp,whiteUser,", Constants.PID_WHITE),
+    WHITELIST_IF_DEVICE_REQUIRE("whitelist:ifDeviceRequire", "白名单是否必须设备号", ConfigValueType.INT, "1", Constants.PID_WHITE);
+
+    private static class Constants {
+        public static final Integer PID_ROOT = 0;
+        public static final Integer PID_LOCK = 2;
+        public static final Integer PID_FREQUENCY = 3;
+        public static final Integer PID_BLACK = 4;
+        public static final Integer PID_WHITE = 5;
+    }
+
 
     public static SystemConfigCodes parse(String code) {
         SystemConfigCodes[] arrays = SystemConfigCodes.values();
@@ -51,12 +80,14 @@ public enum SystemConfigCodes {
     private final String name;
     private final ConfigValueType valueType;
     private final String defaultValue;
+    private final Integer parentId;
 
-    SystemConfigCodes(String code, String name, ConfigValueType valueType, String defaultValue) {
+    SystemConfigCodes(String code, String name, ConfigValueType valueType, String defaultValue, Integer parentId) {
         this.code = code;
         this.name = name;
         this.valueType = valueType;
         this.defaultValue = defaultValue;
+        this.parentId = parentId;
     }
 
     public String getCode() {
@@ -73,5 +104,9 @@ public enum SystemConfigCodes {
 
     public ConfigValueType getValueType() {
         return valueType;
+    }
+
+    public Integer getParentId() {
+        return parentId;
     }
 }

@@ -12,20 +12,20 @@ import org.springframework.test.context.ActiveProfiles;
 @Slf4j
 public class SystemConfigTest {
     @Test
-    void getByCache(){
-        Integer outLimitMinTime= SystemConfig.getByCache(SystemConfigCodes.LIMIT_OUT_LIMIT_MIN_TIME, SystemConfigCodes.PARENT_ID_FREQUENCY);
+    void getByCache() {
+        Integer outLimitMinTime = SystemConfig.getByCache(SystemConfigCodes.LIMIT_OUT_LIMIT_MIN_TIME);
         System.out.println(outLimitMinTime);
-        Integer minRunTime= SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_MIN_RUN_TIME, SystemConfigCodes.PARENT_ID_FREQUENCY);
+        Integer minRunTime = SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_MIN_RUN_TIME);
         System.out.println(minRunTime);
-        Integer logDebugCount= SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_INIT_LOG_DEBUG_COUNT, SystemConfigCodes.PARENT_ID_FREQUENCY);
-        System.out.println("logDebugCount="+logDebugCount);
-        Integer lockIfActive= SystemConfig.getByCache(SystemConfigCodes.LOCK_IF_ACTIVE, SystemConfigCodes.PARENT_ID_LOCK);
-        System.out.println("lockIfActive="+lockIfActive);
+        Integer logDebugCount = SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_INIT_LOG_DEBUG_COUNT);
+        System.out.println("logDebugCount=" + logDebugCount);
+        Integer lockIfActive = SystemConfig.getByCache(SystemConfigCodes.LOCK_IF_ACTIVE);
+        System.out.println("lockIfActive=" + lockIfActive);
     }
 
     @Test
-    void getByLang(){
-        Integer outLimitMinTime= SystemConfig.getByLang(SystemConfigCodes.LIMIT_OUT_LIMIT_MIN_TIME.getCode());
+    void getByLang() {
+        Integer outLimitMinTime = SystemConfig.getByLang(SystemConfigCodes.LIMIT_OUT_LIMIT_MIN_TIME.getCode());
         System.out.println(outLimitMinTime++);
     }
 }

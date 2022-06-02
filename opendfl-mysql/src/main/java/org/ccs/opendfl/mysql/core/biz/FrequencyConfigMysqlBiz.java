@@ -108,19 +108,22 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
      */
     private void recoverFrequencyConfig(Long curTime) {
         if (curTime - recoverFrequencyConfigTime > FrequencyConstant.LOAD_CONFIG_INTERVAL) {
-            if(recoverFrequencyConfigTime==0){
+            if (recoverFrequencyConfigTime == 0) {
                 log.info("-----recoverFrequencyConfig--");
             }
             recoverFrequencyConfigTime = curTime;
             try {
-                Integer minRunTime=SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_MIN_RUN_TIME, SystemConfigCodes.PARENT_ID_FREQUENCY);
-                frequencyConfiguration.setMinRunTime(0L+minRunTime);
-                frequencyConfiguration.getLimit().setItems(SystemConfig.getByCache(SystemConfigCodes.LIMIT_RULE_ITEMS, SystemConfigCodes.PARENT_ID_FREQUENCY));
-                frequencyConfiguration.getLimit().setOutLimitLogTime(SystemConfig.getByCache(SystemConfigCodes.LIMIT_OUT_LIMIT_MIN_TIME, SystemConfigCodes.PARENT_ID_FREQUENCY));
+                Integer minRunTime = SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_MIN_RUN_TIME);
+                Integer runTimeMonitor = SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_RUN_TIME_MONITOR);
+                frequencyConfiguration.setMinRunTime(0L + minRunTime);
+                frequencyConfiguration.setRedisPrefix(SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_REDIS_PREFIX));
+                frequencyConfiguration.setRunTimeMonitor(("" + runTimeMonitor).charAt(0));
+                frequencyConfiguration.setInitLogCount(SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_INIT_LOG_DEBUG_COUNT));
+                frequencyConfiguration.getLimit().setItems(SystemConfig.getByCache(SystemConfigCodes.LIMIT_RULE_ITEMS));
+                frequencyConfiguration.getLimit().setOutLimitLogTime(SystemConfig.getByCache(SystemConfigCodes.LIMIT_OUT_LIMIT_MIN_TIME));
             } catch (Exception e) {
                 log.warn("-----recoverFrequencyConfig--error={}", e.getMessage(), e);
             }
-//        frequencyConfiguration.setRedisPrefix(SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_REDIS_PREFIX));
         }
     }
 
@@ -198,10 +201,6 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
     @Override
     public void limitBySysconfigUri(RequestVo requestVo) {
         String requestUri = requestVo.getRequestUri();
-//        if(StringUtils.equals("/error", requestUri)){
-//            requestVo.setLimitRequests(Collections.emptyList());
-//            return;
-//        }
         Long curTime = System.currentTimeMillis();
         String key = "uri:" + requestVo.getRequestUri();
         String keyLoad = "uriLoad:" + requestVo.getRequestUri();

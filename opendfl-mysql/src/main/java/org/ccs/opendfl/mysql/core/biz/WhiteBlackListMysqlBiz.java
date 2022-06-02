@@ -96,16 +96,16 @@ public class WhiteBlackListMysqlBiz implements IWhiteBlackListBiz {
         if (blackWhiteType == BlackWhiteType.BLACK) {
 //            Character ifDeviceIdRequire = frequencyConfiguration.getBlack().getIfDeviceIdRequire();
 //            String ruleItems = frequencyConfiguration.getBlack().getItems();
-            Character ifDeviceIdRequire = getCharset(SystemConfig.getByCache(SystemConfigCodes.BLACKLIST_IF_DEVICE_REQUIRE, SystemConfigCodes.PARENT_ID_BLACK));
-            String ruleItems = SystemConfig.getByCache(SystemConfigCodes.BLACKLIST_RULE_ITEMS, SystemConfigCodes.PARENT_ID_BLACK);
+            Character ifDeviceIdRequire = getCharset(SystemConfig.getByCache(SystemConfigCodes.BLACKLIST_IF_DEVICE_REQUIRE));
+            String ruleItems = SystemConfig.getByCache(SystemConfigCodes.BLACKLIST_RULE_ITEMS);
             blackConfig.setIfDeviceIdRequire(ifDeviceIdRequire);
             blackConfig.setItems(ruleItems);
             frequencyConfiguration.setBlack(blackConfig);
         } else if (blackWhiteType == BlackWhiteType.WHITE) {
 //            Character ifDeviceIdRequire = frequencyConfiguration.getWhite().getIfDeviceIdRequire();
 //            String ruleItems = frequencyConfiguration.getWhite().getItems();
-            Character ifDeviceIdRequire = getCharset(SystemConfig.getByCache(SystemConfigCodes.WHITELIST_IF_DEVICE_REQUIRE, SystemConfigCodes.PARENT_ID_WHITE));
-            String ruleItems = SystemConfig.getByCache(SystemConfigCodes.WHITELIST_RULE_ITEMS, SystemConfigCodes.PARENT_ID_WHITE);
+            Character ifDeviceIdRequire = getCharset(SystemConfig.getByCache(SystemConfigCodes.WHITELIST_IF_DEVICE_REQUIRE));
+            String ruleItems = SystemConfig.getByCache(SystemConfigCodes.WHITELIST_RULE_ITEMS);
             blackConfig.setIfDeviceIdRequire(ifDeviceIdRequire);
             blackConfig.setItems(ruleItems);
             frequencyConfiguration.setWhite(blackConfig);

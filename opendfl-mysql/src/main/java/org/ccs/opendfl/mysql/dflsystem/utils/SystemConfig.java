@@ -47,7 +47,7 @@ public class SystemConfig {
     protected static final Map<String, Long> configLoadTimeMap = new ConcurrentHashMap<>();
 
     public static <E> E getByCache(SystemConfigCodes sysConfigCodes) {
-        return getByCache(sysConfigCodes, SystemConfigCodes.PARENT_ID_ROOT);
+        return getByCache(sysConfigCodes, sysConfigCodes.getParentId());
     }
 
 
