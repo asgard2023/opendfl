@@ -3,12 +3,15 @@ package org.ccs.opendfl.mysql.dflsystem.utils;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.utils.StringUtils;
+import org.ccs.opendfl.mysql.constant.CommonStatus;
 import org.ccs.opendfl.mysql.dflsystem.biz.IDflSystemConfigBiz;
 import org.ccs.opendfl.mysql.dflsystem.constant.ConfigValueType;
 import org.ccs.opendfl.mysql.dflsystem.constant.SystemConfigCodes;
+import org.ccs.opendfl.mysql.dflsystem.po.DflSystemConfigPo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -60,15 +63,15 @@ public class SystemConfig {
             return ConfigValueType.getValue(valueType, defualt);
         }
         String cacheKey = configCode;
-        Long loadTime = configLoadTimeMap.get(cacheKey);
         Long curTime = System.currentTimeMillis();
+        loadAnyChange(curTime);
+        Long loadTime = configLoadTimeMap.get(cacheKey);
         if (loadTime == null) {
             loadTime = 0L;
         }
         E value = (E) configMap.get(cacheKey);
         if (curTime - loadTime > FrequencyConstant.LOAD_CONFIG_INTERVAL || value == null) {
-            loadTime = curTime;
-            configLoadTimeMap.put(cacheKey, loadTime);
+            configLoadTimeMap.put(cacheKey, curTime);
             E value2 = getByLang(configCode);
             if (value2 == null) {
                 //首次未找到，则直接使用默认值
@@ -112,5 +115,74 @@ public class SystemConfig {
      */
     public static <E> E getByLang(String configCode) {
         return dflSystemConfigBiz.getConfigValue(configCode);
+    }
+
+    /**
+     * 按valueType取值
+     * @param po
+     * @param <E>
+     * @return
+     */
+    public static <E> E getSystemConfigValue(DflSystemConfigPo po) {
+        SystemConfigCodes systemConfigCodes = SystemConfigCodes.parse(po.getCode());
+        if (systemConfigCodes != null) {
+            //如果参数状态无效，返回默认值
+            if (po.getStatus().intValue() == CommonStatus.INVALID.getStatus()) {
+                return ConfigValueType.getValue(systemConfigCodes.getValueType(), po.getValueDefault());
+            }
+            if (systemConfigCodes.getValueType() == ConfigValueType.INT) {
+                return ConfigValueType.getValue(systemConfigCodes.getValueType(), po.getValue());
+            } else if (systemConfigCodes.getValueType() == ConfigValueType.JSON) {
+                return ConfigValueType.getValue(systemConfigCodes.getValueType(), po.getValueJson());
+            } else {
+                return ConfigValueType.getValue(systemConfigCodes.getValueType(), po.getValue());
+            }
+        }
+        log.warn("----getSystemConfigValue--code={} invalid", po.getCode());
+        return null;
+    }
+
+
+    private static Long maxModifyTimeSysConfig = 0L;
+    private static Long maxModifyTimeSysConfigLT = 0L;
+
+    /**
+     * 时支持根修改时间，来重新加载系统参数配置
+     *
+     * @param curTime
+     */
+    private static void loadAnyChange(Long curTime) {
+        if (curTime - maxModifyTimeSysConfigLT > FrequencyConstant.LOAD_CONFIG_INTERVAL) {
+            maxModifyTimeSysConfigLT = curTime;
+            Long maxModifyTimeSysConfigData = dflSystemConfigBiz.getSysconfigMaxUpdateTime();
+            if (maxModifyTimeSysConfigData > maxModifyTimeSysConfig) {
+                reloadNewlyModify(maxModifyTimeSysConfig, curTime);
+                maxModifyTimeSysConfig = maxModifyTimeSysConfigData;
+            }
+            //批量修改缓存的加载时间
+            configLoadTimeMap.entrySet().stream().forEach(t -> {
+                t.setValue(curTime);
+            });
+        }
+    }
+
+    /**
+     * 重新加载有修改的数据
+     */
+    private static <E> void reloadNewlyModify(Long modifyTime, Long curTime) {
+        log.info("-------reloadNewlyModify---modifyTime={}", modifyTime);
+        List<DflSystemConfigPo> modifys = dflSystemConfigBiz.findSystemConfigByNewlyModify(modifyTime);
+        for (DflSystemConfigPo modifyInfo : modifys) {
+            //不处理主节点，一航非配置
+            if(modifyInfo.getId().intValue()==0 || modifyInfo.getParentId().intValue()==0){
+                continue;
+            }
+            String cacheKey = modifyInfo.getCode();
+            configLoadTimeMap.put(cacheKey, curTime);
+            E value = getSystemConfigValue(modifyInfo);
+            if(value!=null) {
+                configMap.put(cacheKey, value);
+            }
+        }
     }
 }

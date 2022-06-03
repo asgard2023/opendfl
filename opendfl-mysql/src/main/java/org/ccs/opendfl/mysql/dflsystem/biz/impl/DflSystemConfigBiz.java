@@ -13,6 +13,7 @@ import org.ccs.opendfl.mysql.dflsystem.constant.ConfigValueType;
 import org.ccs.opendfl.mysql.dflsystem.constant.SystemConfigCodes;
 import org.ccs.opendfl.mysql.dflsystem.mapper.DflSystemConfigMapper;
 import org.ccs.opendfl.mysql.dflsystem.po.DflSystemConfigPo;
+import org.ccs.opendfl.mysql.dflsystem.utils.SystemConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -230,23 +231,28 @@ public class DflSystemConfigBiz extends BaseService<DflSystemConfigPo> implement
         String value = null;
         DflSystemConfigPo po = this.getConfigByCode(configCode);
         if (po != null) {
-            SystemConfigCodes systemConfigCodes = SystemConfigCodes.parse(configCode);
-            if (systemConfigCodes != null) {
-                //如果参数状态无效，返回默认值
-                if (po.getStatus().intValue() == CommonStatus.INVALID.getStatus()) {
-                    return ConfigValueType.getValue(systemConfigCodes.getValueType(), po.getValueDefault());
-                }
-                if (systemConfigCodes.getValueType() == ConfigValueType.INT) {
-                    return ConfigValueType.getValue(systemConfigCodes.getValueType(), po.getValue());
-                } else if (systemConfigCodes.getValueType() == ConfigValueType.JSON) {
-                    return ConfigValueType.getValue(systemConfigCodes.getValueType(), po.getValueJson());
-                } else {
-                    return ConfigValueType.getValue(systemConfigCodes.getValueType(), po.getValue());
-                }
-            }
+            return SystemConfig.getSystemConfigValue(po);
         } else {
             logger.warn("=====getConfigValue:configCode={} value={} time={}", configCode, value, System.currentTimeMillis() - time);
         }
         return null;
+    }
+
+    @Override
+    public Long getSysconfigMaxUpdateTime(){
+        Date maxUpdateTime = mapper.getSysconfigMaxUpdateTime();
+        if(maxUpdateTime==null){
+            return 0L;
+        }
+        return maxUpdateTime.getTime();
+    }
+
+    @Override
+    public List<DflSystemConfigPo> findSystemConfigByNewlyModify(Long modifyTime){
+        Example example = new Example(DflSystemConfigPo.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("ifDel", 0);
+        criteria.andGreaterThan("modifyTime", new Date(modifyTime));
+        return this.mapper.selectByExample(example);
     }
 }

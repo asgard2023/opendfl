@@ -4,6 +4,7 @@ import org.ccs.opendfl.mysql.base.IBaseService;
 import org.ccs.opendfl.mysql.dflsystem.constant.SystemConfigCodes;
 import org.ccs.opendfl.mysql.dflsystem.po.DflSystemConfigPo;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -64,5 +65,26 @@ public interface IDflSystemConfigBiz extends IBaseService<DflSystemConfigPo> {
     public List<DflSystemConfigPo> getSysconfigByName(Integer confType, String name);
 
     public void getConfigValue_evict(String configCode);
+
+    /**
+     * 如果状态无效，则自动取默认值
+     * 如果已删除，有调用会重新生成新数据
+     * @param configCode
+     * @param <E>
+     * @return
+     */
     <E> E getConfigValue(String configCode);
+
+    /**
+     * 取未删除的最大修改时间
+     * @return
+     */
+    public Long getSysconfigMaxUpdateTime();
+
+    /**
+     * 查询有新修改的数据
+     * @param modifyTime
+     * @return
+     */
+    public List<DflSystemConfigPo> findSystemConfigByNewlyModify(Long modifyTime);
 }
