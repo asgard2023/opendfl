@@ -6,7 +6,8 @@ info:
 
 spring:
   redis:
-    host: localhost
+    host: 192.168.1.254
+    database: 2
     password: ''
     port: 6379
     jedis:

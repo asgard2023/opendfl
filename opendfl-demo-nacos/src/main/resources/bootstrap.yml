@@ -5,14 +5,14 @@ spring:
     nacos:
       discovery:
         # 指定nacos server的地址
-        server-addr: localhost:8848
+        server-addr: 192.168.1.254:8848
         cluster-name: BJ
         metadata:
           author: chenjh
           version: v1
       config:
         file-extension: yml
-        server-addr: localhost:8848
+        server-addr: 192.168.1.254:8848
         group: DEFAULT_GROUP
         cluster-name: BJ
         name: opendfl-demo
