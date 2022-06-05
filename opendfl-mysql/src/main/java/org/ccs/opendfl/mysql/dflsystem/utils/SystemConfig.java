@@ -32,6 +32,7 @@ public class SystemConfig {
     @Autowired
     public void setDflSystemConfigBiz(IDflSystemConfigBiz dflSystemConfigBiz) {
         SystemConfig.dflSystemConfigBiz = dflSystemConfigBiz;
+        SystemConfig.loadAnyChange(System.currentTimeMillis());
     }
 
     /**
@@ -147,7 +148,7 @@ public class SystemConfig {
     private static Long maxModifyTimeSysConfigLT = 0L;
 
     /**
-     * 时支持根修改时间，来重新加载系统参数配置
+     * 时支持根据修改时间，来重新加载系统参数配置
      *
      * @param curTime
      */

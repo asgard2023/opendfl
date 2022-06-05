@@ -141,22 +141,24 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
         String key = (String) CommUtils.nvl(aliasName, frequency.getName());
         DflFrequencyPo frequencyPo = dflFrequencyBiz.getFrequencyByCode(key, frequency.getTime());
         if (frequencyPo != null) {
-            FrequencyMysqlVo frequencyMysql = FrequencyMysqlVo.copy(frequency);
-            //如果数据状态无效，则用原来的默认值
-            frequencyMysql.setLimit(frequencyPo.getLimitCount());
-            frequencyMysql.setIpUserCount(frequencyPo.getIpUserCount());
-            frequencyMysql.setUserIpCount(frequencyPo.getUserIpCount());
-            frequencyMysql.setErrMsg(frequencyPo.getErrMsg());
-            frequencyMysql.setErrMsgEn(frequencyPo.getErrMsgEn());
-            frequencyMysql.setStatus(frequencyPo.getStatus());
-            return frequencyMysql;
-
+            return getFrequencyMysqlVo(frequency, frequencyPo);
         } else {
             //首次加载时自动保存
             autoCreateFrequency(frequency);
+            return null;
         }
+    }
 
-        return null;
+    private FrequencyMysqlVo getFrequencyMysqlVo(FrequencyVo frequency, DflFrequencyPo frequencyPo) {
+        FrequencyMysqlVo frequencyMysql = FrequencyMysqlVo.copy(frequency);
+        //如果数据状态无效，则用原来的默认值
+        frequencyMysql.setLimit(frequencyPo.getLimitCount());
+        frequencyMysql.setIpUserCount(frequencyPo.getIpUserCount());
+        frequencyMysql.setUserIpCount(frequencyPo.getUserIpCount());
+        frequencyMysql.setErrMsg(frequencyPo.getErrMsg());
+        frequencyMysql.setErrMsgEn(frequencyPo.getErrMsgEn());
+        frequencyMysql.setStatus(frequencyPo.getStatus());
+        return frequencyMysql;
     }
 
     private void autoCreateFrequency(FrequencyVo frequency) {
@@ -219,8 +221,17 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
             if (loadTime == null || (loadTime.longValue() != maxUpdateTime.longValue())) {
                 log.info("-----limitBySysconfigUri--uri={} maxUpdateTime={} reload config by modify_time changed loadTime={}", requestUri, maxUpdateTime, System.currentTimeMillis() - curTime);
                 loadSysconfigTimeMap.put(keyLoad, maxUpdateTime);
-                list = getLimitUriConfigVos(requestVo, requestUri);
-                uriLimitConfigsMap.put(requestUri, list);
+                List<DflFrequencyPo> dflFrequencyPoList = dflFrequencyBiz.getFrequencyByUri(requestUri);
+                if (CollectionUtils.isEmpty(dflFrequencyPoList)) {
+                    //首次加载时自动保存
+                    autoCreateFrequencyByRequest(requestVo, requestUri);
+                    list= Collections.emptyList();
+                    uriLimitConfigsMap.put(requestUri, list);
+                }
+                else {
+                    list = getLimitUriConfigVos(dflFrequencyPoList, requestVo.getMethod(), requestUri);
+                    uriLimitConfigsMap.put(requestUri, list);
+                }
             }
         }
         if (list == null) {
@@ -229,13 +240,7 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
         requestVo.setLimitRequests(list);
     }
 
-    private List<LimitUriConfigVo> getLimitUriConfigVos(RequestVo requestVo, String requestUri) {
-        List<DflFrequencyPo> dflFrequencyPoList = dflFrequencyBiz.getFrequencyByUri(requestUri);
-        if (CollectionUtils.isEmpty(dflFrequencyPoList)) {
-            //首次加载时自动保存
-            autoCreateFrequencyByRequest(requestVo, requestUri);
-            return Collections.emptyList();
-        }
+    private List<LimitUriConfigVo> getLimitUriConfigVos(List<DflFrequencyPo> dflFrequencyPoList, String method, String requestUri) {
         List<LimitUriConfigVo> list = new ArrayList<>();
         for (DflFrequencyPo dflFrequencyPo : dflFrequencyPoList) {
             //如果数据状态无效，该项不起作用
@@ -245,7 +250,7 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
             if (dflFrequencyPo.getTime() == null || dflFrequencyPo.getTime() == 0) {
                 continue;
             }
-            boolean isSameMethod = StringUtils.equals(dflFrequencyPo.getMethod(), requestVo.getMethod());
+            boolean isSameMethod = StringUtils.equals(dflFrequencyPo.getMethod(), method);
             boolean isEmptyMethod = StringUtils.isBlank(dflFrequencyPo.getMethod());
             //uriConfig支持请求方法,如GET/POST
             if (isEmptyMethod || !isEmptyMethod && isSameMethod) {
@@ -255,6 +260,4 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
         }
         return list;
     }
-
-
 }
