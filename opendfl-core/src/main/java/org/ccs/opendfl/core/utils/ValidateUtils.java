@@ -1,16 +1,28 @@
 package org.ccs.opendfl.core.utils;
 
-import org.ccs.opendfl.core.exception.BaseException;
-import org.ccs.opendfl.core.exception.DataFormatException;
-import org.ccs.opendfl.core.exception.ParamErrorException;
-import org.ccs.opendfl.core.exception.ParamNullException;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.ccs.opendfl.core.config.OpendflConfiguration;
+import org.ccs.opendfl.core.exception.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collection;
+import java.util.*;
 
+@Slf4j
+@Service
 public class ValidateUtils {
-    private ValidateUtils(){
+    private ValidateUtils() {
 
+    }
+
+    private static OpendflConfiguration opendflConfiguration;
+
+    @Autowired
+    public void setOpendflConfiguration(OpendflConfiguration opendfl) {
+        ValidateUtils.opendflConfiguration = opendfl;
     }
 
     /**
@@ -56,11 +68,11 @@ public class ValidateUtils {
     /**
      * 参证参数必须合理
      *
-     * @Deprecated
      * @param value
      * @param msg
      * @param values 多个值用英文“,”隔开
      * @throws BaseException
+     * @Deprecated
      */
     public static void mustIn(Object value, String msg, String values) throws BaseException {
         if (StringUtils.isEmpty(values)) {
@@ -187,5 +199,178 @@ public class ValidateUtils {
         }
     }
 
+
+    /**
+     * 检查天数
+     *
+     * @param params
+     * @param noDayLimits 如果这些参数有值，就不限制天数条件
+     * @throws Exception
+     */
+    public static void checkTimeDateLimit(Map<String, Object> params, String noDayLimits) throws BaseException {
+        int limitDay=opendflConfiguration.getBaseLimit().getSearchDateMaxDay();
+        checkTimeDateLimit(params, noDayLimits, limitDay, 0);
+    }
+
+    /**
+     * 检查天数
+     *
+     * @param params
+     * @param noDayLimits 如果这些参数有值，就不限制天数条件
+     * @param limitDay    天数限制
+     * @throws Exception
+     */
+    public static void checkTimeDateLimit(Map<String, Object> params, String noDayLimits, int limitDay) throws BaseException {
+        checkTimeDateLimit(params, noDayLimits, limitDay, 0);
+    }
+
+    private static boolean isParaValue(Map<String, Object> params, List<String> noLimitParams) {
+        boolean isParaValue = false;
+        for (String noLimit : noLimitParams) {
+            Object paramValue = params.get(noLimit);
+            if (paramValue != null && !"".equals(paramValue)) {
+                isParaValue = true;
+                break;
+            }
+        }
+        return isParaValue;
+    }
+
+    /**
+     * 检查天数
+     *
+     * @param params
+     * @param noDayLimits 如果这些参数有值，就不限制天数条件
+     * @param limitDay    天数限制
+     * @throws Exception
+     */
+    public static void checkTimeDateLimit(Map<String, Object> params, String noDayLimits, int limitDay, int limitUserDay) throws BaseException {
+        boolean isParamValue = false;
+        if (StringUtils.isNotBlank(noDayLimits)) {
+            List<String> noLimitParams = Arrays.asList(noDayLimits.split(","));
+            if (isParaValue(params, noLimitParams)) {
+                isParamValue = true;
+                if (limitUserDay == 0) {
+                    return;
+                }
+            }
+        }
+        String startTime = (String) params.get("startTime");
+        if (startTime == null) {
+            startTime = (String) params.get("startDate");
+        }
+        String endTime = (String) params.get("endTime");
+        if (endTime == null) {
+            endTime = (String) params.get("endDate");
+        }
+        if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
+            throw new FailedException("开始时间，结束时间不能都为空");
+        }
+
+
+        Date startTimeDate = null;
+        String timeValueDateFormat = "yyyyMMdd";
+        if (StringUtils.isNotBlank(startTime)) {
+            if (StringUtils.isNumeric(startTime) && startTime.length() == timeValueDateFormat.length()) {
+                startTimeDate = DateUtil.parse(startTime, timeValueDateFormat);
+            } else if (startTime.length() == DatePattern.NORM_DATE_PATTERN.length()) {
+                startTimeDate = DateUtil.parseDate(startTime);
+            } else {
+                startTimeDate = DateUtil.parseDateTime(startTime);
+            }
+            if (startTimeDate == null) {
+                throw new FailedException("开始时间无效");
+            }
+        }
+
+        Date endTimeDate = null;
+        if (StringUtils.isNotBlank(endTime)) {
+            if (StringUtils.isNumeric(endTime) && endTime.length() == timeValueDateFormat.length()) {
+                endTimeDate = DateUtil.parse(endTime, timeValueDateFormat);
+            } else if (endTime.length() == DatePattern.NORM_DATE_PATTERN.length()) {
+                endTimeDate = DateUtil.parseDate(endTime);
+            } else {
+                endTimeDate = DateUtil.parseDateTime(endTime);
+            }
+            if (endTimeDate == null) {
+                throw new FailedException("结束时间无效");
+            }
+        }
+        else{
+            endTimeDate=new Date();
+        }
+        if (isParamValue && limitUserDay > 0) {
+            checkDayLimit(limitUserDay, startTimeDate, endTimeDate);
+            return;
+        }
+
+        checkDayLimit(limitDay, startTimeDate, endTimeDate);
+
+        if (!"export".equals(params.get("opFuncType"))) {
+            validPageCount(params);//检查要查的数据行数
+        }
+    }
+
+    private static void checkDayLimit(int limitDay, Date startTimeDate, Date endTimeDate) {
+        if (startTimeDate != null && endTimeDate != null) {
+            long day = endTimeDate.getTime() / 3600 / 24000 - startTimeDate.getTime() / 3600 / 24000;
+            if (day < 0) {
+                throw new FailedException("结束时间小于开始时间");
+            } else if (day > limitDay) {
+                throw new FailedException("查询天数超出限制:" + limitDay);
+            }
+        }
+    }
+
+    private static Integer limitPageSize = 1000;
+    private static Integer limitPageMax = 1000;
+    private static Integer limitPageTotalRow = 10000;
+    private static Long limitLoadTime = 0L;
+
+    public static void loadLimit() {
+        Long curTime = System.currentTimeMillis();
+        if (limitPageSize == null || curTime - limitLoadTime > 60000) {
+            limitLoadTime = curTime;
+            limitPageSize = opendflConfiguration.getBaseLimit().getPageSizeMax();
+            limitPageMax = opendflConfiguration.getBaseLimit().getPageNumMax();
+            limitPageTotalRow = opendflConfiguration.getBaseLimit().getTotalRowMax();
+        }
+    }
+
+    /**
+     * 初始化查询分页对象
+     *
+     * @param params
+     * @return
+     * @throws BaseException
+     */
+    public static void validPageCount(Map<String, Object> params) throws BaseException {
+        Object pageNumObj = params.get("pageNum");
+        if (pageNumObj == null) {
+            pageNumObj = params.get("page");
+        }
+        Object pageSizeObj = params.get("rows");
+        if (pageSizeObj == null) {
+            pageSizeObj = params.get("pageSize");
+        }
+        ValidateUtils.notNull(pageNumObj, "请输入页码参数page(或者pageNum)");
+        ValidateUtils.notNull(pageSizeObj, "请输入页长参数pageSize");
+        int pageNum = (Integer.parseInt(pageNumObj.toString()));
+        int pageSize = (Integer.parseInt(pageSizeObj.toString()));
+        loadLimit();
+        if (pageSize > limitPageSize) {
+            log.warn("----validPageCount--pageSize={} outLimit", pageSize);
+            throw new FailedException("pageSize out limit");
+        }
+        if (pageNum > limitPageMax) {
+            log.warn("----validPageCount--pageNum={} outLimit", pageNum);
+            throw new FailedException("pageNum out limit");
+        }
+        int totalRow = pageNum * pageSize;
+        if (totalRow > limitPageTotalRow) {
+            log.warn("----validPageCount--totalRow={} outLimit", totalRow);
+            throw new FailedException("pageNum out limit");
+        }
+    }
 
 }

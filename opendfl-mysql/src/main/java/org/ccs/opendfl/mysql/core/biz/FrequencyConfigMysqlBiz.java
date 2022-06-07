@@ -3,6 +3,7 @@ package org.ccs.opendfl.mysql.core.biz;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IFrequencyConfigBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
+import org.ccs.opendfl.core.config.OpendflConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.constants.FrequencyLimitType;
@@ -40,6 +41,8 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
     private IDflFrequencyBiz dflFrequencyBiz;
     @Autowired
     private FrequencyConfiguration frequencyConfiguration;
+    @Autowired
+    private OpendflConfiguration opendflConfiguration;
 
     /**
      * 有修改日志一下
@@ -121,6 +124,11 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
                 frequencyConfiguration.setInitLogCount(SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_INIT_LOG_DEBUG_COUNT));
                 frequencyConfiguration.getLimit().setItems(SystemConfig.getByCache(SystemConfigCodes.LIMIT_RULE_ITEMS));
                 frequencyConfiguration.getLimit().setOutLimitLogTime(SystemConfig.getByCache(SystemConfigCodes.LIMIT_OUT_LIMIT_MIN_TIME));
+
+                opendflConfiguration.getBaseLimit().setPageSizeMax(SystemConfig.getByCache(SystemConfigCodes.BASE_LIMIT_PAGE_SIZE_MAX));
+                opendflConfiguration.getBaseLimit().setPageNumMax(SystemConfig.getByCache(SystemConfigCodes.BASE_LIMIT_PAGE_NUM_MAX));
+                opendflConfiguration.getBaseLimit().setTotalRowMax(SystemConfig.getByCache(SystemConfigCodes.BASE_LIMIT_TOTAL_ROW_MAX));
+                opendflConfiguration.getBaseLimit().setSearchDateMaxDay(SystemConfig.getByCache(SystemConfigCodes.BASE_LIMIT_SEARCH_DATE_DAY_MAX));
             } catch (Exception e) {
                 log.warn("-----recoverFrequencyConfig--error={}", e.getMessage(), e);
             }

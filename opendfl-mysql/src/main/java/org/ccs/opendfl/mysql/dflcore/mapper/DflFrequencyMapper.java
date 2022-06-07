@@ -17,4 +17,7 @@ import java.util.Date;
 public interface DflFrequencyMapper extends Mapper<DflFrequencyPo> {
     @Select("select max(modify_time) from dfl_frequency where if_del=0 and status=1 and uri=#{uri}")
     public Date getFrequencyByUriMaxUpdateTime(@Param("uri") String uri);
+
+    @Select("select max(modify_time) from dfl_frequency where if_del=0")
+    public Date getFrequencyMaxUpdateTime();
 }

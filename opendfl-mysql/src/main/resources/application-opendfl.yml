@@ -1,2 +1,7 @@
 opendfl:
   defaultAttrName: userId
+  defaultDeviceId: deviceId
+  baseLimit:
+    pageSizeMax: 1000
+    pageNumMax: 1000
+    totalRowMax: 10000

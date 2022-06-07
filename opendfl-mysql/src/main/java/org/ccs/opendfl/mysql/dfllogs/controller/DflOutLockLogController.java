@@ -74,6 +74,7 @@ public class DflOutLockLogController extends BaseController {
             entity = new DflOutLockLogPo();
         }
         Map<String, Object> params=this.createAllParams(request);
+        ValidateUtils.checkTimeDateLimit(params,"uri,ip,uid,userId",90);
         if (this.mysqlConfiguration.getUserIdToNum() == 1) {
             if (StringUtils.isNotBlank(entity.getUserId())) {
                 entity.setUid(this.dflLogUserBiz.getUid(entity.getUserId(), null, null));

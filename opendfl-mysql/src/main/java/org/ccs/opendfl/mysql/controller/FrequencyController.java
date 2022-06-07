@@ -14,6 +14,9 @@ import org.ccs.opendfl.core.utils.*;
 import org.ccs.opendfl.core.vo.*;
 import org.ccs.opendfl.mysql.auth.CheckAuthorization;
 import org.ccs.opendfl.mysql.auth.CheckLogin;
+import org.ccs.opendfl.mysql.base.BaseController;
+import org.ccs.opendfl.mysql.base.MyPageInfo;
+import org.ccs.opendfl.mysql.base.PageVO;
 import org.ccs.opendfl.mysql.constant.UserOperType;
 import org.ccs.opendfl.mysql.dflsystem.biz.IDflUserLoginBiz;
 import org.ccs.opendfl.mysql.utils.AuditLogUtils;
@@ -39,7 +42,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/frequency")
 @Slf4j
-public class FrequencyController {
+public class FrequencyController  extends BaseController {
     public static final String INSUFFICIENT_USER_PERMISSIONS = "Insufficient user permissions";
     @Autowired
     private IUserBiz userBiz;
@@ -318,7 +321,38 @@ public class FrequencyController {
 
         //显示从启动到现在各接口的调用情况（调用次数，调用时间超过1秒的最大时长，超限次数）
         requestRunCount(type, day, showList);
+
         return ResultData.success(showList);
+    }
+
+    @RequestMapping(value = "/requestScansPage", method = {RequestMethod.POST, RequestMethod.GET})
+    @CheckLogin
+    public PageVO<RequestShowVo> requestScansPage(HttpServletRequest request, RequestVo requestVo
+            , @RequestParam(value = "type", required = false, defaultValue = "current") String type
+            , @RequestParam(value = "day", required = false, defaultValue = "-1") Integer day, MyPageInfo<RequestShowVo> pageInfo) {
+        this.pageSortBy(pageInfo);
+        if (pageInfo.getPageSize() == 0) {
+            pageInfo.setPageSize(getPageSize());
+        }
+
+        ResultData resultData = requestScans(request, requestVo, type, day);
+        List<RequestShowVo> showList = (List<RequestShowVo>)resultData.getData();
+
+        List<RequestShowVo> pageList=new ArrayList<>();
+        int startCount=(pageInfo.getPageNum())*pageInfo.getPageSize();
+        int endCount=(pageInfo.getPageNum()+1)*pageInfo.getPageSize();
+        if(showList.size()>endCount){
+            pageList.addAll(showList.subList(startCount, endCount));
+        }
+        else if(showList.size()>startCount){
+            pageList.addAll(showList.subList(startCount, showList.size()-1));
+        }
+        MyPageInfo myPageInfo= new MyPageInfo<>(pageList);
+        myPageInfo.setTotal(showList.size()/pageInfo.getPageSize());
+        myPageInfo.setPageNum(pageInfo.getPageNum());
+        myPageInfo.setPageSize(pageInfo.getPageSize());
+        return new PageVO<>(myPageInfo);
+
     }
 
     private void addRequestRunTime(List<RequestShowVo> list) {

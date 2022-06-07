@@ -29,7 +29,8 @@ function doSearchReload() {
 
 
 function doSearchTree() {
-    var confType = $('#query_confType').combobox('getValue');
+    var confType;
+    // confType=$('#query_confType').combobox('getValue');
     $.ajax({
         type: 'post',
         headers: app.headers,
@@ -278,10 +279,10 @@ function onDestroy() {
 
 dict_tf_conf_type = [
     {id: '1', name: '系统参数', color: 'red'},
-    {id: '2', name: 'All product param', color: 'pink'},
-    {id: '3', name: 'product param', color: 'pink'},
-    {id: '4', name: 'User config', color: 'green'},
-    {id: '5', name: '客户参数配置', color: 'orange'}
+   // {id: '2', name: 'All product param', color: 'pink'},
+   {id: '3', name: 'project param', color: 'pink'}
+   // {id: '4', name: 'User config', color: 'green'},
+   // {id: '5', name: '客户参数配置', color: 'orange'}
 ];
 
 function formatter(node) {
@@ -404,7 +405,8 @@ function listenerName(ex) {
 $('#query_name').keydown(listenerName);
 
 function onBeforeExpand(node, param) {
-    var confType = $('#query_confType').combobox('getValue');
+    var confType;
+    // confType = $('#query_confType').combobox('getValue');
     var url = "/dflSystem/dflSystemConfig/findSysconfigByParentId?parentId=" + node.id;
     if (confType) {
         url += '&confType=' + confType;

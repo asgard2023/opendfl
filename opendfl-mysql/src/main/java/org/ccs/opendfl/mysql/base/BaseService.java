@@ -399,7 +399,7 @@ public abstract class BaseService<T> implements IBaseService<T> {
      * @throws Exception
      */
     @Override
-    public void loadPropoty(List<?> list, String byProp, String propId, String propName, Class<T> clazz) throws Exception {
+    public void loadProperty(List<?> list, String byProp, String propId, String propName, Class<T> clazz) throws Exception {
         if (list == null || list.size() == 0) {
             return;
         }
@@ -418,7 +418,7 @@ public abstract class BaseService<T> implements IBaseService<T> {
     }
 
     @Override
-    public void loadPropoty(List<?> list, String byKey, String setName, String getKey, String getName, Class<T> clazz) throws Exception {
+    public void loadProperty(List<?> list, String byKey, String setName, String getKey, String getName, Class<T> clazz) throws Exception {
         if (list == null) return;
         List<Object> props = BeanUtils.getPropsByName(list, byKey);
         List<T> findList = findByPropotys(getKey, props, clazz);
@@ -444,7 +444,7 @@ public abstract class BaseService<T> implements IBaseService<T> {
             return map;
         }
         for (T po : pos) {
-            Object tid = BeanUtils.getValue(po, "tid");
+            Object tid = BeanUtils.getValue(po, "id");
             map.put(tid.toString(), po);
         }
         return map;

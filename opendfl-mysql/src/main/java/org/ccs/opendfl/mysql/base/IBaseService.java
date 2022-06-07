@@ -132,11 +132,11 @@ public interface IBaseService<T> {
      */
     List<T> findByPropoty(String propoty, Object value, Class<T> entity, String orderByClause);
 
-    void loadPropoty(List<?> list, String byProp, String propId, String propName, Class<T> clazz) throws Exception;
+    void loadProperty(List<?> list, String byProp, String propId, String propName, Class<T> clazz) throws Exception;
 
     List<T> findByPropotys(String propName, List<Object> propotys, Class<?> entityClass, String orderByClause) throws Exception;
 
-    void loadPropoty(List<?> list, String byKey, String setName, String getKey, String getName, Class<T> clazz)
+    void loadProperty(List<?> list, String byKey, String setName, String getKey, String getName, Class<T> clazz)
             throws Exception;
 
     List<T> findByPropotys(String propName, List<Object> propotys, Class<?> entityClass) throws Exception;

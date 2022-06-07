@@ -189,4 +189,22 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
         }
         return null;
     }
+
+    @Override
+    public Long getFrequencyMaxUpdateTime(){
+        Date maxUpdateTime = this.mapper.getFrequencyMaxUpdateTime();
+        if (maxUpdateTime != null) {
+            return maxUpdateTime.getTime();
+        }
+        return null;
+    }
+
+    @Override
+    public List<DflFrequencyPo> findFrequencyByNewlyModify(Long modifyTime){
+        Example example = new Example(DflFrequencyPo.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("ifDel", 0);
+        criteria.andGreaterThan("modifyTime", new Date(modifyTime));
+        return this.mapper.selectByExample(example);
+    }
 }

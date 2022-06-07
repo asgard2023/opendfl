@@ -75,6 +75,7 @@ public class DflAuditLogController extends BaseController {
             pageInfo.setPageSize(getPageSize());
         }
         Map<String, Object> params = this.createAllParams(request);
+        ValidateUtils.checkTimeDateLimit(params,"uri,uriId,ip,uid,user.nickname");
         if (StringUtils.isNotBlank(entity.getIp())) {
             entity.setIp(RequestUtils.convertIpv4(entity.getIp()));
             params.put("ip", entity.getIp());

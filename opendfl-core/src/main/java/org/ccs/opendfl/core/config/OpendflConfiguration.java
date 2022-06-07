@@ -1,6 +1,7 @@
 package org.ccs.opendfl.core.config;
 
 import lombok.Data;
+import org.ccs.opendfl.core.config.vo.BaseLimitVo;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,4 +11,5 @@ import org.springframework.context.annotation.Configuration;
 public class OpendflConfiguration {
     private String defaultAttrName="userId";
     private String defaultDeviceId="deviceId";
+    private BaseLimitVo baseLimit=new BaseLimitVo();
 }

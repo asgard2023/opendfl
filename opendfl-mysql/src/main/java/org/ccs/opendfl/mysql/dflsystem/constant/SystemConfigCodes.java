@@ -13,7 +13,14 @@ public enum SystemConfigCodes {
     /**
      * 全局参数默认附加属性
      */
-    GLOBAL_DEFAULT_ATTR_NAME("global:defaultAttrName", "全局参数默认附加属性", ConfigValueType.STRING, "userId", Constants.PID_ROOT),
+    GLOBAL_DEFAULT_ATTR_NAME("global:defaultAttrName", "全局参数默认附加属性", ConfigValueType.STRING, "userId", Constants.PID_BASE_LIMIT),
+    /**
+     * opendfl.baseLimit
+     */
+    BASE_LIMIT_PAGE_NUM_MAX("baseLimit:pageNumMax", "baseLimit最大页数", ConfigValueType.INT, "1000", Constants.PID_BASE_LIMIT),
+    BASE_LIMIT_PAGE_SIZE_MAX("baseLimit:pageSizeMax", "baseLimit最大每页行数", ConfigValueType.INT, "1000", Constants.PID_BASE_LIMIT),
+    BASE_LIMIT_TOTAL_ROW_MAX("baseLimit:totalRowMax", "baseLimit最大总行数", ConfigValueType.INT, "10000", Constants.PID_BASE_LIMIT),
+    BASE_LIMIT_SEARCH_DATE_DAY_MAX("baseLimit:searchDateDayMax", "baseLimit查询时段最大天数", ConfigValueType.INT, "90", Constants.PID_BASE_LIMIT),
 
     /**
      * 分布式锁功能是否启用
@@ -63,6 +70,7 @@ public enum SystemConfigCodes {
         public static final Integer PID_FREQUENCY = 3;
         public static final Integer PID_BLACK = 4;
         public static final Integer PID_WHITE = 5;
+        public static final Integer PID_BASE_LIMIT = 6;
     }
 
 

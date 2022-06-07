@@ -90,7 +90,6 @@
         </div>
         <table id="dg" class="easyui-datagrid"
                data-options="headers:app.headers, onDblClickRow:onDblClick, onClickRow:onClick, onLoadError:loadError, onLoadSuccess:function(){$('.datagrid-btable').find('div.datagrid-cell').css('text-align','left');}"
-               url="/dflLogs/dflLogUser/list2"
                toolbar="#toolbar" pagination="true" sortName="createTime" sortOrder="desc"
                rownumbers="true" fitColumns="true" singleSelect="true" style="display:none;">
             <thead>
@@ -156,9 +155,14 @@
         $('#search-form')[0].reset();
     });
 
+    $(function () {
+        doSearch();
+    });
+
     function doSearch() {
+        var url="/dflLogs/dflLogUser/list2";
         var jsonParam = $('#search-form').serializeJson();
-        $('#dg').datagrid('load', jsonParam);
+        $('#dg').datagrid({url: url, queryParams: jsonParam})
     }
 
 

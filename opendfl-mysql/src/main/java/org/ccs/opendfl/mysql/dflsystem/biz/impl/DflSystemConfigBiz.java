@@ -7,7 +7,6 @@ import org.ccs.opendfl.core.utils.ValidateUtils;
 import org.ccs.opendfl.mysql.base.BaseService;
 import org.ccs.opendfl.mysql.base.ISelfInject;
 import org.ccs.opendfl.mysql.base.MyPageInfo;
-import org.ccs.opendfl.mysql.constant.CommonStatus;
 import org.ccs.opendfl.mysql.dflsystem.biz.IDflSystemConfigBiz;
 import org.ccs.opendfl.mysql.dflsystem.constant.ConfigValueType;
 import org.ccs.opendfl.mysql.dflsystem.constant.SystemConfigCodes;
@@ -157,7 +156,11 @@ public class DflSystemConfigBiz extends BaseService<DflSystemConfigPo> implement
         if (parentIds.size() == 0) {
             return new ArrayList<>();
         }
-
+        if(confType!=null){
+//            throw new FailedException("暂不支持");
+            log.warn("-----findSysconfigByParentIds--confType={} 暂不支持", confType);
+            confType = null;
+        }
         return this.mapper.findSysconfigByParentIds(confType, parentIds);
     }
 

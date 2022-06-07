@@ -62,7 +62,7 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler({Exception.class})
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
     public Object handleException(HttpServletRequest request, Exception ex) {
         if (ex != null && (ex instanceof HttpRequestMethodNotSupportedException
@@ -84,7 +84,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BaseException.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ResultData handleBaseException(HttpServletRequest request, BaseException e) {
         String logType = getLogExceptionTypeBase();
