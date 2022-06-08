@@ -24,7 +24,7 @@ public @interface Frequency {
     String name() default "all";
 
     /**
-     * 别名，用于多个功能共用一个限制
+     * 只相当于分组，没有实际作用，允许重复
      *
      * @return
      */

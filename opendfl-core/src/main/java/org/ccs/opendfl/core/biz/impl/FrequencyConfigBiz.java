@@ -6,7 +6,6 @@ import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitFrequencyConfigVo;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
-import org.ccs.opendfl.core.utils.CommUtils;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestVo;
@@ -80,12 +79,7 @@ public class FrequencyConfigBiz implements IFrequencyConfigBiz {
      * @param frequency FrequencyVo
      */
     private FrequencyVo limitBySysconfig(FrequencyVo frequency) {
-        String aliasName = null;
-
-        if (!"".equals(frequency.getAliasName())) {
-            aliasName = frequency.getAliasName();
-        }
-        String key = (String) CommUtils.nvl(aliasName, frequency.getName());
+        String key = frequency.getName();
         List<LimitFrequencyConfigVo> frequencyConfigList = frequencyConfiguration.getLimit().getFrequencyConfigs();
         LimitFrequencyConfigVo frequencyConfigVo = null;
         for (LimitFrequencyConfigVo configVo : frequencyConfigList) {

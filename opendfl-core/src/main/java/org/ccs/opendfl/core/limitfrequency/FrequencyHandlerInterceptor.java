@@ -246,6 +246,10 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         frequencyConfigBiz.limitBySysconfigUri(requestVo);
         List<LimitUriConfigVo> limitConfigList = requestVo.getLimitRequests();
         for (LimitUriConfigVo uriConfigVo : limitConfigList) {
+            //无效数据不算
+            if(uriConfigVo.getStatus()!=1){
+                continue;
+            }
             frequencyVo = FrequencyVo.toFrequencyVo(frequencyVo, uriConfigVo);
             frequencyVo.setSysconfig(true);
             handleFrequency(response, params, frequencyVo, strategyParams);

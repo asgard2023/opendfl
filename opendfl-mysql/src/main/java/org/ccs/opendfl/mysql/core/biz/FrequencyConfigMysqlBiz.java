@@ -21,11 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * 频率限制配置查询-redis
@@ -70,6 +68,7 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
 
     @Override
     public void limitBySysconfigLoad(FrequencyVo frequency, Long curTime) {
+        loadAnyChange(curTime);
         //只支持注解模式，uriConfig模式不处理
         if (StringUtils.equals(FrequencyLimitType.URI_CONFIG.getType(), frequency.getLimitType())) {
             return;
@@ -141,12 +140,7 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
      * @param frequency FrequencyVo
      */
     private FrequencyMysqlVo limitBySysconfig(FrequencyVo frequency) {
-        String aliasName = null;
-
-        if (!"".equals(frequency.getAliasName())) {
-            aliasName = frequency.getAliasName();
-        }
-        String key = (String) CommUtils.nvl(aliasName, frequency.getName());
+        String key = frequency.getName();
         DflFrequencyPo frequencyPo = dflFrequencyBiz.getFrequencyByCode(key, frequency.getTime());
         if (frequencyPo != null) {
             return getFrequencyMysqlVo(frequency, frequencyPo);
@@ -233,10 +227,9 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
                 if (CollectionUtils.isEmpty(dflFrequencyPoList)) {
                     //首次加载时自动保存
                     autoCreateFrequencyByRequest(requestVo, requestUri);
-                    list= Collections.emptyList();
+                    list = Collections.emptyList();
                     uriLimitConfigsMap.put(requestUri, list);
-                }
-                else {
+                } else {
                     list = getLimitUriConfigVos(dflFrequencyPoList, requestVo.getMethod(), requestUri);
                     uriLimitConfigsMap.put(requestUri, list);
                 }
@@ -251,10 +244,6 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
     private List<LimitUriConfigVo> getLimitUriConfigVos(List<DflFrequencyPo> dflFrequencyPoList, String method, String requestUri) {
         List<LimitUriConfigVo> list = new ArrayList<>();
         for (DflFrequencyPo dflFrequencyPo : dflFrequencyPoList) {
-            //如果数据状态无效，该项不起作用
-            if (dflFrequencyPo.getStatus() != CommonStatus.VALID.getStatus()) {
-                continue;
-            }
             if (dflFrequencyPo.getTime() == null || dflFrequencyPo.getTime() == 0) {
                 continue;
             }
@@ -267,5 +256,99 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
             }
         }
         return list;
+    }
+
+    private static Long maxModifyTimeSysConfig = 0L;
+    private static Long maxModifyTimeSysConfigLT = 0L;
+
+    /**
+     * 时支持根据修改时间，来重新加载系统参数配置
+     *
+     * @param curTime
+     */
+    private void loadAnyChange(Long curTime) {
+        if (curTime - maxModifyTimeSysConfigLT > FrequencyConstant.LOAD_CONFIG_INTERVAL) {
+            maxModifyTimeSysConfigLT = curTime;
+            Long maxModifyTimeSysConfigData = dflFrequencyBiz.getFrequencyMaxUpdateTime();
+            if (maxModifyTimeSysConfigData > maxModifyTimeSysConfig) {
+                reloadNewlyModify(maxModifyTimeSysConfig, curTime);
+                maxModifyTimeSysConfig = maxModifyTimeSysConfigData;
+            }
+
+            //批量修改缓存的加载时间
+            loadSysconfigTimeMap.entrySet().stream().forEach(t -> {
+                t.setValue(curTime);
+            });
+        }
+    }
+
+    /**
+     * 重新加载有修改的数据
+     */
+    private void reloadNewlyModify(Long modifyTime, Long curTime) {
+        List<DflFrequencyPo> modifys = dflFrequencyBiz.findFrequencyByNewlyModify(modifyTime);
+        if (CollectionUtils.isEmpty(modifys)) {
+            return;
+        }
+        List<DflFrequencyPo> modifyFrequencys = modifys.stream().filter(t -> !FrequencyLimitType.URI_CONFIG.getType().equals(t.getLimitType())).collect(Collectors.toList());
+        Map<String, List<DflFrequencyPo>> modifyUriConfigs = modifys.stream().filter(t -> FrequencyLimitType.URI_CONFIG.getType().equals(t.getLimitType())).collect(Collectors.groupingBy(DflFrequencyPo::getUri));
+        log.info("-------reloadNewlyModify---modifyTime={} modifys={} modifyFrequencys={} modifyUriConfigs={}", modifyTime, modifys.size(), modifyFrequencys.size(), modifyUriConfigs.size());
+        reloadNewlyFrequency(modifyFrequencys, curTime);
+
+        reloadNewlyUriConfigs(curTime, modifyUriConfigs);
+    }
+
+    private void reloadNewlyUriConfigs(Long curTime, Map<String, List<DflFrequencyPo>> modifyUriConfigs) {
+        Set<Map.Entry<String, List<DflFrequencyPo>>> sets = modifyUriConfigs.entrySet();
+        for (Map.Entry<String, List<DflFrequencyPo>> entry : sets) {
+            String requestUri = entry.getKey();
+            List<DflFrequencyPo> dflFrequencyPoList = entry.getValue();
+            String method = dflFrequencyPoList.get(0).getMethod();
+//            String cacheKey = "uri:" + requestUri;
+//            loadSysconfigTimeMap.put(cacheKey, curTime);
+//            String keyLoad = "uriLoad:" + requestUri;
+//            loadSysconfigTimeMap.put(keyLoad, curTime);
+//            List<LimitUriConfigVo> exists =uriLimitConfigsMap.get(requestUri);
+//            List<LimitUriConfigVo> list = getLimitUriConfigVos(dflFrequencyPoList, method, requestUri);
+//            uriLimitConfigsMap.put(requestUri, list);
+
+            //复用已有方法
+            RequestVo requestVo = new RequestVo();
+            requestVo.setRequestUri(requestUri);
+            requestVo.setMethod(method);
+            limitBySysconfigUri(requestVo);
+        }
+    }
+
+    private void reloadNewlyFrequency(List<DflFrequencyPo> modifyFrequencys, Long curTime) {
+        String cacheKey;
+        for (DflFrequencyPo modifyInfo : modifyFrequencys) {
+            cacheKey = modifyInfo.getCode();
+            if(cacheKey==null){
+                log.warn("----reloadNewlyFrequency--cacheKey={} uri={} unexist", cacheKey, modifyInfo.getUri());
+                continue;
+            }
+            FrequencyMysqlVo frequencyMysqlExist = sysconfigLimitMap.get(cacheKey);
+            if (frequencyMysqlExist == null) {
+                log.warn("----reloadNewlyFrequency--cacheKey={} unexist", cacheKey);
+                continue;
+            }
+            FrequencyVo frequencyVo = new FrequencyVo();
+            frequencyVo.setName(frequencyMysqlExist.getName());
+            frequencyVo.setAliasName(frequencyMysqlExist.getAliasName());
+            frequencyVo.setLimit(frequencyMysqlExist.getLimit());
+            frequencyVo.setTime(frequencyMysqlExist.getTime());
+            frequencyVo.setRequestUri(frequencyMysqlExist.getRequestUri());
+            frequencyVo.setLimitType(frequencyMysqlExist.getLimitType());
+            frequencyVo.setUserIpCount(frequencyMysqlExist.getUserIpCount());
+            frequencyVo.setIpUserCount(frequencyMysqlExist.getIpUserCount());
+            frequencyVo.setAttrName(frequencyMysqlExist.getAttrName());
+            frequencyVo.setNeedLogin(frequencyMysqlExist.isNeedLogin());
+            frequencyVo.setWhiteCode(frequencyMysqlExist.getWhiteCode());
+            frequencyVo.setCreateTime(frequencyMysqlExist.getCreateTime());
+            loadSysconfigTimeMap.put(cacheKey, curTime);
+            FrequencyMysqlVo frequencyMysqlNew = getFrequencyMysqlVo(frequencyVo, modifyInfo);
+            sysconfigLimitMap.put(cacheKey, frequencyMysqlNew);
+        }
     }
 }

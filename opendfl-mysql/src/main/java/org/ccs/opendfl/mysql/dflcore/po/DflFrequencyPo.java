@@ -33,6 +33,7 @@ public class DflFrequencyPo implements Serializable {
 
     public static LimitUriConfigVo toConfigVo(DflFrequencyPo frequencyPo) {
         LimitUriConfigVo uriConfigVo = new LimitUriConfigVo();
+        uriConfigVo.setStatus(frequencyPo.getStatus());
         uriConfigVo.setUri(frequencyPo.getUri());
         uriConfigVo.setTime(frequencyPo.getTime());
         uriConfigVo.setLimit(frequencyPo.getLimitCount());

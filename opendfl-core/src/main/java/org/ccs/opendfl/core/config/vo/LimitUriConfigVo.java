@@ -13,6 +13,7 @@ public class LimitUriConfigVo {
     private Integer userIp = 0;
     private Integer ipUser = 0;
     private String attrName = "";
+    private Integer status=0;
     private String errMsg = FrequencyConstant.FREQ_ERR_MSG;
     private String errMsgEn = FrequencyConstant.FREQ_ERR_MSG_EN;
     private String whiteCode = FrequencyConstant.NONE;
