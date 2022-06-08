@@ -75,6 +75,8 @@ public interface IDflSystemConfigBiz extends IBaseService<DflSystemConfigPo> {
      */
     <E> E getConfigValue(String configCode);
 
+    public void getSysconfigMaxUpdateTime_evict();
+
     /**
      * 取未删除的最大修改时间
      * @return

@@ -115,6 +115,7 @@ public class DflSystemConfigBiz extends BaseService<DflSystemConfigPo> implement
             entity.setIfDel(0);
         }
         int v = this.mapper.insert(entity);
+        this._self.getSysconfigMaxUpdateTime_evict();
         return v;
     }
 
@@ -125,6 +126,7 @@ public class DflSystemConfigBiz extends BaseService<DflSystemConfigPo> implement
         int v = this.updateByPrimaryKeySelective(entity);
         if (v > 0) {
             this._self.getConfigValue_evict(exist.getCode());
+            this._self.getSysconfigMaxUpdateTime_evict();
         }
         return v;
     }
@@ -141,6 +143,7 @@ public class DflSystemConfigBiz extends BaseService<DflSystemConfigPo> implement
         int v = this.updateByPrimaryKeySelective(po);
         if (v > 0) {
             this._self.getConfigValue_evict(exist.getCode());
+            this._self.getSysconfigMaxUpdateTime_evict();
         }
         return v;
     }
@@ -156,7 +159,7 @@ public class DflSystemConfigBiz extends BaseService<DflSystemConfigPo> implement
         if (parentIds.size() == 0) {
             return new ArrayList<>();
         }
-        if(confType!=null){
+        if (confType != null) {
 //            throw new FailedException("暂不支持");
             log.warn("-----findSysconfigByParentIds--confType={} 暂不支持", confType);
             confType = null;
@@ -242,16 +245,23 @@ public class DflSystemConfigBiz extends BaseService<DflSystemConfigPo> implement
     }
 
     @Override
-    public Long getSysconfigMaxUpdateTime(){
+    @CacheEvict(value = CacheTimeType.CACHE1H, key = "'opendfl:getSysconfigMaxUpdateTime'")
+    public void getSysconfigMaxUpdateTime_evict() {
+        logger.info("-----getSysconfigMaxUpdateTime_evict");
+    }
+
+    @Override
+    @Cacheable(value = CacheTimeType.CACHE1H, key = "'opendfl:getSysconfigMaxUpdateTime'")
+    public Long getSysconfigMaxUpdateTime() {
         Date maxUpdateTime = mapper.getSysconfigMaxUpdateTime();
-        if(maxUpdateTime==null){
+        if (maxUpdateTime == null) {
             return 0L;
         }
         return maxUpdateTime.getTime();
     }
 
     @Override
-    public List<DflSystemConfigPo> findSystemConfigByNewlyModify(Long modifyTime){
+    public List<DflSystemConfigPo> findSystemConfigByNewlyModify(Long modifyTime) {
         Example example = new Example(DflSystemConfigPo.class);
         Example.Criteria criteria = example.createCriteria();
         criteria.andEqualTo("ifDel", 0);

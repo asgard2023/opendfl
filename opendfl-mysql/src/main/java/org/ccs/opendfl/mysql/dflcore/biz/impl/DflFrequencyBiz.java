@@ -106,6 +106,7 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
         int v = this.mapper.insert(entity);
         this._self.getFrequencyByUri_evict(entity.getUri());
         this._self.getFrequencyByUriMaxUpdateTime_evict(entity.getUri());
+        this._self.getFrequencyMaxUpdateTime_evict();
         return v;
     }
 
@@ -118,6 +119,7 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
             this._self.getFrequencyByCode_evict(exist.getCode(), exist.getTime());
             this._self.getFrequencyByUri_evict(exist.getUri());
             this._self.getFrequencyByUriMaxUpdateTime_evict(exist.getUri());
+            this._self.getFrequencyMaxUpdateTime_evict();
         }
         return v;
     }
@@ -136,6 +138,7 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
             this._self.getFrequencyByCode_evict(exist.getCode(), exist.getTime());
             this._self.getFrequencyByUri_evict(exist.getUri());
             this._self.getFrequencyByUriMaxUpdateTime_evict(exist.getUri());
+            this._self.getFrequencyMaxUpdateTime_evict();
         }
         return v;
     }
@@ -191,7 +194,14 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
     }
 
     @Override
-    public Long getFrequencyMaxUpdateTime(){
+    @CacheEvict(value = CacheTimeType.CACHE1H, key = "'opendfl:getFrequencyMaxUpdateTime'")
+    public void getFrequencyMaxUpdateTime_evict() {
+        logger.info("-----getFrequencyMaxUpdateTime_evict");
+    }
+
+    @Override
+    @Cacheable(value = CacheTimeType.CACHE1H, key = "'opendfl:getFrequencyMaxUpdateTime'")
+    public Long getFrequencyMaxUpdateTime() {
         Date maxUpdateTime = this.mapper.getFrequencyMaxUpdateTime();
         if (maxUpdateTime != null) {
             return maxUpdateTime.getTime();
@@ -200,7 +210,7 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
     }
 
     @Override
-    public List<DflFrequencyPo> findFrequencyByNewlyModify(Long modifyTime){
+    public List<DflFrequencyPo> findFrequencyByNewlyModify(Long modifyTime) {
         Example example = new Example(DflFrequencyPo.class);
         Example.Criteria criteria = example.createCriteria();
         criteria.andEqualTo("ifDel", 0);

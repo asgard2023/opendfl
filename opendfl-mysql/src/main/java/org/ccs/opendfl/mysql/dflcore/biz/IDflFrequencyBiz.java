@@ -54,6 +54,7 @@ public interface IDflFrequencyBiz extends IBaseService<DflFrequencyPo> {
     public void getFrequencyByUriMaxUpdateTime_evict(String uri);
     public Long getFrequencyByUriMaxUpdateTime(String uri);
 
+    public void getFrequencyMaxUpdateTime_evict();
     public Long getFrequencyMaxUpdateTime();
 
     public List<DflFrequencyPo> findFrequencyByNewlyModify(Long modifyTime);
