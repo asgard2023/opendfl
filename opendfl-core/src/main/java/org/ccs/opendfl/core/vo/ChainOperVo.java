@@ -14,6 +14,7 @@ public class ChainOperVo {
     private Integer pos = 0;
     private BlackStrategy blackStrategy;
     private WhiteStrategy whiteStrategy;
+    private boolean isFail=false;
 
     public void setPos(Integer pos) {
         this.pos = pos;

@@ -1,7 +1,6 @@
 package org.ccs.opendfl.core.strategy.black.impl;
 
-import org.ccs.opendfl.core.biz.IWhiteBlackCheckBiz;
-import org.ccs.opendfl.core.constants.FreqLimitType;
+import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
 import org.ccs.opendfl.core.strategy.black.BlackChain;
 import org.ccs.opendfl.core.strategy.black.BlackStrategy;
@@ -21,9 +20,9 @@ import org.springframework.stereotype.Service;
 @Service(value = "blackIpStrategy")
 public class BlackIpStrategy implements BlackStrategy {
     private static final Logger logger = LoggerFactory.getLogger(BlackIpStrategy.class);
-    public static final FreqLimitType LIMIT_TYPE = FreqLimitType.BLACK_IP;
+    public static final WhiteBlackCheckType LIMIT_TYPE = WhiteBlackCheckType.IP;
     @Autowired
-    private IWhiteBlackCheckBiz whiteBlackCheckBiz;
+    private FrequencyConfiguration frequencyConfiguration;
 
     @Override
     public String getLimitType() {
@@ -36,12 +35,13 @@ public class BlackIpStrategy implements BlackStrategy {
             String userId = strategyParams.getUserId();
             String ip = strategyParams.getIp();
 
-            if (whiteBlackCheckBiz.isIncludeBlackId(ip, WhiteBlackCheckType.IP)) {
+            if (frequencyConfiguration.getWhiteBlackCheckBiz().isIncludeBlackId(ip, LIMIT_TYPE)) {
                 if (StringUtils.isNumeric(ip)) {
                     ip = RequestUtils.getNumConvertIp(Long.parseLong(ip));
                 }
                 logger.warn("----doCheckLimit-blackIp={} userId={} uri={}", ip, userId, strategyParams.getRequestUri());
                 strategyParams.getChainOper().setBlackStrategy(this);
+                strategyParams.getChainOper().setFail(true);
                 return true;
             }
         }

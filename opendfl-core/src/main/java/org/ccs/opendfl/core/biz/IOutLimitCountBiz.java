@@ -1,8 +1,7 @@
 package org.ccs.opendfl.core.biz;
 
-import org.ccs.opendfl.core.constants.FreqLimitType;
+import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
 import org.ccs.opendfl.core.vo.ComboxItemVo;
-import org.ccs.opendfl.core.vo.MaxRunTimeVo;
 import org.ccs.opendfl.core.vo.RunCountVo;
 
 import java.util.List;
@@ -21,6 +20,7 @@ public interface IOutLimitCountBiz {
 
     /**
      * 获取每个类型下的接口统计数量
+     *
      * @param curTime
      * @return
      */
@@ -33,12 +33,12 @@ public interface IOutLimitCountBiz {
      *
      * @return list
      */
-    List<RunCountVo> getNewlyRunCount(FreqLimitType type, Integer count);
+    List<RunCountVo> getNewlyRunCount(WhiteBlackCheckType type, Integer count);
 
     /**
      * 找出当前second时间内执行次数最多的前count个接口
      *
      * @return list
      */
-    List<RunCountVo> getNewlyRunCount(FreqLimitType type, Long dateTime, Integer count);
+    List<RunCountVo> getNewlyRunCount(WhiteBlackCheckType type, Long dateTime, Integer count);
 }

@@ -31,6 +31,8 @@ public class WhiteChainImpl implements WhiteChain {
     private WhiteStrategy whiteIpStrategy;
     @Resource(name = "whiteUserStrategy")
     private WhiteStrategy whiteUserStrategy;
+    @Resource(name = "whiteOriginStrategy")
+    private WhiteStrategy whiteOriginStrategy;
 
     /**
      * 新增策略需要在这里注册
@@ -39,6 +41,7 @@ public class WhiteChainImpl implements WhiteChain {
     public void initStrategy() {
         this.addLimit(whiteIpStrategy);
         this.addLimit(whiteUserStrategy);
+        this.addLimit(whiteOriginStrategy);
     }
 
     private void addLimit(WhiteStrategy limitStrategy) {

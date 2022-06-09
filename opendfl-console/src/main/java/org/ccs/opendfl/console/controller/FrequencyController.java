@@ -9,9 +9,9 @@ import org.ccs.opendfl.console.constant.UserOperType;
 import org.ccs.opendfl.console.utils.AuditLogUtils;
 import org.ccs.opendfl.core.biz.*;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
-import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.constants.RunCountType;
+import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
 import org.ccs.opendfl.core.exception.PermissionDeniedException;
 import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.limitfrequency.FrequencyHandlerInterceptor;
@@ -135,8 +135,8 @@ public class FrequencyController {
 
         AuditLogUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
         Collection<RequestVo> list = FrequencyHandlerInterceptor.requestVoMap.values();
-        if(StringUtils.isNotBlank(requestVo.getRequestUri())){
-            list=list.stream().filter(t->t.getRequestUri().contains(requestVo.getRequestUri())).collect(Collectors.toList());
+        if (StringUtils.isNotBlank(requestVo.getRequestUri())) {
+            list = list.stream().filter(t -> t.getRequestUri().contains(requestVo.getRequestUri())).collect(Collectors.toList());
         }
         List<RequestShowVo> showList = toRequestShowList(list, requestVo);
         return ResultData.success(showList);
@@ -160,13 +160,14 @@ public class FrequencyController {
         if (countType != null) {
             requestRunCount(countType, showList, curTime);
         } else {
-            FreqLimitType limitType = FreqLimitType.parseCode(type);
+            WhiteBlackCheckType limitType = WhiteBlackCheckType.parseCode(type);
             requestOutLimitCount(limitType, showList, curTime);
         }
     }
 
     /**
      * 接口访问最大执行时间查询
+     *
      * @param showList
      * @param curTime
      */
@@ -185,9 +186,9 @@ public class FrequencyController {
         //未找到的接口，即接口地址发生过修改而找不到的接口也找出来
         boolean isExist;
         for (MaxRunTimeVo runTimeVo : list) {
-            isExist=showList.stream().anyMatch(t->StringUtils.equals(runTimeVo.getUri(), t.getRequestUri()));
-            if(!isExist){
-                RequestShowVo showVo=new RequestShowVo();
+            isExist = showList.stream().anyMatch(t -> StringUtils.equals(runTimeVo.getUri(), t.getRequestUri()));
+            if (!isExist) {
+                RequestShowVo showVo = new RequestShowVo();
                 showVo.setRequestUri(runTimeVo.getUri());
                 showVo.setMaxRunTime(runTimeVo.getMaxRunTime());
                 showVo.setMaxRunTimeCreateTime(runTimeVo.getCreateTime());
@@ -225,7 +226,7 @@ public class FrequencyController {
         showList.addAll(tmpList);
     }
 
-    private void requestOutLimitCount(FreqLimitType limitType, List<RequestShowVo> showList, Long curTime) {
+    private void requestOutLimitCount(WhiteBlackCheckType limitType, List<RequestShowVo> showList, Long curTime) {
         if (limitType == null) {
             return;
         }
@@ -237,9 +238,9 @@ public class FrequencyController {
         //未找到的接口，即接口地址发生过修改而找不到的接口也找出来
         boolean isExist;
         for (RunCountVo countVo : countList) {
-            isExist=showList.stream().anyMatch(t->StringUtils.equals(countVo.getUri(), t.getRequestUri()));
-            if(!isExist){
-                RequestShowVo showVo=new RequestShowVo();
+            isExist = showList.stream().anyMatch(t -> StringUtils.equals(countVo.getUri(), t.getRequestUri()));
+            if (!isExist) {
+                RequestShowVo showVo = new RequestShowVo();
                 showVo.setRequestUri(countVo.getUri());
                 showVo.setCounter(new AtomicInteger(countVo.getCount()));
                 showVo.setLimitCounter(new AtomicInteger(0));
@@ -278,7 +279,7 @@ public class FrequencyController {
      */
     @RequestMapping(value = "/requestScans", method = {RequestMethod.POST, RequestMethod.GET})
     public ResultData requestScans(HttpServletRequest request, RequestVo requestVo
-            , @RequestParam(value = "type", required = false, defaultValue ="current") String type
+            , @RequestParam(value = "type", required = false, defaultValue = "current") String type
             , @RequestParam(value = "day", required = false, defaultValue = "-1") Integer day) {
         String token = RequestUtils.getToken(request);
         UserVo userVo = frequencyLoginBiz.getUserByToken(token);
@@ -287,10 +288,10 @@ public class FrequencyController {
         pkg = (String) CommUtils.nvl(pkg, "org.ccs.opendfl");
         AuditLogUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
         List<RequestVo> list = AnnotationControllerUtils.getControllerRequests(pkg);
-        List<RequestShowVo> showList=list.stream().map(RequestShowVo.class::cast).collect(Collectors.toList());
+        List<RequestShowVo> showList = list.stream().map(RequestShowVo.class::cast).collect(Collectors.toList());
 
-        if(StringUtils.isNotBlank(requestVo.getRequestUri())){
-            showList=showList.stream().filter(t->t.getRequestUri().contains(requestVo.getRequestUri())).collect(Collectors.toList());
+        if (StringUtils.isNotBlank(requestVo.getRequestUri())) {
+            showList = showList.stream().filter(t -> t.getRequestUri().contains(requestVo.getRequestUri())).collect(Collectors.toList());
         }
 
         requestRunCount(type, day, showList);
@@ -301,7 +302,7 @@ public class FrequencyController {
         //把接口调用情况更新过来
         final Collection<RequestVo> requestList = FrequencyHandlerInterceptor.requestVoMap.values();
         list.stream().forEach(t -> {
-            RequestShowVo showVo =t;
+            RequestShowVo showVo = t;
             for (RequestVo req : requestList) {
                 if (StringUtils.equals(showVo.getRequestUri(), req.getRequestUri())) {
                     showVo.setCounter(req.getCounter());
@@ -333,7 +334,7 @@ public class FrequencyController {
         List<MaxRunTimeVo> maxRunTimes = this.maxRunTimeBiz.getNewlyMaxRunTime(second, count);
 
         List<RequestVo> list = AnnotationControllerUtils.getControllerRequests(pkg);
-        List<RequestShowVo> showList=list.stream().map(RequestShowVo.class::cast).collect(Collectors.toList());
+        List<RequestShowVo> showList = list.stream().map(RequestShowVo.class::cast).collect(Collectors.toList());
         addRequestRunTime(showList);
         List<RequestShowVo> showMaxList = new ArrayList<>();
         for (RequestShowVo showVo : showList) {

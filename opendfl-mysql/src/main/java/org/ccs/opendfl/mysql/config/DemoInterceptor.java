@@ -64,7 +64,9 @@ public class DemoInterceptor extends WebMvcConfigurationSupport {
 
         WhiteBlackCheckBiz checkBiz = (WhiteBlackCheckBiz) whiteBlackCheckBiz;
         log.info("----changeMysqlImplement--whiteBlackListBiz={}", whiteBlackListBiz);
+        whiteBlackListBiz.loadInit();
         checkBiz.setWhiteBlackListBiz(whiteBlackListBiz);
+        frequencyConfiguration.setWhiteBlackCheckBiz(whiteBlackCheckBiz);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package org.ccs.opendfl.core.strategy.white.impl;
 
-import org.ccs.opendfl.core.biz.IWhiteBlackCheckBiz;
-import org.ccs.opendfl.core.constants.FreqLimitType;
+import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
 import org.ccs.opendfl.core.limitfrequency.FrequencyUtils;
 import org.ccs.opendfl.core.strategy.white.WhiteChain;
@@ -14,15 +13,16 @@ import org.springframework.stereotype.Service;
 
 /**
  * IP限限制检查
+ * 在白名单的用户不限制频率
  *
  * @author chenjh
  */
 @Service(value = "whiteUserStrategy")
 public class WhiteUserStrategy implements WhiteStrategy {
     private static final Logger logger = LoggerFactory.getLogger(WhiteUserStrategy.class);
-    public static final FreqLimitType LIMIT_TYPE = FreqLimitType.WHITE_USER;
+    public static final WhiteBlackCheckType LIMIT_TYPE = WhiteBlackCheckType.USER;
     @Autowired
-    private IWhiteBlackCheckBiz whiteBlackCheckBiz;
+    private FrequencyConfiguration frequencyConfiguration;
 
     @Override
     public String getLimitType() {
@@ -33,7 +33,7 @@ public class WhiteUserStrategy implements WhiteStrategy {
     public boolean doCheckLimit(String limitItems, WhiteChain limitChain, final RequestStrategyParamsVo strategyParams) {
         if (containLimit(limitItems, LIMIT_TYPE)) {
             String userId = strategyParams.getUserId();
-            if (whiteBlackCheckBiz.isIncludeWhiteId(userId, WhiteBlackCheckType.USER)) {
+            if (frequencyConfiguration.getWhiteBlackCheckBiz().isIncludeWhiteId(userId, LIMIT_TYPE)) {
                 //方便测试，日志前1000条
                 if (FrequencyUtils.isInitLog(getLimitType())) {
                     logger.info("----doCheckLimit-whiteUser={} uri={}", userId, strategyParams.getRequestUri());

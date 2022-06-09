@@ -2,9 +2,12 @@ package org.ccs.opendfl.core.config;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.ccs.opendfl.core.biz.IWhiteBlackCheckBiz;
+import org.ccs.opendfl.core.biz.IWhiteBlackListBiz;
 import org.ccs.opendfl.core.config.vo.LimitConfigVo;
 import org.ccs.opendfl.core.config.vo.WhiteBlackConfigVo;
 import org.ccs.opendfl.core.utils.RequestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Configuration;
@@ -52,6 +55,15 @@ public class FrequencyConfiguration {
      * 黑名单配置
      */
     private WhiteBlackConfigVo black;
+
+    @Autowired
+    private IWhiteBlackCheckBiz whiteBlackCheckBiz;
+    public void setWhiteBlackCheckBiz(IWhiteBlackCheckBiz whiteBlackCheckBiz){
+        this.whiteBlackCheckBiz = whiteBlackCheckBiz;
+    }
+    public IWhiteBlackCheckBiz getWhiteBlackCheckBiz() {
+        return this.whiteBlackCheckBiz;
+    }
 
     public void setBlack(WhiteBlackConfigVo black) {
         String ipsOld = black.getIps();

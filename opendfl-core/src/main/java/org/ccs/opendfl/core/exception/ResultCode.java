@@ -17,6 +17,8 @@ public enum ResultCode {
     PERMISSION_DENIED("100023", "没有权限"),
 
     USER_FREQUENCY_ERROR("100030", "访问频率限制"),
+    USER_BLACK_ERROR("100031", "黑名单限制"),
+    USER_WHITE_ERROR("100032", "白名单限制"),
 
     USER_IMAGE_CAPTCHA_ERROR("101001", "图片验证码错误"),
     USER_IMAGE_CAPTCHA_EXPIRE("101002", "图片验证码过期，请重新获取"),

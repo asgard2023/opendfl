@@ -4,9 +4,9 @@ package org.ccs.opendfl.mysql.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.*;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
-import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.constants.RunCountType;
+import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
 import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.limitfrequency.FrequencyHandlerInterceptor;
 import org.ccs.opendfl.core.limitlock.RequestLockHandlerInterceptor;
@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/frequency")
 @Slf4j
-public class FrequencyController  extends BaseController {
+public class FrequencyController extends BaseController {
     public static final String INSUFFICIENT_USER_PERMISSIONS = "Insufficient user permissions";
     @Autowired
     private IUserBiz userBiz;
@@ -182,7 +182,7 @@ public class FrequencyController  extends BaseController {
         if (countType != null) {
             requestRunCount(countType, showList, curTime);
         } else {
-            FreqLimitType limitType = FreqLimitType.parseCode(type);
+            WhiteBlackCheckType limitType = WhiteBlackCheckType.parseCode(type);
             requestOutLimitCount(limitType, showList, curTime);
         }
     }
@@ -248,7 +248,7 @@ public class FrequencyController  extends BaseController {
         showList.addAll(tmpList);
     }
 
-    private void requestOutLimitCount(FreqLimitType limitType, List<RequestShowVo> showList, Long curTime) {
+    private void requestOutLimitCount(WhiteBlackCheckType limitType, List<RequestShowVo> showList, Long curTime) {
         if (limitType == null) {
             return;
         }
@@ -336,19 +336,18 @@ public class FrequencyController  extends BaseController {
         }
 
         ResultData resultData = requestScans(request, requestVo, type, day);
-        List<RequestShowVo> showList = (List<RequestShowVo>)resultData.getData();
+        List<RequestShowVo> showList = (List<RequestShowVo>) resultData.getData();
 
-        List<RequestShowVo> pageList=new ArrayList<>();
-        int startCount=(pageInfo.getPageNum())*pageInfo.getPageSize();
-        int endCount=(pageInfo.getPageNum()+1)*pageInfo.getPageSize();
-        if(showList.size()>endCount){
+        List<RequestShowVo> pageList = new ArrayList<>();
+        int startCount = (pageInfo.getPageNum()) * pageInfo.getPageSize();
+        int endCount = (pageInfo.getPageNum() + 1) * pageInfo.getPageSize();
+        if (showList.size() > endCount) {
             pageList.addAll(showList.subList(startCount, endCount));
+        } else if (showList.size() > startCount) {
+            pageList.addAll(showList.subList(startCount, showList.size() - 1));
         }
-        else if(showList.size()>startCount){
-            pageList.addAll(showList.subList(startCount, showList.size()-1));
-        }
-        MyPageInfo myPageInfo= new MyPageInfo<>(pageList);
-        myPageInfo.setTotal(showList.size()/pageInfo.getPageSize());
+        MyPageInfo myPageInfo = new MyPageInfo<>(pageList);
+        myPageInfo.setTotal(showList.size() / pageInfo.getPageSize());
         myPageInfo.setPageNum(pageInfo.getPageNum());
         myPageInfo.setPageSize(pageInfo.getPageSize());
         return new PageVO<>(myPageInfo);

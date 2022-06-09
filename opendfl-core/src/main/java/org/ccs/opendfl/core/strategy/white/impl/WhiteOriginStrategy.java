@@ -5,8 +5,6 @@ import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
 import org.ccs.opendfl.core.limitfrequency.FrequencyUtils;
 import org.ccs.opendfl.core.strategy.white.WhiteChain;
 import org.ccs.opendfl.core.strategy.white.WhiteStrategy;
-import org.ccs.opendfl.core.utils.RequestUtils;
-import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,18 +12,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * IP限限制检查
- * 在白名单的IP用户不限制频率
+ * Origin白名单检查
+ * 这个白名单与其他白名单功能不一样
+ * 如果未配置origins表示功能未启用
+ * 在白名单的origin能访问，不在的不能访问（header的origin为空也不行）
  *
  * @author chenjh
  */
-@Service(value = "whiteIpStrategy")
-public class WhiteIpStrategy implements WhiteStrategy {
-    private static final Logger logger = LoggerFactory.getLogger(WhiteIpStrategy.class);
-    public static final WhiteBlackCheckType LIMIT_TYPE = WhiteBlackCheckType.IP;
+@Service(value = "whiteOriginStrategy")
+public class WhiteOriginStrategy implements WhiteStrategy {
+    private static final Logger logger = LoggerFactory.getLogger(WhiteOriginStrategy.class);
+    public static final WhiteBlackCheckType LIMIT_TYPE = WhiteBlackCheckType.ORIGIN;
     @Autowired
     private FrequencyConfiguration frequencyConfiguration;
-
 
     @Override
     public String getLimitType() {
@@ -35,19 +34,18 @@ public class WhiteIpStrategy implements WhiteStrategy {
     @Override
     public boolean doCheckLimit(String limitItems, WhiteChain limitChain, final RequestStrategyParamsVo strategyParams) {
         if (containLimit(limitItems, LIMIT_TYPE)) {
-            String ip = strategyParams.getIp();
-            if (frequencyConfiguration.getWhiteBlackCheckBiz().isIncludeWhiteId(ip, LIMIT_TYPE)) {
+            String userId = strategyParams.getUserId();
+            if (!frequencyConfiguration.getWhiteBlackCheckBiz().isIncludeWhiteId(userId, LIMIT_TYPE)) {
                 //方便测试，日志前1000条
                 if (FrequencyUtils.isInitLog(getLimitType())) {
-                    if (StringUtils.isNumeric(ip)) {
-                        ip = RequestUtils.getNumConvertIp(Long.parseLong(ip));
-                    }
-                    logger.info("----doCheckLimit-whiteIp={} uri={}", ip, strategyParams.getRequestUri());
+                    logger.info("----doCheckLimit-whiteUser={} uri={}", userId, strategyParams.getRequestUri());
                 }
                 strategyParams.getChainOper().setWhiteStrategy(this);
-                return true;
+                strategyParams.getChainOper().setFail(true);
+                return false;
             }
         }
         return limitChain.doCheckLimit(limitChain, strategyParams);
+
     }
 }

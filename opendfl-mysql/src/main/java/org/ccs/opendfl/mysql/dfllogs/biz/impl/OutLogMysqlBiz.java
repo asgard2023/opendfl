@@ -3,6 +3,7 @@ package org.ccs.opendfl.mysql.dfllogs.biz.impl;
 import org.ccs.opendfl.core.biz.IOutLogBiz;
 import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.constants.ReqSysType;
+import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
 import org.ccs.opendfl.core.utils.CommUtils;
 import org.ccs.opendfl.core.vo.RequestLockVo;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
@@ -36,18 +37,18 @@ public class OutLogMysqlBiz implements IOutLogBiz {
 
     @Async
     @Override
-    public void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, Long v, FreqLimitType type) {
+    public void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, Long v, String typeCode) {
         String userId=strategyParams.getUserId();
         String uri=strategyParams.getRequestUri();
         String ip=strategyParams.getIp();
-        logger.debug("----addFreqLog--type={} uri={} limit={} userId={} ip={} v={}", type, uri, limit, userId, ip, v);
+        logger.debug("----addFreqLog--type={} uri={} limit={} userId={} ip={} v={}", typeCode, uri, limit, userId, ip, v);
         DflOutLimitLogPo logPo = new DflOutLimitLogPo();
         logPo.setLimitCount(limit);
         logPo.setReqCount(v.intValue());
         if (strategyParams.getFrequency() != null) {
             logPo.setTimeSecond(strategyParams.getFrequency().getTime());
         }
-        logPo.setLimitType(type.getCode());
+        logPo.setLimitType(typeCode);
         logPo.setIp(ip);
         logPo.setUri(uri);
         logPo.setSysType(ReqSysType.getSysType(strategyParams.getSysType()));

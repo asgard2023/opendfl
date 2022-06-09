@@ -12,14 +12,14 @@ frequency:
     manager: none
   #全局白名单
   white:
-    ifDeviceIdRequire: '1'
-    items: 'whiteIp,whiteUser,'
+    ifDeviceIdRequire: '0'
+    items: 'ip,user,origin,'
     ips: '192.168.5.101'
     users: '5101,'
   #全局黑名单
   black:
-    ifDeviceIdRequire: '1'
-    items: 'blackIp,blackUser,blackDeviceId,'
+    ifDeviceIdRequire: '0'
+    items: 'ip,user,device,'
     ips: '192.168.5.103'
     users: '5103,'
     deviceIds: 'blackDevice123,'

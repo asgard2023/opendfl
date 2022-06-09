@@ -49,7 +49,7 @@ public class WhiteBlackListMysqlBiz implements IWhiteBlackListBiz {
         return getConfigCached(blackWhiteType);
     }
 
-    @PostConstruct
+    @Override
     public void loadInit() {
         long time = System.currentTimeMillis();
         this.getBlackConfig();
@@ -71,9 +71,10 @@ public class WhiteBlackListMysqlBiz implements IWhiteBlackListBiz {
             if (blackConfig == null || maxTimeLast.longValue() != maxUpdateTime) {
                 loadTimeMap.put(keyMaxTime, maxUpdateTime);
                 blackConfig = getBlackWhiteConfigLoad(blackWhiteType);
-                log.info("-----getConfigCached--blackType={} maxUpdateTime={} reload by modify_time changed loadTime={}", blackWhiteType.getCode(), maxUpdateTime, System.currentTimeMillis() - curTime);
                 //如果系统参数未初始化完成，读到的是参数默认值，不缓存本次结果，等初始化完成了再缓存
-                if (SystemConfig.isInit()) {
+                boolean isInit = SystemConfig.isInit();
+                log.info("-----getConfigCached--blackType={} isInit={} maxUpdateTime={} reload by modify_time changed loadTime={}", blackWhiteType.getCode(), isInit, maxUpdateTime, System.currentTimeMillis() - curTime);
+                if (isInit) {
                     configMap.put(key, blackConfig);
                 }
             }
@@ -84,20 +85,23 @@ public class WhiteBlackListMysqlBiz implements IWhiteBlackListBiz {
     private WhiteBlackConfigVo getBlackWhiteConfigLoad(BlackWhiteType blackWhiteType) {
         WhiteBlackConfigVo blackConfig = new WhiteBlackConfigVo();
         BlackWhiteType blackType = blackWhiteType;
-        String users = getBlackWhiteTypeString(blackType, WhiteBlackCheckType.USER);
+        List<DflBlackWhiteVo> itemList = dflBlackWhiteItemBiz.findBlackWhiteList(blackType.getCode(), null);
+        String users = getBlackWhiteTypeString(blackType, WhiteBlackCheckType.USER, itemList);
         blackConfig.setUsers(users);
 
-        String ips = getBlackWhiteTypeString(blackType, WhiteBlackCheckType.IP);
-        blackConfig.setIps(ips);
+        String ips = getBlackWhiteTypeString(blackType, WhiteBlackCheckType.IP, itemList);
 
-        String deviceIds = getBlackWhiteTypeString(blackType, WhiteBlackCheckType.DEVICE);
+        String origins = getBlackWhiteTypeString(blackType, WhiteBlackCheckType.ORIGIN, itemList);
+        blackConfig.setIps(origins);
+
+        String deviceIds = getBlackWhiteTypeString(blackType, WhiteBlackCheckType.DEVICE, itemList);
+        String ruleItems=null;
         blackConfig.setDeviceIds(deviceIds);
-        log.debug("-----getBlackWhiteConfigLoad--users={} ips={} deviceIds={}", users, ips, deviceIds);
         if (blackWhiteType == BlackWhiteType.BLACK) {
 //            Character ifDeviceIdRequire = frequencyConfiguration.getBlack().getIfDeviceIdRequire();
 //            String ruleItems = frequencyConfiguration.getBlack().getItems();
             Character ifDeviceIdRequire = getCharset(SystemConfig.getByCache(SystemConfigCodes.BLACKLIST_IF_DEVICE_REQUIRE));
-            String ruleItems = SystemConfig.getByCache(SystemConfigCodes.BLACKLIST_RULE_ITEMS);
+            ruleItems = SystemConfig.getByCache(SystemConfigCodes.BLACKLIST_RULE_ITEMS);
             blackConfig.setIfDeviceIdRequire(ifDeviceIdRequire);
             blackConfig.setItems(ruleItems);
             frequencyConfiguration.setBlack(blackConfig);
@@ -105,11 +109,12 @@ public class WhiteBlackListMysqlBiz implements IWhiteBlackListBiz {
 //            Character ifDeviceIdRequire = frequencyConfiguration.getWhite().getIfDeviceIdRequire();
 //            String ruleItems = frequencyConfiguration.getWhite().getItems();
             Character ifDeviceIdRequire = getCharset(SystemConfig.getByCache(SystemConfigCodes.WHITELIST_IF_DEVICE_REQUIRE));
-            String ruleItems = SystemConfig.getByCache(SystemConfigCodes.WHITELIST_RULE_ITEMS);
+            ruleItems = SystemConfig.getByCache(SystemConfigCodes.WHITELIST_RULE_ITEMS);
             blackConfig.setIfDeviceIdRequire(ifDeviceIdRequire);
             blackConfig.setItems(ruleItems);
             frequencyConfiguration.setWhite(blackConfig);
         }
+        log.debug("-----getBlackWhiteConfigLoad--blackWhiteType={} ruleItems={} users={} ips={} deviceIds={}", blackWhiteType, ruleItems, users, ips, deviceIds);
         return blackConfig;
     }
 
@@ -121,6 +126,10 @@ public class WhiteBlackListMysqlBiz implements IWhiteBlackListBiz {
     private String getBlackWhiteTypeString(BlackWhiteType blackType, WhiteBlackCheckType limitType) {
         List<DflBlackWhiteVo> itemList = dflBlackWhiteItemBiz.findBlackWhiteList(blackType.getCode(), limitType.getType());
         return itemList.stream().map(DflBlackWhiteVo::getDatas).collect(Collectors.joining(",")) + ",";
+    }
+
+    private String getBlackWhiteTypeString(BlackWhiteType blackType, WhiteBlackCheckType limitType, List<DflBlackWhiteVo> itemList) {
+        return itemList.stream().filter(t -> t.getLimitType() == limitType.getType().intValue()).map(DflBlackWhiteVo::getDatas).collect(Collectors.joining(",")) + ",";
     }
 
     /**

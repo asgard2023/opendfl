@@ -10,6 +10,7 @@ import java.util.Map;
  * @author chenjh
  */
 public interface IWhiteBlackListBiz {
+    public void loadInit();
     /**
      * 全局黑名单
      * @return WhiteBlackConfigVo

@@ -1,6 +1,6 @@
 package org.ccs.opendfl.core.strategy.black;
 
-import org.ccs.opendfl.core.constants.FreqLimitType;
+import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
 
 /**
@@ -11,7 +11,7 @@ import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
 public interface BlackStrategy {
     boolean doCheckLimit(String limitItems, BlackChain blackChain, RequestStrategyParamsVo strategyParams);
 
-    default boolean containLimit(String limitItems, FreqLimitType limitType) {
+    default boolean containLimit(String limitItems, WhiteBlackCheckType limitType) {
         return limitItems.contains(limitType.getCode() + ",");
     }
 

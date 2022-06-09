@@ -262,7 +262,7 @@ class FrequencyTestControllerTest {
 
         int limtCount = 0;
         int successCount = 0;
-        String errorLimitType = "frequency:blackUser";
+        String errorLimitType = "frequency:black:user";
         String whiteUserId = "5103";
         for (int i = 0; i < 20; i++) {
             MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreq")
@@ -289,7 +289,7 @@ class FrequencyTestControllerTest {
     void serverTimeFreqSameUser_blackIp() throws Exception {
         int limtCount = 0;
         int successCount = 0;
-        String errorLimitType = "frequency:blackIp";
+        String errorLimitType = "frequency:black:ip";
         String blackIp = "192.168.5.103";
         for (int i = 0; i < 20; i++) {
             String userId = "124" + i;
@@ -373,7 +373,7 @@ class FrequencyTestControllerTest {
     void serverTimeDeviceIdByHader() throws Exception {
         int limtCount = 0;
         int successCount = 0;
-        String errorLimitType = "frequency:blackDeviceId";
+        String errorLimitType = "frequency:black:device";
         for (int i = 0; i < 20; i++) {
             String userId = "123" + i;
             MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqDevice")
@@ -401,7 +401,7 @@ class FrequencyTestControllerTest {
     void serverTimeDeviceIdByParam() throws Exception {
         int limtCount = 0;
         int successCount = 0;
-        String errorLimitType = "frequency:blackDeviceId";
+        String errorLimitType = "frequency:black:device";
         for (int i = 0; i < 20; i++) {
             String userId = "123" + i;
             MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqDevice")
@@ -448,6 +448,63 @@ class FrequencyTestControllerTest {
         Assertions.assertTrue(successCount > 0, "successCount:" + successCount);
         Assertions.assertTrue(limtCount > 0, "ipUserCount:" + limtCount);
     }
+
+    /**
+     * origin成功测试
+     */
+    @Test
+    void serverTimeFreq_whiteOrigin() throws Exception {
+        int limtCount = 0;
+        int successCount = 0;
+        String errorLimitType = "frequency:white:origin";
+        for (int i = 0; i < 20; i++) {
+            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqIpUser")
+                            .param("userId", "123" + i)
+                            .header(RequestParams.ORIGIN, "localhost")
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andReturn();
+            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+            if (content.contains(errorLimitType)) {
+                limtCount++;
+            } else {
+                successCount++;
+            }
+            System.out.println("----serverTimeFreq_whiteOrigin  status=" + status + " content=" + content);
+        }
+        System.out.println("----serverTimeFreq_whiteOrigin  successCount=" + successCount + " limtCount=" + limtCount);
+        Assertions.assertTrue(successCount > 0, "successCount:" + successCount);
+        Assertions.assertTrue(limtCount > 0, "ipUserCount:" + limtCount);
+    }
+
+    /**
+     * origin成功测试
+     */
+    @Test
+    void serverTimeFreq_whiteOrigin_fail() throws Exception {
+        int limtCount = 0;
+        int successCount = 0;
+        String errorLimitType = "frequency:white:origin";
+        for (int i = 0; i < 20; i++) {
+            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqIpUser")
+                            .param("userId", "123" + i)
+                            .header(RequestParams.ORIGIN, "localhostFail")
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andReturn();
+            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+            if (content.contains(errorLimitType)) {
+                limtCount++;
+            } else {
+                successCount++;
+            }
+            System.out.println("----serverTimeFreq_whiteOrigin_fail  status=" + status + " content=" + content);
+        }
+        System.out.println("----serverTimeFreq_whiteOrigin_fail  successCount=" + successCount + " limtCount=" + limtCount);
+        Assertions.assertTrue(successCount > 0, "successCount:" + successCount);
+        Assertions.assertTrue(limtCount > 0, "ipUserCount:" + limtCount);
+    }
+
 
     /**
      * 同用户多IP测试

@@ -16,6 +16,11 @@ import java.util.Map;
 @Service(value = "whiteBlackListBiz")
 public class WhiteBlackListBiz implements IWhiteBlackListBiz {
 
+    @Override
+    public void loadInit(){
+
+    }
+
     @Autowired
     private FrequencyConfiguration frequencyConfiguration;
 

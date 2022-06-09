@@ -3,7 +3,7 @@ package org.ccs.opendfl.core.biz.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IOutLimitCountBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
-import org.ccs.opendfl.core.constants.FreqLimitType;
+import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
 import org.ccs.opendfl.core.limitfrequency.FrequencyUtils;
 import org.ccs.opendfl.core.utils.RedisTemplateUtil;
 import org.ccs.opendfl.core.vo.ComboxItemVo;
@@ -34,7 +34,7 @@ public class OutLimitCountRedisBiz implements IOutLimitCountBiz {
         this.frequencyConfiguration = frequencyConfiguration;
     }
 
-    public String getRedisKeyCount(FreqLimitType type, Long curTime) {
+    public String getRedisKeyCount(WhiteBlackCheckType type, Long curTime) {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(curTime);
         return frequencyConfiguration.getRedisPrefix() + ":" + type.getCode() + ":" + cal.get(Calendar.DAY_OF_MONTH);
@@ -43,8 +43,8 @@ public class OutLimitCountRedisBiz implements IOutLimitCountBiz {
     @Override
     public Map<String, Integer> getTypeUriCount(Long curTime) {
         Map<String, Integer> map = new HashMap<>();
-        FreqLimitType[] types = FreqLimitType.values();
-        for (FreqLimitType type : types) {
+        WhiteBlackCheckType[] types = WhiteBlackCheckType.values();
+        for (WhiteBlackCheckType type : types) {
             int size = getRunTypeSize(type, curTime);
             map.put(type.getCode(), size);
         }
@@ -52,8 +52,8 @@ public class OutLimitCountRedisBiz implements IOutLimitCountBiz {
     }
 
     private boolean existRun(Long curTime) {
-        FreqLimitType[] types = FreqLimitType.values();
-        for (FreqLimitType type : types) {
+        WhiteBlackCheckType[] types = WhiteBlackCheckType.values();
+        for (WhiteBlackCheckType type : types) {
             int size = getRunTypeSize(type, curTime);
             if (size > 0) {
                 return true;
@@ -62,18 +62,19 @@ public class OutLimitCountRedisBiz implements IOutLimitCountBiz {
         return false;
     }
 
-    private boolean existRun(FreqLimitType type, Long curTime) {
+    private boolean existRun(WhiteBlackCheckType type, Long curTime) {
         int size = getRunTypeSize(type, curTime);
         return size > 0;
     }
 
     /**
      * 查类型对应的接口数
-     * @param type FreqLimitType
+     *
+     * @param type    WhiteBlackCheckType
      * @param curTime Long
      * @return Integer 当日调用接口个数
      */
-    private Integer getRunTypeSize(FreqLimitType type, Long curTime) {
+    private Integer getRunTypeSize(WhiteBlackCheckType type, Long curTime) {
         String redisKey = getRedisKeyCount(type, curTime);
         Long size = redisTemplateString.opsForZSet().size(redisKey);
         if (size == null) {
@@ -90,8 +91,8 @@ public class OutLimitCountRedisBiz implements IOutLimitCountBiz {
         if (day > 0) {
             curTimeBefore = curTime - day * TIME_MILLISECOND_TO_DAY;
         }
-        FreqLimitType[] types = FreqLimitType.values();
-        for (FreqLimitType type : types) {
+        WhiteBlackCheckType[] types = WhiteBlackCheckType.values();
+        for (WhiteBlackCheckType type : types) {
             if (existRun(type, curTimeBefore)) {
                 list.add(new ComboxItemVo(type.getCode(), "超限-" + type.getTypeName(), false));
             }
@@ -103,9 +104,9 @@ public class OutLimitCountRedisBiz implements IOutLimitCountBiz {
     @Override
     public Map<String, Integer> saveLimitCount() {
         Long curTime = System.currentTimeMillis();
-        FreqLimitType[] types = FreqLimitType.values();
+        WhiteBlackCheckType[] types = WhiteBlackCheckType.values();
         Map<String, Integer> typeCountMap = new HashMap<>();
-        for (FreqLimitType type : types) {
+        for (WhiteBlackCheckType type : types) {
             int count = saveLimitCountByType(type);
             typeCountMap.put(type.getCode(), count);
         }
@@ -114,7 +115,7 @@ public class OutLimitCountRedisBiz implements IOutLimitCountBiz {
         return typeCountMap;
     }
 
-    private int saveLimitCountByType(FreqLimitType type) {
+    private int saveLimitCountByType(WhiteBlackCheckType type) {
         Integer cacheDay = frequencyConfiguration.getRunCountCacheDay();
         if (cacheDay == 0) {
             return 0;
@@ -161,7 +162,7 @@ public class OutLimitCountRedisBiz implements IOutLimitCountBiz {
      * @return list
      */
     @Override
-    public List<RunCountVo> getNewlyRunCount(FreqLimitType type, Integer count) {
+    public List<RunCountVo> getNewlyRunCount(WhiteBlackCheckType type, Integer count) {
         Long curTime = System.currentTimeMillis();
         return getNewlyRunCount(type, curTime, count);
     }
@@ -172,7 +173,7 @@ public class OutLimitCountRedisBiz implements IOutLimitCountBiz {
      * @return list
      */
     @Override
-    public List<RunCountVo> getNewlyRunCount(FreqLimitType type, Long dateTime, Integer count) {
+    public List<RunCountVo> getNewlyRunCount(WhiteBlackCheckType type, Long dateTime, Integer count) {
         Long curTime = dateTime;
         String redisKeyCount = getRedisKeyCount(type, curTime);
 

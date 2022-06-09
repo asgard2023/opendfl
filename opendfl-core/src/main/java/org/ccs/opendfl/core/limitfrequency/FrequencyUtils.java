@@ -7,6 +7,7 @@ import org.ccs.opendfl.core.biz.IOutLogBiz;
 import org.ccs.opendfl.core.biz.IRsaBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.constants.FreqLimitType;
+import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.FrequencyException;
 import org.ccs.opendfl.core.exception.ResultCode;
@@ -60,6 +61,10 @@ public class FrequencyUtils {
     }
 
 
+    public static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, WhiteBlackCheckType type) {
+        addFreqLog(strategyParams, limit, v, type.getCode());
+    }
+
     /**
      * 频率超限日志，超出部分才记录
      *
@@ -68,11 +73,15 @@ public class FrequencyUtils {
      * @param type           limit type
      */
     public static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, FreqLimitType type) {
-        outLimitCount(strategyParams, type);
-        outLogBiz.addFreqLog(strategyParams, limit, v, type);
+        addFreqLog(strategyParams, limit, v, type.getCode());
+    }
+
+    private static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, String typeCode) {
+        outLimitCount(strategyParams, typeCode);
+        outLogBiz.addFreqLog(strategyParams, limit, v, typeCode);
         Integer logTime = frequencyConfiguration.getLimit().getOutLimitLogTime();
         FrequencyVo frequency = strategyParams.getFrequency();
-        if (frequency==null || !(logTime > 0 && frequency.getTime() >= logTime)) {
+        if (frequency == null || !(logTime > 0 && frequency.getTime() >= logTime)) {
             return;
         }
         String uri = strategyParams.getRequestUri();
@@ -82,16 +91,13 @@ public class FrequencyUtils {
         if (limit != null) {
             countLimit = limit;
         }
-        logger.info("----addFreqLog--type={} uri={} limit={} attrData={} reqCount={} ip={}", type.getCode(), uri, countLimit, userId, v, ip);
+        logger.info("----addFreqLog--type={} uri={} limit={} attrData={} reqCount={} ip={}", typeCode, uri, countLimit, userId, v, ip);
     }
 
     public static final Map<String, Map<String, AtomicInteger>> outLimitCountMap = new ConcurrentHashMap<>();
 
-    public static void outLimitCount(RequestStrategyParamsVo strategyParams, String limitType) {
-        FreqLimitType freqLimitType = FreqLimitType.parseCode(limitType);
-        if (freqLimitType != null) {
-            outLimitCount(strategyParams, freqLimitType);
-        }
+    public static void outLimitCount(RequestStrategyParamsVo strategyParams, WhiteBlackCheckType type) {
+        outLimitCount(strategyParams, type.getCode());
     }
 
     /**
@@ -101,13 +107,17 @@ public class FrequencyUtils {
      * @param type           FreqLimitType
      */
     public static void outLimitCount(RequestStrategyParamsVo strategyParams, FreqLimitType type) {
+        outLimitCount(strategyParams, type.getCode());
+    }
+
+    private static void outLimitCount(RequestStrategyParamsVo strategyParams, String typeCode) {
         if (frequencyConfiguration.getRunCountCacheDay().intValue() == 0) {
             return;
         }
-        Map<String, AtomicInteger> typeCountMap = outLimitCountMap.get(type.getCode());
+        Map<String, AtomicInteger> typeCountMap = outLimitCountMap.get(typeCode);
         if (typeCountMap == null) {
             typeCountMap = new ConcurrentHashMap<>();
-            outLimitCountMap.put(type.getCode(), typeCountMap);
+            outLimitCountMap.put(typeCode, typeCountMap);
         }
         AtomicInteger counter = typeCountMap.get(strategyParams.getRequestUri());
         if (counter == null) {

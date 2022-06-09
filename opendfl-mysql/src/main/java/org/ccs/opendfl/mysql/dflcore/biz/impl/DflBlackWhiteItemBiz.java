@@ -185,13 +185,13 @@ public class DflBlackWhiteItemBiz extends BaseService<DflBlackWhiteItemPo> imple
     }
 
     @Override
-    @CacheEvict(value = CacheTimeType.CACHE30S, key = "'opendfl:findBlackWhiteMaxUpdateTime:'+#type+':'+#limitType")
+    @CacheEvict(value = CacheTimeType.CACHE1H, key = "'opendfl:findBlackWhiteMaxUpdateTime:'+#type+':'+#limitType")
     public void findBlackWhiteMaxUpdateTime_evict(String type, Integer limitType) {
         logger.info("-----findBlackWhiteMaxUpdateTime_evict--type={} limitType={}", type, limitType);
     }
 
     @Override
-    @Cacheable(value = CacheTimeType.CACHE30S, key = "'opendfl:findBlackWhiteMaxUpdateTime:'+#type+':'+#limitType")
+    @Cacheable(value = CacheTimeType.CACHE1H, key = "'opendfl:findBlackWhiteMaxUpdateTime:'+#type+':'+#limitType")
     public Long findBlackWhiteMaxUpdateTime(String type, Integer limitType) {
         Date maxUpdateTime = this.mapper.findBlackWhiteMaxUpdateTime(type, limitType);
         if (maxUpdateTime != null) {

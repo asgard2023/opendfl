@@ -1,5 +1,9 @@
 package org.ccs.opendfl.mysql.dflsystem.constant;
 
+import org.ccs.opendfl.core.utils.CommUtils;
+
+import java.util.Arrays;
+
 /**
  * 系统参数枚举
  * <p>
@@ -71,6 +75,11 @@ public enum SystemConfigCodes {
         public static final Integer PID_BLACK = 4;
         public static final Integer PID_WHITE = 5;
         public static final Integer PID_BASE_LIMIT = 6;
+        public static final String pids= CommUtils.concat(Arrays.asList(PID_ROOT, PID_LOCK, PID_FREQUENCY, PID_BLACK, PID_WHITE, PID_BASE_LIMIT), ",")+",";
+    }
+
+    public static boolean isPid(Integer id){
+        return Constants.pids.contains(id+",");
     }
 
 

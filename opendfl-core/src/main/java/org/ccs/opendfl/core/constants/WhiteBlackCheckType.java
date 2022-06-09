@@ -7,28 +7,70 @@ public enum WhiteBlackCheckType {
     /**
      * 用户
      */
-    USER(1, "user"),
+    USER(1, "user", "用户"),
     /**
      * IP
      */
-    IP(2, "ip"),
+    IP(2, "ip", "IP"),
     /**
      * 设备号
      */
-    DEVICE(3, "device");
+    DEVICE(3, "device", "设备号"),
+    /**
+     * header origin
+     */
+    ORIGIN(4, "origin", "origin"),
+    /**
+     * header type_token
+     */
+    TYPE_TOKEN(5, "type_token", "type_token");
 
     private Integer type;
     private String code;
-    WhiteBlackCheckType(Integer type, String code){
+    private String typeName;
+
+    WhiteBlackCheckType(Integer type, String code, String typeName) {
         this.type = type;
         this.code = code;
+        this.typeName = typeName;
     }
 
-    public Integer getType(){
+    public Integer getType() {
         return type;
     }
 
     public String getCode() {
         return code;
+    }
+
+    public String getTypeName() {
+        return this.typeName;
+    }
+
+
+    public static WhiteBlackCheckType parse(Integer type) {
+        if (type == null) {
+            return null;
+        }
+        WhiteBlackCheckType[] types = WhiteBlackCheckType.values();
+        for (WhiteBlackCheckType limitType : types) {
+            if (limitType.type.intValue() == type.intValue()) {
+                return limitType;
+            }
+        }
+        return null;
+    }
+
+    public static WhiteBlackCheckType parseCode(String code) {
+        if (code == null) {
+            return null;
+        }
+        WhiteBlackCheckType[] types = WhiteBlackCheckType.values();
+        for (WhiteBlackCheckType limitType : types) {
+            if (limitType.code.equals(code)) {
+                return limitType;
+            }
+        }
+        return null;
     }
 }

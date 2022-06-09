@@ -1,7 +1,6 @@
 package org.ccs.opendfl.core.strategy.black.impl;
 
-import org.ccs.opendfl.core.biz.IWhiteBlackCheckBiz;
-import org.ccs.opendfl.core.constants.FreqLimitType;
+import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
 import org.ccs.opendfl.core.strategy.black.BlackChain;
 import org.ccs.opendfl.core.strategy.black.BlackStrategy;
@@ -19,9 +18,9 @@ import org.springframework.stereotype.Service;
 @Service(value = "blackDeviceIdtrategy")
 public class BlackDeviceIdtrategy implements BlackStrategy {
     private static final Logger logger = LoggerFactory.getLogger(BlackDeviceIdtrategy.class);
-    public static final FreqLimitType LIMIT_TYPE = FreqLimitType.BLACK_DEVICE_ID;
+    public static final WhiteBlackCheckType LIMIT_TYPE = WhiteBlackCheckType.DEVICE;
     @Autowired
-    private IWhiteBlackCheckBiz whiteBlackCheckBiz;
+    private FrequencyConfiguration frequencyConfiguration;
 
     @Override
     public String getLimitType() {
@@ -32,9 +31,10 @@ public class BlackDeviceIdtrategy implements BlackStrategy {
     public boolean doCheckLimit(String limitItems, BlackChain limitChain, final RequestStrategyParamsVo strategyParams) {
         if (containLimit(limitItems, LIMIT_TYPE)) {
             String deviceId = strategyParams.getDeviceId();
-            if (whiteBlackCheckBiz.isIncludeBlackId(deviceId, WhiteBlackCheckType.DEVICE)) {
+            if (frequencyConfiguration.getWhiteBlackCheckBiz().isIncludeBlackId(deviceId, LIMIT_TYPE)) {
                 logger.warn("-----doCheckLimit-blackDeviceId={} uri={}", deviceId, strategyParams.getRequestUri());
                 strategyParams.getChainOper().setBlackStrategy(this);
+                strategyParams.getChainOper().setFail(true);
                 return true;
             }
         }

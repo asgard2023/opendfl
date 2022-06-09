@@ -22,9 +22,11 @@ public class WhiteBlackCheckBiz implements IWhiteBlackCheckBiz {
     private IUserBiz userBiz;
     @Autowired
     private IWhiteBlackListBiz whiteBlackListBiz;
-    public void setWhiteBlackListBiz(IWhiteBlackListBiz whiteBlackListBiz){
+
+    public void setWhiteBlackListBiz(IWhiteBlackListBiz whiteBlackListBiz) {
         this.whiteBlackListBiz = whiteBlackListBiz;
     }
+
     private static final Map<String, Long> whiteCodeMap = new ConcurrentHashMap<>();
     private static final Map<String, String> whiteUserIdsMap = new ConcurrentHashMap<>();
 
@@ -83,6 +85,13 @@ public class WhiteBlackCheckBiz implements IWhiteBlackCheckBiz {
             check = this.isIncludeId(id, whiteConfig.getUsers());
         } else if (WhiteBlackCheckType.IP == checkType) {
             check = this.isIncludeId(id, whiteConfig.getIps());
+        } else if (WhiteBlackCheckType.ORIGIN == checkType) {
+            //白名单为空，也返回true
+            if(StringUtils.isBlank(whiteConfig.getOrigins()) || StringUtils.equals("none", whiteConfig.getOrigins())){
+                check = true;
+                return check;
+            }
+            check = this.isIncludeId(id, whiteConfig.getOrigins());
         }
         return check;
     }
@@ -96,8 +105,8 @@ public class WhiteBlackCheckBiz implements IWhiteBlackCheckBiz {
         } else if (WhiteBlackCheckType.IP == checkType) {
             check = this.isIncludeId(id, blackConfig.getIps());
         } else if (WhiteBlackCheckType.DEVICE == checkType) {
-            if (!StringUtils.ifYes(blackConfig.getIfDeviceIdRequire()) || StringUtils.isEmpty(id)) {
-                return false;
+            if (StringUtils.ifYes(blackConfig.getIfDeviceIdRequire()) && StringUtils.isEmpty(id)) {
+                return true;
             }
             check = this.isIncludeId(id, blackConfig.getDeviceIds());
         }

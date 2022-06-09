@@ -107,6 +107,7 @@ public class DflBlackWhiteBiz extends BaseService<DflBlackWhitePo> implements ID
         if (v > 0) {
             this.dflBlackWhiteItemBiz.findBlackWhiteList_evict(entity.getType(), entity.getLimitType());
             this.dflBlackWhiteItemBiz.findBlackWhiteMaxUpdateTime_evict(entity.getType(), entity.getLimitType());
+            this.dflBlackWhiteItemBiz.findBlackWhiteMaxUpdateTime_evict(entity.getType(), null);
         }
         return v;
     }
@@ -118,6 +119,7 @@ public class DflBlackWhiteBiz extends BaseService<DflBlackWhitePo> implements ID
         if (v > 0) {
             this.dflBlackWhiteItemBiz.findBlackWhiteList_evict(entity.getType(), entity.getLimitType());
             this.dflBlackWhiteItemBiz.findBlackWhiteMaxUpdateTime_evict(entity.getType(), entity.getLimitType());
+            this.dflBlackWhiteItemBiz.findBlackWhiteMaxUpdateTime_evict(entity.getType(), null);
         }
         return v;
     }
@@ -135,6 +137,7 @@ public class DflBlackWhiteBiz extends BaseService<DflBlackWhitePo> implements ID
         if (v > 0) {
             this.dflBlackWhiteItemBiz.findBlackWhiteList_evict(exist.getType(), exist.getLimitType());
             this.dflBlackWhiteItemBiz.findBlackWhiteMaxUpdateTime_evict(exist.getType(), exist.getLimitType());
+            this.dflBlackWhiteItemBiz.findBlackWhiteMaxUpdateTime_evict(exist.getType(), null);
         }
         return v;
     }

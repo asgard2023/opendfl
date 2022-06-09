@@ -139,7 +139,9 @@ public class SystemConfig {
                 return ConfigValueType.getValue(systemConfigCodes.getValueType(), po.getValue());
             }
         }
-        log.warn("----getSystemConfigValue--code={} invalid", po.getCode());
+        if(!SystemConfigCodes.isPid(po.getId())) {
+            log.warn("----getSystemConfigValue--code={} invalid", po.getCode());
+        }
         return null;
     }
 

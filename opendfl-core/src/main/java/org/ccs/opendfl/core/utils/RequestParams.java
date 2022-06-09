@@ -30,8 +30,9 @@ public final class RequestParams {
      * 用户ID
      */
     public static String USER_ID = "userId";
-    public static String DEVICE_ID ="deviceId";
-    public static String SYS_TYPE ="sysType";
+    public static String DEVICE_ID ="device_id";
+    public static String SYS_TYPE ="sys_type";
+    public static String ORIGIN ="origin";
     /**
      * username
      */
@@ -46,5 +47,5 @@ public final class RequestParams {
      */
     public static final String LANG = "lang";
     
-    public static final String AUTHORIZATION = "Authorization";
+    public static final String AUTHORIZATION = "authorization";
 }
