@@ -114,7 +114,7 @@ public class WhiteBlackListMysqlBiz implements IWhiteBlackListBiz {
             blackConfig.setItems(ruleItems);
             frequencyConfiguration.setWhite(blackConfig);
         }
-        log.debug("-----getBlackWhiteConfigLoad--blackWhiteType={} ruleItems={} users={} ips={} deviceIds={}", blackWhiteType, ruleItems, users, ips, deviceIds);
+        log.info("-----getBlackWhiteConfigLoad--blackWhiteType={} ruleItems={} users={} ips={} deviceIds={}", blackWhiteType, ruleItems, users, ips, deviceIds);
         return blackConfig;
     }
 
