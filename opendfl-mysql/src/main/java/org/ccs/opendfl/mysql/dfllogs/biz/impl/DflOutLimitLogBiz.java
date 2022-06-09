@@ -75,6 +75,7 @@ public class DflOutLimitLogBiz extends BaseService<DflOutLimitLogPo> implements 
         this.addEqualByKey(criteria, "userId", otherParams);
         this.addEqualByKey(criteria, "ip", otherParams);
         this.addEqualByKey(criteria, "limitType", otherParams);
+        this.addEqualByKey(criteria, "outType", otherParams);
     }
 
     @Override

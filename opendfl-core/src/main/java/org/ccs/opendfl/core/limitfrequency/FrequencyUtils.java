@@ -61,8 +61,8 @@ public class FrequencyUtils {
     }
 
 
-    public static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, WhiteBlackCheckType type) {
-        addFreqLog(strategyParams, limit, v, type.getCode());
+    public static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, String outType, WhiteBlackCheckType type) {
+        addFreqLog(strategyParams, limit, v, outType, type.getCode());
     }
 
     /**
@@ -73,12 +73,12 @@ public class FrequencyUtils {
      * @param type           limit type
      */
     public static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, FreqLimitType type) {
-        addFreqLog(strategyParams, limit, v, type.getCode());
+        addFreqLog(strategyParams, limit, v, strategyParams.getFrequency().getLimitType(), type.getCode());
     }
 
-    private static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, String typeCode) {
+    private static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, String outType, String typeCode) {
         outLimitCount(strategyParams, typeCode);
-        outLogBiz.addFreqLog(strategyParams, limit, v, typeCode);
+        outLogBiz.addFreqLog(strategyParams, limit, v, outType, typeCode);
         Integer logTime = frequencyConfiguration.getLimit().getOutLimitLogTime();
         FrequencyVo frequency = strategyParams.getFrequency();
         if (frequency == null || !(logTime > 0 && frequency.getTime() >= logTime)) {

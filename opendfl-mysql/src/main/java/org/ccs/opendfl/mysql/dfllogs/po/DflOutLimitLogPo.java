@@ -90,6 +90,12 @@ public class DflOutLimitLogPo implements Serializable {
     /**
      *
      */
+    @Column(name = "out_type")
+    private String outType;
+
+    /**
+     *
+     */
     @Column(name = "limit_type")
     private String limitType;
 
@@ -104,6 +110,10 @@ public class DflOutLimitLogPo implements Serializable {
      */
     @Column(name = "ip")
     private String ip;
+
+    @Column(name = "origin")
+    private String origin;
+
 
     /**
      * 设备号

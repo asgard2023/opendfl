@@ -45,7 +45,7 @@ var app = {
             return unescape(r[2]);
         return null;
     },
-    headers: {'source': header_source, 'sysType': header_sysType, 'Authorization': getToken()},
+    headers: {'source': header_source, 'sysType': header_sysType, 'authorization': getToken()},
     typeItemApi: '/dflBasedata/dflTypeItem/typeItems',
     getTypeItems: function (codes, lang) {
         if (!lang) {
@@ -188,7 +188,7 @@ function initQueryDate(){
 $(function () {
     $.ajaxSetup({
         headers: {
-            'Authorization': app.authorToken(),
+            'authorization': app.authorToken(),
             'lang': 'CN'
         }
     });

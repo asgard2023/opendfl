@@ -86,7 +86,7 @@ var appUtil =
 $(function () {
     $.ajaxSetup({
         headers: {
-            'Authorization': app.authorToken(),
+            'authorization': app.authorToken(),
             'lang':'CN'
         }
     });

@@ -227,9 +227,10 @@
     }
 
     function doSearch() {
-        var url = '/frequency/requests';
-        var jsonParam = $('#search-form').serializeJson();
-        $('#dg').datagrid({headers:app.headers, url: url, queryParams: jsonParam})
+        // var url = '/frequency/requests';
+        // var jsonParam = $('#search-form').serializeJson();
+        // $('#dg').datagrid({headers:app.headers, url: url, queryParams: jsonParam})
+        loadData();
     }
 
     function loadData() {

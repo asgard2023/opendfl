@@ -81,6 +81,10 @@ public class RequestUtils {
         return request.getHeader(RequestParams.SYS_TYPE);
     }
 
+    public static String getOrigin(HttpServletRequest request) {
+        return request.getHeader(RequestParams.ORIGIN);
+    }
+
     public static Character getSysTypeId(HttpServletRequest request) {
         String sysType = getSysType(request);
         if (sysType == null) {

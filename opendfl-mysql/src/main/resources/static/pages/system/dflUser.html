@@ -374,7 +374,7 @@
                     $.ajax({
                         type: 'post',
                         data: {id: row.id},
-                        headers: {'source': app.source, 'Authorization': app.authorToken()},
+                        headers: app.headers,
                         dataType: 'json',
                         url: '/dflSystem/dflUser/delete',
                         success: function (data, textStatus, jqXHR) {

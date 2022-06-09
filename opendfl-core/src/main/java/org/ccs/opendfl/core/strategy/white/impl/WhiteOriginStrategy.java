@@ -34,11 +34,11 @@ public class WhiteOriginStrategy implements WhiteStrategy {
     @Override
     public boolean doCheckLimit(String limitItems, WhiteChain limitChain, final RequestStrategyParamsVo strategyParams) {
         if (containLimit(limitItems, LIMIT_TYPE)) {
-            String userId = strategyParams.getUserId();
-            if (!frequencyConfiguration.getWhiteBlackCheckBiz().isIncludeWhiteId(userId, LIMIT_TYPE)) {
+            String origin = strategyParams.getOrigin();
+            if (!frequencyConfiguration.getWhiteBlackCheckBiz().isIncludeWhiteId(origin, LIMIT_TYPE)) {
                 //方便测试，日志前1000条
                 if (FrequencyUtils.isInitLog(getLimitType())) {
-                    logger.info("----doCheckLimit-whiteUser={} uri={}", userId, strategyParams.getRequestUri());
+                    logger.info("----doCheckLimit-origin={} uri={}", origin, strategyParams.getRequestUri());
                 }
                 strategyParams.getChainOper().setWhiteStrategy(this);
                 strategyParams.getChainOper().setFail(true);

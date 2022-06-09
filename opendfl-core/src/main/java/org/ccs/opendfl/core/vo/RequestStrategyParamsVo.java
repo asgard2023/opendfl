@@ -2,8 +2,6 @@ package org.ccs.opendfl.core.vo;
 
 import lombok.Data;
 import lombok.Getter;
-import org.ccs.opendfl.core.strategy.black.BlackStrategy;
-import org.ccs.opendfl.core.strategy.white.WhiteStrategy;
 
 /**
  * 请求参数，用于限制处理
@@ -26,6 +24,8 @@ public class RequestStrategyParamsVo {
      * 默认取deviceId
      */
     private final String deviceId;
+
+    private final String origin;
     /**
      * 可以从url参数，post的json参数，inputStream中的参数中取值
      * 默认取userId也可以是接口注解指定的attrName参数
@@ -34,8 +34,13 @@ public class RequestStrategyParamsVo {
     private ChainOperVo chainOper = new ChainOperVo();
 
     public RequestStrategyParamsVo(String lang, String ip, String deviceId, String methodName, String requestUri, String sysType, long curTime) {
+        this(lang, ip, null, deviceId, methodName, requestUri, sysType, curTime);
+    }
+
+    public RequestStrategyParamsVo(String lang, String ip, String origin, String deviceId, String methodName, String requestUri, String sysType, long curTime) {
         this.lang = lang;
         this.ip = ip;
+        this.origin = origin;
         this.deviceId = deviceId;
         this.methodName = methodName;
         this.requestUri = requestUri;

@@ -257,7 +257,7 @@
             method: 'post',
             url: url,
             data: jsonParam,
-            headers: {'source': app.source, 'Authorization': app.authorToken()},
+            headers: app.headers,
             dataType: 'json',
             success: function (data) {
                 console.log(data);
@@ -296,7 +296,7 @@
                 var url = '/frequency/requests?clearRequestType=clearRequest';
                 $.ajax({
                     type: "post",
-                    headers: {'source': app.source, 'Authorization': app.authorToken()},
+                    headers: app.headers,
                     url: url,
                     success: function (data) {
                         if (data.success) {
