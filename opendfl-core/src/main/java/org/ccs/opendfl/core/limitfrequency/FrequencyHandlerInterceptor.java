@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IFrequencyConfigBiz;
 import org.ccs.opendfl.core.biz.IUserBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
+import org.ccs.opendfl.core.config.OpendflConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
@@ -46,6 +47,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     @Autowired
     private FrequencyConfiguration frequencyConfiguration;
+    @Autowired
+    private OpendflConfiguration opendflConfiguration;
     @Resource(name = "frequencyConfigBiz")
     private IFrequencyConfigBiz frequencyConfigBiz;
     @Autowired
@@ -246,6 +249,16 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         retVo = FrequencyVo.toFrequencyVo(methodFrequency3, frequencyVo);
         isAllNull = retVo == null && isAllNull;
         handleFrequency(response, params, retVo, strategyParams);
+
+        Frequency4 methodFrequency4 = handlerMethod.getMethodAnnotation(Frequency4.class);
+        retVo = FrequencyVo.toFrequencyVo(methodFrequency4, frequencyVo);
+        isAllNull = retVo == null && isAllNull;
+        handleFrequency(response, params, retVo, strategyParams);
+
+        Frequency5 methodFrequency5 = handlerMethod.getMethodAnnotation(Frequency5.class);
+        retVo = FrequencyVo.toFrequencyVo(methodFrequency5, frequencyVo);
+        isAllNull = retVo == null && isAllNull;
+        handleFrequency(response, params, retVo, strategyParams);
         return isAllNull;
     }
 
@@ -383,20 +396,18 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         if (frequency.isNeedLogin()) {
             userBiz.checkUser(userId);
         }
-        String attrName = RequestParams.USER_ID;
+        String attrName = opendflConfiguration.getDefaultAttrName();
         if (StringUtils.isNotBlank(frequency.getAttrName())) {
             attrName = frequency.getAttrName();
         }
         String attrValue = FrequencyUtils.getAttrNameValue(params, attrName);
 
-        if (attrValue != null) {
-            userId = attrValue;
-            params.put(RequestParams.USER_ID, userId);
+        if (attrValue == null) {
+            attrValue = userId;
         }
-
         logFirstload(frequency, curTime);
 
-        strategyParams.load(frequency, userId);
+        strategyParams.load(frequency, userId, attrValue);
 
         //这里的顺序没有关系，主要由frequency.limit.items这个参数来控制是否启用及顺序
         strategyParams.getChainOper().setPos(0);

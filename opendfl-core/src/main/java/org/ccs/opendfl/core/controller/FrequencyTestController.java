@@ -10,6 +10,8 @@ import org.ccs.opendfl.core.exception.FailedException;
 import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.limitfrequency.Frequency;
 import org.ccs.opendfl.core.limitfrequency.Frequency2;
+import org.ccs.opendfl.core.limitfrequency.Frequency3;
+import org.ccs.opendfl.core.limitfrequency.Frequency4;
 import org.ccs.opendfl.core.limitlock.RequestLock;
 import org.ccs.opendfl.core.utils.RequestParams;
 import org.ccs.opendfl.core.utils.RequestUtils;
@@ -72,6 +74,8 @@ public class FrequencyTestController {
     @GetMapping("/serverTimeFreq")
     @Frequency(time = 5, limit = 5, name = "serverTimeFreq")
     @Frequency2(time = 3600, limit = 100, name = "serverTimeFreq")
+    @Frequency3(time = 300, limit = 10, resource = true, attrName = "dataId", name = "serverTimeFreqRes")
+    @Frequency4(time = 300, limit = 10, resource = true, attrName = "dataId", ipUserCount = 20, name = "serverTimeFreqIp")
     public Object serverTimeFreq(HttpServletRequest request) {
         log.info("----serverTimeFreq--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();

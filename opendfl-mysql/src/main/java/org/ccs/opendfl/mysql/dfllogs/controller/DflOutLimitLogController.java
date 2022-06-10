@@ -10,6 +10,8 @@ import org.ccs.opendfl.mysql.base.BaseController;
 import org.ccs.opendfl.mysql.base.MyPageInfo;
 import org.ccs.opendfl.mysql.base.PageVO;
 import org.ccs.opendfl.mysql.config.MysqlConfiguration;
+import org.ccs.opendfl.mysql.dflcore.biz.IDflFrequencyBiz;
+import org.ccs.opendfl.mysql.dflcore.po.DflFrequencyPo;
 import org.ccs.opendfl.mysql.dfllogs.biz.IDflLogUserBiz;
 import org.ccs.opendfl.mysql.dfllogs.biz.IDflOutLimitLogBiz;
 import org.ccs.opendfl.mysql.dfllogs.biz.IDflRequestScansBiz;
@@ -20,7 +22,10 @@ import org.ccs.opendfl.mysql.dfllogs.vo.DflOutLimitLogCountVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -47,6 +52,8 @@ public class DflOutLimitLogController extends BaseController {
     private IDflRequestScansBiz dflRequestScansBiz;
     @Autowired
     private IDflLogUserBiz dflLogUserBiz;
+    @Autowired
+    private IDflFrequencyBiz dflFrequencyBiz;
     @Autowired
     private MysqlConfiguration mysqlConfiguration;
 
@@ -110,9 +117,13 @@ public class DflOutLimitLogController extends BaseController {
         List<Integer> uriIdList = list.stream().filter(t -> t.getUriId() != null).map(DflOutLimitLogPo::getUriId).distinct().collect(Collectors.toList());
         Map<Integer, DflRequestScansPo> uriMap = dflRequestScansBiz.getUriPos(uriIdList);
 
+        List<Integer> frequencyIdList = list.stream().filter(t -> t.getFrequencyId() != null).map(DflOutLimitLogPo::getFrequencyId).distinct().collect(Collectors.toList());
+        Map<Integer, DflFrequencyPo> frequencyMap = dflFrequencyBiz.getFrequencyByIds(frequencyIdList);
+
         list.stream().forEach(t -> {
             t.setUser(userMap.get(t.getUid()));
             t.setUriPo(uriMap.get(t.getUriId()));
+            t.setFrequency(frequencyMap.get(t.getFrequencyId()));
             if (t.getUriPo() != null) {
                 t.setUri(t.getUriPo().getUri());
             }

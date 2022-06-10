@@ -38,7 +38,7 @@ public class FrequencyDataRedisBiz implements IFrequencyDataBiz {
         boolean isExist;
         String redisKey;
         for (FrequencyVo frequency : limits) {
-            redisKey = FreqLimitUserCountStrategy.getRedisKey(frequency, account, null);
+            redisKey = FreqLimitUserCountStrategy.getRedisKey(frequency, account, null,null);
             isExist = redisTemplate.hasKey(redisKey);
             if (isExist) {
                 FrequencyVo copy = frequency.toCopy();
@@ -110,7 +110,7 @@ public class FrequencyDataRedisBiz implements IFrequencyDataBiz {
      */
     @Override
     public String freqEvict(FrequencyVo frequency, String account) {
-        String key = FreqLimitUserCountStrategy.getRedisKey(frequency, account, null);
+        String key = FreqLimitUserCountStrategy.getRedisKey(frequency, account, null,null);
         boolean isExist = redisTemplate.hasKey(key);
         if (isExist) {
             Long count = redisTemplate.opsForValue().increment(key, 0);

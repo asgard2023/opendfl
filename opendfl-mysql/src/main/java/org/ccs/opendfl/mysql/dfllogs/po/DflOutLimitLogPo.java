@@ -3,6 +3,7 @@ package org.ccs.opendfl.mysql.dfllogs.po;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.Data;
+import org.ccs.opendfl.mysql.dflcore.po.DflFrequencyPo;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Column;
@@ -50,6 +51,11 @@ public class DflOutLimitLogPo implements Serializable {
      */
     @Column(name = "uri_id")
     private Integer uriId;
+
+    @Column(name = "frequency_id")
+    private Integer frequencyId;
+    @Transient
+    private DflFrequencyPo frequency;
 
     /**
      * 用户端用户id

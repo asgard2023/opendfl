@@ -2,8 +2,10 @@ package org.ccs.opendfl.mysql.dflcore.biz;
 
 import org.ccs.opendfl.mysql.base.IBaseService;
 import org.ccs.opendfl.mysql.dflcore.po.DflFrequencyPo;
+import org.ccs.opendfl.mysql.dfllogs.po.DflRequestScansPo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Version V1.0
@@ -13,6 +15,7 @@ import java.util.List;
  * @Date: 2022-5-18 21:43:11
  */
 public interface IDflFrequencyBiz extends IBaseService<DflFrequencyPo> {
+    public Map<Integer, DflFrequencyPo> getFrequencyByIds(List<Integer> freqencyIdList);
     /**
      * 频率限制配置表 保存
      *
@@ -47,6 +50,8 @@ public interface IDflFrequencyBiz extends IBaseService<DflFrequencyPo> {
 
     public void getFrequencyByCode_evict(String code, Integer time);
     DflFrequencyPo getFrequencyByCode(String code, Integer time);
+
+    public Integer getFrequencyIdByCode(String code, Integer time);
 
     public void getFrequencyByUri_evict(String uri);
     public List<DflFrequencyPo> getFrequencyByUri(String uri);

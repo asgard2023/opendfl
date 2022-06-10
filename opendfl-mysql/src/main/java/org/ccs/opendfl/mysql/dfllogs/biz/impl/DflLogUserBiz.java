@@ -115,6 +115,11 @@ public class DflLogUserBiz extends BaseService<DflLogUserPo> implements IDflLogU
     }
 
     @Override
+    public Long getUid(String userId){
+        return getUid(userId, null, null);
+    }
+
+    @Override
     public Long getUid(String userId, String sysType, String ip) {
         if (userId == null) {
             return null;

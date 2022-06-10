@@ -3,9 +3,11 @@ package org.ccs.opendfl.mysql.dfllogs.biz.impl;
 import org.ccs.opendfl.core.biz.IOutLogBiz;
 import org.ccs.opendfl.core.constants.ReqSysType;
 import org.ccs.opendfl.core.utils.CommUtils;
+import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestLockVo;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
 import org.ccs.opendfl.mysql.config.MysqlConfiguration;
+import org.ccs.opendfl.mysql.dflcore.biz.IDflFrequencyBiz;
 import org.ccs.opendfl.mysql.dfllogs.biz.IDflLogUserBiz;
 import org.ccs.opendfl.mysql.dfllogs.biz.IDflOutLimitLogBiz;
 import org.ccs.opendfl.mysql.dfllogs.biz.IDflOutLockLogBiz;
@@ -29,13 +31,15 @@ public class OutLogMysqlBiz implements IOutLogBiz {
     @Autowired
     private IDflRequestScansBiz dflRequestScansBiz;
     @Autowired
+    private IDflFrequencyBiz dflFrequencyBiz;
+    @Autowired
     private IDflLogUserBiz dflLogUserBiz;
     @Autowired
     private MysqlConfiguration mysqlConfiguration;
 
     @Async
     @Override
-    public void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, Long v, String outType, String typeCode) {
+    public void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, Long v, String outType, String typeCode, String attrValue) {
         String userId = strategyParams.getUserId();
         String uri = strategyParams.getRequestUri();
         String ip = strategyParams.getIp();
@@ -43,11 +47,16 @@ public class OutLogMysqlBiz implements IOutLogBiz {
         DflOutLimitLogPo logPo = new DflOutLimitLogPo();
         logPo.setLimitCount(limit);
         logPo.setReqCount(v.intValue());
-        if (strategyParams.getFrequency() != null) {
-            logPo.setTimeSecond(strategyParams.getFrequency().getTime());
+
+        FrequencyVo frequencyVo = strategyParams.getFrequency();
+        if (frequencyVo != null) {
+            logPo.setTimeSecond(frequencyVo.getTime());
+
+            logPo.setFrequencyId(dflFrequencyBiz.getFrequencyIdByCode(frequencyVo.getName(), frequencyVo.getTime()));
         }
         logPo.setOutType(outType);
         logPo.setLimitType(typeCode);
+        logPo.setAttrValue(attrValue);
         logPo.setIp(ip);
         logPo.setOrigin(strategyParams.getOrigin());
         logPo.setUri(uri);
@@ -59,6 +68,7 @@ public class OutLogMysqlBiz implements IOutLogBiz {
             logPo.setUserId(userId);
         }
         logPo.setUriId(dflRequestScansBiz.getUriId(logPo.getUri()));
+
         //uriId不为空时，uri不用保存
         if (logPo.getUriId() != null) {
             logPo.setUri(null);

@@ -76,6 +76,9 @@
                         <input type="text" id="query_uri" name="uri" class="easyui-validatebox" placeholder="Input uri">
                     </td>
                     <td>
+                        <input type="text" id="query_code" name="code" class="easyui-validatebox" placeholder="Input frequency code">
+                    </td>
+                    <td>
                         <input type="text" id="query_ip" name="ip" class="easyui-validatebox" style="width:100px" placeholder="Input ip">
                     </td>
                     <td>
@@ -115,11 +118,13 @@
                 <th align="center" field="id" width="50" sortable="true" hidden="true">id</th>
                 <th align="center" field="uri" width="100" sortable="false">uri</th>
                 <th align="center" field="uriId" width="50" sortable="true" hidden="true">uriId</th>
+                <th align="center" field="frequencyId" width="50" sortable="true" hidden="true">frequencyId</th>
+                <th align="center" field="frequency" width="80" sortable="false"  formatter="formatterFrequencyCode">Frequency code</th>
                 <th align="center" field="uid" width="50" sortable="true" hidden="true">用户端用户id</th>
                 <th align="center" field="user" width="50" sortable="false" formatter="dgUserId">userId</th>
-                <th align="center" field="lang" width="50" sortable="false">lang</th>
-                <th align="center" field="limitCount" width="50" sortable="true">限制次数</th>
-                <th align="center" field="timeSecond" width="50" sortable="true">间隔时间</th>
+                <th align="center" field="lang" width="40" sortable="false">lang</th>
+                <th align="center" field="limitCount" width="40" sortable="true">限制次数</th>
+                <th align="center" field="timeSecond" width="40" sortable="true">间隔时间</th>
                 <th align="center" field="attrValue" width="50" sortable="true">attrValue</th>
                 <th align="center" field="outType" width="50" sortable="true">outType</th>
                 <th align="center" field="limitType" width="50" sortable="true">limitType</th>
@@ -226,6 +231,13 @@
     $('#reset-btn').click(function () {
         $('#search-form')[0].reset();
     });
+
+    function formatterFrequencyCode(d){
+        if(d){
+            return d.code;
+        }
+        return null;
+    }
 
     var dict_limitType = [
         {id: 'limit', name: 'limit用户限制'},

@@ -78,7 +78,7 @@ public class FrequencyUtils {
 
     private static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, String outType, String typeCode) {
         outLimitCount(strategyParams, typeCode);
-        outLogBiz.addFreqLog(strategyParams, limit, v, outType, typeCode);
+        outLogBiz.addFreqLog(strategyParams, limit, v, outType, typeCode, strategyParams.getAttrValue());
         Integer logTime = frequencyConfiguration.getLimit().getOutLimitLogTime();
         FrequencyVo frequency = strategyParams.getFrequency();
         if (frequency == null || !(logTime > 0 && frequency.getTime() >= logTime)) {

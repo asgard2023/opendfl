@@ -53,6 +53,10 @@ public class FreqLimitIpUserStrategy implements FreqLimitStrategy {
     public void doCheckLimit(String limitItems, FreqLimitChain limitChain, RequestStrategyParamsVo strategyParams) {
         if (containLimit(limitItems, LIMIT_TYPE)) {
             FrequencyVo frequency = strategyParams.getFrequency();
+            if(!LIMIT_TYPE.isResource() && frequency.isResource()){
+                limitChain.doCheckLimit(limitChain, strategyParams);
+                return;
+            }
             int limit = frequency.getIpUserCount();
             if (limit > 0) {
                 String userId = strategyParams.getUserId();

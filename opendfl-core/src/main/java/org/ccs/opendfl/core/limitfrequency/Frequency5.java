@@ -14,60 +14,32 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Component
-public @interface Frequency {
+public @interface Frequency5 {
 
-    /**
-     * 编码，uniqueKey
-     *
-     * @return
-     */
-    String name() default "all";
+    String name() default "all"; //uniqueKey
 
-    /**
-     * 只相当于分组，没有实际作用，允许重复
-     *
-     * @return
-     */
     String aliasName() default "";
 
-    /**
-     * 单位:秒/unit:s
-     *
-     * @return
-     */
-    int time() default 5;
+    int time() default 86400; //单位:秒/unit:s
 
-    /**
-     * 限制次数，为0不限次数
-     *
-     * @return
-     */
     int limit() default 0;
 
     /**
      * 支持ip数限制，同一个用户能使用的ip数
-     *
      * @return
      */
-    int userIpCount() default 0;
+    int userIpCount() default 14;
 
     /**
      * 支持ip数限制，同一个IP能登入的用户数
-     *
      * @return
      */
-    int ipUserCount() default 0;
+    int ipUserCount() default 14;//
 
-    /**
-     * 方法参数名，默认userId
-     * 可以用于指定为其他的参数，比如account，username等
-     * @return
-     */
     String attrName() default "";
 
     /**
      * 是否支持系统参数配置
-     *
      * @return
      */
     boolean sysconfig() default false;
@@ -77,14 +49,12 @@ public @interface Frequency {
     /**
      * 是否需要登入
      *
-     * @return
      */
     boolean needLogin() default false;
 
     /**
-     * 方法级用户白名单
+     * 白名单编码
      *
-     * @return
      */
     String whiteCode() default FrequencyConstant.NONE;
 

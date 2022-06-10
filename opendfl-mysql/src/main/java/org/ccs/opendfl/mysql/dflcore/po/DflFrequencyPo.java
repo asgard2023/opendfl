@@ -45,6 +45,9 @@ public class DflFrequencyPo implements Serializable {
         uriConfigVo.setErrMsg(frequencyPo.getErrMsg());
         uriConfigVo.setErrMsgEn(frequencyPo.getErrMsgEn());
         uriConfigVo.setMethod(frequencyPo.getMethod());
+        if(frequencyPo.getResource()!=null && frequencyPo.getResource()==1){
+            uriConfigVo.setResource(true);
+        }
 
         if(uriConfigVo.getTime()==null){
             uriConfigVo.setTime(0);
@@ -138,6 +141,12 @@ public class DflFrequencyPo implements Serializable {
      */
     @Column(name = "limit_type")
     private String limitType;
+
+    /**
+     * ifResource 是否资源限制
+     */
+    @Column(name = "resource")
+    private Integer resource;
 
     /**
      * 限制属性名

@@ -7,19 +7,19 @@ public enum FreqLimitType {
     /**
      * 同用户次数频率
      */
-    LIMIT(20, "limit", "同用户次数频率", WhiteBlackType.FREQUENCY),
+    LIMIT(20, "limit", "同用户次数频率", true, WhiteBlackType.FREQUENCY),
     /**
      * 同IP次数频率
      */
-    LIMIT_IP(21, "limitIp", "同IP次数频率", WhiteBlackType.FREQUENCY),
+    LIMIT_IP(21, "limitIp", "同IP次数频率", false, WhiteBlackType.FREQUENCY),
     /**
      * 同用户多IP数限制
      */
-    USER_IP_COUNT(22, "userIp", "同用户多IP数限制", WhiteBlackType.FREQUENCY),
+    USER_IP_COUNT(22, "userIp", "同用户多IP数限制", false, WhiteBlackType.FREQUENCY),
     /**
      * 同IP多用户数限制
      */
-    IP_USER_COUNT(23, "ipUser", "同IP多用户数限制", WhiteBlackType.FREQUENCY);
+    IP_USER_COUNT(23, "ipUser", "同IP多用户数限制", false, WhiteBlackType.FREQUENCY);
     /**
      * IP限制的redis的zset 超限个数，以提高性能
      */
@@ -28,12 +28,14 @@ public enum FreqLimitType {
     private Integer type;
     private String code;
     private String typeName;
+    private boolean resource;
     private WhiteBlackType whiteBlackType;
 
-    FreqLimitType(Integer type, String code, String typeName, WhiteBlackType whiteBlackType) {
+    FreqLimitType(Integer type, String code, String typeName, boolean resource, WhiteBlackType whiteBlackType) {
         this.type = type;
         this.code = code;
         this.typeName = typeName;
+        this.resource = resource;
         this.whiteBlackType = whiteBlackType;
     }
 
@@ -78,5 +80,9 @@ public enum FreqLimitType {
 
     public WhiteBlackType getWhiteBlackType() {
         return whiteBlackType;
+    }
+
+    public boolean isResource() {
+        return resource;
     }
 }

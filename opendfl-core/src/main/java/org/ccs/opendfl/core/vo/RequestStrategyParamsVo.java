@@ -31,6 +31,7 @@ public class RequestStrategyParamsVo {
      * 默认取userId也可以是接口注解指定的attrName参数
      */
     private String userId;
+    private String attrValue;
     private ChainOperVo chainOper = new ChainOperVo();
 
     public RequestStrategyParamsVo(String lang, String ip, String deviceId, String methodName, String requestUri, String sysType, long curTime) {
@@ -48,10 +49,14 @@ public class RequestStrategyParamsVo {
         this.curTime = curTime;
     }
 
-
-    public void load(FrequencyVo frequency, String userId) {
+    public void load(FrequencyVo frequency, String userId){
         this.frequency = frequency;
         this.userId = userId;
+    }
+    public void load(FrequencyVo frequency, String userId, String attrValue) {
+        this.frequency = frequency;
+        this.userId = userId;
+        this.attrValue = attrValue;
     }
 
 }

@@ -15,6 +15,7 @@ import java.util.Map;
  * @Date: 2022-5-10 22:16:27
  */
 public interface IDflLogUserBiz extends IBaseService<DflLogUserPo> {
+    public Long getUid(String userId);
     public Long getUid(String userId, String sysType, String ip);
 
     public Map<Long, DflLogUserPo> getUserPos(List<Long> uriIdList);

@@ -24,13 +24,27 @@ public @interface Frequency3 {
 
     int limit() default 0;
 
-    int userIpCount() default 14;//支持ip数限制，同一个用户能使用的ip数
+    /**
+     * 支持ip数限制，同一个用户能使用的ip数
+     * @return
+     */
+    int userIpCount() default 14;
 
-    int ipUserCount() default 14;//支持ip数限制，同一个IP能登入的用户数
+    /**
+     * 支持ip数限制，同一个IP能登入的用户数
+     * @return
+     */
+    int ipUserCount() default 14;//
 
     String attrName() default "";
 
-    boolean sysconfig() default false;//是否支持系统参数配置
+    /**
+     * 是否支持系统参数配置
+     * @return
+     */
+    boolean sysconfig() default false;
+
+    boolean resource() default false;
 
     /**
      * 是否需要登入

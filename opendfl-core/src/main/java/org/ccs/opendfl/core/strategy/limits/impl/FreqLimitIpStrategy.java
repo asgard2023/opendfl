@@ -48,6 +48,10 @@ public class FreqLimitIpStrategy implements FreqLimitStrategy {
     public void doCheckLimit(String limitItems, FreqLimitChain limitChain, RequestStrategyParamsVo strategyParams) {
         if (containLimit(limitItems, LIMIT_TYPE)) {
             FrequencyVo frequency = strategyParams.getFrequency();
+            if(!LIMIT_TYPE.isResource() && frequency.isResource()){
+                limitChain.doCheckLimit(limitChain, strategyParams);
+                return;
+            }
             String ip = strategyParams.getIp();
             String redisKey = getRedisKey(frequency, ip);
             int limit = frequency.getLimit() * 5;

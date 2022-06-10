@@ -3,6 +3,7 @@ package org.ccs.opendfl.core.limitlock;
 
 import org.ccs.opendfl.core.biz.IOutLogBiz;
 import org.ccs.opendfl.core.biz.IRequestLockConfigBiz;
+import org.ccs.opendfl.core.config.OpendflConfiguration;
 import org.ccs.opendfl.core.config.RequestLockConfiguration;
 import org.ccs.opendfl.core.constants.DataSourceType;
 import org.ccs.opendfl.core.constants.ReqLockType;
@@ -45,6 +46,8 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
     private static final Logger logger = LoggerFactory.getLogger(RequestLockHandlerInterceptor.class);
     @Autowired
     private RequestLockConfiguration requestLockConfiguration;
+    @Autowired
+    private OpendflConfiguration opendflConfiguration;
     @Resource(name = "requestLockConfigBiz")
     private IRequestLockConfigBiz requestLockConfigBiz;
     @Resource(name = "redisTemplateString")
@@ -97,8 +100,8 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
         }
 
         RequestLockVo requestLockVo = null;
-        String attrName = RequestParams.USER_ID;
-        String dataId = null;
+        String attrName = opendflConfiguration.getDefaultAttrName();
+        String attrValue = null;
         String ip = null;
         String userId = null;
         String deviceId = null;
@@ -123,17 +126,17 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
             final Integer time = requestLockVo.getTime();
             final String errMsg = requestLockVo.getErrMsg();
             Map<String, Object> reqParams = RequestUtils.getParamsObject(request);
-            dataId = FrequencyUtils.getAttrNameValue(reqParams, attrName);
+            attrValue = FrequencyUtils.getAttrNameValue(reqParams, attrName);
 
-            if (dataId != null) {
-                lockDataId.set(dataId);
+            if (attrValue != null) {
+                lockDataId.set(attrValue);
                 ip = RequestUtils.getIpAddress(request);
                 Integer count = counter.incrementAndGet();
                 String rndId = count + "-" + random.nextInt(1000);
                 boolean isLimit = false;
                 userId = (String) reqParams.get(RequestParams.USER_ID);
                 deviceId = (String) reqParams.get(RequestParams.DEVICE_ID);
-                String lockKey = LockUtils.getLockKey(reqLimit, dataId);
+                String lockKey = LockUtils.getLockKey(reqLimit, attrValue);
                 if (StringUtils.equals(DataSourceType.ETCD.getType(), reqLimit.lockType().getSource())) {
                     isLimit = lockEtcd(reqLimit, lockKey, time, rndId);
                 } else if (ReqLockType.ZK == reqLimit.lockType()) {
@@ -144,16 +147,16 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
                     isLimit = RedisLockUtils.lock(reqLimit, lockKey, rndId);
                 }
                 if (isLimit) {
-                    logger.debug("----preHandle--name={} time={} dataId={}, rndId={}", reqLimit.name(), time, dataId, rndId);
+                    logger.debug("----preHandle--name={} time={} dataId={}, rndId={}", reqLimit.name(), time, attrValue, rndId);
                     lockRandomId.set(rndId);
                 } else {
-                    logger.warn("----preHandle--lockKey={} time={} dataId={} ip={} limited", lockKey, time, dataId, ip);
+                    logger.warn("----preHandle--lockKey={} time={} dataId={} ip={} limited", lockKey, time, attrValue, ip);
                     String title = "frequency:lock";
-                    BaseException baseException = new FrequencyException("重复任务限制:" + String.format(errMsg, dataId));
+                    BaseException baseException = new FrequencyException("重复任务限制:" + String.format(errMsg, attrValue));
                     baseException.setTitle(title);
 
                     ip = RequestUtils.convertIpv4(ip);
-                    outLogBiz.addLockLog(requestLockVo, userId, ip, deviceId, sysType, attrName, dataId, null);
+                    outLogBiz.addLockLog(requestLockVo, userId, ip, deviceId, sysType, attrName, attrValue, null);
                     throw baseException;
                 }
             }
@@ -162,8 +165,8 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
         } catch (Exception e) {
             logger.warn("-----preHandle--error={}", e.getMessage());
             ip = RequestUtils.convertIpv4(ip);
-            outLogBiz.addLockLog(requestLockVo, userId, ip, deviceId, sysType, attrName, dataId, e.toString());
-            if (dataId != null) {
+            outLogBiz.addLockLog(requestLockVo, userId, ip, deviceId, sysType, attrName, attrValue, e.toString());
+            if (attrValue != null) {
                 lockDataId.remove();
             }
             throw e;

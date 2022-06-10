@@ -7,6 +7,7 @@ import java.util.List;
 @Data
 public class LimitConfigVo {
     private String items;
+    private String resourceLimitType="ip,data";
     private Character ipLimitSplitFunction='0';
     private Integer outLimitLogTime=3600;
     private List<LimitFrequencyConfigVo> frequencyConfigs;

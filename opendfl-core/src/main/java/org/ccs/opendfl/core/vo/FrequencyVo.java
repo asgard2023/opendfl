@@ -3,9 +3,7 @@ package org.ccs.opendfl.core.vo;
 import lombok.Data;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
 import org.ccs.opendfl.core.constants.FrequencyLimitType;
-import org.ccs.opendfl.core.limitfrequency.Frequency;
-import org.ccs.opendfl.core.limitfrequency.Frequency2;
-import org.ccs.opendfl.core.limitfrequency.Frequency3;
+import org.ccs.opendfl.core.limitfrequency.*;
 import org.springframework.beans.BeanUtils;
 
 import java.util.Objects;
@@ -25,6 +23,7 @@ public class FrequencyVo {
     private String errMsg;
     private String errMsgEn;
     private boolean sysconfig;
+    private boolean resource;
     private boolean needLogin;
     private Long createTime;
     public static final FrequencyVo instance=new FrequencyVo();
@@ -58,6 +57,7 @@ public class FrequencyVo {
         vo.errMsgEn= uriConfigVo.getErrMsgEn();
         vo.whiteCode= uriConfigVo.getWhiteCode();
         vo.attrName= uriConfigVo.getAttrName();
+        vo.resource=uriConfigVo.isResource();
         return vo;
     }
     public static FrequencyVo toFrequencyVo(Frequency frequency, FrequencyVo vo){
@@ -77,6 +77,7 @@ public class FrequencyVo {
         vo.attrName=frequency.attrName();
         vo.sysconfig=frequency.sysconfig();
         vo.needLogin= frequency.needLogin();
+        vo.resource=frequency.resource();
         return vo;
     }
 
@@ -102,6 +103,7 @@ public class FrequencyVo {
         vo.whiteCode=frequency.whiteCode();
         vo.attrName=frequency.attrName();
         vo.sysconfig=frequency.sysconfig();
+        vo.resource=frequency.resource();
         vo.needLogin= frequency.needLogin();
         return vo;
     }
@@ -128,6 +130,61 @@ public class FrequencyVo {
         vo.whiteCode=frequency.whiteCode();
         vo.attrName=frequency.attrName();
         vo.sysconfig=frequency.sysconfig();
+        vo.resource=frequency.resource();
+        vo.needLogin= frequency.needLogin();
+        return vo;
+    }
+
+    /**
+     *
+     * @param frequency
+     * @param vo 复用已有对象
+     * @return FrequencyVo
+     */
+    public static FrequencyVo toFrequencyVo(Frequency4 frequency, FrequencyVo vo){
+        if(frequency==null){
+            return null;
+        }
+        vo.setLimitType(FrequencyLimitType.FREQUENCY3.getType());
+        vo.name=frequency.name();
+        vo.aliasName=frequency.aliasName();
+        vo.time=frequency.time();
+        vo.limit=frequency.limit();
+        vo.ipUserCount= frequency.ipUserCount();
+        vo.userIpCount= frequency.userIpCount();
+        vo.errMsg=frequency.errMsg();
+        vo.errMsgEn=frequency.errMsgEn();
+        vo.whiteCode=frequency.whiteCode();
+        vo.attrName=frequency.attrName();
+        vo.sysconfig=frequency.sysconfig();
+        vo.resource=frequency.resource();
+        vo.needLogin= frequency.needLogin();
+        return vo;
+    }
+
+    /**
+     *
+     * @param frequency
+     * @param vo 复用已有对象
+     * @return FrequencyVo
+     */
+    public static FrequencyVo toFrequencyVo(Frequency5 frequency, FrequencyVo vo){
+        if(frequency==null){
+            return null;
+        }
+        vo.setLimitType(FrequencyLimitType.FREQUENCY3.getType());
+        vo.name=frequency.name();
+        vo.aliasName=frequency.aliasName();
+        vo.time=frequency.time();
+        vo.limit=frequency.limit();
+        vo.ipUserCount= frequency.ipUserCount();
+        vo.userIpCount= frequency.userIpCount();
+        vo.errMsg=frequency.errMsg();
+        vo.errMsgEn=frequency.errMsgEn();
+        vo.whiteCode=frequency.whiteCode();
+        vo.attrName=frequency.attrName();
+        vo.sysconfig=frequency.sysconfig();
+        vo.resource=frequency.resource();
         vo.needLogin= frequency.needLogin();
         return vo;
     }
@@ -146,6 +203,7 @@ public class FrequencyVo {
                 ", whiteCode=" + whiteCode +
                 ", errMsg='" + errMsg + '\'' +
                 ", errMsgEn='" + errMsgEn + '\'' +
+                ", resource=" + resource +
                 ", sysconfig=" + sysconfig +
                 '}';
     }

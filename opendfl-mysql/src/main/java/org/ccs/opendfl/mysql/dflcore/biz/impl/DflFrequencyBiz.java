@@ -1,6 +1,8 @@
 package org.ccs.opendfl.mysql.dflcore.biz.impl;
 
 import com.github.pagehelper.PageHelper;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.ccs.opendfl.core.constants.CacheTimeType;
 import org.ccs.opendfl.core.utils.ValidateUtils;
 import org.ccs.opendfl.mysql.base.BaseService;
@@ -17,13 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import tk.mybatis.mapper.common.Mapper;
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.mapper.util.StringUtil;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Description: 频率限制配置表 业务实现
@@ -94,6 +96,23 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
     }
 
     @Override
+    public Map<Integer, DflFrequencyPo> getFrequencyByIds(List<Integer> freqencyIdList){
+        if (CollectionUtils.isEmpty(freqencyIdList)) {
+            return Collections.emptyMap();
+        }
+        Example example = new Example(DflFrequencyPo.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("ifDel", 0);
+        criteria.andIn("id", freqencyIdList);
+        List<DflFrequencyPo> uriList = this.mapper.selectByExample(example);
+        Map<Integer, DflFrequencyPo> frequencyPoMap = new HashMap<>();
+        for (DflFrequencyPo scansPo : uriList) {
+            frequencyPoMap.put(scansPo.getId(), scansPo);
+        }
+        return frequencyPoMap;
+    }
+
+    @Override
     public Integer saveDflFrequency(DflFrequencyPo entity) {
         if (entity.getCreateTime() == null) {
             entity.setCreateTime(new Date());
@@ -161,6 +180,29 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
         return this.mapper.selectOne(search);
     }
 
+    public static final Cache<String, Integer> frequencyIdMap = CacheBuilder.newBuilder().expireAfterWrite(12, TimeUnit.HOURS)
+            .maximumSize(2000).build();
+
+    @Override
+    public Integer getFrequencyIdByCode(String code, Integer time){
+        if(code==null||time==null){
+            return 0;
+        }
+        String key=code+":"+time;
+        Integer id=frequencyIdMap.getIfPresent(key);
+        if(id==null){
+            DflFrequencyPo frequencyPo= this._self.getFrequencyByCode(code, time);
+            if(frequencyPo!=null){
+                id=frequencyPo.getId();
+            }
+            if(id==null){
+                id=-1;
+            }
+            frequencyIdMap.put(key, id);
+        }
+        return id;
+    }
+
     @Override
     @CacheEvict(value = CacheTimeType.CACHE30S, key = "'opendfl:getFrequencyByUri:'+#uri")
     public void getFrequencyByUri_evict(String uri) {
@@ -214,6 +256,7 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
         Example example = new Example(DflFrequencyPo.class);
         Example.Criteria criteria = example.createCriteria();
         criteria.andEqualTo("ifDel", 0);
+        criteria.andIsNotNull("time");
         criteria.andGreaterThan("modifyTime", new Date(modifyTime));
         return this.mapper.selectByExample(example);
     }
