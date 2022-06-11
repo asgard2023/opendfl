@@ -86,11 +86,7 @@ public class RequestUtils {
         if (origin == null) {
             return null;
         }
-        origin = CommUtils.ignoreHttp(origin);
-        //忽略端口号
-        if (origin.indexOf(':') > 0) {
-            origin = origin.substring(0, origin.indexOf(':'));
-        }
+        origin = CommUtils.getDomain(origin);
         return origin;
     }
 

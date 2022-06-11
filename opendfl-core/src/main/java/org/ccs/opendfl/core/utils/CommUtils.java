@@ -160,7 +160,7 @@ public final class CommUtils {
     }
 
     public static List newList(Object... objects) {
-        List list = new ArrayList();
+        List list = new ArrayList(objects.length);
         for (Object obj : objects) {
             list.add(obj);
         }
@@ -179,6 +179,28 @@ public final class CommUtils {
             url = url.substring(HTTP.length());
         } else if (url.startsWith(HTTPS)) {
             url = url.substring(HTTPS.length());
+        }
+        return url;
+    }
+
+    /**
+     * 取网址的域名或IP
+     * @param url
+     * @return
+     */
+    public static String getDomain(String url){
+        if(url==null){
+            return null;
+        }
+        url=ignoreHttp(url);
+        //忽略端口号
+        if (url.indexOf(':') > 0) {
+            url = url.substring(0, url.indexOf(':'));
+        }
+        else{
+            if(url.indexOf('/')>0){
+                url = url.substring(0, url.indexOf('/'));
+            }
         }
         return url;
     }
