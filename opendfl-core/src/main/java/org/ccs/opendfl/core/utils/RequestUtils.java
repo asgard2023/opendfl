@@ -82,7 +82,16 @@ public class RequestUtils {
     }
 
     public static String getOrigin(HttpServletRequest request) {
-        return request.getHeader(RequestParams.ORIGIN);
+        String origin = request.getHeader(RequestParams.ORIGIN);
+        if (origin == null) {
+            return null;
+        }
+        origin = CommUtils.ignoreHttp(origin);
+        //忽略端口号
+        if (origin.indexOf(':') > 0) {
+            origin = origin.substring(0, origin.indexOf(':'));
+        }
+        return origin;
     }
 
     public static Character getSysTypeId(HttpServletRequest request) {
