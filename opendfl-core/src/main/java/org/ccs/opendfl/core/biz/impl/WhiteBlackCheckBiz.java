@@ -86,12 +86,14 @@ public class WhiteBlackCheckBiz implements IWhiteBlackCheckBiz {
         } else if (WhiteBlackCheckType.IP == checkType) {
             check = this.isIncludeId(id, whiteConfig.getIps());
         } else if (WhiteBlackCheckType.ORIGIN == checkType) {
-            //白名单为空，也返回true
-            if(StringUtils.isBlank(whiteConfig.getOrigins()) || StringUtils.equals("none", whiteConfig.getOrigins())){
+            //如果白名单ifOriginRequire!=1表示origin非必填，origin为空默认通过
+            if (!StringUtils.ifYes(whiteConfig.getIfOriginRequire()) && StringUtils.isEmpty(id)) {
                 check = true;
-                return check;
+            } else if (StringUtils.isBlank(whiteConfig.getOrigins())) {
+                check = true;
+            } else {
+                check = this.isIncludeId(id, whiteConfig.getOrigins());
             }
-            check = this.isIncludeId(id, whiteConfig.getOrigins());
         }
         return check;
     }

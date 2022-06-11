@@ -474,7 +474,7 @@ class FrequencyTestControllerTest {
         }
         System.out.println("----serverTimeFreq_whiteOrigin  successCount=" + successCount + " limtCount=" + limtCount);
         Assertions.assertTrue(successCount > 0, "successCount:" + successCount);
-        Assertions.assertTrue(limtCount > 0, "ipUserCount:" + limtCount);
+        Assertions.assertTrue(limtCount == 0, "ipUserCount:" + limtCount);
     }
 
     /**
@@ -501,7 +501,7 @@ class FrequencyTestControllerTest {
             System.out.println("----serverTimeFreq_whiteOrigin_fail  status=" + status + " content=" + content);
         }
         System.out.println("----serverTimeFreq_whiteOrigin_fail  successCount=" + successCount + " limtCount=" + limtCount);
-        Assertions.assertTrue(successCount > 0, "successCount:" + successCount);
+        Assertions.assertTrue(successCount == 0, "successCount:" + successCount);
         Assertions.assertTrue(limtCount > 0, "ipUserCount:" + limtCount);
     }
 
