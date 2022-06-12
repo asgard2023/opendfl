@@ -248,6 +248,7 @@
         <if test="outLimitType != null">and out_limit_type=#{outLimitType}</if>
         <if test="timeSecond != null">and time_second=#{timeSecond}</if>
         <if test="limitCount != null">and limit_count=#{limitCount}</if>
+        <if test="ifResource != null">and if_resource=#{ifResource}</if>
         <if test="uid != null">and uid=#{uid}</if>
         <if test="uriId != null">and uri_id=#{uriId}</if>
         GROUP BY uri_id,time_second, limit_count,limit_type

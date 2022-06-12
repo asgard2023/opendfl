@@ -55,7 +55,7 @@
 <div class="easyui-layout" data-options="fit:true">
     <!-- 查询条件  -->
     <div data-options="region:'north', title:'频率限制超限日志-条件'"
-         style="height: 80px; padding: 5px 80px;display:none;">
+         style="height: 120px; padding: 5px 80px;display:none;">
         <form id="search-form">
             <table class="search-table">
                 <tr>
@@ -69,6 +69,29 @@
                         <input name="endTime" id="query_endTime" class="easyui-datetimebox" style="width:145px"
                                formatter="Common.DateTimeFormatter">
                     </td>
+                    <td>
+                        超限类型:
+                        <input class="easyui-combobox" name="outLimitType" id="query_outLimitType" data-options="
+									valueField: 'id',
+									textField: 'name',
+									data: dict_outLimitType"/>
+                    </td>
+                    <td>
+                        限制类型
+                        <input class="easyui-combobox" name="limitType" id="query_limitType" data-options="
+									valueField: 'id',
+									textField: 'name',data: dict_limitType"/>
+                    </td>
+                    <td>
+                        ifResource
+                        <input class="easyui-combobox" name="ifResource" id="query_ifResource" data-options="
+									valueField: 'id',
+									textField: 'name',data: dict_if"/>
+                    </td>
+                </tr>
+            </table>
+            <table class="search-table">
+                <tr>
                     <td>
                         <input type="text" id="query_userId" name="userId" class="easyui-validatebox"
                                placeholder="Input userId">
@@ -87,19 +110,6 @@
                     <td>
                         <input type="text" id="query_ip" name="ip" class="easyui-validatebox" style="width:100px"
                                placeholder="Input ip">
-                    </td>
-                    <td>
-                        超限类型:
-                        <input class="easyui-combobox" name="outLimitType" id="query_outLimitType" data-options="
-									valueField: 'id',
-									textField: 'name',
-									data: dict_outLimitType"/>
-                    </td>
-                    <td>
-                        限制类型
-                        <input class="easyui-combobox" name="limitType" id="query_limitType" data-options="
-									valueField: 'id',
-									textField: 'name',data: dict_limitType"/>
                     </td>
                     <td>
                         <a class="easyui-linkbutton"

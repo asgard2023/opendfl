@@ -55,7 +55,7 @@
 <div class="easyui-layout" data-options="fit:true">
     <!-- 查询条件  -->
     <div data-options="region:'north', title:'频率限制超限日志-条件'"
-         style="height: 80px; padding: 5px 80px;display:none;">
+         style="height: 120px; padding: 5px 80px;display:none;">
         <form id="search-form">
             <table class="search-table">
                 <tr>
@@ -68,10 +68,6 @@
                         <label for="query_endTime">结束时间<</label>
                         <input name="endTime" id="query_endTime" class="easyui-datetimebox" style="width:150px"
                                formatter="Common.DateTimeFormatter">
-                    </td>
-                    <td>
-                        <input type="text" id="query_userId" name="userId" class="easyui-validatebox"
-                               placeholder="Input userId">
                     </td>
                     <td>
                         超限类型:
@@ -87,11 +83,25 @@
 									textField: 'name',data: dict_limitType"/>
                     </td>
                     <td>
+                        ifResource
+                        <input class="easyui-combobox" name="ifResource" id="query_ifResource" data-options="
+									valueField: 'id',
+									textField: 'name',data: dict_if"/>
+                    </td>
+                    <td>
                         统计类型
                         <input class="easyui-combobox" name="findType" id="dflRequestScans_findType" data-options="
 									valueField: 'id',
 									textField: 'name',
 									data: dict_findType"/>
+                    </td>
+                </tr>
+            </table>
+            <table class="search-table">
+                <tr>
+                    <td>
+                        <input type="text" id="query_userId" name="userId" class="easyui-validatebox"
+                               placeholder="Input userId">
                     </td>
                     <td>
                         <input type="text" id="query_uri" name="uri" class="easyui-validatebox" placeholder="Input uri">

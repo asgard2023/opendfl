@@ -147,6 +147,7 @@ public class DflOutLimitLogController extends BaseController {
     @RequestMapping(value = "/listCount", method = {RequestMethod.POST, RequestMethod.GET})
     @CheckLogin
     public PageVO<DflOutLimitLogCountVo> listCount(HttpServletRequest request, DflOutLimitLogPo entity, MyPageInfo<DflOutLimitLogCountVo> pageInfo) {
+        this.pageSortBy(pageInfo);
         if (entity == null) {
             entity = new DflOutLimitLogPo();
         }
