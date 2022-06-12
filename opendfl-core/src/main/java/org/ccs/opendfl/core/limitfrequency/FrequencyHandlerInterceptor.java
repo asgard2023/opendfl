@@ -8,8 +8,8 @@ import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.OpendflConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
+import org.ccs.opendfl.core.constants.OutLimitType;
 import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
-import org.ccs.opendfl.core.constants.WhiteBlackType;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.strategy.black.BlackChain;
 import org.ccs.opendfl.core.strategy.limits.FreqLimitChain;
@@ -62,18 +62,23 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     private BlackChain blackChain;
     @Autowired
     private RunCountTask runCountTask;
-    public void setFrequencyConfigBiz(IFrequencyConfigBiz frequencyConfigBiz){
+
+    public void setFrequencyConfigBiz(IFrequencyConfigBiz frequencyConfigBiz) {
         this.frequencyConfigBiz = frequencyConfigBiz;
     }
-    public void setFreqLimitChain(FreqLimitChain freqLimitChain){
+
+    public void setFreqLimitChain(FreqLimitChain freqLimitChain) {
         this.freqLimitChain = freqLimitChain;
     }
-    public void setWhiteChain(WhiteChain white){
+
+    public void setWhiteChain(WhiteChain white) {
         this.whiteChain = white;
     }
-    private void setBlackChain(BlackChain black){
+
+    private void setBlackChain(BlackChain black) {
         this.blackChain = black;
     }
+
     private static final String FREQUENCY_LIST_INFO = "{\"resultCode\":\"100030\",\"errorMsg\":\"Frequency limit\",\"errorType\":\"%s\",\"success\":false}";
     private static final String BLACK_LIST_INFO = "{\"resultCode\":\"100031\",\"errorMsg\":\"Black limit\",\"errorType\":\"%s\",\"success\":false}";
     private static final String WHITE_LIST_INFO = "{\"resultCode\":\"100032\",\"errorMsg\":\"White limit\",\"errorType\":\"%s\",\"success\":false}";
@@ -107,7 +112,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             String deviceId = (String) params.get(RequestParams.DEVICE_ID);
 
             String sysType = RequestUtils.getSysType(request);
-            String origin=RequestUtils.getOrigin(request);
+            String origin = RequestUtils.getOrigin(request);
             strategyParams = new RequestStrategyParamsVo(lang, ip, origin, deviceId, handlerMethod.getMethod().getName(), requestUri, sysType, curTime);
             String userId = (String) params.get(RequestParams.USER_ID);
             strategyParams.setUserId(userId);
@@ -125,13 +130,13 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             String limitType = null;
             if (isBlack) {
                 log.warn("----preHandle--uri={} blackIp={} ", request.getRequestURI(), remoteIp);
-                WhiteBlackCheckType freqLimitType=null;
+                WhiteBlackCheckType freqLimitType = null;
                 String title = "frequency:black";
                 if (chainOper.getBlackStrategy() != null) {
                     limitType = chainOper.getBlackStrategy().getLimitType();
                     title = "frequency:black:" + limitType;
                     freqLimitType = WhiteBlackCheckType.parseCode(limitType);
-                    FrequencyUtils.addFreqLog(strategyParams, 1, 0, WhiteBlackType.BLACK.getCode(), freqLimitType);
+                    FrequencyUtils.addFreqLog(strategyParams, 1, 0, OutLimitType.BLACK, freqLimitType);
                 }
                 this.frequencyReturn(requestVo, true);
                 FrequencyUtils.outLimitCount(strategyParams, freqLimitType);
@@ -152,16 +157,16 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
                 this.frequencyReturn(requestVo, false);
                 WhiteBlackCheckType freqLimitType = WhiteBlackCheckType.parseCode(limitType);
                 FrequencyUtils.outLimitCount(strategyParams, freqLimitType);
-                FrequencyUtils.addFreqLog(strategyParams, 1, 0, WhiteBlackType.WHITE.getCode(), freqLimitType);
+                FrequencyUtils.addFreqLog(strategyParams, 1, 0, OutLimitType.WHITE, freqLimitType);
                 return true;
             }
-            if(chainOper.isFail()){
+            if (chainOper.isFail()) {
                 this.frequencyReturn(requestVo, true);
                 limitType = chainOper.getWhiteStrategy().getLimitType();
                 WhiteBlackCheckType freqLimitType = WhiteBlackCheckType.parseCode(limitType);
                 FrequencyUtils.outLimitCount(strategyParams, freqLimitType);
-                FrequencyUtils.addFreqLog(strategyParams, 1, 0, WhiteBlackType.WHITE.getCode(), freqLimitType);
-                String title = "frequency:white:"+limitType;
+                FrequencyUtils.addFreqLog(strategyParams, 1, 0, OutLimitType.WHITE, freqLimitType);
+                String title = "frequency:white:" + limitType;
                 response.getWriter().println(String.format(WHITE_LIST_INFO, title));
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return false;
@@ -276,7 +281,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         List<LimitUriConfigVo> limitConfigList = requestVo.getLimitRequests();
         for (LimitUriConfigVo uriConfigVo : limitConfigList) {
             //无效数据不算
-            if(uriConfigVo.getStatus()!=1){
+            if (uriConfigVo.getStatus() != 1) {
                 continue;
             }
             frequencyVo = FrequencyVo.toFrequencyVo(frequencyVo, uriConfigVo);

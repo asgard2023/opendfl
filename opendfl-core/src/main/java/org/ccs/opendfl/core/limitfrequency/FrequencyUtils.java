@@ -7,6 +7,7 @@ import org.ccs.opendfl.core.biz.IOutLogBiz;
 import org.ccs.opendfl.core.biz.IRsaBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.constants.FreqLimitType;
+import org.ccs.opendfl.core.constants.OutLimitType;
 import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.FrequencyException;
@@ -61,8 +62,11 @@ public class FrequencyUtils {
     }
 
 
-    public static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, String outType, WhiteBlackCheckType type) {
-        addFreqLog(strategyParams, limit, v, outType, type.getCode());
+    public static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, OutLimitType outType, WhiteBlackCheckType type) {
+        if(type==null){
+            return;
+        }
+        addFreqLog(strategyParams, limit, v, outType, null, 0, type.getCode());
     }
 
     /**
@@ -73,12 +77,18 @@ public class FrequencyUtils {
      * @param type           limit type
      */
     public static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, FreqLimitType type) {
-        addFreqLog(strategyParams, limit, v, strategyParams.getFrequency().getLimitType(), type.getCode());
+        FreqLimitType freqLimitType = FreqLimitType.parseCode(strategyParams.getFrequency().getLimitType());
+        Integer ifResource = 0;
+        if (freqLimitType != null && freqLimitType.isResource()) {
+            ifResource = 1;
+        }
+        OutLimitType outLimitType = OutLimitType.FREQUENCY;
+        addFreqLog(strategyParams, limit, v, outLimitType, strategyParams.getFrequency().getLimitType(), ifResource, type.getCode());
     }
 
-    private static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, String outType, String typeCode) {
+    private static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, OutLimitType outLimitType, String subLimit, Integer ifResource, String typeCode) {
         outLimitCount(strategyParams, typeCode);
-        outLogBiz.addFreqLog(strategyParams, limit, v, outType, typeCode, strategyParams.getAttrValue());
+        outLogBiz.addFreqLog(strategyParams, limit, v, outLimitType, subLimit, ifResource, typeCode, strategyParams.getAttrValue());
         Integer logTime = frequencyConfiguration.getLimit().getOutLimitLogTime();
         FrequencyVo frequency = strategyParams.getFrequency();
         if (frequency == null || !(logTime > 0 && frequency.getTime() >= logTime)) {

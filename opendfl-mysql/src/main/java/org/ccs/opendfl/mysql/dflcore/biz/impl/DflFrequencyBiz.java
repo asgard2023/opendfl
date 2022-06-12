@@ -1,9 +1,11 @@
 package org.ccs.opendfl.mysql.dflcore.biz.impl;
 
+import com.alibaba.druid.util.StringUtils;
 import com.github.pagehelper.PageHelper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.ccs.opendfl.core.constants.CacheTimeType;
+import org.ccs.opendfl.core.constants.FrequencyType;
 import org.ccs.opendfl.core.utils.ValidateUtils;
 import org.ccs.opendfl.mysql.base.BaseService;
 import org.ccs.opendfl.mysql.base.ISelfInject;
@@ -132,6 +134,12 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
     @Override
     public Integer updateDflFrequency(DflFrequencyPo entity) {
         DflFrequencyPo exist = this.findById(entity.getId());
+        if(StringUtils.isEmpty(exist.getLimitType())){
+            entity.setLimitType(FrequencyType.URI_CONFIG.getType());
+        }
+        if(entity.getTime()==null||entity.getLimitCount()==null){
+            entity.setLimitType(null);
+        }
         entity.setModifyTime(new Date());
         int v = this.updateByPrimaryKeySelective(entity);
         if (v > 0) {

@@ -2,7 +2,7 @@ package org.ccs.opendfl.core.vo;
 
 import lombok.Data;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
-import org.ccs.opendfl.core.constants.FrequencyLimitType;
+import org.ccs.opendfl.core.constants.FrequencyType;
 import org.ccs.opendfl.core.limitfrequency.*;
 import org.springframework.beans.BeanUtils;
 
@@ -46,7 +46,7 @@ public class FrequencyVo {
         if(frequency==null){
             vo=FrequencyVo.newInstance();
         }
-        vo.setLimitType(FrequencyLimitType.URI_CONFIG.getType());
+        vo.setLimitType(FrequencyType.URI_CONFIG.getType());
         vo.name= uriConfigVo.getUri();
         vo.aliasName= uriConfigVo.getAliasName();
         vo.time= uriConfigVo.getTime();
@@ -64,7 +64,7 @@ public class FrequencyVo {
         if(frequency==null){
             return null;
         }
-        vo.setLimitType(FrequencyLimitType.FREQUENCY.getType());
+        vo.setLimitType(FrequencyType.FREQUENCY.getType());
         vo.name=frequency.name();
         vo.aliasName=frequency.aliasName();
         vo.time=frequency.time();
@@ -91,7 +91,7 @@ public class FrequencyVo {
         if(frequency==null){
             return null;
         }
-        vo.setLimitType(FrequencyLimitType.FREQUENCY2.getType());
+        vo.setLimitType(FrequencyType.FREQUENCY2.getType());
         vo.name=frequency.name();
         vo.aliasName=frequency.aliasName();
         vo.time=frequency.time();
@@ -118,7 +118,7 @@ public class FrequencyVo {
         if(frequency==null){
             return null;
         }
-        vo.setLimitType(FrequencyLimitType.FREQUENCY3.getType());
+        vo.setLimitType(FrequencyType.FREQUENCY3.getType());
         vo.name=frequency.name();
         vo.aliasName=frequency.aliasName();
         vo.time=frequency.time();
@@ -145,7 +145,7 @@ public class FrequencyVo {
         if(frequency==null){
             return null;
         }
-        vo.setLimitType(FrequencyLimitType.FREQUENCY3.getType());
+        vo.setLimitType(FrequencyType.FREQUENCY3.getType());
         vo.name=frequency.name();
         vo.aliasName=frequency.aliasName();
         vo.time=frequency.time();
@@ -172,7 +172,7 @@ public class FrequencyVo {
         if(frequency==null){
             return null;
         }
-        vo.setLimitType(FrequencyLimitType.FREQUENCY3.getType());
+        vo.setLimitType(FrequencyType.FREQUENCY3.getType());
         vo.name=frequency.name();
         vo.aliasName=frequency.aliasName();
         vo.time=frequency.time();

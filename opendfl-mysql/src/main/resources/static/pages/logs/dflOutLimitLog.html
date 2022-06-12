@@ -11,6 +11,7 @@
     <script type="text/javascript" src="../../scripts/Common.js"></script>
     <script type="text/javascript" src="../../scripts/comm.dict.js"></script>
     <script type="text/javascript" src="../../scripts/DateUtils.js"></script>
+    <script type="text/javascript" src="dict_logs.js"></script>
     <link rel="stylesheet" type="text/css" href="../../scripts/easyui1.7.0/themes/bootstrap/easyui.css">
     <link rel="stylesheet" type="text/css" href="../../scripts/easyui1.7.0/themes/icon.css">
 
@@ -60,33 +61,45 @@
                 <tr>
                     <td>
                         <label for="query_startTime">开始时间>=</label>
-                        <input name="startTime" id="query_startTime" class="easyui-datetimebox" style="width:150px" formatter="Common.DateTimeFormatter">
+                        <input name="startTime" id="query_startTime" class="easyui-datetimebox" style="width:145px"
+                               formatter="Common.DateTimeFormatter">
                     </td>
                     <td>
                         <label for="query_endTime">结束时间<</label>
-                        <input name="endTime" id="query_endTime" class="easyui-datetimebox" style="width:150px" formatter="Common.DateTimeFormatter">
+                        <input name="endTime" id="query_endTime" class="easyui-datetimebox" style="width:145px"
+                               formatter="Common.DateTimeFormatter">
                     </td>
                     <td>
-                        <input type="text" id="query_userId"  name="userId" class="easyui-validatebox" placeholder="Input userId">
+                        <input type="text" id="query_userId" name="userId" class="easyui-validatebox"
+                               placeholder="Input userId">
                     </td>
                     <td>
-                        <input type="text" id="query_attrValue" name="attrValue" class="easyui-validatebox" placeholder="Input attrValue" >
+                        <input type="text" id="query_attrValue" name="attrValue" class="easyui-validatebox"
+                               placeholder="Input attrValue">
                     </td>
                     <td>
                         <input type="text" id="query_uri" name="uri" class="easyui-validatebox" placeholder="Input uri">
                     </td>
                     <td>
-                        <input type="text" id="query_code" name="code" class="easyui-validatebox" placeholder="Input frequency code">
+                        <input type="text" id="query_code" name="code" class="easyui-validatebox"
+                               placeholder="Input frequency code">
                     </td>
                     <td>
-                        <input type="text" id="query_ip" name="ip" class="easyui-validatebox" style="width:100px" placeholder="Input ip">
+                        <input type="text" id="query_ip" name="ip" class="easyui-validatebox" style="width:100px"
+                               placeholder="Input ip">
+                    </td>
+                    <td>
+                        超限类型:
+                        <input class="easyui-combobox" name="outLimitType" id="query_outLimitType" data-options="
+									valueField: 'id',
+									textField: 'name',
+									data: dict_outLimitType"/>
                     </td>
                     <td>
                         限制类型
-                        <input class="easyui-combobox" name="limitType" id="dflRequestScans_limitType" data-options="
+                        <input class="easyui-combobox" name="limitType" id="query_limitType" data-options="
 									valueField: 'id',
-									textField: 'name',
-									data: dict_limitType"/>
+									textField: 'name',data: dict_limitType"/>
                     </td>
                     <td>
                         <a class="easyui-linkbutton"
@@ -119,22 +132,31 @@
                 <th align="center" field="uri" width="100" sortable="false">uri</th>
                 <th align="center" field="uriId" width="50" sortable="true" hidden="true">uriId</th>
                 <th align="center" field="frequencyId" width="50" sortable="true" hidden="true">frequencyId</th>
-                <th align="center" field="frequency" width="80" sortable="false"  formatter="formatterFrequencyCode">Frequency code</th>
+                <th align="center" field="frequency" width="80" sortable="false" formatter="formatterFrequencyCode">
+                    Frequency code
+                </th>
                 <th align="center" field="uid" width="50" sortable="true" hidden="true">用户端用户id</th>
                 <th align="center" field="user" width="50" sortable="false" formatter="dgUserId">userId</th>
                 <th align="center" field="lang" width="40" sortable="false">lang</th>
                 <th align="center" field="limitCount" width="40" sortable="true">限制次数</th>
                 <th align="center" field="timeSecond" width="40" sortable="true">间隔时间</th>
                 <th align="center" field="attrValue" width="50" sortable="true">attrValue</th>
-                <th align="center" field="outType" width="50" sortable="true">outType</th>
+                <th align="center" field="outLimitType" width="50" sortable="true" formatter="formatterOutLimitType">
+                    outLimitType
+                </th>
+                <th align="center" field="subType" width="50" sortable="true">subType</th>
                 <th align="center" field="limitType" width="50" sortable="true">limitType</th>
-                <th align="center" field="sysType" width="50" sortable="true" formatter="formatterReqSysType">sysType</th>
+                <th align="center" field="ifResource" width="50" sortable="true">ifResource</th>
+                <th align="center" field="sysType" width="50" sortable="true" formatter="formatterReqSysType">sysType
+                </th>
                 <th align="center" field="origin" width="50" sortable="true">Origin</th>
                 <th align="center" field="ip" width="50" sortable="true">用户IP地址</th>
                 <th align="center" field="deviceId" width="50" sortable="false">设备号</th>
                 <th align="center" field="reqCount" width="50" sortable="true">请求次数</th>
                 <th align="center" field="errMsg" width="50" sortable="true">异常信息</th>
-                <th align="center" field="createTime" width="50" sortable="true" formatter="timestampFormatDateTime">创建时间</th>
+                <th align="center" field="createTime" width="50" sortable="true" formatter="timestampFormatDateTime">
+                    创建时间
+                </th>
                 <th align="center" field="remark" width="50" sortable="true">备注</th>
                 <th align="center" field="userType" width="50" sortable="true">0未登入，1用户Id，2用户账号</th>
                 <th align="center" field="runTime" width="50" sortable="true">runTime</th>
@@ -201,10 +223,6 @@
             <input name="errMsg" class="easyui-validatebox" required="true">
         </div>
         <div class="fitem">
-            <label>创建时间:</label>
-            <input name="createTime" class="easyui-datebox" required="true">
-        </div>
-        <div class="fitem">
             <label>备注:</label>
             <input name="remark" class="easyui-validatebox" required="true">
         </div>
@@ -232,32 +250,34 @@
         $('#search-form')[0].reset();
     });
 
-    function formatterFrequencyCode(d){
-        if(d){
+    function formatterFrequencyCode(d) {
+        if (d) {
             return d.code;
         }
         return null;
     }
 
-    var dict_limitType = [
-        {id: 'limit', name: 'limit用户限制'},
-        {id: 'limitIp', name: 'limitIp同IP次数频率'},
-        {id: 'userIp', name: 'userIp用户IP数限制'},
-        {id: 'ipUser', name: 'ipUserIP用户数限制'},
-        {id: 'blackUser', name: 'blackUser用户黑名单'},
-        {id: 'blackIp', name: 'blackIp黑名单'},
-        {id: 'blackDeviceId', name: 'blackDevice设备黑名单'}
-    ]
 
     $(function () {
+        $('#query_outLimitType').combobox({
+            onSelect: function (data) {
+                console.log(data);
+                if (data.id == '1') {
+                    $('#query_limitType').combobox('loadData', dict_freqLimitType);
+                }
+                else{
+                    $('#query_limitType').combobox('loadData', dict_whiteBlackCheckType);
+                }
+            }
+        });
         initQueryDate();
         doSearch();
     });
 
     function doSearch() {
-        var url="/dflLogs/dflOutLimitLog/list2";
+        var url = "/dflLogs/dflOutLimitLog/list2";
         var jsonParam = $('#search-form').serializeJson();
-        $('#dg').datagrid({headers:app.headers, url: url, queryParams: jsonParam})
+        $('#dg').datagrid({headers: app.headers, url: url, queryParams: jsonParam})
     }
 
 
@@ -327,9 +347,9 @@
                 return;
             }
         }
-        var url= '/dflLogs/dflOutLimitLog/save';
+        var url = '/dflLogs/dflOutLimitLog/save';
         var jsonParam = $('#fm').serializeJson();
-        if($('#fm').form('validate')) {
+        if ($('#fm').form('validate')) {
             $.ajax({
                 method: 'post',
                 url: url,

@@ -86,7 +86,7 @@ public class FreqLimitUserCountStrategy implements FreqLimitStrategy {
             final String userId = strategyParams.getUserId();
             final String attrValue = strategyParams.getAttrValue();
             final String ip = strategyParams.getIp();
-            if (filterResource(limitChain, strategyParams, frequency, userId, attrValue)) {
+            if (filterResource(frequency, userId, attrValue)) {
                 limitChain.doCheckLimit(limitChain, strategyParams);
                 return;
             }
@@ -117,7 +117,7 @@ public class FreqLimitUserCountStrategy implements FreqLimitStrategy {
         limitChain.doCheckLimit(limitChain, strategyParams);
     }
 
-    private boolean filterResource(FreqLimitChain limitChain, RequestStrategyParamsVo strategyParams, FrequencyVo frequency, String userId, String dataId) {
+    private boolean filterResource(FrequencyVo frequency, String userId, String dataId) {
         //是否资源限制
         if (frequency.isResource()) {
             //如果限制类型不支持，不处理这个限制

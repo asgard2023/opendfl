@@ -6,7 +6,7 @@ import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.OpendflConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
-import org.ccs.opendfl.core.constants.FrequencyLimitType;
+import org.ccs.opendfl.core.constants.FrequencyType;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestVo;
@@ -69,7 +69,7 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
     public void limitBySysconfigLoad(FrequencyVo frequency, Long curTime) {
         loadAnyChange(curTime);
         //只支持注解模式，uriConfig模式不处理
-        if (StringUtils.equals(FrequencyLimitType.URI_CONFIG.getType(), frequency.getLimitType())) {
+        if (StringUtils.equals(FrequencyType.URI_CONFIG.getType(), frequency.getLimitType())) {
             return;
         }
         String key = frequency.getName() + ":" + frequency.getTime();
@@ -199,7 +199,7 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
         DflFrequencyPo entity = new DflFrequencyPo();
         entity.setUri(requestUri);
         entity.setMethod(requestVo.getMethod());
-        entity.setLimitType(FrequencyLimitType.URI_CONFIG.getType());
+        entity.setLimitType(FrequencyType.URI_CONFIG.getType());
         entity.setIfDel(0);
         entity.setStatus(1);
         entity.setNeedLogin(0);
@@ -299,8 +299,8 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
         if (CollectionUtils.isEmpty(modifys)) {
             return;
         }
-        List<DflFrequencyPo> modifyFrequencys = modifys.stream().filter(t ->t.getTime()!=null &&  !FrequencyLimitType.URI_CONFIG.getType().equals(t.getLimitType())).collect(Collectors.toList());
-        Map<String, List<DflFrequencyPo>> modifyUriConfigs = modifys.stream().filter(t -> t.getTime()!=null && FrequencyLimitType.URI_CONFIG.getType().equals(t.getLimitType())).collect(Collectors.groupingBy(DflFrequencyPo::getUri));
+        List<DflFrequencyPo> modifyFrequencys = modifys.stream().filter(t ->t.getTime()!=null &&  !FrequencyType.URI_CONFIG.getType().equals(t.getLimitType())).collect(Collectors.toList());
+        Map<String, List<DflFrequencyPo>> modifyUriConfigs = modifys.stream().filter(t -> t.getTime()!=null && FrequencyType.URI_CONFIG.getType().equals(t.getLimitType())).collect(Collectors.groupingBy(DflFrequencyPo::getUri));
         log.info("-------reloadNewlyModify---modifyTime={} modifys={} modifyFrequencys={} modifyUriConfigs={}", modifyTime, modifys.size(), modifyFrequencys.size(), modifyUriConfigs.size());
         reloadNewlyFrequency(modifyFrequencys, curTime);
 

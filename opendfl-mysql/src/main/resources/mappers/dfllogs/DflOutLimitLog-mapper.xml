@@ -245,6 +245,7 @@
         from `dfl_out_limit_log`
         where create_time >=#{startTime} and create_time <![CDATA[<]]> #{endTime}
         <if test="limitType != null">and limit_type=#{limitType}</if>
+        <if test="outLimitType != null">and out_limit_type=#{outLimitType}</if>
         <if test="timeSecond != null">and time_second=#{timeSecond}</if>
         <if test="limitCount != null">and limit_count=#{limitCount}</if>
         <if test="uid != null">and uid=#{uid}</if>

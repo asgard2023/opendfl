@@ -11,6 +11,7 @@
     <script type="text/javascript" src="../../scripts/Common.js"></script>
     <script type="text/javascript" src="../../scripts/comm.dict.js"></script>
     <script type="text/javascript" src="../../scripts/DateUtils.js"></script>
+    <script type="text/javascript" src="dict_logs.js"></script>
     <link rel="stylesheet" type="text/css" href="../../scripts/easyui1.7.0/themes/bootstrap/easyui.css">
     <link rel="stylesheet" type="text/css" href="../../scripts/easyui1.7.0/themes/icon.css">
 
@@ -73,11 +74,17 @@
                                placeholder="Input userId">
                     </td>
                     <td>
-                        限制类型
-                        <input class="easyui-combobox" name="limitType" id="dflRequestScans_limitType" data-options="
+                        超限类型:
+                        <input class="easyui-combobox" name="outLimitType" id="query_outLimitType" data-options="
 									valueField: 'id',
 									textField: 'name',
-									data: dict_limitType"/>
+									data: dict_outLimitType"/>
+                    </td>
+                    <td>
+                        限制类型
+                        <input class="easyui-combobox" name="limitType" id="query_limitType" data-options="
+									valueField: 'id',
+									textField: 'name',data: dict_limitType"/>
                     </td>
                     <td>
                         统计类型
@@ -213,21 +220,23 @@
     });
 
     var dict_findType = [
-        {id: 'user', name: '用户'},
-        {id: 'userCount', name: '用户统计'}
-    ]
-
-    var dict_limitType = [
-        {id: 'limit', name: 'limit用户限制'},
-        {id: 'limitIp', name: 'limitIp同IP次数频率'},
-        {id: 'userIp', name: 'userIp用户IP数限制'},
-        {id: 'ipUser', name: 'ipUserIP用户数限制'},
-        {id: 'blackUser', name: 'blackUser用户黑名单'},
-        {id: 'blackIp', name: 'blackIp黑名单'},
-        {id: 'blackDeviceId', name: 'blackDevice设备黑名单'}
+        {id: 'user', name: '用户统计'},
+        {id: 'userCount', name: '用户量统计'}
     ]
 
     $(function () {
+        $('#query_outLimitType').combobox({
+            onSelect: function (data) {
+                console.log(data);
+                if (data.id == '1') {
+                    $('#query_limitType').combobox('loadData', dict_freqLimitType);
+                }
+                else{
+                    $('#query_limitType').combobox('loadData', dict_whiteBlackCheckType);
+                }
+            }
+        });
+
         $('#dflRequestScans_findType').combobox('select', 'userCount');
         var recentlyDate = new Date(new Date().getTime() - 2 * 24 * 3600 * 1000);//7天内
         $('#query_startTime').datetimebox('setValue', Common.DateFormatter(recentlyDate));

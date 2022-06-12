@@ -1,5 +1,6 @@
 package org.ccs.opendfl.mysql.dfllogs.biz.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.PageHelper;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.mysql.base.BaseService;
@@ -75,7 +76,8 @@ public class DflOutLimitLogBiz extends BaseService<DflOutLimitLogPo> implements 
         this.addEqualByKey(criteria, "userId", otherParams);
         this.addEqualByKey(criteria, "ip", otherParams);
         this.addEqualByKey(criteria, "limitType", otherParams);
-        this.addEqualByKey(criteria, "outType", otherParams);
+        this.addEqualByKey(criteria, "outLimitType", otherParams);
+        this.addEqualByKey(criteria, "subType", otherParams);
     }
 
     @Override
@@ -135,9 +137,13 @@ public class DflOutLimitLogBiz extends BaseService<DflOutLimitLogPo> implements 
             entity.setUid(userUid);
         }
 
+        if(endTime==null){
+            Date curDate = new Date();
+            endTime= DateUtil.formatDateTime(curDate);
+        }
         logger.info("----countFreqLogs--startTime={} endTime={} userId={} orderBy={}", startTime, endTime, userId, orderBy);
         String order = orderBy + " " + pageInfo.getOrder();
         PageHelper.startPage(pageInfo.getPageNum(), pageInfo.getPageSize(), false).setOrderBy(order);
-        return this.mapper.countFreqLogs(entity.getUriId(), findType, entity.getLimitType(), entity.getLimitCount(), entity.getTimeSecond(), entity.getUid(), startTime, endTime);
+        return this.mapper.countFreqLogs(entity.getUriId(), findType, entity.getOutLimitType(), entity.getLimitType(), entity.getLimitCount(), entity.getTimeSecond(), entity.getUid(), startTime, endTime);
     }
 }

@@ -1,6 +1,7 @@
 package org.ccs.opendfl.mysql.dfllogs.biz.impl;
 
 import org.ccs.opendfl.core.biz.IOutLogBiz;
+import org.ccs.opendfl.core.constants.OutLimitType;
 import org.ccs.opendfl.core.constants.ReqSysType;
 import org.ccs.opendfl.core.utils.CommUtils;
 import org.ccs.opendfl.core.vo.FrequencyVo;
@@ -39,7 +40,7 @@ public class OutLogMysqlBiz implements IOutLogBiz {
 
     @Async
     @Override
-    public void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, Long v, String outType, String typeCode, String attrValue) {
+    public void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, Long v, OutLimitType outType, String subType, Integer ifResource, String typeCode, String attrValue) {
         String userId = strategyParams.getUserId();
         String uri = strategyParams.getRequestUri();
         String ip = strategyParams.getIp();
@@ -54,7 +55,8 @@ public class OutLogMysqlBiz implements IOutLogBiz {
 
             logPo.setFrequencyId(dflFrequencyBiz.getFrequencyIdByCode(frequencyVo.getName(), frequencyVo.getTime()));
         }
-        logPo.setOutType(outType);
+        logPo.setOutLimitType(outType.getType());
+        logPo.setSubType(subType);
         logPo.setLimitType(typeCode);
         logPo.setAttrValue(attrValue);
         logPo.setIp(ip);
@@ -68,6 +70,7 @@ public class OutLogMysqlBiz implements IOutLogBiz {
             logPo.setUserId(userId);
         }
         logPo.setUriId(dflRequestScansBiz.getUriId(logPo.getUri()));
+        logPo.setIfResource(ifResource);
 
         //uriId不为空时，uri不用保存
         if (logPo.getUriId() != null) {

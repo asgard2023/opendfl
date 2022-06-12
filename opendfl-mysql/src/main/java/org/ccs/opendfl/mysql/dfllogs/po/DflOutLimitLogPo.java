@@ -94,16 +94,26 @@ public class DflOutLimitLogPo implements Serializable {
     private String attrValue;
 
     /**
-     *
+     * 超限类型frequency,white,black
      */
-    @Column(name = "out_type")
-    private String outType;
+    @Column(name = "out_limit_type")
+    private Integer outLimitType;
 
     /**
-     *
+     * 子类型：frequency,frequency2，frequency3，frequency4，frequency5
+     */
+    @Column(name = "sub_type")
+    private String subType;
+
+    /**
+     * 如果outType=white/black则WhiteBlackCheckType:black,white则user,ip,origin,device
+     * 如果outType=frequency则FreqLimitType:limit,limitIp,ipUser,userIp
      */
     @Column(name = "limit_type")
     private String limitType;
+
+    @Column(name = "if_resource")
+    private Integer ifResource;
 
     /**
      * i ios,a android h h5
