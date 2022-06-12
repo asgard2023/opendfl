@@ -13,7 +13,7 @@ frequency:
   #全局白名单
   white:
     ifDeviceIdRequire: '0'
-    ifOriginRequire: '1'
+    ifOriginRequire: '0'
     items: 'ip,user,origin,'
     ips: '192.168.5.101'
     users: '5101,'

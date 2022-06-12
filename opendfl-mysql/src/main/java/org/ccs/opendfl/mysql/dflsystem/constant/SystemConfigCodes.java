@@ -66,7 +66,8 @@ public enum SystemConfigCodes {
 
     WHITELIST_IF_ACTIVE("whitelist:ifActive", "白名单是否启用", ConfigValueType.INT, "1", Constants.PID_WHITE),
     WHITELIST_RULE_ITEMS("whitelist:ruleItems", "白名单策略", ConfigValueType.STRING, "whiteIp,whiteUser,", Constants.PID_WHITE),
-    WHITELIST_IF_DEVICE_REQUIRE("whitelist:ifDeviceRequire", "白名单是否必须设备号", ConfigValueType.INT, "1", Constants.PID_WHITE);
+    WHITELIST_IF_DEVICE_REQUIRE("whitelist:ifDeviceRequire", "白名单是否必须设备号", ConfigValueType.INT, "1", Constants.PID_WHITE),
+    WHITELIST_IF_ORIGIN_REQUIRE("blacklist:ifOriginRequire", "白名单是否必须origin", ConfigValueType.INT, "0", Constants.PID_WHITE);
 
     private static class Constants {
         public static final Integer PID_ROOT = 0;

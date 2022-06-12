@@ -38,15 +38,12 @@ function getDict(dict, id) {
 
 function getDictData(b, d) {
     var a = [], c;
-    if(!b){
-        console.log('----getDictData--dict='+b);
+    if (!b) {
+        console.log('----getDictData--dict=' + b);
         return a;
     }
-    if(d){
-        a.push({
-            id : "-1",
-            name : d
-        });
+    if (d) {
+        a.push({id: "-1", name: d});
     }
     for (var e = 0; e < b.length; e++)
         c = b[e], a.push(c);
@@ -140,101 +137,34 @@ function dgUserId(val) {
 }
 
 dict_typeColor = [
-    {
-        "id": "red",
-        "name": "红色",
-        "color": "red"
-    },
-    {
-        "id": "black",
-        "name": "黑色",
-        "color": "black"
-    },
-    {
-        "id": "green",
-        "name": "绿色",
-        "color": "green"
-    },
-    {
-        "id": "blue",
-        "name": "蓝色",
-        "color": "blue"
-    },
-    {
-        "id": "yellow",
-        "name": "黄色",
-        "color": "yellow"
-    },
-    {
-        "id": "white",
-        "name": "白色",
-        "color": "white"
-    },
-    {
-        "id": "pink",
-        "name": "粉红色",
-        "color": "pink"
-    },
-    {
-        "id": "purple",
-        "name": "紫色",
-        "color": "purple"
-    }
+    {"id": "red", "name": "红色", "color": "red"},
+    {"id": "black", "name": "黑色", "color": "black"},
+    {"id": "green", "name": "绿色", "color": "green"},
+    {"id": "blue", "name": "蓝色", "color": "blue"},
+    {"id": "yellow", "name": "黄色", "color": "yellow"},
+    {"id": "white", "name": "白色", "color": "white"},
+    {"id": "pink", "name": "粉红色", "color": "pink"},
+    {"id": "purple", "name": "紫色", "color": "purple"}
 ]
 
 dict_reqSysType = [
-    {
-        "id": "i",
-        "name": "IOS"
-    },
-    {
-        "id": "a",
-        "name": "安卓"
-    },
-    {
-        "id": "h",
-        "name": "H5"
-    },
-    {
-        "id": "w",
-        "name": "微信"
-    },
-    {
-        "id": "p",
-        "name": "PC"
-    }
+    {"id": "i", "name": "IOS"},
+    {"id": "a", "name": "安卓"},
+    {"id": "h", "name": "H5"},
+    {"id": "w", "name": "微信"},
+    {"id": "p", "name": "PC"}
 ]
 
 dict_blackWhiteLimitType = [
-    {
-        "id": 1,
-        "name": "用户"
-    },
-    {
-        "id": 2,
-        "name": "IP"
-    },
-    {
-        "id": 3,
-        "name": "设备号"
-    }
+    {"id": 1, "name": "用户"},
+    {"id": 2, "name": "IP"},
+    {"id": 3, "name": "设备号"},
+    {"id": 4, "name": "origin"}
 ]
 
 dict_reqLockType = [
-    {
-        "id": "redis",
-        "name": "redis快速失败模式"
-    },
-    {
-        "id": "etcdKv",
-        "name": "etcdKv快速失败模式"
-    },
-    {
-        "id": "etcdLock",
-        "name": "etcdLock同步模式"
-    },
-    {
-        "id": "zk",
-        "name": "zookeeper模式"
-    }
+    {"id": "redis", "name": "redis快速失败模式"},
+    {"id": "etcdKv", "name": "etcdKv快速失败模式"},
+    {"id": "etcdLock", "name": "etcdLock同步模式"},
+    {"id": "zk", "name": "zookeeper模式"}
 ]

@@ -108,9 +108,11 @@ public class WhiteBlackListMysqlBiz implements IWhiteBlackListBiz {
         } else if (blackWhiteType == BlackWhiteType.WHITE) {
 //            Character ifDeviceIdRequire = frequencyConfiguration.getWhite().getIfDeviceIdRequire();
 //            String ruleItems = frequencyConfiguration.getWhite().getItems();
+            Character ifOriginRequire = getCharset(SystemConfig.getByCache(SystemConfigCodes.WHITELIST_IF_ORIGIN_REQUIRE));
+            blackConfig.setIfOriginRequire(ifOriginRequire);
             Character ifDeviceIdRequire = getCharset(SystemConfig.getByCache(SystemConfigCodes.WHITELIST_IF_DEVICE_REQUIRE));
-            ruleItems = SystemConfig.getByCache(SystemConfigCodes.WHITELIST_RULE_ITEMS);
             blackConfig.setIfDeviceIdRequire(ifDeviceIdRequire);
+            ruleItems = SystemConfig.getByCache(SystemConfigCodes.WHITELIST_RULE_ITEMS);
             blackConfig.setItems(ruleItems);
             frequencyConfiguration.setWhite(blackConfig);
         }
@@ -129,7 +131,11 @@ public class WhiteBlackListMysqlBiz implements IWhiteBlackListBiz {
     }
 
     private String getBlackWhiteTypeString(BlackWhiteType blackType, WhiteBlackCheckType limitType, List<DflBlackWhiteVo> itemList) {
-        return itemList.stream().filter(t -> t.getLimitType() == limitType.getType().intValue()).map(DflBlackWhiteVo::getDatas).collect(Collectors.joining(",")) + ",";
+        String typeItems = itemList.stream().filter(t -> t.getLimitType() == limitType.getType().intValue()).map(DflBlackWhiteVo::getDatas).collect(Collectors.joining(",")) + ",";
+        if (",".equals(typeItems)) {
+            typeItems = "";
+        }
+        return typeItems;
     }
 
     /**

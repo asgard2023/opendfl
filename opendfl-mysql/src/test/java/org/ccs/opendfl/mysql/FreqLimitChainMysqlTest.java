@@ -16,7 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import javax.annotation.Resource;
 
 @SpringBootTest
-@ActiveProfiles(value = "dev")
+@ActiveProfiles(value = "test")
 @Slf4j
 class FreqLimitChainMysqlTest {
     @Resource(name = "freqLimitChainMysql")

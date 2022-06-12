@@ -10,7 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-@ActiveProfiles(value="dev")
+@ActiveProfiles(value = "dev")
 class MysqlApplicationTests {
     private static Logger logger = LoggerFactory.getLogger(MysqlApplicationTests.class);
     @Autowired
@@ -24,11 +24,10 @@ class MysqlApplicationTests {
     }
 
     @Test
-    public void redisTtl(){
-        System.out.println("unexit key ttl="+redisTemplate.getExpire("testabcd"));
-        System.out.println("foreraver key ttl="+redisTemplate.getExpire("test"));
+    void redisTtl() {
+        System.out.println("unexit key ttl=" + redisTemplate.getExpire("testabcd"));
+        System.out.println("foreraver key ttl=" + redisTemplate.getExpire("test"));
     }
-
 
 
 }

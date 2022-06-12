@@ -67,13 +67,16 @@ public class WhiteBlackCheckBiz implements IWhiteBlackCheckBiz {
 
     @Override
     public boolean isIncludeId(String userId, String whiteUserIds) {
-        if (StringUtils.isBlank(userId)) {//userId无效忽略
+        //userId无效忽略
+        if (StringUtils.isBlank(userId)) {
             return false;
         }
-        if (FrequencyConstant.NONE.equals(whiteUserIds)) {//白名单无效，忽略
+        //白名单无效，忽略
+        if (FrequencyConstant.NONE.equals(whiteUserIds)) {
             return false;
         } else {
-            return whiteUserIds.contains(userId + ",");//是否含白名单
+            //是否含白名单
+            return whiteUserIds.contains(userId + ",");
         }
     }
 
