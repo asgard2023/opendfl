@@ -28,6 +28,6 @@ public interface DflOutLimitLogMapper extends Mapper<DflOutLimitLogPo> {
      */
     public List<DflOutLimitLogCountVo> countFreqLogs(@Param("uriId") Integer uriId, @Param("findType") String findType, @Param("outLimitType") Integer outLimitType, @Param("limitType") String limitType
             , @Param("ifResource") Integer ifResource, @Param("limitCount") Integer limitCount
-            , @Param("timeSecond") Integer timeSecond, @Param("uid") Long uid
+            , @Param("timeSecond") Integer timeSecond, @Param("uid") Long uid, @Param("ip") String ip
             , @Param("startTime") String startTime, @Param("endTime") String endTime);
 }

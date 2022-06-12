@@ -14,7 +14,6 @@ import org.ccs.opendfl.mysql.dflsystem.utils.SystemConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -90,13 +89,14 @@ public class WhiteBlackListMysqlBiz implements IWhiteBlackListBiz {
         blackConfig.setUsers(users);
 
         String ips = getBlackWhiteTypeString(blackType, WhiteBlackCheckType.IP, itemList);
+        blackConfig.setIps(ips);
 
         String origins = getBlackWhiteTypeString(blackType, WhiteBlackCheckType.ORIGIN, itemList);
-        blackConfig.setIps(origins);
+        blackConfig.setOrigins(origins);
 
         String deviceIds = getBlackWhiteTypeString(blackType, WhiteBlackCheckType.DEVICE, itemList);
-        String ruleItems=null;
         blackConfig.setDeviceIds(deviceIds);
+        String ruleItems = null;
         if (blackWhiteType == BlackWhiteType.BLACK) {
 //            Character ifDeviceIdRequire = frequencyConfiguration.getBlack().getIfDeviceIdRequire();
 //            String ruleItems = frequencyConfiguration.getBlack().getItems();

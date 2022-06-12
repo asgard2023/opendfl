@@ -80,7 +80,7 @@ public class DflOutLimitLogController extends BaseController {
             entity = new DflOutLimitLogPo();
         }
         Map<String, Object> params = this.createAllParams(request);
-        ValidateUtils.checkTimeDateLimit(params,"uri,ip,uid,userId");
+        ValidateUtils.checkTimeDateLimit(params, "uri,ip,uid,userId");
         if (this.mysqlConfiguration.getUserIdToNum() == 1) {
             if (StringUtils.isNotBlank(entity.getUserId())) {
                 entity.setUid(this.dflLogUserBiz.getUid(entity.getUserId(), null, null));
@@ -168,6 +168,10 @@ public class DflOutLimitLogController extends BaseController {
                 uriId = -1;
             }
             entity.setUriId(uriId);
+        }
+        if (StringUtils.isNotBlank(entity.getIp())) {
+            entity.setIp(RequestUtils.convertIpv4(entity.getIp()));
+            paramsMap.put("ip", entity.getIp());
         }
         List<DflOutLimitLogCountVo> list = dflOutLimitLogBiz.countFreqLogs(entity, paramsMap, pageInfo);
         List<Long> userUidList = list.stream().filter(t -> t.getUid() != null).map(DflOutLimitLogCountVo::getUid).collect(Collectors.toList());

@@ -251,6 +251,7 @@
         <if test="limitCount != null">and limit_count=#{limitCount}</if>
         <if test="ifResource != null">and if_resource=#{ifResource}</if>
         <if test="uid != null">and uid=#{uid}</if>
+        <if test="ip != null">and ip=#{ip}</if>
         <if test="uriId != null">and uri_id=#{uriId}</if>
         GROUP BY uri_id,time_second, limit_count,limit_type
         <if test='findType=="user"'> ,uid</if>

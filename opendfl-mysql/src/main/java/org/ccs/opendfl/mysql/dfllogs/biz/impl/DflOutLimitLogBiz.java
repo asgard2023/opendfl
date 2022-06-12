@@ -76,6 +76,9 @@ public class DflOutLimitLogBiz extends BaseService<DflOutLimitLogPo> implements 
         this.addEqualByKey(criteria, "userId", otherParams);
         this.addEqualByKey(criteria, "ip", otherParams);
         this.addEqualByKey(criteria, "limitType", otherParams);
+        this.addEqualByKey(criteria, "uri", otherParams);
+        this.addEqualByKey(criteria, "uriId", otherParams);
+        this.addEqualByKey(criteria, "attrValue", otherParams);
         this.addEqualByKey(criteria, "outLimitType", otherParams);
         this.addEqualByKey(criteria, "subType", otherParams);
         this.addEqualByKey(criteria, "ifResource", otherParams);
@@ -146,6 +149,6 @@ public class DflOutLimitLogBiz extends BaseService<DflOutLimitLogPo> implements 
         String order = orderBy + " " + pageInfo.getOrder();
         PageHelper.startPage(pageInfo.getPageNum(), pageInfo.getPageSize(), false).setOrderBy(order);
         return this.mapper.countFreqLogs(entity.getUriId(), findType, entity.getOutLimitType(), entity.getLimitType(), entity.getIfResource()
-                , entity.getLimitCount(), entity.getTimeSecond(), entity.getUid(), startTime, endTime);
+                , entity.getLimitCount(), entity.getTimeSecond(), entity.getUid(), entity.getIp(), startTime, endTime);
     }
 }
