@@ -145,6 +145,7 @@ public class DflOutLimitLogBiz extends BaseService<DflOutLimitLogPo> implements 
         logger.info("----countFreqLogs--startTime={} endTime={} userId={} orderBy={}", startTime, endTime, userId, orderBy);
         String order = orderBy + " " + pageInfo.getOrder();
         PageHelper.startPage(pageInfo.getPageNum(), pageInfo.getPageSize(), false).setOrderBy(order);
-        return this.mapper.countFreqLogs(entity.getUriId(), findType, entity.getOutLimitType(), entity.getLimitType(), entity.getLimitCount(), entity.getTimeSecond(), entity.getUid(), startTime, endTime);
+        return this.mapper.countFreqLogs(entity.getUriId(), findType, entity.getOutLimitType(), entity.getLimitType(), entity.getIfResource()
+                , entity.getLimitCount(), entity.getTimeSecond(), entity.getUid(), startTime, endTime);
     }
 }

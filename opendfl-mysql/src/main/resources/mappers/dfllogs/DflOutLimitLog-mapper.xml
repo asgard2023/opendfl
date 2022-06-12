@@ -238,6 +238,7 @@
 
 
     <select id="countFreqLogs" resultType="org.ccs.opendfl.mysql.dfllogs.vo.DflOutLimitLogCountVo">
+        select * from (
         select uri_id uriId, limit_type limitType, `time_second` timeSecond, `limit_count` limitCount,count(*) rowCount ,count(DISTINCT(ip)) ipCount,max(req_count) reqCountMax
              ,max(run_time) maxRunTime,min(create_time) createTimeMin,max(create_time) createTimeMax
         <if test='findType=="user"'>, `uid` </if>
@@ -253,5 +254,6 @@
         <if test="uriId != null">and uri_id=#{uriId}</if>
         GROUP BY uri_id,time_second, limit_count,limit_type
         <if test='findType=="user"'> ,uid</if>
+        ) dfl_log
     </select>
 </mapper>

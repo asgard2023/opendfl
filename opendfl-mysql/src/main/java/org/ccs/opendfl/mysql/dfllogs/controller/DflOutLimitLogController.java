@@ -148,6 +148,9 @@ public class DflOutLimitLogController extends BaseController {
     @CheckLogin
     public PageVO<DflOutLimitLogCountVo> listCount(HttpServletRequest request, DflOutLimitLogPo entity, MyPageInfo<DflOutLimitLogCountVo> pageInfo) {
         this.pageSortBy(pageInfo);
+        if (pageInfo.getPageSize() == 0) {
+            pageInfo.setPageSize(getPageSize());
+        }
         if (entity == null) {
             entity = new DflOutLimitLogPo();
         }
