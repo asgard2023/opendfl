@@ -8,18 +8,22 @@ package org.ccs.opendfl.core.constants;
 public enum FreqLimitType {
     /**
      * 同用户次数频率
+     * 限制数=frequency.limit
      */
     LIMIT(20, "limit", "同用户次数频率", true),
     /**
      * 同IP次数频率
+     * 限制数=frequency.limit*2，以免有用户共用IP
      */
     LIMIT_IP(21, "limitIp", "同IP次数频率", false),
     /**
      * 同用户多IP数限制
+     * 限制数=frequency.userIpCount
      */
     USER_IP_COUNT(22, "userIp", "同用户多IP数限制", false),
     /**
      * 同IP多用户数限制
+     * 限制数=frequency.ipUserCount
      */
     IP_USER_COUNT(23, "ipUser", "同IP多用户数限制", false);
     /**

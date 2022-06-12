@@ -54,12 +54,13 @@ public class FreqLimitIpStrategy implements FreqLimitStrategy {
             }
             String ip = strategyParams.getIp();
             String redisKey = getRedisKey(frequency, ip);
-            int limit = frequency.getLimit() * 5;
+            int limit = frequency.getLimit() * 2;
             int time = frequency.getTime();
             long v = redisTemplate.opsForValue().increment(redisKey, 1);
             if (v == 1) {
                 redisTemplate.expire(redisKey, frequency.getTime(), TimeUnit.SECONDS);
             } else if (v > limit) {
+                strategyParams.getChainOper().setFail(true);
                 String userId = strategyParams.getUserId();
                 String lang = strategyParams.getLang();
 

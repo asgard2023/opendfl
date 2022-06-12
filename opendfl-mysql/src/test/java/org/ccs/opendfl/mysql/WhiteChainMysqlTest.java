@@ -26,7 +26,7 @@ import javax.annotation.Resource;
 @ActiveProfiles(value = "dev")
 @Slf4j
 class WhiteChainMysqlTest {
-    @Resource(name = "whiteChainnMysql")
+    @Resource(name = "whiteChainMysql")
     private WhiteChain whiteChain;
 
     private String deviceId = "chainDeviceTest";
@@ -35,7 +35,7 @@ class WhiteChainMysqlTest {
     @BeforeEach
     void init() {
         System.out.println("----init----");
-        String freqTypeItems = "whiteUser,whiteIp,";
+        String freqTypeItems = "user,ip,";
         whiteChain.sortStrategies(freqTypeItems);
     }
 
@@ -64,7 +64,7 @@ class WhiteChainMysqlTest {
         frequencyVo.setName("serverTime");
         frequencyVo.setLimit(1000);
 
-        String freqTypeItems = "whiteIp,whiteUser,";
+        String freqTypeItems = "ip,user,";
         whiteChain.sortStrategies(freqTypeItems);
         long time = System.currentTimeMillis();
         int successCount = 0;
@@ -73,6 +73,7 @@ class WhiteChainMysqlTest {
             try {
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, "130" + i);
+                strategyParamsVo.getChainOper().clearChain();
                 this.whiteChain.doCheckLimit(whiteChain, strategyParamsVo);
                 successCount++;
             } catch (BaseException e) {
@@ -101,7 +102,7 @@ class WhiteChainMysqlTest {
         frequencyVo.setName("serverTime");
         frequencyVo.setLimit(1000);
 
-        String freqTypeItems = "whiteIp,whiteUser,";
+        String freqTypeItems = "ip,user,";
         whiteChain.sortStrategies(freqTypeItems);
         long time = System.currentTimeMillis();
         int successCount = 0;
@@ -110,6 +111,7 @@ class WhiteChainMysqlTest {
             try {
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, "130" + i);
+                strategyParamsVo.getChainOper().clearChain();
                 this.whiteChain.doCheckLimit(whiteChain, strategyParamsVo);
                 successCount++;
             } catch (BaseException e) {
@@ -137,7 +139,7 @@ class WhiteChainMysqlTest {
 
         String whiteUser = "5101";
 
-        String freqTypeItems = "whiteIp,whiteUser,";
+        String freqTypeItems = "ip,user,";
         whiteChain.sortStrategies(freqTypeItems);
         long time = System.currentTimeMillis();
         int successCount = 0;
@@ -148,6 +150,7 @@ class WhiteChainMysqlTest {
                 ip = "" + RequestUtils.getIpConvertNum(ip);
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, whiteUser);
+                strategyParamsVo.getChainOper().clearChain();
                 this.whiteChain.doCheckLimit(whiteChain, strategyParamsVo);
                 successCount++;
             } catch (BaseException e) {
