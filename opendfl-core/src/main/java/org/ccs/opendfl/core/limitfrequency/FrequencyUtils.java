@@ -63,10 +63,10 @@ public class FrequencyUtils {
 
 
     public static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, OutLimitType outType, WhiteBlackCheckType type) {
-        if(type==null){
+        if (type == null) {
             return;
         }
-        addFreqLog(strategyParams, limit, v, outType, null, 0, type.getCode());
+        addFreqLog(strategyParams, limit, v, outType, null, type.getCode());
     }
 
     /**
@@ -77,23 +77,26 @@ public class FrequencyUtils {
      * @param type           limit type
      */
     public static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, FreqLimitType type) {
-        FreqLimitType freqLimitType = FreqLimitType.parseCode(strategyParams.getFrequency().getLimitType());
-        Integer ifResource = 0;
-        if (freqLimitType != null && freqLimitType.isResource()) {
-            ifResource = 1;
-        }
+
         OutLimitType outLimitType = OutLimitType.FREQUENCY;
-        addFreqLog(strategyParams, limit, v, outLimitType, strategyParams.getFrequency().getLimitType(), ifResource, type.getCode());
+        addFreqLog(strategyParams, limit, v, outLimitType, strategyParams.getFrequency().getLimitType(), type.getCode());
     }
 
-    private static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, OutLimitType outLimitType, String subLimit, Integer ifResource, String typeCode) {
+    private static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, OutLimitType outLimitType, String subLimit, String typeCode) {
         outLimitCount(strategyParams, typeCode);
+        FrequencyVo frequencyVo = strategyParams.getFrequency();
+        Integer ifResource = 0;
+        if (frequencyVo!=null && frequencyVo.isResource()) {
+            ifResource = 1;
+        }
         outLogBiz.addFreqLog(strategyParams, limit, v, outLimitType, subLimit, ifResource, typeCode, strategyParams.getAttrValue());
+
         Integer logTime = frequencyConfiguration.getLimit().getOutLimitLogTime();
         FrequencyVo frequency = strategyParams.getFrequency();
         if (frequency == null || !(logTime > 0 && frequency.getTime() >= logTime)) {
             return;
         }
+
         String uri = strategyParams.getRequestUri();
         String ip = strategyParams.getIp();
         String userId = strategyParams.getUserId();

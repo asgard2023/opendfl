@@ -110,11 +110,30 @@ public class FreqLimitUserCountStrategy implements FreqLimitStrategy {
                     FrequencyUtils.addFreqLog(strategyParams, limit, v, LIMIT_TYPE);
                     final String errMsg = String.format(frequency.getErrMsg(), frequency.getLimit());
                     final String errMsgEn = String.format(frequency.getErrMsgEn(), frequency.getLimit());
-                    FrequencyUtils.failExceptionMsg(getLimitType(), errMsg, errMsgEn, lang);
+                    String limitType = getLimitTypeIfResource(frequency);
+                    FrequencyUtils.failExceptionMsg(limitType, errMsg, errMsgEn, lang);
                 }
             }
         }
         limitChain.doCheckLimit(limitChain, strategyParams);
+    }
+
+    /**
+     * 支持显示资源类型
+     * @param frequency
+     * @return
+     */
+    private String getLimitTypeIfResource(FrequencyVo frequency) {
+        String limitType=getLimitType();
+        if(frequency !=null && frequency.isResource()){
+            if(frequency.getIpUserCount()>0) {
+                limitType = limitType + ":ip";
+            }
+            else{
+                limitType = limitType + ":data";
+            }
+        }
+        return limitType;
     }
 
     private boolean filterResource(FrequencyVo frequency, String userId, String dataId) {
