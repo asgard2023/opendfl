@@ -40,21 +40,30 @@ public class FreqLimitIpStrategy implements FreqLimitStrategy {
         return LIMIT_TYPE.getCode();
     }
 
-    public String getRedisKey(FrequencyVo frequency, String ip) {
-        return frequencyConfiguration.getRedisPrefix() + ":" + LIMIT_TYPE.getCode() + ":" + frequency.getName() + ":" + frequency.getTime() + ":" + ip;
+    public String getRedisKey(FrequencyVo frequency, String ip, String attrValue) {
+        final String redisKey = frequencyConfiguration.getRedisPrefix();
+        String key = redisKey + ":" + LIMIT_TYPE.getCode() + ":" + frequency.getName() + ":" + frequency.getTime();
+        if (frequency.isResource() && frequency.getIpUserCount() > 0) {
+            key += ":" + attrValue;
+        }
+        return key + ":" + ip;
     }
 
     @Override
     public void doCheckLimit(String limitItems, FreqLimitChain limitChain, RequestStrategyParamsVo strategyParams) {
         if (containLimit(limitItems, LIMIT_TYPE)) {
             FrequencyVo frequency = strategyParams.getFrequency();
-            if(!LIMIT_TYPE.isResource() && frequency.isResource()){
+            if (frequency.isResource() && frequency.getIpUserCount() == 0) {
                 limitChain.doCheckLimit(limitChain, strategyParams);
                 return;
             }
             String ip = strategyParams.getIp();
-            String redisKey = getRedisKey(frequency, ip);
+            String attrValue = strategyParams.getAttrValue();
             int limit = frequency.getLimit() * 2;
+            String redisKey = getRedisKey(frequency, ip, attrValue);
+            if (frequency.isResource()) {
+                limit = frequency.getIpUserCount();
+            }
             int time = frequency.getTime();
             long v = redisTemplate.opsForValue().increment(redisKey, 1);
             if (v == 1) {

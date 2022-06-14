@@ -46,13 +46,8 @@ public class FreqLimitUserCountStrategy implements FreqLimitStrategy {
     public static String getRedisKey(FrequencyVo frequency, String userId, String attrValue, String ip) {
         final String redisKey = frequencyConfiguration.getRedisPrefix();
         String key = redisKey + ":" + frequency.getName() + ":" + frequency.getTime();
-        if (frequency.isResource()) {
-            if (frequency.getIpUserCount() > 0) {
-                key += ":" + attrValue + ":" + ip;
-            } else {
-                key += ":" + attrValue + ":" + userId;
-            }
-            return key;
+        if (frequency.isResource() && frequency.getIpUserCount() == 0) {
+            key += ":" + attrValue;
         }
         if (userId == null) {
             key += ":noUser:" + ip;
@@ -110,7 +105,7 @@ public class FreqLimitUserCountStrategy implements FreqLimitStrategy {
                     FrequencyUtils.addFreqLog(strategyParams, limit, v, LIMIT_TYPE);
                     final String errMsg = String.format(frequency.getErrMsg(), frequency.getLimit());
                     final String errMsgEn = String.format(frequency.getErrMsgEn(), frequency.getLimit());
-                    String limitType = getLimitTypeIfResource(frequency);
+                    String limitType = getLimitType();
                     FrequencyUtils.failExceptionMsg(limitType, errMsg, errMsgEn, lang);
                 }
             }
@@ -118,27 +113,13 @@ public class FreqLimitUserCountStrategy implements FreqLimitStrategy {
         limitChain.doCheckLimit(limitChain, strategyParams);
     }
 
-    /**
-     * 支持显示资源类型
-     * @param frequency
-     * @return
-     */
-    private String getLimitTypeIfResource(FrequencyVo frequency) {
-        String limitType=getLimitType();
-        if(frequency !=null && frequency.isResource()){
-            if(frequency.getIpUserCount()>0) {
-                limitType = limitType + ":ip";
-            }
-            else{
-                limitType = limitType + ":data";
-            }
-        }
-        return limitType;
-    }
-
     private boolean filterResource(FrequencyVo frequency, String userId, String dataId) {
         //是否资源限制
         if (frequency.isResource()) {
+            //资源IP限制不处理
+            if (frequency.getIpUserCount()>0) {
+                return true;
+            }
             //如果限制类型不支持，不处理这个限制
             if (!isFreqTypeLimit(frequency)) {
                 return true;

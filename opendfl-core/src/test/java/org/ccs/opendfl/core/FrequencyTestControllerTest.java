@@ -143,13 +143,15 @@ class FrequencyTestControllerTest {
     void serverTimeFreq_resource_data() throws Exception {
         int limtCount = 0;
         int successCount = 0;
+        String blackIp="192.168.0.1";
         String errorLimitType = "frequency:limit";
         for (int i = 0; i < 20; i++) {
-            String userId = "123";
-            String dataId="abc";
+            String userId = "1232";
+            String dataId="abc2";
             MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreq")
                             .param("userId", userId)
                             .param("dataId", dataId)
+                            .header("x-forwarded-for", blackIp+i)
                             .accept(MediaType.APPLICATION_JSON))
                     .andReturn();
             int status = mvcResult.getResponse().getStatus();                 //得到返回代码
@@ -173,11 +175,11 @@ class FrequencyTestControllerTest {
     void serverTimeFreq_resource_ip() throws Exception {
         int limtCount = 0;
         int successCount = 0;
-        String errorLimitType = "frequency:limit";
-        String blackIp="192.168.0.100";
+        String errorLimitType = "frequency:limitIp";
+        String blackIp="192.168.0.119";
         for (int i = 0; i < 20; i++) {
-            String userId = "123";
-            String dataId="abc";
+            String userId = "1234";
+            String dataId="abcf";
             MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreq")
                             .param("userId", userId+i)
                             .param("dataId", dataId)

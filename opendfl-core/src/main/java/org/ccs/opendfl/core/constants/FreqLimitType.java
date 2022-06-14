@@ -15,7 +15,7 @@ public enum FreqLimitType {
      * 同IP次数频率
      * 限制数=frequency.limit*2，以免有用户共用IP
      */
-    LIMIT_IP(21, "limitIp", "同IP次数频率", false),
+    LIMIT_IP(21, "limitIp", "同IP次数频率", true),
     /**
      * 同用户多IP数限制
      * 限制数=frequency.userIpCount
