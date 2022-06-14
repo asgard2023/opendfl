@@ -1,6 +1,7 @@
 package org.ccs.opendfl.core;
 
 
+import cn.hutool.http.Header;
 import com.alibaba.fastjson.JSONObject;
 import org.ccs.opendfl.core.utils.RequestParams;
 import org.ccs.opendfl.core.vo.RequestTestVo;
@@ -44,6 +45,8 @@ class FrequencyTestControllerTest {
     public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();//建议使用这种
     }
+    
+    private final String HEADER_IP="x-forwarded-for";
 
     /**
      * 用户访问频率-没有用户（默认走IP）
@@ -115,11 +118,13 @@ class FrequencyTestControllerTest {
 
         int limtCount = 0;
         int successCount = 0;
+        String ip="192.168.9";
         String errorLimitType = "frequency:limit";
         for (int i = 0; i < 20; i++) {
             String userId = "123";
             MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreq")
                             .param("userId", userId)
+                            .header(HEADER_IP, ip+i)
                             .accept(MediaType.APPLICATION_JSON))
                     .andReturn();
             int status = mvcResult.getResponse().getStatus();                 //得到返回代码
@@ -151,7 +156,7 @@ class FrequencyTestControllerTest {
             MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreq")
                             .param("userId", userId)
                             .param("dataId", dataId)
-                            .header("x-forwarded-for", blackIp+i)
+                            .header(HEADER_IP, blackIp+i)
                             .accept(MediaType.APPLICATION_JSON))
                     .andReturn();
             int status = mvcResult.getResponse().getStatus();                 //得到返回代码
@@ -183,7 +188,7 @@ class FrequencyTestControllerTest {
             MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreq")
                             .param("userId", userId+i)
                             .param("dataId", dataId)
-                            .header("x-forwarded-for", blackIp)
+                            .header(HEADER_IP, blackIp)
                             .accept(MediaType.APPLICATION_JSON))
                     .andReturn();
             int status = mvcResult.getResponse().getStatus();                 //得到返回代码
@@ -279,7 +284,7 @@ class FrequencyTestControllerTest {
             String userId = "123";
             MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreq")
                             .param("userId", userId)
-                            .header("x-forwarded-for", whiteIp)
+                            .header(HEADER_IP, whiteIp)
                             .accept(MediaType.APPLICATION_JSON))
                     .andReturn();
             int status = mvcResult.getResponse().getStatus();                 //得到返回代码
@@ -366,7 +371,7 @@ class FrequencyTestControllerTest {
             String userId = "124" + i;
             MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreq")
                             .param("userId", userId)
-                            .header("x-forwarded-for", blackIp)
+                            .header(HEADER_IP, blackIp)
                             .accept(MediaType.APPLICATION_JSON))
                     .andReturn();
             int status = mvcResult.getResponse().getStatus();                 //得到返回代码
@@ -416,19 +421,20 @@ class FrequencyTestControllerTest {
      * ip限制
      */
     @Test
-    void serverTimeFreqIp() throws Exception {
+    void serverTimeFreqIp_ipUser() throws Exception {
         int limtCount = 0;
         int successCount = 0;
         String errorLimitTypeIpUser = "frequency:ipUser";
-        String errorLimitTypeUserIp = "frequency:userIp";
+        String ip="192.168.0.5";
         for (int i = 0; i < 20; i++) {
             MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqIp")
-                            .param("userId", "125" + i)
+                            .param("userId", "126" + i)
+                            .header(HEADER_IP, ip)
                             .accept(MediaType.APPLICATION_JSON))
                     .andReturn();
             int status = mvcResult.getResponse().getStatus();                 //得到返回代码
             String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
-            if (content.contains(errorLimitTypeIpUser) || content.contains(errorLimitTypeUserIp)) {
+            if (content.contains(errorLimitTypeIpUser)) {
                 limtCount++;
             } else {
                 successCount++;
@@ -436,8 +442,38 @@ class FrequencyTestControllerTest {
             System.out.println("----serverTimeFreqIp  status=" + status + " content=" + content);
         }
         System.out.println("----serverTimeFreqIp  successCount=" + successCount + " limtCount=" + limtCount);
-        Assertions.assertTrue(limtCount > 0, "ipUserCount:" + limtCount);
-//        Assertions.assertTrue("successCount:"+successCount,successCount>0);
+        Assertions.assertEquals(13, limtCount, "ipUserCount:" + limtCount);
+        Assertions.assertEquals(7, successCount, "successCount:"+successCount);
+    }
+
+    /**
+     * ip限制
+     */
+    @Test
+    void serverTimeFreqIp_userIp() throws Exception {
+        int limtCount = 0;
+        int successCount = 0;
+        String errorLimitTypeUserIp = "frequency:userIp";
+        String ip="192.168.0.2";
+        String user="13user";
+        for (int i = 0; i < 20; i++) {
+            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqIp")
+                            .param("userId", user)
+                            .header(HEADER_IP, ip+i)
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andReturn();
+            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+            if (content.contains(errorLimitTypeUserIp)) {
+                limtCount++;
+            } else {
+                successCount++;
+            }
+            System.out.println("----serverTimeFreqIp  status=" + status + " content=" + content);
+        }
+        System.out.println("----serverTimeFreqIp  successCount=" + successCount + " limtCount=" + limtCount);
+        Assertions.assertEquals(13, limtCount, "ipUserCount:" + limtCount);
+        Assertions.assertEquals(7, successCount, "successCount:"+successCount);
     }
 
     /**
@@ -547,8 +583,9 @@ class FrequencyTestControllerTest {
             System.out.println("----serverTimeFreq_whiteOrigin  status=" + status + " content=" + content);
         }
         System.out.println("----serverTimeFreq_whiteOrigin  successCount=" + successCount + " limtCount=" + limtCount);
-        Assertions.assertTrue(successCount > 0, "successCount:" + successCount);
-        Assertions.assertTrue(limtCount == 0, "ipUserCount:" + limtCount);
+        //这个测试主要测origin,非origin异常，也算蓪过
+        Assertions.assertEquals(20, successCount , "successCount:" + successCount);
+        Assertions.assertEquals(0, limtCount, "ipUserCount:" + limtCount);
     }
 
     /**
@@ -575,8 +612,8 @@ class FrequencyTestControllerTest {
             System.out.println("----serverTimeFreq_whiteOrigin_fail  status=" + status + " content=" + content);
         }
         System.out.println("----serverTimeFreq_whiteOrigin_fail  successCount=" + successCount + " limtCount=" + limtCount);
-        Assertions.assertTrue(successCount == 0, "successCount:" + successCount);
-        Assertions.assertTrue(limtCount > 0, "ipUserCount:" + limtCount);
+        Assertions.assertEquals(0,successCount, "successCount:" + successCount);
+        Assertions.assertEquals(19, limtCount, "ipUserCount:" + limtCount);
     }
 
 
@@ -593,7 +630,7 @@ class FrequencyTestControllerTest {
             ip = "192.168.0." + i;
             MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqUserIp")
                             .param("userId", "123")
-                            .header("x-forwarded-for", ip)
+                            .header(HEADER_IP, ip)
                             .accept(MediaType.APPLICATION_JSON))
                     .andReturn();
             int status = mvcResult.getResponse().getStatus();                 //得到返回代码
@@ -637,7 +674,7 @@ class FrequencyTestControllerTest {
                     MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/waitLockTestUser")
                                     .param("userId", "123" + (iOper / 4))
                                     .param("sleepTime", "" + sleepTime)
-                                    .header("x-forwarded-for", ip)
+                                    .header(HEADER_IP, ip)
                                     .accept(MediaType.APPLICATION_JSON))
                             .andReturn();
                     int status = mvcResult.getResponse().getStatus();                 //得到返回代码
@@ -695,7 +732,7 @@ class FrequencyTestControllerTest {
                                     .param("userId", "123" + (iOper / 4))
                                     .param("sleepTime", "" + sleepTime)
                                     .param("orderId", orderId)
-                                    .header("x-forwarded-for", ip)
+                                    .header(HEADER_IP, ip)
                                     .accept(MediaType.APPLICATION_JSON))
                             .andReturn();
                     int status = mvcResult.getResponse().getStatus();                 //得到返回代码
@@ -753,7 +790,7 @@ class FrequencyTestControllerTest {
                                     .param("userId", "123" + (iOper / 4))
                                     .param("sleepTime", "" + sleepTime)
                                     .param("orderId", orderId)
-                                    .header("x-forwarded-for", ip)
+                                    .header(HEADER_IP, ip)
                                     .accept(MediaType.APPLICATION_JSON))
                             .andReturn();
                     int status = mvcResult.getResponse().getStatus();                 //得到返回代码
@@ -811,7 +848,7 @@ class FrequencyTestControllerTest {
                                     .param("userId", "123" + (iOper / 4))
                                     .param("sleepTime", "" + sleepTime)
                                     .param("orderId", orderId)
-                                    .header("x-forwarded-for", ip)
+                                    .header(HEADER_IP, ip)
                                     .accept(MediaType.APPLICATION_JSON))
                             .andReturn();
                     int status = mvcResult.getResponse().getStatus();                 //得到返回代码
