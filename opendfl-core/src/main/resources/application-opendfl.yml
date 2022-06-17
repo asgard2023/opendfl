@@ -1,6 +1,6 @@
 opendfl:
   defaultAttrName: userId
-  defaultDeviceId: deviceId
+  defaultDeviceId: device_id
   baseLimit:
     pageSizeMax: 20
     pageNumMax: 20

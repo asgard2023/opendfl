@@ -1,7 +1,6 @@
 package org.ccs.opendfl.core;
 
 
-import cn.hutool.http.Header;
 import com.alibaba.fastjson.JSONObject;
 import org.ccs.opendfl.core.utils.RequestParams;
 import org.ccs.opendfl.core.vo.RequestTestVo;
@@ -613,7 +612,7 @@ class FrequencyTestControllerTest {
         }
         System.out.println("----serverTimeFreq_whiteOrigin_fail  successCount=" + successCount + " limtCount=" + limtCount);
         Assertions.assertEquals(0,successCount, "successCount:" + successCount);
-        Assertions.assertEquals(19, limtCount, "ipUserCount:" + limtCount);
+        Assertions.assertEquals(20, limtCount, "ipUserCount:" + limtCount);
     }
 
 
