@@ -26,7 +26,7 @@ class FreqLimitChainMysqlTest {
     @BeforeEach
     void init() {
         System.out.println("----init----");
-        String freqTypeItems = "limit,userCount,userIp,ipUser,";
+        String freqTypeItems = "limit,limitIp,userIp,ipUser,";
         freqLimitChain.sortStrategies(freqTypeItems);
     }
 
@@ -44,7 +44,7 @@ class FreqLimitChainMysqlTest {
         frequencyVo.setLimit(1000);
         frequencyVo.setUserIpCount(10);
 
-        String freqTypeItems = "limit,userCount,userIp,ipUser,";
+        String freqTypeItems = "limit,limitIp,userIp,ipUser,";
         freqLimitChain.sortStrategies(freqTypeItems);
         ReqSysType reqSysType = ReqSysType.PC;
         long time = System.currentTimeMillis();
@@ -92,7 +92,7 @@ class FreqLimitChainMysqlTest {
         frequencyVo.setIpUserCount(10);
         frequencyVo.setName("serverTimeFreqIpUser");
 
-        String freqTypeItems = "limit,userCount,userIp,ipUser,";
+        String freqTypeItems = "limit,limitIp,userIp,ipUser,";
 
         freqLimitChain.sortStrategies(freqTypeItems);
         long time = System.currentTimeMillis();
