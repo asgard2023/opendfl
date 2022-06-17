@@ -81,6 +81,13 @@ public class FrequencyTestController {
         return System.currentTimeMillis();
     }
 
+    @GetMapping("/serverTimeFreqLimitIp")
+    @Frequency(time = 5, limit = 10, name = "serverTimeFreqLimitIp")
+    public Object serverTimeFreqLimitIp(HttpServletRequest request) {
+        log.info("----serverTimeFreqLimitIp--userId={}", request.getParameter(RequestParams.USER_ID));
+        return System.currentTimeMillis();
+    }
+
     @GetMapping("/serverTimeNeedLogin")
     @Frequency(time = 5, limit = 5, needLogin = true, name = "serverTimeNeedLogin")
     @Frequency2(time = 3600, needLogin = true, limit = 100, name = "serverTimeNeedLogin")

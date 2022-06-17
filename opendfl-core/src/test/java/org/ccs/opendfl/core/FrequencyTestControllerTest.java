@@ -141,6 +141,36 @@ class FrequencyTestControllerTest {
     }
 
     /**
+     * 用户访问频率-同一用户
+     */
+    @Test
+    void serverTimeFreqSameIpDiffUser() throws Exception {
+        int limtCount = 0;
+        int successCount = 0;
+        String ip="192.168.9.100";
+        String errorLimitType = "frequency:limitIp";
+        for (int i = 0; i < 40; i++) {
+            String userId = "123";
+            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqLimitIp")
+                            .param("userId", userId+i)
+                            .header(HEADER_IP, ip)
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andReturn();
+            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+            if (content.contains(errorLimitType)) {
+                limtCount++;
+            } else {
+                successCount++;
+            }
+            System.out.println("----serverTimeFreqSameIpDiffUser status=" + status + " content=" + content);
+        }
+        System.out.println("----serverTimeFreqSameIpDiffUser  successCount=" + successCount + " limtCount=" + limtCount);
+        Assertions.assertEquals(20, limtCount, "successCount:" + successCount);
+        Assertions.assertEquals(20, limtCount, "limtCount:" + limtCount);
+    }
+
+    /**
      * 用户访问频率-同一用户同一资源ID限制
      */
     @Test

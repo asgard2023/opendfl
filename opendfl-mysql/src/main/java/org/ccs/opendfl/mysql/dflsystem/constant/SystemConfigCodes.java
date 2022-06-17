@@ -48,6 +48,11 @@ public enum SystemConfigCodes {
      */
     FREQUENCY_INIT_LOG_DEBUG_COUNT("frequency:initLogDebugCount", "启动时前面部份多输出部份debug日志", ConfigValueType.INT, "100", Constants.PID_FREQUENCY),
     /**
+     * 频率限制数limitIp与limit的比率（limitIp=limit*{limitIpRate}）
+     */
+    FREQUENCY_LIMIT_IP_RATE("frequency:limitIpRate", "频率限制数limitIp与limit的比率（limitIp=limit*{limitIpRate}）", ConfigValueType.STRING, "2", Constants.PID_FREQUENCY),
+
+    /**
      * 记录慢接口时间(毫秒)，为0关闭此功能
      */
     FREQUENCY_MIN_RUN_TIME("frequency:minRunTime", "统计运行时间最小值(ms)", ConfigValueType.INT, "500", Constants.PID_FREQUENCY),

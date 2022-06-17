@@ -13,7 +13,7 @@ public enum FreqLimitType {
     LIMIT(20, "limit", "同用户次数频率", true),
     /**
      * 同IP次数频率
-     * 限制数=frequency.limit*2，以免有用户共用IP
+     * 限制数=frequency.limit*{limitIpRate}，以免有用户共用IP
      */
     LIMIT_IP(21, "limitIp", "同IP次数频率", true),
     /**
@@ -27,7 +27,7 @@ public enum FreqLimitType {
      */
     IP_USER_COUNT(23, "ipUser", "同IP多用户数限制", false);
     /**
-     * IP限制的redis的zset 超限个数，以提高性能
+     * IP限制的redis的zset 超限个数，允许多存2个ip
      */
     public static final int REDIS_SET_OUT_LIMIT = 2;
 

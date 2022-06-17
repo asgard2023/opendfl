@@ -51,6 +51,11 @@ public class FrequencyConfiguration {
      * 为0不保存
      */
     private Integer runCountCacheDay = 7;
+
+    /**
+     * IP限制数与limit的比率，如果2表示是2倍
+     */
+    private Float limitIpRate=2F;
     /**
      * 黑名单配置
      */

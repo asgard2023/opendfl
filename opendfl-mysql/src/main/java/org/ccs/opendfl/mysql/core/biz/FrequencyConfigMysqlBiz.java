@@ -120,6 +120,8 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
                 frequencyConfiguration.setRedisPrefix(SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_REDIS_PREFIX));
                 frequencyConfiguration.setRunTimeMonitor(("" + runTimeMonitor).charAt(0));
                 frequencyConfiguration.setInitLogCount(SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_INIT_LOG_DEBUG_COUNT));
+                String limitIpRate=SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_LIMIT_IP_RATE);
+                frequencyConfiguration.setLimitIpRate(Float.parseFloat(limitIpRate));
                 frequencyConfiguration.getLimit().setItems(SystemConfig.getByCache(SystemConfigCodes.LIMIT_RULE_ITEMS));
                 frequencyConfiguration.getLimit().setOutLimitLogTime(SystemConfig.getByCache(SystemConfigCodes.LIMIT_OUT_LIMIT_MIN_TIME));
 

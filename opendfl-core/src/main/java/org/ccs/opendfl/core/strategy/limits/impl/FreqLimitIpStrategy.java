@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * IP限限制检查
+ * limitIp的限制数=limit*2
  *
  * @author chenjh
  */
@@ -59,7 +60,8 @@ public class FreqLimitIpStrategy implements FreqLimitStrategy {
             }
             String ip = strategyParams.getIp();
             String attrValue = strategyParams.getAttrValue();
-            int limit = frequency.getLimit() * 2;
+            Float limitFloat = frequency.getLimit() * frequencyConfiguration.getLimitIpRate();
+            int limit=limitFloat.intValue();
             String redisKey = getRedisKey(frequency, ip, attrValue);
             if (frequency.isResource()) {
                 limit = frequency.getIpUserCount();
