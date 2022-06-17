@@ -47,11 +47,6 @@ public class RequestUtils {
     public static Map<String, Object> getParamsObject(HttpServletRequest request) throws BaseException {
         Map<String, String[]> requestParams = request.getParameterMap();
         Map<String, Object> params = new HashMap<>(requestParams.size());
-        String deviceId = request.getHeader(RequestParams.DEVICE_ID);
-        //参数优先，header允许被参数覆盖
-        if (deviceId != null) {
-            params.put(RequestParams.DEVICE_ID, deviceId);
-        }
 
         for (Map.Entry<String, String[]> entry : requestParams.entrySet()) {
             String[] values = entry.getValue();
@@ -88,6 +83,10 @@ public class RequestUtils {
         }
         origin = CommUtils.getDomain(origin);
         return origin;
+    }
+
+    public static String getDeviceId(HttpServletRequest request) {
+        return request.getHeader(RequestParams.DEVICE_ID);
     }
 
     public static Character getSysTypeId(HttpServletRequest request) {

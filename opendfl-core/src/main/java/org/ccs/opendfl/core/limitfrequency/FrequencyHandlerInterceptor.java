@@ -109,8 +109,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             selectStrategyItems();
 
             Map<String, Object> params = RequestUtils.getParamsObject(request);
-            String deviceId = (String) params.get(RequestParams.DEVICE_ID);
-
+            String deviceId = RequestUtils.getDeviceId(request);
             String sysType = RequestUtils.getSysType(request);
             String origin = RequestUtils.getOrigin(request);
             strategyParams = new RequestStrategyParamsVo(lang, ip, origin, deviceId, handlerMethod.getMethod().getName(), requestUri, sysType, curTime);

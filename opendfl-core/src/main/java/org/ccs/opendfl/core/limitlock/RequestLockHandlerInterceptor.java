@@ -135,7 +135,7 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
                 String rndId = count + "-" + random.nextInt(1000);
                 boolean isLimit = false;
                 userId = (String) reqParams.get(RequestParams.USER_ID);
-                deviceId = (String) reqParams.get(RequestParams.DEVICE_ID);
+                deviceId = RequestUtils.getDeviceId(request);
                 String lockKey = LockUtils.getLockKey(reqLimit, attrValue);
                 if (StringUtils.equals(DataSourceType.ETCD.getType(), reqLimit.lockType().getSource())) {
                     isLimit = lockEtcd(reqLimit, lockKey, time, rndId);

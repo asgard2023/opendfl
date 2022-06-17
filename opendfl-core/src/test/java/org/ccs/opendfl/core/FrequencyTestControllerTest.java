@@ -503,33 +503,6 @@ class FrequencyTestControllerTest {
         Assertions.assertEquals(20, limtCount, "limtCount:" + limtCount);
     }
 
-    /**
-     * 设备号黑名单限制
-     */
-    @Test
-    void serverTimeDeviceIdByParam() throws Exception {
-        int limtCount = 0;
-        int successCount = 0;
-        String errorLimitType = "frequency:black:device";
-        for (int i = 0; i < 20; i++) {
-            String userId = "123" + i;
-            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqDevice")
-                            .param("userId", userId)
-                            .param(RequestParams.DEVICE_ID, "blackDevice123")
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andReturn();
-            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
-            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
-            if (content.contains(errorLimitType)) {
-                limtCount++;
-            } else {
-                successCount++;
-            }
-            System.out.println("----serverTimeFreqDiffUser status=" + status + " content=" + content);
-        }
-        Assertions.assertEquals(0, successCount, "successCount:" + successCount);
-        Assertions.assertEquals(20, limtCount, "limtCount:" + limtCount);
-    }
 
     /**
      * 同IP多用户测试

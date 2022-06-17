@@ -120,10 +120,7 @@ public class FrequencyTestController {
 
     @GetMapping("/serverTimeFreqDevice")
     public Object serverTimeFreqDevice(HttpServletRequest request) {
-        String deviceId = request.getParameter(RequestParams.DEVICE_ID);
-        if (deviceId == null) {
-            deviceId = request.getHeader(RequestParams.DEVICE_ID);
-        }
+        String deviceId = RequestUtils.getDeviceId(request);
         log.info("----serverTimeFreqDevice--deviceId={}", deviceId);
         return System.currentTimeMillis();
     }
