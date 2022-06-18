@@ -77,8 +77,8 @@ public class FreqLimitIpStrategy implements FreqLimitStrategy {
 
                 //再次过期处理，以免有变成永久的key
                 RedisTemplateUtil.expireTimeTTL(redisTemplate, redisKey, frequency.getTime());
-                final String errMsg = String.format(frequency.getErrMsg(), frequency.getLimit());
-                final String errMsgEn = String.format(frequency.getErrMsgEn(), frequency.getLimit());
+                final String errMsg = String.format(frequency.getErrMsg(), time, limit);
+                final String errMsgEn = String.format(frequency.getErrMsgEn(), time, limit);
 
                 logger.warn("----doCheckLimit-limitIp--redisKey={} userId={} time={} count={} limit={} ip={}", redisKey, userId, time, v, limit, ip);
 
