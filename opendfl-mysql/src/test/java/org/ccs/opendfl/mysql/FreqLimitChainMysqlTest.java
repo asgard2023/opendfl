@@ -5,6 +5,7 @@ import org.ccs.opendfl.core.constants.ReqSysType;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.ResultCode;
 import org.ccs.opendfl.core.strategy.limits.FreqLimitChain;
+import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
 import org.junit.jupiter.api.Assertions;
@@ -15,6 +16,9 @@ import org.springframework.test.context.ActiveProfiles;
 
 import javax.annotation.Resource;
 
+/**
+ * 不走controller，直接方法测试
+ */
 @SpringBootTest
 @ActiveProfiles(value = "test")
 @Slf4j
@@ -81,6 +85,7 @@ class FreqLimitChainMysqlTest {
     void doCheckLimit_ipUser() {
         String lang = null;
         String ip = "192.168.5.101";
+        ip= RequestUtils.convertIpv4(ip);
         String requestUri = "/frequencyTest/serverTimeFreqIpUser";
         String methodName = "serverTimeFreqIpUser";
         ReqSysType reqSysType = ReqSysType.PC;
@@ -118,6 +123,7 @@ class FreqLimitChainMysqlTest {
     void doCheckLimit_all() {
         String lang = null;
         String ip = "192.168.5.101";
+        ip= RequestUtils.convertIpv4(ip);
         String requestUri = "/frequencyTest/serverTimeFreq";
         ReqSysType reqSysType = ReqSysType.PC;
         String methodName = "serverTimeFreq";
@@ -159,6 +165,7 @@ class FreqLimitChainMysqlTest {
     void doCheckLimit_limit() {
         String lang = null;
         String ip = "192.168.5.101";
+        ip= RequestUtils.convertIpv4(ip);
         String requestUri = "/frequencyTest/serverTimeFreq";
         ReqSysType reqSysType = ReqSysType.PC;
         String methodName = "serverTimeFreq";
@@ -167,6 +174,7 @@ class FreqLimitChainMysqlTest {
 
         FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
         frequencyVo.setLimit(100);
+        frequencyVo.setTime(60);
 
         String freqTypeItems = "limit,";
 
@@ -195,6 +203,7 @@ class FreqLimitChainMysqlTest {
     void doCheckLimit_limitIp() {
         String lang = null;
         String ip = "192.168.5.109";
+        ip= RequestUtils.convertIpv4(ip);
         String requestUri = "/frequencyTest/serverTimeFreq";
         ReqSysType reqSysType = ReqSysType.PC;
         String methodName = "serverTimeFreq";
@@ -233,6 +242,7 @@ class FreqLimitChainMysqlTest {
     void doCheckLimit_noLimit() {
         String lang = null;
         String ip = "192.168.5.101";
+        ip= RequestUtils.convertIpv4(ip);
         String requestUri = "/frequencyTest/serverTimeFreq";
         String methodName = "serverTimeFreq";
         ReqSysType reqSysType = ReqSysType.PC;
@@ -241,6 +251,7 @@ class FreqLimitChainMysqlTest {
 
         FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
         frequencyVo.setLimit(100);
+        frequencyVo.setTime(60);
 
         String freqTypeItems = "userCount,userIp,ipUser,";
 
