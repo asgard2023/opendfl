@@ -228,4 +228,11 @@ public class FrequencyUtils {
         }
         return attrValue;
     }
+
+    public static String getErrMsg(String errMsg, int time, int limit){
+        if(errMsg==null){
+            return null;
+        }
+        return String.format(errMsg.replace("#{time}", ""+time), limit);
+    }
 }
