@@ -1,5 +1,6 @@
 package org.ccs.opendfl.core.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,7 +14,7 @@ public class GetRequestJsonUtil {
 
     public static JSONObject getRequestJsonObject(HttpServletRequest request) throws IOException {
         String json = getRequestJsonString(request);
-        return JSONObject.parseObject(json);
+        return JSON.parseObject(json);
     }
 
     /***

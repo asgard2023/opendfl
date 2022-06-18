@@ -42,7 +42,7 @@ public class AuthAspect {
             UserVo userVo = LoginUtils.getUserByToken(token);
 
             // 2. 校验token是否合法&是否过期；如果不合法或已过期直接抛异常；如果合法放行
-            Boolean isValid = userVo != null;
+            boolean isValid = userVo != null;
             if (!isValid) {
                 throw new SecurityException("Token不合法！");
             }

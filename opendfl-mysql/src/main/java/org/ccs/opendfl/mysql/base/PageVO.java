@@ -25,7 +25,7 @@ public class PageVO<T> implements IPageVO<T>, java.io.Serializable{
 	private Collection<T> datas;
 	private String sort;
 	private String order;
-	public static List<String>commParamList=Arrays.asList("sort","order","page","rows","startDate","endDate");
+	protected static final List<String> commParamList=Arrays.asList("sort","order","page","rows","startDate","endDate");
 	private Map<String, String> paramMap=null;
 	public PageVO(){
 		paramMap=new HashMap<>();
@@ -71,7 +71,7 @@ public class PageVO<T> implements IPageVO<T>, java.io.Serializable{
 		
 	}
 	
-	private final char UNDERLINE = '_';
+	private static final char UNDERLINE = '_';
 
 	public String camelToUnderline(String param) {
 		if (param == null || "".equals(param.trim())) {

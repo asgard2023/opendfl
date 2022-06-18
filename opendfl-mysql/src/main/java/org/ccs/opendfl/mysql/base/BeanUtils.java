@@ -1,5 +1,7 @@
 package org.ccs.opendfl.mysql.base;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import tk.mybatis.mapper.MapperException;
 import tk.mybatis.mapper.entity.EntityColumn;
@@ -13,6 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
+@Slf4j
 public class BeanUtils {
 
     /**
@@ -63,16 +66,8 @@ public class BeanUtils {
             String methodName = "set" + upperCaseFirst(propertyName);
             method = entity.getClass().getDeclaredMethod(methodName, value.getClass());
             method.invoke(entity, value);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+           log.error("----{} setValue--propertyName={}", e.getClass().getSimpleName(), propertyName, e);
         }
 
     }
@@ -89,16 +84,8 @@ public class BeanUtils {
         try {
             method = entity.getClass().getDeclaredMethod(methodName, params.getClass());
             return method.invoke(entity, params);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+        }  catch (Exception e) {
+            log.error("----{} executeMethod--propertyName={}", e.getClass().getSimpleName(), methodName, e);
         }
         return null;
     }
@@ -132,24 +119,16 @@ public class BeanUtils {
             String methodName = "get" + upperCaseFirst(propertyName);
             method = entity.getClass().getDeclaredMethod(methodName);
             return method.invoke(entity);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+        }  catch (Exception e) {
+            log.error("----{} getValue--propertyName={}", e.getClass().getSimpleName(), propertyName, e);
         }
         return null;
     }
 
     public static Map<Object, Object> getMapProps(Collection<?> list, String keyProp, String valueProp) {
         Map<Object, Object> result = new HashMap<>();
-        if (list == null || list.size() == 0) {
-            return result;
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyMap();
         }
         for (Object obj : list) {
             result.put(getValue(obj, keyProp), getValue(obj, valueProp));
@@ -166,10 +145,10 @@ public class BeanUtils {
      * @throws Exception
      */
     public static List<Object> getPropsByName(Collection<?> list, String propName) {
-        if (list == null || list.size() == 0) {
-            return new ArrayList<>();
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyList();
         }
-        List<Object> propDataList = new ArrayList<Object>(list.size());
+        List<Object> propDataList = new ArrayList<>(list.size());
         for (Object obj : list) {
             Object o = getValue(obj, propName);
             if (o != null) {
@@ -188,8 +167,8 @@ public class BeanUtils {
      * @throws Exception
      */
     public static List<String> getStrPropsByName(Collection<?> list, String propName) {
-        if (list == null || list.size() == 0) {
-            return new ArrayList<>();
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyList();
         }
         List<String> propDataList = new ArrayList<>(list.size());
         String str = null;
@@ -208,6 +187,9 @@ public class BeanUtils {
     }
 
     public static List<String> toStringList(List<Object> list) {
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyList();
+        }
         List<String> list2 = new ArrayList<>(list.size());
         String str = null;
         for (Object o : list) {
@@ -249,8 +231,7 @@ public class BeanUtils {
             String propertyName = descriptor.getName();
             if (!propertyName.equals("class") && propertyName.equals(property)) {
                 Method readMethod = descriptor.getReadMethod();
-                Object result = readMethod.invoke(bean, new Object[0]);
-                return result;
+                return readMethod.invoke(bean, new Object[0]);
             }
         }
         return null;

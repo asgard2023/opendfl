@@ -32,6 +32,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import tk.mybatis.mapper.common.Mapper;
 import tk.mybatis.mapper.entity.EntityColumn;
@@ -119,10 +120,10 @@ public abstract class BaseService<T> implements IBaseService<T> {
                         criteria.andNotIn(field, Arrays.asList(datas.split(",")));
                     } else if ("cn".equals(op)) {//包含
                         String datas = (String) data;
-                        criteria.andLike(field, (String) data);
+                        criteria.andLike(field, datas);
                     } else if ("nc".equals(op)) {//不包含
                         String datas = (String) data;
-                        criteria.andNotLike(field, (String) data);
+                        criteria.andNotLike(field, datas);
                     } else if ("bw".equals(op)) {//开始于
                         criteria.andGreaterThanOrEqualTo(field, data);
                     }
@@ -140,20 +141,6 @@ public abstract class BaseService<T> implements IBaseService<T> {
         }
     }
 
-//	/**
-//	 * 批量保存
-//	 * @param list
-//	 * @return
-//	 */
-//	@Override
-//	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-//	public int saveBatch(List<T> list) {
-//		if (list == null || list.size() == 0) {
-//			//TODO exception
-//			return -1;
-//		}
-//		return this.getMapper().insertList(list);
-//	}
 
     /**
      * 删除
@@ -191,35 +178,6 @@ public abstract class BaseService<T> implements IBaseService<T> {
         return getMapper().updateByPrimaryKeySelective(entity);
     }
 
-//	/**
-//	 * 批量更新，包括为空的属性也更新
-//	 * @param list
-//	 * @return
-//	 */
-//	@Override
-//	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-//	public int updateBatch(List<T> list) {
-//		if (list.size() == 0) {
-//			//TODO exception
-//			return -1;
-//		}
-//		return this.getMapper().updateListById(list);
-//	}
-//
-//	/**
-//	 * 批量更新，为空的属性不更新
-//	 * @param list
-//	 * @return
-//	 */
-//	@Override
-//	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-//	public int updateBatchSelective(List<T> list) {
-//		if (list.size() == 0) {
-//			//TODO exception
-//			return -1;
-//		}
-//		return this.getMapper().updateListByIdSelective(list);
-//	}
 
     /**
      * 软删除
@@ -280,8 +238,8 @@ public abstract class BaseService<T> implements IBaseService<T> {
      */
     @Override
     public List<T> findByPropotys(String propName, List<Object> propotys, Class<?> entityClass, String orderByClause) throws Exception {
-        if (propotys == null || propotys.size() == 0) {
-            return new ArrayList<T>();
+        if (CollectionUtils.isEmpty(propotys)) {
+            return Collections.emptyList();
         }
         Example example = new Example(entityClass);
         if (orderByClause != null) {
@@ -320,7 +278,7 @@ public abstract class BaseService<T> implements IBaseService<T> {
     @Override
     public T findOne(String propoty, Object value, Class<T> entity) {
         List<T> list = findByPropoty(propoty, value, entity);
-        if (list == null || list.size() == 0) {
+        if (CollectionUtils.isEmpty(list)) {
             return null;
         }
         if (list.size() > 1) {
@@ -400,11 +358,11 @@ public abstract class BaseService<T> implements IBaseService<T> {
      */
     @Override
     public void loadProperty(List<?> list, String byProp, String propId, String propName, Class<T> clazz) throws Exception {
-        if (list == null || list.size() == 0) {
+        if (CollectionUtils.isEmpty(list)) {
             return;
         }
         List<Object> ids = BeanUtils.getPropsByName(list, byProp);
-        if (ids == null || ids.size() == 0) {
+        if (CollectionUtils.isEmpty(ids)) {
             return;
         }
         List<T> tList = this.findByIds(ids, clazz);
@@ -419,7 +377,7 @@ public abstract class BaseService<T> implements IBaseService<T> {
 
     @Override
     public void loadProperty(List<?> list, String byKey, String setName, String getKey, String getName, Class<T> clazz) throws Exception {
-        if (list == null) return;
+        if (CollectionUtils.isEmpty(list)) return;
         List<Object> props = BeanUtils.getPropsByName(list, byKey);
         List<T> findList = findByPropotys(getKey, props, clazz);
         Map<Object, Object> result = BeanUtils.getMapProps(findList, getKey, getName);
@@ -435,14 +393,14 @@ public abstract class BaseService<T> implements IBaseService<T> {
 
     @Override
     public Map<String, T> findMapByIds(List<Object> ids, Class<T> entity) throws Exception {
-        Map<String, T> map = new HashMap<String, T>();
-        if (ids == null || ids.size() == 0) {
-            return map;
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyMap();
         }
         List<T> pos = this.findByIds(ids, entity);
-        if (pos == null || pos.size() == 0) {
-            return map;
+        if (CollectionUtils.isEmpty(pos)) {
+            return Collections.emptyMap();
         }
+        Map<String, T> map = new HashMap<String, T>();
         for (T po : pos) {
             Object tid = BeanUtils.getValue(po, "id");
             map.put(tid.toString(), po);

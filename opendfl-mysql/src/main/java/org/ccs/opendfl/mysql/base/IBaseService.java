@@ -15,12 +15,6 @@ public interface IBaseService<T> {
      */
     public int save(T entity);
 
-//	/**
-//	 * 批量保存
-//	 * @param list
-//	 * @return
-//	 */
-//	public int saveBatch(List<T> list);
 
     /**
      * 删除
@@ -46,19 +40,6 @@ public interface IBaseService<T> {
      */
     public int updateByPrimaryKeySelective(T entity);
 
-//	/**
-//	 * 批量更新，包括为空的属性也更新
-//	 * @param list
-//	 * @return
-//	 */
-//	public int updateBatch(List<T> list);
-//
-//	/**
-//	 * 批量更新，为空的属性不更新
-//	 * @param list
-//	 * @return
-//	 */
-//	public int updateBatchSelective(List<T> list);
 
     /**
      * 通过id查找

@@ -160,11 +160,7 @@ public final class CommUtils {
     }
 
     public static List newList(Object... objects) {
-        List list = new ArrayList(objects.length);
-        for (Object obj : objects) {
-            list.add(obj);
-        }
-        return list;
+        return Arrays.asList(objects);
     }
 
     private static final String HTTP = "http://";

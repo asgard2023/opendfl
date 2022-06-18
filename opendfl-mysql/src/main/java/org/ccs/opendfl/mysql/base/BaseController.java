@@ -34,27 +34,25 @@ public abstract class BaseController {
     static final Pattern PATTERN_TRIM = Pattern.compile(PATTERN_TRIM_EXP);
 
     public Map<String, Object> createAllParams(HttpServletRequest request) {
-        Map properties = request.getParameterMap();
-        Map returnMap = new HashMap();
-        Iterator<Map.Entry<String, Object>> entries = properties.entrySet().iterator();
-        Map.Entry<String, Object> entry;
+        Map<String, String[]> properties = request.getParameterMap();
+        Map<String, Object> returnMap = new HashMap<>(properties.size());
+        Iterator<Map.Entry<String, String[]>> entries = properties.entrySet().iterator();
+        Map.Entry<String, String[]> entry;
         String name = "";
         String value = "";
 
         while (entries.hasNext()) {
             entry = entries.next();
             name = entry.getKey();
-            Object valueObj = entry.getValue();
+            String[] valueObj = entry.getValue();
             if (null == valueObj) {
                 value = "";
-            } else if (valueObj instanceof String[]) {
-                String[] values = (String[]) valueObj;
+            } else {
+                String[] values = valueObj;
                 for (int i = 0; i < values.length; i++) {
                     value = values[i] + ",";
                 }
                 value = value.substring(0, value.length() - 1);
-            } else {
-                value = valueObj.toString();
             }
             Matcher m = PATTERN_TRIM.matcher(value.trim());
             value = m.replaceAll("");
