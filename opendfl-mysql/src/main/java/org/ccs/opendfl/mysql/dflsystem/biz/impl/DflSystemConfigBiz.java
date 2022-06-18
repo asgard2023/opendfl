@@ -26,10 +26,7 @@ import tk.mybatis.mapper.common.Mapper;
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.mapper.util.StringUtil;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Version V1.0
@@ -157,7 +154,7 @@ public class DflSystemConfigBiz extends BaseService<DflSystemConfigPo> implement
     public List<DflSystemConfigPo> findSysconfigByParentIds(Integer confType, List<Integer> parentIds) {
         logger.debug("----findSysconfigByParentIds--confType=" + confType + " parentIds=" + parentIds);
         if (parentIds.size() == 0) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
         if (confType != null) {
 //            throw new FailedException("暂不支持");
