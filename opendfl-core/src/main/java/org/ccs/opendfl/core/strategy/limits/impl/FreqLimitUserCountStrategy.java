@@ -103,10 +103,7 @@ public class FreqLimitUserCountStrategy implements FreqLimitStrategy {
                     logger.warn("----doCheckLimit-userCount--redisKey={} lang={} time={} count={} limit={} ip={}", redisKey, lang, time, v, limit, ip);
                     strategyParams.getChainOper().setFail(true);
                     FrequencyUtils.addFreqLog(strategyParams, limit, v, LIMIT_TYPE);
-                    final String errMsg = FrequencyUtils.getErrMsg(frequency.getErrMsg(), time, limit);
-                    final String errMsgEn = FrequencyUtils.getErrMsg(frequency.getErrMsgEn(), time, limit);
-                    String limitType = getLimitType();
-                    FrequencyUtils.failExceptionMsg(limitType, errMsg, errMsgEn, lang);
+                    FrequencyUtils.failExceptionMsg(getLimitType(), frequency, lang);
                 }
             }
         }

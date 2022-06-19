@@ -141,29 +141,6 @@ public class FrequencyUtils {
     }
 
 
-    public static boolean failExceptionMsg(String title, String errMsg, String errMsgEn, String lang) {
-        boolean isCn = LangType.ZH.code.equals(lang);
-        title = "frequency:" + title;
-        BaseException exception = null;
-        if (StringUtils.isBlank(errMsg)) {
-            if (isCn) {
-                exception = new FrequencyException();
-            } else {
-                exception = new FrequencyException("Frequency limit");
-            }
-        } else {
-            if (isCn && StringUtils.isNotBlank(errMsg)) {
-                exception = new FrequencyException("访问频率限制" + ":" + errMsg);
-            } else if (StringUtils.isNotBlank(errMsgEn)) {
-                exception = new FrequencyException("Frequency limit" + ":" + errMsgEn);
-            } else {
-                exception = new FrequencyException(ResultCode.USER_FREQUENCY_ERROR.getMsg() + ":" + errMsg);
-            }
-        }
-        exception.setTitle(title);
-        throw exception;
-    }
-
     protected static final Map<String, AtomicInteger> counterMap = new ConcurrentHashMap<>();
     protected static final Map<String, Boolean> initLogrMap = new ConcurrentHashMap<>();
 
@@ -233,6 +210,68 @@ public class FrequencyUtils {
         if(errMsg==null){
             return null;
         }
-        return String.format(errMsg.replace("#{time}", ""+time), limit);
+        try {
+            return errMsg.replace("#{time}", ""+time).replace("#{limit}", ""+limit);
+        } catch (Exception e) {
+            return errMsg;
+        }
     }
+
+    public static String getErrMsg(FrequencyVo frequency, LangType langType){
+        if(frequency==null){
+            return null;
+        }
+        if(langType==LangType.EN){
+            return getErrMsg(frequency.getErrMsgEn(), frequency.getTime(), frequency.getLimit());
+        }
+        return getErrMsg(frequency.getErrMsg(), frequency.getTime(), frequency.getLimit());
+    }
+
+    public static boolean failExceptionMsg(String title, FrequencyVo frequency, String lang) {
+//        boolean isCn = LangType.ZH.code.equals(lang);
+        title = "frequency:" + title;
+        LangType langType = LangType.parse(lang);
+        String limitInfo = getLimitInfo(langType);
+        if(frequency==null){
+            BaseException exception = new FrequencyException(limitInfo);
+            exception.setTitle(title);
+            throw exception;
+        }
+
+        String errMsg=getErrMsg(frequency, langType);
+        BaseException exception = new FrequencyException(limitInfo+ ":" + errMsg);
+        exception.setTitle(title);
+        throw exception;
+    }
+
+    private static String getLimitInfo(LangType langType) {
+        String limitInfo;
+        if(LangType.ZH== langType){
+            limitInfo = "访问频率限制";
+        }
+        else{
+            limitInfo = "Frequency limit";
+        }
+        return limitInfo;
+    }
+
+    public static String getFailErrMsg(OutLimitType limitType, String title, FrequencyVo frequency, String lang){
+        LangType langType = LangType.parse(lang);
+        String errMsg = getLimitInfo(langType);
+        if(frequency!=null){
+            errMsg=FrequencyUtils.getErrMsg(frequency, langType);
+        }
+
+        String limitCode="100030";
+        if(OutLimitType.BLACK==limitType){
+            limitCode= ResultCode.USER_BLACK_ERROR.getCode();
+        }
+        else if(OutLimitType.WHITE==limitType){
+            limitCode= ResultCode.USER_WHITE_ERROR.getCode();
+        }
+        return String.format(FrequencyUtils.OUT_INFO, limitCode, errMsg, title);
+    }
+
+    public static final String FREQUENCY_INVALID_INFO = "{\"resultCode\":\"100030\",\"errorMsg\":\"Frequency limit\",\"errorType\":\"%s\",\"success\":false}";
+    public static final String OUT_INFO = "{\"resultCode\":\"%s\",\"errorMsg\":\"%s\",\"errorType\":\"%s\",\"success\":false}";
 }

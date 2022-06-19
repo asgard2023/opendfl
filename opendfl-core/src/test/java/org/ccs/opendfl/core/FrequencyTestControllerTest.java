@@ -2,6 +2,7 @@ package org.ccs.opendfl.core;
 
 
 import com.alibaba.fastjson.JSONObject;
+import org.ccs.opendfl.core.utils.LangType;
 import org.ccs.opendfl.core.utils.RequestParams;
 import org.ccs.opendfl.core.vo.RequestTestVo;
 import org.junit.jupiter.api.Assertions;
@@ -15,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -358,21 +360,37 @@ class FrequencyTestControllerTest {
         Assertions.assertEquals(0, limtCount, "limtCount:" + limtCount);
     }
 
+    @Test
+    void serverTimeFreqSameUser_blackUser() throws Exception {
+        serverTimeFreqSameUser_blackUser(null);
+    }
+
+    @Test
+    void serverTimeFreqSameUser_blackUserCn() throws Exception {
+        serverTimeFreqSameUser_blackUser(LangType.ZH.code);
+    }
+
+    @Test
+    void serverTimeFreqSameUser_blackUserEn() throws Exception {
+        serverTimeFreqSameUser_blackUser(LangType.EN.code);
+    }
+
     /**
      * 用户访问频率-同一用户-用户黑名单
      */
-    @Test
-    void serverTimeFreqSameUser_blackUser() throws Exception {
+    void serverTimeFreqSameUser_blackUser(String lang) throws Exception {
 
         int limtCount = 0;
         int successCount = 0;
         String errorLimitType = "frequency:black:user";
         String whiteUserId = "5103";
         for (int i = 0; i < 20; i++) {
-            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreq")
-                            .param("userId", whiteUserId)
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andReturn();
+            MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreq")
+                    .param("userId", whiteUserId);
+            if(lang!=null){
+                builder=builder.header(RequestParams.LANG, lang);
+            }
+            MvcResult mvcResult = mockMvc.perform(builder.accept(MediaType.APPLICATION_JSON)).andReturn();
             int status = mvcResult.getResponse().getStatus();                 //得到返回代码
             String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
             if (content.contains(errorLimitType)) {

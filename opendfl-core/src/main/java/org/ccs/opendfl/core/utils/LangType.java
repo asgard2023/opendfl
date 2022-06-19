@@ -9,21 +9,23 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 public enum LangType {
-    ZH(LangCodes.ZH, "中文", true),
-    TW(LangCodes.TW, "繁体", false),
-    JA(LangCodes.JA, "日语", false),
-    EN(LangCodes.EN, "英语", false);
+    ZH(LangCodes.ZH, "中文", true, Locale.SIMPLIFIED_CHINESE),
+    TW(LangCodes.TW, "繁体", false, Locale.TRADITIONAL_CHINESE),
+    JA(LangCodes.JA, "日语", false, Locale.JAPAN),
+    EN(LangCodes.EN, "英语", false, Locale.ENGLISH);
     protected static final List<String> LANG_TYPES= Arrays.asList(LangType.values()).stream().map(t->t.code).collect(Collectors.toList());
     public static final String NONE_LANG="noneLang";//表示整个数据不做国际化，即不显示
     static final Logger logger = LoggerFactory.getLogger(LangType .class);
     public final String code;
     public final String descs;
+    public final Locale locale;
     public final boolean isDefault;
 
-    LangType(String code, String descs, boolean isDefault) {
+    LangType(String code, String descs, boolean isDefault, Locale locale) {
         this.code =code;
         this.descs = descs;
         this.isDefault=isDefault;
+        this.locale=locale;
     }
 
     public static LangType parse(String code) {
@@ -59,22 +61,6 @@ public enum LangType {
         if(langType==null){
             langType=getDefault();
         }
-        Locale locale=null;
-        if(ZH==langType){
-            locale= new Locale("zh", "CN");
-        }
-        else if(TW==langType){
-            locale=new Locale("zh", "TW");
-        }
-        else if(EN==langType){
-            locale=new Locale("en", "US");
-        }
-        else if(JA==langType){
-            locale=Locale.JAPAN;
-        }
-        else{
-            locale= new Locale("zh", "CN");
-        }
-        return locale;
+        return langType.locale;
     }
 }
