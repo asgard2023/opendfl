@@ -272,6 +272,6 @@ public class FrequencyUtils {
         return String.format(FrequencyUtils.OUT_INFO, limitCode, errMsg, title);
     }
 
-    public static final String FREQUENCY_INVALID_INFO = "{\"resultCode\":\"100030\",\"errorMsg\":\"Frequency limit\",\"errorType\":\"%s\",\"success\":false}";
+    public static final String FREQUENCY_INVALID_INFO = "{\"resultCode\":\"100030\",\"errorMsg\":\"Frequency limit\",\"errorType\":\"time=0 or limit=0\",\"success\":false}";
     public static final String OUT_INFO = "{\"resultCode\":\"%s\",\"errorMsg\":\"%s\",\"errorType\":\"%s\",\"success\":false}";
 }
