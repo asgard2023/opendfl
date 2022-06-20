@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Version V1.0
@@ -101,10 +102,7 @@ public class DflSystemConfigController extends BaseController {
         }
         List<Integer> idList = Arrays.asList(parentId);
         List<DflSystemConfigPo> list = this.dflSystemConfigBiz.findSysconfigByParentIds(confType, idList);
-        idList=new ArrayList<>();
-        for (DflSystemConfigPo m : list) {
-            idList.add(m.getId());
-        }
+        idList=list.stream().map(DflSystemConfigPo::getId).collect(Collectors.toList());
         //用于检查是否有子节点
         List<Map<String, Object>> mCountMapList = this.dflSystemConfigBiz.findSysconfigByParentIdsCount(confType, idList);
         List<HashMap<String, Object>> mapList = new ArrayList();
