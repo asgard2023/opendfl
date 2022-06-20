@@ -91,7 +91,12 @@ public class FreqLimitUserCountStrategy implements FreqLimitStrategy {
             if (v == 1) {
                 redisTemplate.expire(redisKey, frequency.getTime(), TimeUnit.SECONDS);
             } else {
-                if (v > limit) {
+                //主要用于避免服务重启造成部份key变成永久key
+                //低于60秒的也忽略，就让用户多等一下，否则就检查一下是否永久key
+                if(v<limit){
+                    RedisTemplateUtil.expireTimeHashFrequencyCache(redisTemplate, redisKey, time, v);
+                }
+                else if (v > limit) {
                     String lang = strategyParams.getLang();
                     //再次过期处理，以免有变成永久的key
                     RedisTemplateUtil.expireTimeTTL(redisTemplate, redisKey, frequency.getTime());
