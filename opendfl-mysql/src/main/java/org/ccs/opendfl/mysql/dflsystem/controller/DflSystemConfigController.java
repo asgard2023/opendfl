@@ -19,10 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Version V1.0
@@ -102,9 +99,9 @@ public class DflSystemConfigController extends BaseController {
         if (parentId == null) {
             parentId = 0;
         }
-        List<Integer> idList = CommUtils.newList(parentId);
+        List<Integer> idList = Arrays.asList(parentId);
         List<DflSystemConfigPo> list = this.dflSystemConfigBiz.findSysconfigByParentIds(confType, idList);
-        idList.clear();
+        idList=new ArrayList<>();
         for (DflSystemConfigPo m : list) {
             idList.add(m.getId());
         }
