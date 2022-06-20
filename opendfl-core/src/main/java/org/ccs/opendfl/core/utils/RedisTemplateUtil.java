@@ -64,6 +64,7 @@ public class RedisTemplateUtil {
     public static void expireTimeTTL(RedisTemplate<String, Object> redisTemplate, String redisKey, int seconds) {
         Long v = redisTemplate.getExpire(redisKey);
         if (v == -1L) {
+            logger.warn("----expireTimeTTL--permanent redisKey={} seconds={}", redisKey, seconds);
             redisTemplate.expire(redisKey, seconds, TimeUnit.SECONDS);
         }
     }
