@@ -73,15 +73,25 @@
         </form>
     </div>
 
+
+
     <!-- 查询结果 center -->
     <div data-options="region:'center', title:'查询结果'">
+        <div id="helper-info" style="display: none">
+            1,限制次数limit=0表示配置错误，全部403拒绝<br/>
+            2,限制次数limit=-1表示功能关闭，频率限制不起作用<br/>
+            2,限制次数limit>0表示功能开启<br/>
+        </div>
         <div id="toolbar" style="display:none;">
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true"
                onclick="onAdd()">新增</a>
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="onEdit()">修改</a>
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
                onclick="onDestroy()">删除</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-help" plain="true"
+               onclick="helperShow()">帮助</a>
         </div>
+
         <table id="dg" class="easyui-datagrid"
                data-options="onDblClickRow:onDblClick,queryParams:function(){return $('#search-form').serializeJson();}, onClickRow:onClick, onLoadError:loadError, onLoadSuccess:function(){$('.datagrid-btable').find('div.datagrid-cell').css('text-align','left');}"
                toolbar="#toolbar" pagination="true"
@@ -215,6 +225,18 @@
     $(function () {
         doSearch();
     });
+
+    var isBlock=false;
+    function helperShow(){
+        if(!isBlock){
+            $('#helper-info').css('display','block');
+            isBlock=true;
+        }
+        else{
+            $('#helper-info').css('display','none');
+            isBlock=false;
+        }
+    }
 
     function doSearch() {
         var  url="/dflcore/dflFrequency/list2";
