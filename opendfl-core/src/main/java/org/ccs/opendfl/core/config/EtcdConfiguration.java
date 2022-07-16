@@ -21,12 +21,17 @@ public class EtcdConfiguration {
 
     @Bean(name="etcdClient")
     public Client etcdClient() {
-        log.info("----etcdClient--etcd.endpoints={}", endpoints);
         if (StringUtils.isBlank(endpoints)) {
-            log.warn("----etcdClient--disabled");
+            log.warn("----etcdClient--etcd.endpoints={} empty disabled", endpoints);
             return null;
         }
-        String[] urls = endpoints.split(",");
-        return Client.builder().endpoints(urls).build();
+        try {
+            log.info("----etcdClient--etcd.endpoints={}", endpoints);
+            String[] urls = endpoints.split(",");
+            return Client.builder().endpoints(urls).build();
+        } catch (Exception e) {
+            log.error("----etcdClient--etcd.endpoints={} invalid disabled {}", endpoints, e.getMessage());
+            return null;
+        }
     }
 }
