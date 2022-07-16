@@ -1,11 +1,14 @@
 package org.ccs.opendfl.mysql.exception;
 
 
+import com.alibaba.druid.util.StringUtils;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.FailedException;
 import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.exception.UnknownException;
 import org.ccs.opendfl.core.utils.RequestUtils;
+import org.ccs.opendfl.mysql.dflsystem.constant.SystemConfigCodes;
+import org.ccs.opendfl.mysql.dflsystem.utils.SystemConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -65,9 +68,12 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
     public Object handleException(HttpServletRequest request, Exception ex) {
-        if (ex != null && (ex instanceof HttpRequestMethodNotSupportedException
+        if(ex==null){
+            return null;
+        }
+        if (ex instanceof HttpRequestMethodNotSupportedException
                 || ex instanceof HttpMediaTypeNotSupportedException
-                || ex instanceof HttpMediaTypeNotAcceptableException)) {
+                || ex instanceof HttpMediaTypeNotAcceptableException) {
             logger.error("---handleException method={} uri={} error={}", request.getMethod(), request.getRequestURI(), ex.getMessage(), ex);
             ResultData resultData = ResultData.error(new FailedException());
             resultData.setErrorMsg(ex.getMessage());
@@ -106,8 +112,23 @@ public class GlobalExceptionHandler {
 
 
     private static String logExceptionTypeBase = "simple";
+    private static Long baseExceptionTypeTime=0L;
+    private static final int CACHE_TIME=120000;
 
     private static String getLogExceptionTypeBase() {
+        long curTime=System.currentTimeMillis();
+        if(logExceptionTypeBase==null ||curTime-baseExceptionTypeTime>CACHE_TIME) {//2分钟内配置值不用重新读取
+            synchronized (GlobalExceptionHandler.class) {
+                if (curTime - baseExceptionTypeTime > CACHE_TIME) {
+                    baseExceptionTypeTime=curTime;
+                    String expType= SystemConfig.getByCache(SystemConfigCodes.BASE_LIMIT_LOG_EXP_TYPE);
+                    if(!StringUtils.equals(logExceptionTypeBase, expType)){
+                        logger.info("-----getLogExceptionTypeBase--logExceptionTypeBase={} time={}", expType, baseExceptionTypeTime);
+                        logExceptionTypeBase=expType;
+                    }
+                }
+            }
+        }
         return logExceptionTypeBase;
     }
 

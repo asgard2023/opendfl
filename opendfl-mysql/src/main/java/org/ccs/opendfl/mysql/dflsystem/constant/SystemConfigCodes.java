@@ -25,6 +25,8 @@ public enum SystemConfigCodes {
     BASE_LIMIT_PAGE_SIZE_MAX("baseLimit:pageSizeMax", "baseLimit最大每页行数", ConfigValueType.INT, "1000", Constants.PID_BASE_LIMIT),
     BASE_LIMIT_TOTAL_ROW_MAX("baseLimit:totalRowMax", "baseLimit最大总行数", ConfigValueType.INT, "10000", Constants.PID_BASE_LIMIT),
     BASE_LIMIT_SEARCH_DATE_DAY_MAX("baseLimit:searchDateDayMax", "baseLimit查询时段最大天数", ConfigValueType.INT, "90", Constants.PID_BASE_LIMIT),
+    BASE_LIMIT_LOG_EXP_TYPE("baseLimit.log.exception.type", "BaseException日志类型(full/simple)2分钟内生效", ConfigValueType.STRING, "simple", Constants.PID_BASE_LIMIT),
+    BASE_LIMIT_LOG_EXP_USER("baseLimit.log.exception.user", "BaseException日志用户(userId)2分钟内生效", ConfigValueType.STRING, "none", Constants.PID_BASE_LIMIT),
 
     /**
      * 分布式锁功能是否启用
