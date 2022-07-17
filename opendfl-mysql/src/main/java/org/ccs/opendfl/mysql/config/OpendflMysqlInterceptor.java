@@ -23,7 +23,7 @@ import javax.annotation.Resource;
  */
 @Configuration
 @Slf4j
-public class DemoInterceptor extends WebMvcConfigurationSupport {
+public class OpendflMysqlInterceptor extends WebMvcConfigurationSupport {
     @Resource(name = "requestLockHandlerInterceptor")
     private HandlerInterceptor requestLockHandlerInterceptor;
 
