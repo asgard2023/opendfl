@@ -63,9 +63,13 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public Object handleException(HttpServletRequest request, Exception ex) {
-        if (ex != null && (ex instanceof HttpRequestMethodNotSupportedException
+        if (ex == null) {
+            logger.error("---handleException method={} \n request={}", request.getMethod(), this.getRequestMap(request), ex);
+            return null;
+        }
+        if (ex instanceof HttpRequestMethodNotSupportedException
                 || ex instanceof HttpMediaTypeNotSupportedException
-                || ex instanceof HttpMediaTypeNotAcceptableException)) {
+                || ex instanceof HttpMediaTypeNotAcceptableException) {
             logger.error("---handleException method={} uri={} error={}", request.getMethod(), request.getRequestURI(), ex.getMessage(), ex);
             ResultData resultData = ResultData.error(new FailedException());
             resultData.setErrorMsg(ex.getMessage());
@@ -73,7 +77,7 @@ public class GlobalExceptionHandler {
         }
 
 
-        String messageError = ex != null ? ex.getMessage() : null;
+        String messageError = ex.getMessage();
         logger.error("---handleException method={} error={} \n request={}", request.getMethod(), messageError, this.getRequestMap(request), ex);
 
         ResultData resultData = ResultData.error(new UnknownException(ex.getMessage()));
@@ -97,6 +101,7 @@ public class GlobalExceptionHandler {
 
 
     private static String logExceptionTypeBase = "simple";
+
     private static String getLogExceptionTypeBase() {
         return logExceptionTypeBase;
     }
