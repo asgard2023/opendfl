@@ -28,8 +28,8 @@ public enum ResultCode {
     USER_CAPTCHA_ERROR("101006", "验证码错误"),
     USER_PASSWORD_INVALID("101007", "密码错误");
 
-    private String code;
-    private String msg;
+    private final String code;
+    private final String msg;
 
     ResultCode(String code, String msg) {
         this.code = code;
