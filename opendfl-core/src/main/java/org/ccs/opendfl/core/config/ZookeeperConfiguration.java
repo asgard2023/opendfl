@@ -40,7 +40,7 @@ public class ZookeeperConfiguration {
                 log.warn("----zkClient--zookeeper.address={} empty disabled", zookeeperProperties.getAddress());
                 return zooKeeper;
             }
-            log.info("----zkClient--zookeeper.address={} invalid", zookeeperProperties.getAddress());
+            log.info("----zkClient--zookeeper.address={}", zookeeperProperties.getAddress());
             final CountDownLatch countDownLatch = new CountDownLatch(1);
             //连接成功后，会回调watcher监听，此连接操作是异步的，执行完new语句后，直接调用后续代码
             //  可指定多台服务地址 127.0.0.1:2181,127.0.0.1:2182,127.0.0.1:2183
@@ -55,7 +55,6 @@ public class ZookeeperConfiguration {
             });
             countDownLatch.await();
             log.info("【初始化ZooKeeper连接状态....】={}", zooKeeper.getState());
-
         } catch (Exception e) {
             log.error("初始化ZooKeeper连接异常....】={}", e);
         }
