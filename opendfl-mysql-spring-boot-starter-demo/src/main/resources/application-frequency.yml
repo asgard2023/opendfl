@@ -1,0 +1,52 @@
+#限制策略
+frequency:
+  redisPrefix: 'limitFreq'
+  ifActive: '1'
+  #启动时每个接口前100次接口调用白名单可输出日志
+  initLogCount: 100
+  #记录慢接口时间(毫秒)，为0关闭此功能
+  minRunTime: 500
+  #接口级用户白名单
+  whiteCodeUsers:
+    #管理员白名单
+    manager: none
+  #全局白名单
+  white:
+    ifDeviceIdRequire: '0'
+    ifOriginRequire: '0'
+    items: 'ip,user,origin,'
+    ips: '192.168.5.101'
+    users: '5101,'
+    origins: 'localhost,'
+  #全局黑名单
+  black:
+    ifDeviceIdRequire: '0'
+    items: 'ip,user,device,'
+    ips: '192.168.5.103'
+    users: '5103,'
+    deviceIds: 'blackDevice123,'
+  #接口限制
+  limit:
+    items: 'limit,limitIp,userIp,ipUser,'
+    #IP限制是否区分功能，如果不区分功能，则缓存有效期相同，以及ip数或用户数共享
+    ipLimitSplitFunction: '0'
+    #间格时间内超限日志，例如>=3600时超限后的每次访问都将记录
+    outLimitLogTime: 3600
+    #基于uri的限制
+    uriConfigs:
+      - uri: /frequencyTest/serverTimeUri
+        method: GET
+        time: 5
+        limit: 8
+        attrName: account
+      - uri: /frequencyTest/serverTimeUri
+        time: 3600
+        limit: 30
+        userIp: 7
+        ipUser: 7
+        attrName: account
+    #基于注解的频率限制
+    frequencyConfigs:
+      - name: serverTimeFreq
+        time: 5
+        limit: 10
