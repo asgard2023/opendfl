@@ -10,12 +10,14 @@
     </parent>
     <groupId>cn.org.opendfl</groupId>
     <artifactId>opendfl-spring-boot-starter</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
     <name>opendfl-spring-boot-starter</name>
     <description>opendfl of spring-boot-starter</description>
 
     <properties>
         <java.version>1.8</java.version>
+
+        <opendfl-core.version>1.1-SNAPSHOT</opendfl-core.version>
     </properties>
 
     <dependencies>
@@ -26,7 +28,7 @@
         <dependency>
             <groupId>cn.org.opendfl</groupId>
             <artifactId>opendfl-core</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${opendfl-core.version}</version>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>cn.org.opendfl</groupId>-->
@@ -65,19 +67,14 @@
     </dependencies>
 
     <distributionManagement>
-        <repository>
-            <id>releases</id>
-            <uniqueVersion>true</uniqueVersion>
-            <name>Internal Release Repository</name>
-            <url>http://builder.jview.cn:8081/repository/maven-releases</url>
-            <!--			<url>http://nexus.skzsb.com/repository/maven-releases</url>-->
-        </repository>
         <snapshotRepository>
-            <id>snapshots</id>
-            <uniqueVersion>true</uniqueVersion>
-            <name>Internal Snapshot Repository</name>
-            <url>http://builder.jview.cn:8081/repository/maven-snapshots</url>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
     </distributionManagement>
 
 </project>
