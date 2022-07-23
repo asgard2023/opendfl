@@ -31,7 +31,6 @@ public class RequestParamsVo implements Cloneable {
     /**
      * 用于提高创建对象的性能
      *
-     * @return
      */
     public static final RequestParamsVo instance = new RequestParamsVo();
 

@@ -29,10 +29,10 @@ public interface IFrequencyDataBiz {
     /**
      * 删除code对应功能的全部限制
      *
-     * @param code @Frequency.name
+     * @param code 编码
      * @param timeList 间格时间5,3600
      * @param account  attrName(默认userId)的值
-     * @return
+     * @return 删除成功对应的key列表
      */
     List<String> freqEvictList(String code, List<Integer> timeList, String account);
 
@@ -41,6 +41,7 @@ public interface IFrequencyDataBiz {
      *
      * @param frequency 对应的频限制
      * @param account   attrName(默认userId)的值
+     * @return 删除成功对应的key
      */
     String freqEvict(FrequencyVo frequency, String account);
 

@@ -20,8 +20,8 @@ public class GetRequestJsonUtil {
     /***
      * 获取 request 中 json 字符串的内容
      *
-     * @param request
-     * @return : byte[]
+     * @param request httpRequest
+     * @return 返回请求json
      * @throws IOException
      */
 
@@ -39,13 +39,9 @@ public class GetRequestJsonUtil {
 
     /**
      * 描述:获取 post 请求的 byte[] 数组
-     * <p>
-     * <p>
-     * <p>
-     * 举例：
      *
-     * @param request
-     * @return
+     * @param request httpRequest
+     * @return 返回post数据
      * @throws IOException
      */
     public static byte[] getRequestPostBytes(HttpServletRequest request)
@@ -70,13 +66,9 @@ public class GetRequestJsonUtil {
 
     /**
      * 描述:获取 post 请求内容
-     * <p>
-     * <p>
-     * <p>
-     * 举例：
      *
-     * @param request
-     * @return
+     * @param request httpRequest
+     * @return 返回post内容
      * @throws IOException
      */
     public static String getRequestPostStr(HttpServletRequest request)

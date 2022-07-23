@@ -173,8 +173,8 @@ public class VerificateBiz implements IVerificateBiz {
     /**
      * 验证码校码
      *
-     * @param clientId
-     * @param verificationCode
+     * @param clientId sessionId
+     * @param verificationCode 验证码
      */
     @Override
     public void checkVerificationCode(String clientId, String verificationCode) {

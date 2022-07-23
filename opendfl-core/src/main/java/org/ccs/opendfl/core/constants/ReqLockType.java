@@ -2,6 +2,7 @@ package org.ccs.opendfl.core.constants;
 
 /**
  * 分布式锁类型
+ *
  * @author chenjh
  */
 public enum ReqLockType {
@@ -19,25 +20,27 @@ public enum ReqLockType {
     ETCD_LOCK("etcdLock", DataSourceType.ETCD.getType()),
     /**
      * ETCD分布式锁，异步模式，暂时觉得没有必要，未实现
-     * @Deprecated
+     *
+     * @deprecated
      */
     ETCD_ASYNC("etcdAsync", DataSourceType.ETCD.getType()),
     /**
      * zk分布式锁，ifAbsent已存在时快速失败
      */
     ZK("zk", DataSourceType.ZK.getType());
-    private String type;
-    private String source;
-    ReqLockType(String type, String source){
+    private final String type;
+    private final String source;
+
+    ReqLockType(String type, String source) {
         this.type = type;
         this.source = source;
     }
 
-    public String getType(){
+    public String getType() {
         return this.type;
     }
 
-    public String getSource(){
+    public String getSource() {
         return this.source;
     }
 }

@@ -67,8 +67,9 @@ public class MaxRunTimeRedisBiz implements IMaxRunTimeBiz {
     /**
      * 找出当前second时间内执行最慢的近count个接口
      *
-     * @param second 秒
-     * @return
+     * @param second 时间单位秒
+     * @param count 查询szet的前count个数
+     * @return 返回最大运行时间接口
      */
     @Override
     public List<MaxRunTimeVo> getNewlyMaxRunTime(Integer second, Integer count) {
@@ -79,8 +80,10 @@ public class MaxRunTimeRedisBiz implements IMaxRunTimeBiz {
     /**
      * 找出second时间内执行最慢的近count个接口
      *
-     * @param second 秒
-     * @return
+     * @param dateTime 一般传当前时间curTime
+     * @param second 时间单位秒
+     * @param count 查询szet的前count个数
+     * @return 返回最大运行时间接口
      */
     @Override
     public List<MaxRunTimeVo> getNewlyMaxRunTime(Long dateTime, Integer second, Integer count) {

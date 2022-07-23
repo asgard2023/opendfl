@@ -2,14 +2,13 @@ package org.ccs.opendfl.core.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IFrequencyDataBiz;
-import org.ccs.opendfl.core.exception.ParamErrorException;
+import org.ccs.opendfl.core.captcha.biz.IVerificateBiz;
+import org.ccs.opendfl.core.captcha.constant.CaptchaType;
 import org.ccs.opendfl.core.exception.ParamNullException;
 import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.utils.RequestParams;
 import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.utils.StringUtils;
-import org.ccs.opendfl.core.captcha.biz.IVerificateBiz;
-import org.ccs.opendfl.core.captcha.constant.CaptchaType;
 import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +17,10 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -32,6 +34,12 @@ public class FrequencyResetController {
 
     /**
      * 图形验证码
+     *
+     * @param request  httpRequest
+     * @param clientId sessionId
+     * @param response httpResponse
+     * @param type     功能类型
+     * @throws Exception 异常
      */
     @RequestMapping(value = "/imageCaptcha", method = {RequestMethod.GET, RequestMethod.POST})
     public void getImageCaptcha(HttpServletRequest request, HttpServletResponse response
@@ -43,7 +51,7 @@ public class FrequencyResetController {
 
         CaptchaType captchaType = CaptchaType.parse(type);
         if (captchaType == null) {
-            captchaType=CaptchaType.randomType();
+            captchaType = CaptchaType.randomType();
         }
         try {
             // 设置响应的类型格式为图片格式
@@ -59,6 +67,16 @@ public class FrequencyResetController {
         }
     }
 
+    /**
+     * 重置频率限制
+     *
+     * @param request    httpRequest
+     * @param clientId   sessionId
+     * @param type       功能类型
+     * @param funcCode   功能编码
+     * @param verifyCode 验证码值
+     * @return 返回结果
+     */
     @RequestMapping(value = "/resetLimits", method = {RequestMethod.GET, RequestMethod.POST})
     public ResultData resetLimits(HttpServletRequest request
             , @RequestParam(value = "clientId", required = false) String clientId
@@ -77,21 +95,20 @@ public class FrequencyResetController {
 
 
         //查出用户所有的限制
-        List<FrequencyVo> list=frequencyDataBiz.limitUsers(userId);
+        List<FrequencyVo> list = frequencyDataBiz.limitUsers(userId);
         List<String> limitInfoList = new ArrayList<>();
-        if(StringUtils.isNotBlank(frequency.getName())) {
+        if (StringUtils.isNotBlank(frequency.getName())) {
             String evictKey = frequencyDataBiz.freqIpUserEvict(frequency, ip);
             limitInfoList.add(evictKey);
             //找出name对应的限制时间
-            List<Integer> timeList = list.stream().filter(t->t.getName().equals(frequency.getName())).map(FrequencyVo::getTime).distinct().collect(Collectors.toList());
+            List<Integer> timeList = list.stream().filter(t -> t.getName().equals(frequency.getName())).map(FrequencyVo::getTime).distinct().collect(Collectors.toList());
             log.info("----resetLimits--name={} time={} userId={}", frequency.getName(), timeList, userId);
             List<String> infoList = frequencyDataBiz.freqEvictList(frequency.getName(), timeList, userId);
             limitInfoList.addAll(infoList);
             evictKey = frequencyDataBiz.freqUserIpEvict(frequency, userId);
             limitInfoList.add(evictKey);
-        }
-        else{
-            for(FrequencyVo frequencyVo:list){
+        } else {
+            for (FrequencyVo frequencyVo : list) {
                 String evictKey = frequencyDataBiz.freqIpUserEvict(frequencyVo, ip);
                 limitInfoList.add(evictKey);
                 List<Integer> timeList = list.stream().map(FrequencyVo::getTime).distinct().collect(Collectors.toList());
@@ -108,10 +125,14 @@ public class FrequencyResetController {
 
     /**
      * 用于支持在页面显示图片验证码，而不是后台生成
+     *
+     * @param request  httpRequest
+     * @param clientId sessionId
+     * @return 验证码信息
      */
     @RequestMapping(value = "captchaCode", method = {RequestMethod.GET, RequestMethod.POST})
-    public ResultData getImageCaptchaCode(HttpServletRequest request) {
-        String clientId = request.getParameter("clientId");
+    public ResultData getImageCaptchaCode(HttpServletRequest request
+            , @RequestParam(value = "clientId", required = false) String clientId) {
         if (StringUtils.isEmpty(clientId)) {
             throw new ParamNullException("clientId is null");
         }

@@ -22,11 +22,11 @@ public class AnnotationClassUtils {
     /**
      * 增加扫描到的class类
      *
+     * @param packageName 包名
+     * @param packagePath 包地址
+     * @param recursive   是否递归
+     * @param classes     类信息
      * @author chenjh
-     * 异常对象:@param packageName
-     * 异常对象:@param packagePath
-     * 异常对象:@param recursive
-     * 异常对象:@param classes
      */
     public static void findAndAddClassesInPackageByFile(String packageName, String packagePath, final boolean recursive, List<Class<?>> classes) {
         //获取此包的目录 建立一个File
@@ -64,19 +64,19 @@ public class AnnotationClassUtils {
         }
     }
 
-    private static final String CLASSES_PATH_STR="/classes/";
+    private static final String CLASSES_PATH_STR = "/classes/";
 
     /**
      * 从jar包中扫码注解类
      *
-     * @param jarEntries
-     * @param packageName
-     * @param isRecursion
-     * @return
+     * @param jarEntries  jar包
+     * @param packageName 包名
+     * @param isRecursion 是否递归
+     * @return 找到的类型
      */
     private static List<Class<?>> getClassFromJar(Enumeration<JarEntry> jarEntries, String packageName, boolean isRecursion) {
         List<Class<?>> classList = new ArrayList<>();
-        final String CLASS_STR=".class";
+        final String CLASS_STR = ".class";
         while (jarEntries.hasMoreElements()) {
             JarEntry jarEntry = jarEntries.nextElement();
             if (!jarEntry.isDirectory()) {
@@ -139,8 +139,11 @@ public class AnnotationClassUtils {
     /**
      * 支持从war中读jar的class: xxx/opendfl-mysql-1.0-SNAPSHOT.war!/WEB-INF/lib/xxx.jar
      *
-     * @param jarPath
-     * @return List<Class>
+     * @param jarPath       jqr包路径
+     * @param pkgName       包名
+     * @param checkPathList 检查path
+     * @param isRecursion   是否递归
+     * @return 类型信息
      * @author chenjh
      */
     public static List<Class<?>> getClassFromWarJar(String jarPath, String pkgName, List<String> checkPathList, boolean isRecursion) {

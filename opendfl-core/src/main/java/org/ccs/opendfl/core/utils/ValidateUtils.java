@@ -28,9 +28,9 @@ public class ValidateUtils {
     /**
      * 验证参数不能为空
      *
-     * @param value
-     * @param msg
-     * @throws BaseException
+     * @param value 检查对象
+     * @param msg   异常消息
+     * @throws BaseException 异常
      */
     public static void notNull(Object value, String msg) throws BaseException {
         if (value == null || value.toString().trim().length() == 0) {
@@ -42,9 +42,9 @@ public class ValidateUtils {
     /**
      * 这个方法主要是为编码时期出错提示的，非业务错误提示
      *
-     * @param value
-     * @param fieldName
-     * @throws BaseException
+     * @param value     检查对象
+     * @param fieldName 属性名
+     * @throws BaseException 异常
      */
     public static void notNullForCoding(Object value, String fieldName) throws BaseException {
         if (value == null || value.toString().trim().length() == 0) {
@@ -55,9 +55,9 @@ public class ValidateUtils {
     /**
      * 这个方法主要是为编码时期出错提示的，非业务错误提示
      *
-     * @param list
-     * @param fieldName
-     * @throws BaseException
+     * @param list      查检对象
+     * @param fieldName 属性名
+     * @throws BaseException 异常
      */
     public static void notNullForCoding(Collection<?> list, String fieldName) throws BaseException {
         if (CollectionUtils.isEmpty(list)) {
@@ -68,11 +68,11 @@ public class ValidateUtils {
     /**
      * 参证参数必须合理
      *
-     * @param value
-     * @param msg
+     * @param value  查检对象
+     * @param msg    异常消息
      * @param values 多个值用英文“,”隔开
-     * @throws BaseException
-     * @Deprecated
+     * @throws BaseException 异常
+     * @deprecated
      */
     public static void mustIn(Object value, String msg, String values) throws BaseException {
         if (StringUtils.isEmpty(values)) {
@@ -87,10 +87,10 @@ public class ValidateUtils {
     /**
      * 参证参数必须合理
      *
-     * @param value
-     * @param fieldName
+     * @param value     查检对象
+     * @param fieldName 属性名
      * @param values    数组
-     * @throws BaseException
+     * @throws BaseException 异常
      */
     public static void mustIn(Object value, String fieldName, String... values) throws BaseException {
         if (StringUtils.isBlank(fieldName)) {
@@ -116,9 +116,9 @@ public class ValidateUtils {
     /**
      * 验证最大长度，为空也算验证通过
      *
-     * @param value
-     * @param maxLen
-     * @param msg
+     * @param value  查检对象
+     * @param maxLen 最大长度
+     * @param msg    异常消息
      * @throws BaseException
      */
     public static void maxLen(Object value, int maxLen, String msg) throws BaseException {
@@ -131,9 +131,9 @@ public class ValidateUtils {
     /**
      * 验证最小长度，为空会失败
      *
-     * @param value
-     * @param minLen
-     * @param msg
+     * @param value  查检对象
+     * @param minLen 最短长度
+     * @param msg    异常消息
      * @throws BaseException
      */
     public static void minLen(Object value, int minLen, String msg) throws BaseException {
@@ -146,9 +146,9 @@ public class ValidateUtils {
     /**
      * 验证最大值整数，为空也算验证通过
      *
-     * @param value
-     * @param maxVal
-     * @param msg
+     * @param value  查检对象
+     * @param maxVal 最大值
+     * @param msg    异常消息
      * @throws BaseException
      */
     public static void maxIntegerVal(Integer value, int maxVal, String msg) throws BaseException {
@@ -160,10 +160,10 @@ public class ValidateUtils {
     /**
      * 验证最小值整数，为空验证不通过
      *
-     * @param value
-     * @param minVal
-     * @param msg
-     * @throws BaseException
+     * @param value  查检对象
+     * @param minVal 最小值
+     * @param msg    异常消息
+     * @throws BaseException 异常
      */
     public static void minIntegerVal(Integer value, int minVal, String msg) throws BaseException {
         if (value == null || value.intValue() < minVal) {
@@ -174,10 +174,10 @@ public class ValidateUtils {
     /**
      * 验证最小值整数，为空也验证不通过
      *
-     * @param value
-     * @param minVal
-     * @param msg
-     * @throws BaseException
+     * @param value  查检对象
+     * @param minVal 最小值
+     * @param msg    异常消息
+     * @throws BaseException 异常
      */
     public static void minDoubleVal(Double value, int minVal, String msg) throws BaseException {
         if (value == null || value.doubleValue() < minVal) {
@@ -188,10 +188,10 @@ public class ValidateUtils {
     /**
      * 正则表达式验证，如果字符串为空直接验证失败
      *
-     * @param value
-     * @param regStr
-     * @param msg
-     * @throws BaseException
+     * @param value  查检对象
+     * @param regStr 表达式
+     * @param msg    异常消息
+     * @throws BaseException 异常
      */
     public static void regStr(String value, String regStr, String msg) throws BaseException {
         if (value == null || !value.matches(regStr)) {
@@ -203,22 +203,22 @@ public class ValidateUtils {
     /**
      * 检查天数
      *
-     * @param params
+     * @param params      map参数
      * @param noDayLimits 如果这些参数有值，就不限制天数条件
-     * @throws Exception
+     * @throws BaseException 异常
      */
     public static void checkTimeDateLimit(Map<String, Object> params, String noDayLimits) throws BaseException {
-        int limitDay=opendflConfiguration.getBaseLimit().getSearchDateMaxDay();
+        int limitDay = opendflConfiguration.getBaseLimit().getSearchDateMaxDay();
         checkTimeDateLimit(params, noDayLimits, limitDay, 0);
     }
 
     /**
      * 检查天数
      *
-     * @param params
+     * @param params      map参数
      * @param noDayLimits 如果这些参数有值，就不限制天数条件
      * @param limitDay    天数限制
-     * @throws Exception
+     * @throws BaseException 异常
      */
     public static void checkTimeDateLimit(Map<String, Object> params, String noDayLimits, int limitDay) throws BaseException {
         checkTimeDateLimit(params, noDayLimits, limitDay, 0);
@@ -239,10 +239,10 @@ public class ValidateUtils {
     /**
      * 检查天数
      *
-     * @param params
+     * @param params      map参数
      * @param noDayLimits 如果这些参数有值，就不限制天数条件
      * @param limitDay    天数限制
-     * @throws Exception
+     * @throws BaseException 异常
      */
     public static void checkTimeDateLimit(Map<String, Object> params, String noDayLimits, int limitDay, int limitUserDay) throws BaseException {
         boolean isParamValue = false;
@@ -295,9 +295,8 @@ public class ValidateUtils {
             if (endTimeDate == null) {
                 throw new FailedException("结束时间无效");
             }
-        }
-        else{
-            endTimeDate=new Date();
+        } else {
+            endTimeDate = new Date();
         }
         if (isParamValue && limitUserDay > 0) {
             checkDayLimit(limitUserDay, startTimeDate, endTimeDate);
@@ -340,9 +339,8 @@ public class ValidateUtils {
     /**
      * 初始化查询分页对象
      *
-     * @param params
-     * @return
-     * @throws BaseException
+     * @param params map参数
+     * @throws BaseException 异常
      */
     public static void validPageCount(Map<String, Object> params) throws BaseException {
         Object pageNumObj = params.get("pageNum");

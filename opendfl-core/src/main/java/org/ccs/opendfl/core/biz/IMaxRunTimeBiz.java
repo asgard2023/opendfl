@@ -22,10 +22,17 @@ public interface IMaxRunTimeBiz {
     /**
      * 找出second时间内执行最慢的近count个接口
      * @param second 时间单位秒
-     * @param count 接口个数
-     * @return
+     * @param count 查询szet的前count个数
+     * @return 返回最大运行时间接口
      */
     List<MaxRunTimeVo> getNewlyMaxRunTime(Integer second, Integer count);
 
+    /**
+     * 最近运行时间
+     * @param dateTime 一般传当前时间curTime
+     * @param second 时间单位秒
+     * @param count 查询szet的前count个数
+     * @return 返回最大运行时间接口
+     */
     List<MaxRunTimeVo> getNewlyMaxRunTime(Long dateTime, Integer second, Integer count);
 }

@@ -30,7 +30,7 @@ public class FrequencyVo {
 
     /**
      * 用于提高创建对象的性能
-     * @return FrequencyVo
+     * @return 得先用户缓存队解（instance）
      */
     public static FrequencyVo newInstance(){
         return new FrequencyVo();
@@ -83,9 +83,9 @@ public class FrequencyVo {
 
     /**
      *
-     * @param frequency
+     * @param frequency 频率限制
      * @param vo 复用已有对象
-     * @return FrequencyVo
+     * @return 转vo对应
      */
     public static FrequencyVo toFrequencyVo(Frequency2 frequency, FrequencyVo vo){
         if(frequency==null){
@@ -110,9 +110,9 @@ public class FrequencyVo {
 
     /**
      *
-     * @param frequency
+     * @param frequency 频率限制
      * @param vo 复用已有对象
-     * @return FrequencyVo
+     * @return 转vo对应
      */
     public static FrequencyVo toFrequencyVo(Frequency3 frequency, FrequencyVo vo){
         if(frequency==null){
@@ -137,9 +137,9 @@ public class FrequencyVo {
 
     /**
      *
-     * @param frequency
+     * @param frequency 频率限制
      * @param vo 复用已有对象
-     * @return FrequencyVo
+     * @return 转vo对应
      */
     public static FrequencyVo toFrequencyVo(Frequency4 frequency, FrequencyVo vo){
         if(frequency==null){
@@ -164,9 +164,9 @@ public class FrequencyVo {
 
     /**
      *
-     * @param frequency
+     * @param frequency 频率限制
      * @param vo 复用已有对象
-     * @return FrequencyVo
+     * @return 转vo对应
      */
     public static FrequencyVo toFrequencyVo(Frequency5 frequency, FrequencyVo vo){
         if(frequency==null){

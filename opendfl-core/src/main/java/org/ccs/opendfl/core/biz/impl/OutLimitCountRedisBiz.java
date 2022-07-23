@@ -158,7 +158,8 @@ public class OutLimitCountRedisBiz implements IOutLimitCountBiz {
 
     /**
      * 找出当前second时间内执行次数最多的前count个接口
-     *
+     * @param type 黑白名单类型
+     * @param count 取zset的前count个
      * @return list
      */
     @Override
@@ -169,6 +170,7 @@ public class OutLimitCountRedisBiz implements IOutLimitCountBiz {
 
     /**
      * 找出当前second时间内执行次数最多的前count个接口
+     * @param count 取zset的前count个
      *
      * @return list
      */

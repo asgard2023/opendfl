@@ -28,7 +28,7 @@ public class WhiteBlackListBiz implements IWhiteBlackListBiz {
     /**
      * 全局黑名单
      *
-     * @return WhiteBlackConfigVo
+     * @return 黑名单配置
      */
     @Override
     public WhiteBlackConfigVo getBlackConfig() {
@@ -38,7 +38,7 @@ public class WhiteBlackListBiz implements IWhiteBlackListBiz {
     /**
      * 全局白名单
      *
-     * @return WhiteBlackConfigVo
+     * @return 白名单配置
      */
     @Override
     public WhiteBlackConfigVo getWhiteConfig() {
@@ -48,7 +48,7 @@ public class WhiteBlackListBiz implements IWhiteBlackListBiz {
     /**
      * 功能用户白名单
      *
-     * @return Map<String, String> whiteCode: users
+     * @return 白名单用户
      */
     @Override
     public Map<String, String> getWhiteCodeUsers() {

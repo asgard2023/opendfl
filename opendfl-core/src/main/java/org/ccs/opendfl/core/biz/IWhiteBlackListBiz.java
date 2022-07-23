@@ -25,7 +25,7 @@ public interface IWhiteBlackListBiz {
 
     /**
      * 功能用户白名单
-     * @return Map<String, String>
+     * @return 白名单用户
      */
     Map<String, String> getWhiteCodeUsers();
 }

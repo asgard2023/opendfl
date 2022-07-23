@@ -1,10 +1,14 @@
 package org.ccs.opendfl.core.utils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * 常用工具类型
+ *
+ * @author chenjh
+ */
 public final class CommUtils {
     private CommUtils() {
 
@@ -13,6 +17,8 @@ public final class CommUtils {
     /**
      * 以ch字符开头
      *
+     * @param str 字符串
+     * @param ch  要检查的字符
      * @return true/false
      */
     public static boolean startWithChar(String str, char ch) {
@@ -25,6 +31,8 @@ public final class CommUtils {
     /**
      * 以ch字符结尾
      *
+     * @param str 字符串
+     * @param ch  要检查的字符
      * @return true/false
      */
     public static boolean endWithChar(String str, char ch) {
@@ -41,9 +49,12 @@ public final class CommUtils {
         if (path == null) {
             path = "";
         }
-        if (CommUtils.endWithChar(url, '/') && CommUtils.startWithChar(path, '/')) {//相当于startsWith
+        //相当于startsWith
+        if (CommUtils.endWithChar(url, '/') && CommUtils.startWithChar(path, '/')) {
             return url + path.substring(1);
-        } else if (CommUtils.endWithChar(url, '/') || CommUtils.startWithChar(path, '/')) {//相当于startsWith
+        }
+        //相当于startsWith
+        else if (CommUtils.endWithChar(url, '/') || CommUtils.startWithChar(path, '/')) {
             return url + path;
         }
 
@@ -62,9 +73,9 @@ public final class CommUtils {
     /**
      * 取数据前maxLength位
      *
-     * @param str
-     * @param maxLength
-     * @return
+     * @param str       字符
+     * @param maxLength 最多取的字符个数
+     * @return 截取后的字符
      */
     public static String getStringLimit(String str, int maxLength) {
         return str != null && str.length() > maxLength ? str.substring(0, maxLength) : str;
@@ -89,7 +100,8 @@ public final class CommUtils {
 
         StringBuilder sb = new StringBuilder();
         for (Object obj : list) {
-            sb.append(obj + splitChar);
+            sb.append(obj);
+            sb.append(splitChar);
         }
 
         String str = sb.toString();
@@ -129,8 +141,8 @@ public final class CommUtils {
     /**
      * 去除尾部逗号
      *
-     * @param str
-     * @return
+     * @param str 字符串
+     * @return 新字符串
      */
     public static String removeEndComma(String str) {
         if (str.endsWith(",")) {
@@ -142,8 +154,8 @@ public final class CommUtils {
     /**
      * 去除开头逗号
      *
-     * @param str
-     * @return
+     * @param str 字符串
+     * @return 新字符串
      */
     public static String removeStartComma(String str) {
         if (str.startsWith(",")) {
@@ -181,20 +193,20 @@ public final class CommUtils {
 
     /**
      * 取网址的域名或IP
-     * @param url
-     * @return
+     *
+     * @param url 网址
+     * @return 域名或ip
      */
-    public static String getDomain(String url){
-        if(url==null){
+    public static String getDomain(String url) {
+        if (url == null) {
             return null;
         }
-        url=ignoreHttp(url);
+        url = ignoreHttp(url);
         //忽略端口号
         if (url.indexOf(':') > 0) {
             url = url.substring(0, url.indexOf(':'));
-        }
-        else{
-            if(url.indexOf('/')>0){
+        } else {
+            if (url.indexOf('/') > 0) {
                 url = url.substring(0, url.indexOf('/'));
             }
         }

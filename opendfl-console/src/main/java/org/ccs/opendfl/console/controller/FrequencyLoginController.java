@@ -2,7 +2,6 @@ package org.ccs.opendfl.console.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.console.biz.IFrequencyLoginBiz;
-import org.ccs.opendfl.console.config.ConsoleConfiguration;
 import org.ccs.opendfl.console.config.vo.UserVo;
 import org.ccs.opendfl.console.vo.LoginVo;
 import org.ccs.opendfl.core.biz.IRsaBiz;
@@ -36,8 +35,6 @@ public class FrequencyLoginController {
 
     @Resource(name = "frequencyLoginRedisBiz")
     private IFrequencyLoginBiz frequencyLoginBiz;
-    @Autowired
-    private ConsoleConfiguration consoleConfiguration;
 
     @GetMapping("/login")
     public String getlogin() {
@@ -85,7 +82,7 @@ public class FrequencyLoginController {
      *
      * @param user        登入对象
      * @param clientIdRsa clientIdRsa
-     * @return ResultData
+     * @return 返回登入数据
      */
     @PostMapping("/login")
     @Frequency(time = 5, limit = 4, name = "frequencyLogin", attrName = "username")

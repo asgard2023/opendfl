@@ -17,10 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 公钥、密钥生成和校验
  * @author p7
- * @ClassName: RSAUtils
- * @Description: 公钥、密钥生成和校验
- * @date 2018年2月2日 下午3:57:14
  **/
 public class RSAUtils {
     private RSAUtils() {
@@ -40,7 +38,7 @@ public class RSAUtils {
     /**
      * 生成公钥和私钥
      *
-     * @throws NoSuchAlgorithmException
+     * @throws NoSuchAlgorithmException 异常
      */
     public static Map<String, Object> getKeys() throws NoSuchAlgorithmException {
         HashMap<String, Object> map = new HashMap<>();
@@ -60,7 +58,7 @@ public class RSAUtils {
      *
      * @param modulus  模
      * @param exponent 指数
-     * @return
+     * @return 公钥key
      */
     public static RSAPublicKey getPublicKey(String modulus, String exponent) {
         try {
@@ -83,7 +81,7 @@ public class RSAUtils {
      *
      * @param modulus  模
      * @param exponent 指数
-     * @return
+     * @return 私钥key
      */
     public static RSAPrivateKey getPrivateKey(String modulus, String exponent) {
         try {
@@ -102,10 +100,10 @@ public class RSAUtils {
     /**
      * 公钥加密
      *
-     * @param data
-     * @param publicKey
-     * @return
-     * @throws Exception
+     * @param data 数据
+     * @param publicKey 公钥
+     * @return 加密公钥key
+     * @throws Exception 异常
      */
     public static String encryptByPublicKey(String data, RSAPublicKey publicKey) throws Exception {
         Cipher cipher = Cipher.getInstance("RSA", new org.bouncycastle.jce.provider.BouncyCastleProvider());
@@ -125,10 +123,10 @@ public class RSAUtils {
     /**
      * 私钥解密
      *
-     * @param data
-     * @param privateKey
-     * @return
-     * @throws Exception
+     * @param data 数据
+     * @param privateKey 私钥
+     * @return 私钥解密
+     * @throws Exception 异常
      */
     public static String decryptByPrivateKey(String data, RSAPrivateKey privateKey) throws Exception {
         Cipher cipher = Cipher.getInstance("RSA", new org.bouncycastle.jce.provider.BouncyCastleProvider());
@@ -148,6 +146,8 @@ public class RSAUtils {
 
     /**
      * ASCII码转BCD码
+     * @param ascii ascii字节流
+     * @param ascLen 长度
      */
     public static byte[] asciiToBCD(byte[] ascii, int ascLen) {
         byte[] bcd = new byte[ascLen / 2];
@@ -214,6 +214,9 @@ public class RSAUtils {
 
     /**
      * 拆分数组
+     * @param data 数据
+     * @param len 长度
+     * @return 数组
      */
     public static byte[][] splitArray(byte[] data, int len) {
         int x = data.length / len;

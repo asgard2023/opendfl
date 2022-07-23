@@ -22,30 +22,33 @@ public interface IRunCountBiz {
 
     /**
      * 获取每个类型下的接口统计数量
-     * @param curTime
-     * @return
+     * @param curTime 当前时间
+     * @return 每个类型的对应curTime有调用的接口数
      */
-    public Map<String, Integer> getTypeUriCount(Long curTime);
+    Map<String, Integer> getTypeUriCount(Long curTime);
 
     /**
      * 查出有运行记录的天，用于下拉框选择
-     * @return
+     * @return 近期有调用的天数选择
      */
-    public List<ComboxItemVo> getRunDays();
+    List<ComboxItemVo> getRunDays();
 
-    public List<ComboxItemVo> getRunCountTypeByDay(Integer day);
+    List<ComboxItemVo> getRunCountTypeByDay(Integer day);
 
     /**
      * 找出当前second时间内执行次数最多的前count个接口
-     *
-     * @return list
+     * @param type 接口调用次数类型
+     * @param count 查询前count个
+     * @return 调用次数
      */
     List<RunCountVo> getNewlyRunCount(RunCountType type, Integer count);
 
     /**
      * 找出当前second时间内执行次数最多的前count个接口
-     *
-     * @return list
+     * @param type 接口调用次数类型
+     * @param dateTime 查询天对应的时间戳
+     * @param count 查询前count个
+     * @return 调用次数
      */
     List<RunCountVo> getNewlyRunCount(RunCountType type, Long dateTime, Integer count);
 }

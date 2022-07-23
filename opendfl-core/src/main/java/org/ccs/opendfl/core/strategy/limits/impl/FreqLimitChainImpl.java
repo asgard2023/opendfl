@@ -73,7 +73,7 @@ public class FreqLimitChainImpl implements FreqLimitChain {
     /**
      * 按limitItems过滤及重新排序
      *
-     * @param limitItems
+     * @param limitItems 规则策略
      */
     @Override
     public void sortStrategies(String limitItems) {

@@ -24,8 +24,9 @@ public class RedisTemplateUtil {
     /**
      * 不能用于含有大量redisKey的数据集处理，比如含userId，那样会造成缓存暴增
      *
-     * @param redisKey String
-     * @param hour 过期时间
+     * @param redisTemplate redisTemplate
+     * @param redisKey      String
+     * @param hour          过期时间
      */
     public static void expireTimeHashCache(RedisTemplate<String, Object> redisTemplate, String redisKey, int hour) {
         if (redisKeyMap.getIfPresent(redisKey) == null) {
@@ -47,12 +48,16 @@ public class RedisTemplateUtil {
     /**
      * 频率限制1小时专用
      * 主要用于避免服务重启造成部份key变成永久key
-     * @param redisKey
+     *
+     * @param redisTemplate redisTemplate
+     * @param redisKey      key
+     * @param time          时间
+     * @param v             访问次数
      */
-    public static void expireTimeHashFrequencyCache(RedisTemplate<String, Object> redisTemplate, String redisKey, int time, long v){
+    public static void expireTimeHashFrequencyCache(RedisTemplate<String, Object> redisTemplate, String redisKey, int time, long v) {
         //time>60以及访问次数>=3检查一下是否永久key
         //time<=60秒的也忽略，就让用户多等一下
-        if(time>60 && v<4) {
+        if (time > 60 && v < 4) {
             if (redisKeyHourMap.getIfPresent(redisKey) == null) {
                 redisKeyHourMap.put(redisKey, System.currentTimeMillis());
                 expireTimeTTL(redisTemplate, redisKey, 3600);

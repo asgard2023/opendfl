@@ -42,7 +42,7 @@ public class RequestUtils {
      * 获取请求参数    不加解密
      *
      * @param request HttpServletRequest
-     * @return Map<String, Object>
+     * @return 参数map
      */
     public static Map<String, Object> getParamsObject(HttpServletRequest request) throws BaseException {
         Map<String, String[]> requestParams = request.getParameterMap();
@@ -162,8 +162,9 @@ public class RequestUtils {
     /**
      * 封装一层，主要抛出参数为空的异常
      *
-     * @param params Map<String, Object>
-     * @return String
+     * @param params map参数
+     * @param key 参数key
+     * @return String 参数值
      */
     public static String getStringFromMap(Map<String, Object> params, String key) throws BaseException {
         if (params == null) {
@@ -177,9 +178,9 @@ public class RequestUtils {
     /**
      * 从Map里取Double数据
      *
-     * @param params Map<String, Object>
-     * @param key    String
-     * @return double
+     * @param params map参数
+     * @param key    参数key
+     * @return double参数
      */
     public static double getDoubleFromMap(Map<String, Object> params, String key) throws BaseException {
         String value = getStringFromMap(params, key);

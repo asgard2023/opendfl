@@ -52,7 +52,7 @@ public class FrequencyTestController {
      * @param request HttpServletRequest
      * @param second  单位秒
      * @param count   接口个数
-     * @return
+     * @return 测试数据
      */
     @GetMapping("/monitor")
     public ResultData monitor(HttpServletRequest request, @RequestParam(name = "second", defaultValue = "30") Integer second
@@ -157,6 +157,7 @@ public class FrequencyTestController {
      *
      * @param request HttpServletRequest
      * @return current time
+     * @throws Exception 异常
      */
     @PostMapping("/serverTimeStreamFreq")
     @Frequency(time = 5, limit = 5, name = "serverTimeStreamFreq")
@@ -180,6 +181,7 @@ public class FrequencyTestController {
     private Integer getSleepTimeIfNull(Integer sleepTime) {
         return getSleepTimeIfNull(sleepTime, 1);
     }
+
     private Integer getSleepTimeIfNull(Integer sleepTime, Integer defaultValue) {
         int maxSleepTime = 100;
         if (sleepTime == null || sleepTime > maxSleepTime) {
@@ -192,6 +194,8 @@ public class FrequencyTestController {
      * 分布式锁测试，按用户，该用户前面请求未完成，再次请求全部拒绝
      *
      * @param sleepTime 测试线程 休睡时间(秒)
+     * @param sleepTime 休眼时间秒数
+     * @param request   HttpServletRequest
      * @return currentTime
      */
     @GetMapping("/waitLockTestUser")
@@ -207,6 +211,7 @@ public class FrequencyTestController {
      * 分布式锁测试，按用户，按oderId的分布式锁，只能一个请求能处理，其他全部拒绝
      *
      * @param sleepTime 测试线程 休睡时间(秒)
+     * @param request   HttpServletRequest
      * @return currentTime
      */
     @GetMapping("/waitLockTestOrder")
@@ -230,7 +235,7 @@ public class FrequencyTestController {
     private void sleepByTime(Integer sleepTime) {
         sleepTime = getSleepTimeIfNull(sleepTime, 0);
         try {
-            if(sleepTime >0) {
+            if (sleepTime > 0) {
                 Thread.sleep(sleepTime * FrequencyConstant.TIME_MILLISECOND_TO_SECOND);
             }
         } catch (InterruptedException e) {
