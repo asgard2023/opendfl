@@ -35,6 +35,14 @@
 ## 完整路线图(<img src="https://opendfl-1259373829.file.myqcloud.com/doc/ok.webp" width="6%" syt height="6%" />表示已完成，红色字体表示计划中)
 <img src="https://opendfl-1259373829.file.myqcloud.com/doc/opendfl_roadmap8.png" width="80%" syt height="80%" />
 
+## maven引入方法
+```xml
+<dependency>
+    <groupId>cn.org.opendfl</groupId>
+    <artifactId>opendfl-mysql-spring-boot-starter</artifactId>
+    <version>1.0</version>
+</dependency>
+```
 
 ## 简单使用：
 
