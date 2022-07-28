@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ccs.opendfl.core.constants.CacheTimeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
@@ -26,9 +28,16 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * redis配置
+ *
+ * @author chenjh
+ */
 @Configuration
 @EnableCaching
 @Component("redisConfiguration")
+@EnableConfigurationProperties({OpendflConfiguration.class})
+@ConditionalOnProperty(value = "opendfl.redisCacheEnable", havingValue = "1")
 public class RedisConfiguration extends CachingConfigurerSupport {
     public static final Logger logger = LoggerFactory.getLogger(RedisConfiguration.class);
 

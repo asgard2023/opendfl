@@ -19,6 +19,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import javax.annotation.Resource;
 
 /**
+ * opoendfl for mysql
+ *
  * @author chenjh
  */
 @Configuration
