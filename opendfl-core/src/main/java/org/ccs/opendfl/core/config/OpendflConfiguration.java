@@ -16,10 +16,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpendflConfiguration {
     /**
-     * 支持关闭这个服务的Redis配置，由外其他类提供
-     */
-    private String redisCacheEnable="1";
-    /**
      * 默认attrName
      */
     private String defaultAttrName="userId";

@@ -36,8 +36,8 @@ import java.util.Map;
 @Configuration
 @EnableCaching
 @Component("redisConfiguration")
-@EnableConfigurationProperties({OpendflConfiguration.class})
-@ConditionalOnProperty(value = "opendfl.redisCacheEnable", havingValue = "1")
+@EnableConfigurationProperties({StarterConfiguration.class})
+@ConditionalOnProperty(value = "starter.redisCacheEnable", havingValue = "1")
 public class RedisConfiguration extends CachingConfigurerSupport {
     public static final Logger logger = LoggerFactory.getLogger(RedisConfiguration.class);
 

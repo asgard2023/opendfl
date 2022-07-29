@@ -1,6 +1,4 @@
 opendfl:
-  #支持关闭这个服务的Redis配置，由外其他类提供
-  redisCacheEnable: 1
   defaultAttrName: userId
   defaultDeviceId: device_id
   baseLimit:

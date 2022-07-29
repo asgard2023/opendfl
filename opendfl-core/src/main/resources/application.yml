@@ -3,6 +3,10 @@ info:
     name: OpenDFL Open Ddstributed frequency limitation
     version: 0.1
 
+starter:
+  #支持关闭这个服务的Redis配置，由外其他类提供
+  redisCacheEnable: 1
+
 spring:
   profiles:
     include:
