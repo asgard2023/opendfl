@@ -115,11 +115,15 @@ public abstract class BaseController {
     public void pageSortBy(MyPageInfo pageInfo) {
         String sort = this.getRequest().getParameter("sort");
         String page = this.getRequest().getParameter("page");
+        String rows = this.getRequest().getParameter("rows");
         if (StringUtils.isNotBlank(sort)) {
             pageInfo.setOrderBy(sort);
         }
         if (StringUtils.isNotBlank(page)) {
             pageInfo.setPageNum(Integer.parseInt(page));
+        }
+        if (StringUtils.isNotBlank(rows)) {
+            pageInfo.setPageSize(Integer.parseInt(rows));
         }
     }
 
