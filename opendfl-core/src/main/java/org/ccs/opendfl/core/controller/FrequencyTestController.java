@@ -1,5 +1,6 @@
 package org.ccs.opendfl.core.controller;
 
+import cn.hutool.core.io.IoUtil;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IMaxRunTimeBiz;
@@ -168,7 +169,7 @@ public class FrequencyTestController {
         while ((temp = br.readLine()) != null) {
             sb.append(temp);
         }
-        br.close();
+        IoUtil.close(br);
         String params = sb.toString();
         log.info("-----serverTimeStreamFreq--params={}", params);
         RequestTestVo requestTest = JSON.parseObject(params, RequestTestVo.class);

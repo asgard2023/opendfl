@@ -1,5 +1,6 @@
 package org.ccs.opendfl.core.utils;
 
+import cn.hutool.core.io.IoUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -58,7 +59,7 @@ public class AnnotationClassUtils {
                     //添加到集合中去
                     classes.add(Thread.currentThread().getContextClassLoader().loadClass(packageName + "." + className));
                 } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                    log.error("-----getClassFromJar--className={} error={}", packageName + "." + className, e.getMessage(), e);
                 }
             }
         }
@@ -99,7 +100,7 @@ public class AnnotationClassUtils {
                             //添加到集合中去
                             classList.add(Thread.currentThread().getContextClassLoader().loadClass(className));
                         } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
+                            log.error("-----getClassFromJar--className={} error={}", className, e.getMessage(), e);
                         }
                     }
                 }
@@ -152,10 +153,10 @@ public class AnnotationClassUtils {
         if (splitIndex > 0 && jarPath.contains(".jar")) {
             String jarPath1 = jarPath.substring(0, splitIndex);
             String jarPath2 = jarPath.substring(splitIndex + 2);
-            try {
+            try (JarFile jarFile1 = new JarFile(jarPath1);) {
                 File file = new File(jarPath1);
                 log.debug("----getClassFromWarJar--jarPath1={} fileExist={}", jarPath1, file.exists());
-                JarFile jarFile1 = new JarFile(jarPath1);
+
                 //避免重复读取war的class
                 if (!checkPathList.contains(jarPath1)) {
                     checkPathList.add(jarPath1);
@@ -182,9 +183,9 @@ public class AnnotationClassUtils {
                         classList.addAll(tmpList);
                     }
                 }
-                jarFile1.close();
+
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("-----getClassFromWarJar--jarPath={} error={}", jarPath, e.getMessage());
             }
         }
         return classList;
@@ -198,8 +199,8 @@ public class AnnotationClassUtils {
         while ((bytesRead = inputStream.read(buffer, 0, 8192)) != -1) {
             os.write(buffer, 0, bytesRead);
         }
-        os.close();
-        inputStream.close();
+        IoUtil.close(os);
+        IoUtil.close(inputStream);
         return tmp;
     }
 }
