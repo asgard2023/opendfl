@@ -409,8 +409,8 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         String attrValue = FrequencyUtils.getAttrNameValue(params, attrName);
         //如果未登入模式，attrName的属性值为空，则不处理，由功能本身做参数验证
         if(!frequency.isNeedLogin()){
-            log.warn("----handleFrequency={} attrName={} dataId={}", frequency.getName(), attrName, attrValue);
             if(StringUtils.isBlank(attrValue)){
+                log.warn("----handleFrequency={} attrName={} attrValue is null ignore limit, need checkNull on interface", frequency.getName(), attrName);
                 return true;
             }
         }
