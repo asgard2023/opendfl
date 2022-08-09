@@ -98,12 +98,12 @@ limit:
 ## Console deomo
 There is a console to easily view interface information and corresponding restrictions
 
-1. console(Mysql) demo: http://175.178.252.112:8080/index.html  
+1. console(Mysql) demo: http://console.mysql.opendfl.org.cn/index.html
 Default account:
 * admin/admin
 * user/user
 
-2. console demo: http://52.221.216.61:8080/index.html  
+2. console demo: http://console.opendfl.org.cn/index.html  
 Default account:
 * admin/admin
 * user/user
