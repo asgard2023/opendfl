@@ -11,6 +11,7 @@ import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.constants.OutLimitType;
 import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
 import org.ccs.opendfl.core.exception.BaseException;
+import org.ccs.opendfl.core.exception.FrequencyAttrNameBlankException;
 import org.ccs.opendfl.core.strategy.black.BlackChain;
 import org.ccs.opendfl.core.strategy.limits.FreqLimitChain;
 import org.ccs.opendfl.core.strategy.white.WhiteChain;
@@ -186,7 +187,12 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             frequencyVo = null;
             params = null;
             return true;
-        } catch (BaseException e) {
+        }
+        catch (FrequencyAttrNameBlankException e ){
+            log.warn("-----preHandle--uri={} error={}", requestUri, e.getMessage());
+            return true;
+        }
+        catch (BaseException e) {
             log.error("-----preHandle--uri={} error={}", requestUri, e.getMessage());
             frequencyReturn(requestVo, true);
             throw e;
@@ -238,7 +244,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
      * @param response       HttpServletResponse
      * @return boolean
      */
-    private boolean limitByFrequency(HandlerMethod handlerMethod, FrequencyVo frequencyVo, RequestStrategyParamsVo strategyParams, Map<String, Object> params, HttpServletResponse response) {
+    private boolean limitByFrequency(HandlerMethod handlerMethod, FrequencyVo frequencyVo, RequestStrategyParamsVo strategyParams, Map<String, Object> params, HttpServletResponse response) throws FrequencyAttrNameBlankException {
         boolean isAllNull = true;
         FrequencyVo retVo = null;
         Frequency methodFrequency = handlerMethod.getMethodAnnotation(Frequency.class);
@@ -277,7 +283,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
      * @param params         Map<String, Object>
      * @param response       HttpServletResponse
      */
-    private void limitByRequestConfig(RequestVo requestVo, FrequencyVo frequencyVo, RequestStrategyParamsVo strategyParams, Map<String, Object> params, HttpServletResponse response) {
+    private void limitByRequestConfig(RequestVo requestVo, FrequencyVo frequencyVo, RequestStrategyParamsVo strategyParams, Map<String, Object> params, HttpServletResponse response) throws FrequencyAttrNameBlankException {
         frequencyConfigBiz.limitBySysconfigUri(requestVo);
         List<LimitUriConfigVo> limitConfigList = requestVo.getLimitRequests();
         for (LimitUriConfigVo uriConfigVo : limitConfigList) {
@@ -376,7 +382,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     }
 
 
-    private boolean handleFrequency(HttpServletResponse response, Map<String, Object> params, FrequencyVo frequency, RequestStrategyParamsVo strategyParams) {
+    private boolean handleFrequency(HttpServletResponse response, Map<String, Object> params, FrequencyVo frequency, RequestStrategyParamsVo strategyParams) throws FrequencyAttrNameBlankException {
         boolean going = true;
         if (frequency == null) {
             return going;
@@ -411,7 +417,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         if(!frequency.isNeedLogin()){
             if(StringUtils.isBlank(attrValue)){
                 log.warn("----handleFrequency={} attrName={} attrValue is null ignore limit, need checkNull on interface", frequency.getName(), attrName);
-                return true;
+                throw new FrequencyAttrNameBlankException(attrName+" is blank,need checkNull on interface");
             }
         }
 

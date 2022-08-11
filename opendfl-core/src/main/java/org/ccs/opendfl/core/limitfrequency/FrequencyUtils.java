@@ -178,7 +178,7 @@ public class FrequencyUtils {
 
         if (attrValue == null) {
             String reqBody = (String) params.get(RequestUtils.REQ_BODYS);
-            if (reqBody != null) {
+            if (reqBody!=null && reqBody.startsWith("{")) {
                 JSONObject jsonObject = JSON.parseObject(reqBody);
                 attrValue = jsonObject.getString(attrName);
                 if (clientIdRsa == null) {

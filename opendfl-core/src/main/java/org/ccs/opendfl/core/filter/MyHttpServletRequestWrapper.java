@@ -26,7 +26,7 @@ public class MyHttpServletRequestWrapper extends HttpServletRequestWrapper {
         //缓存请求body
         try {
             requestBody = StreamUtils.copyToByteArray(request.getInputStream());
-            String bodyStr = GetRequestJsonUtil.getRequestJsonString(request);
+            String bodyStr=new String(requestBody);
             request.setAttribute(RequestUtils.REQ_BODYS, bodyStr);
         } catch (IOException e) {
             e.printStackTrace();
