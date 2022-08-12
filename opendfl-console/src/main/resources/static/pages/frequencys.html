@@ -102,8 +102,7 @@
                 <th field="time" width="30" sortable="true">time(秒)</th>
                 <th field="needLogin" width="50" sortable="true">是否需要登入</th>
                 <th field="limit" width="30" sortable="true">上限</th>
-                <th field="userIpCount" width="30" sortable="true">userIp</th>
-                <th field="ipUserCount" width="30" sortable="true">ipUser</th>
+                <th field="freqLimitType" width="30" sortable="true">频率限制类型</th>
                 <th field="sysconfig" width="30" sortable="true">动态配置参数</th>
                 <th field="whiteCode" width="30" sortable="true">白名单</th>
                 <th field="errMsg" width="70" sortable="true">errMsg</th>
@@ -156,12 +155,8 @@
                 <input name="needLogin" class="easyui-validatebox">
             </div>
             <div class="fitem">
-                <label>userIp:</label>
-                <input name="userIpCount" class="easyui-validatebox">
-            </div>
-            <div class="fitem">
-                <label>ipUser:</label>
-                <input name="ipUserCount" class="easyui-validatebox">
+                <label>频率限制类型:</label>
+                <input name="freqLimitType" class="easyui-validatebox">
             </div>
             <div class="fitem">
                 <label>sysconfig:</label>

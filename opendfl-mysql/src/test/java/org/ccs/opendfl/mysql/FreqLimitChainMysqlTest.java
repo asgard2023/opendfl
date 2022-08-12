@@ -1,6 +1,7 @@
 package org.ccs.opendfl.mysql;
 
 import lombok.extern.slf4j.Slf4j;
+import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.constants.ReqSysType;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.ResultCode;
@@ -46,7 +47,7 @@ class FreqLimitChainMysqlTest {
         FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
         frequencyVo.setName("serverTimeFreqUserIp");
         frequencyVo.setLimit(1000);
-        frequencyVo.setUserIpCount(10);
+        frequencyVo.setFreqLimitType(FreqLimitType.USER_IP_COUNT);
 
         String freqTypeItems = "limit,limitIp,userIp,ipUser,";
         freqLimitChain.sortStrategies(freqTypeItems);
@@ -94,7 +95,7 @@ class FreqLimitChainMysqlTest {
 
         FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
         frequencyVo.setLimit(1000);
-        frequencyVo.setIpUserCount(10);
+        frequencyVo.setFreqLimitType(FreqLimitType.IP_USER_COUNT);
         frequencyVo.setName("serverTimeFreqIpUser");
 
         String freqTypeItems = "limit,limitIp,userIp,ipUser,";

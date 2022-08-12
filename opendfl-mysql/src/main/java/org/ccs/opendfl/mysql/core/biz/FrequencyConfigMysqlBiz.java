@@ -5,6 +5,7 @@ import org.ccs.opendfl.core.biz.IFrequencyConfigBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.OpendflConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
+import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.constants.FrequencyType;
 import org.ccs.opendfl.core.utils.StringUtils;
@@ -52,8 +53,8 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
             isChanged = true;
         }
         if (isChanged) {
-            log.info("----checkChange--name={} time={} limit={} ipUser={} userIp={} errorMsg={}"
-                    , frequency.getName(), frequency.getTime(), frequency.getLimit(), frequency.getIpUserCount(), frequency.getUserIpCount(), frequency.getErrMsg());
+            log.info("----checkChange--name={} time={} limit={} freqLimitType={} errorMsg={}"
+                    , frequency.getName(), frequency.getTime(), frequency.getLimit(), frequency.getFreqLimitType(), frequency.getErrMsg());
         }
         return isChanged;
     }
@@ -90,8 +91,7 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
         if (frequencyExist != null) {
             if (frequencyExist.getStatus() != null && frequencyExist.getStatus() == CommonStatus.VALID.getStatus()) {
                 frequency.setLimit(frequencyExist.getLimit());
-                frequency.setIpUserCount(frequencyExist.getIpUserCount());
-                frequency.setUserIpCount(frequencyExist.getUserIpCount());
+                frequency.setFreqLimitType(frequencyExist.getFreqLimitType());
                 frequency.setErrMsg(frequencyExist.getErrMsg());
                 frequency.setErrMsgEn(frequencyExist.getErrMsgEn());
                 frequency.setSysconfig(frequencyExist.isSysconfig());
@@ -156,25 +156,17 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
         FrequencyMysqlVo frequencyMysql = FrequencyMysqlVo.copy(frequency);
         //如果数据状态无效，则用原来的默认值
         frequencyMysql.setLimit(frequencyPo.getLimitCount());
-        frequencyMysql.setIpUserCount(frequencyPo.getIpUserCount());
-        frequencyMysql.setUserIpCount(frequencyPo.getUserIpCount());
+        frequencyMysql.setFreqLimitType(FreqLimitType.parse(frequencyPo.getFreqLimitType()));
         frequencyMysql.setErrMsg(frequencyPo.getErrMsg());
         frequencyMysql.setErrMsgEn(frequencyPo.getErrMsgEn());
         frequencyMysql.setStatus(frequencyPo.getStatus());
-        if(frequencyPo.getResource()!=null && frequencyPo.getResource()==1) {
-            frequencyMysql.setResource(true);
-        }
-        else{
-            frequencyMysql.setResource(false);
-        }
         return frequencyMysql;
     }
 
     private void autoCreateFrequency(FrequencyVo frequency) {
         DflFrequencyPo entity = new DflFrequencyPo();
         entity.setCode(frequency.getName());
-        entity.setIpUserCount(frequency.getIpUserCount());
-        entity.setUserIpCount(frequency.getUserIpCount());
+        entity.setFreqLimitType(frequency.getFreqLimitType().getType());
         entity.setLimitCount(frequency.getLimit());
         entity.setTime(frequency.getTime());
         entity.setAlias(frequency.getAliasName());
@@ -183,10 +175,6 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
         entity.setErrMsgEn(frequency.getErrMsgEn());
         entity.setLimitType(frequency.getLimitType());
         entity.setNeedLogin(0);
-        entity.setResource(0);
-        if(frequency.isResource()){
-            entity.setResource(1);
-        }
         if (frequency.isNeedLogin()) {
             entity.setNeedLogin(1);
         }

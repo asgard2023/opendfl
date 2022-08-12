@@ -2,6 +2,7 @@ package org.ccs.opendfl.core.biz.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IFrequencyDataBiz;
+import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.limitfrequency.FrequencyHandlerInterceptor;
 import org.ccs.opendfl.core.strategy.limits.impl.FreqLimitIpUserStrategy;
 import org.ccs.opendfl.core.strategy.limits.impl.FreqLimitUserCountStrategy;
@@ -38,7 +39,7 @@ public class FrequencyDataRedisBiz implements IFrequencyDataBiz {
         boolean isExist;
         String redisKey;
         for (FrequencyVo frequency : limits) {
-            redisKey = FreqLimitUserCountStrategy.getRedisKey(frequency, account, null,null);
+            redisKey = FreqLimitUserCountStrategy.getRedisKey(frequency, account, null);
             isExist = redisTemplate.hasKey(redisKey);
             if (isExist) {
                 FrequencyVo copy = frequency.toCopy();
@@ -46,7 +47,7 @@ public class FrequencyDataRedisBiz implements IFrequencyDataBiz {
                 Long expireSecond = redisTemplate.getExpire(redisKey);
                 copy.setErrMsg("limit:count=" + count + ",expireSec=" + expireSecond);
                 tmpList.add(copy.toCopy());
-            } else if (frequency.getUserIpCount() > 0) {
+            } else if (frequency.getFreqLimitType()==FreqLimitType.USER_IP_COUNT) {
                 redisKey = FreqLimitUserIpStrategy.getRedisKey(frequency, account);
                 isExist = redisTemplate.hasKey(redisKey);
                 if (isExist) {
@@ -72,7 +73,7 @@ public class FrequencyDataRedisBiz implements IFrequencyDataBiz {
         Collection<FrequencyVo> limits = FrequencyHandlerInterceptor.freqMap.values();
         List<FrequencyVo> tmpList = new ArrayList<>();
         for (FrequencyVo frequency : limits) {
-            if (frequency.getIpUserCount() == 0) {
+            if (frequency.getFreqLimitType()== FreqLimitType.USER_IP_COUNT) {
                 continue;
             }
             String redisKey = FreqLimitIpUserStrategy.getRedisKey(frequency, ip);
@@ -110,7 +111,7 @@ public class FrequencyDataRedisBiz implements IFrequencyDataBiz {
      */
     @Override
     public String freqEvict(FrequencyVo frequency, String account) {
-        String key = FreqLimitUserCountStrategy.getRedisKey(frequency, account, null,null);
+        String key = FreqLimitUserCountStrategy.getRedisKey(frequency, account, null);
         boolean isExist = redisTemplate.hasKey(key);
         if (isExist) {
             Long count = redisTemplate.opsForValue().increment(key, 0);
@@ -122,11 +123,11 @@ public class FrequencyDataRedisBiz implements IFrequencyDataBiz {
     }
 
     /**
-     * 重置同一用户多个IP登入限制
+     * 重置同IP多用户
      */
     @Override
-    public String freqIpUserEvict(FrequencyVo frequency, String account) {
-        String redisKey = FreqLimitIpUserStrategy.getRedisKey(frequency, account);
+    public String freqIpUserEvict(FrequencyVo frequency, String ip) {
+        String redisKey = FreqLimitIpUserStrategy.getRedisKey(frequency, ip);
         boolean isExist = redisTemplate.hasKey(redisKey);
         if (!isExist) {
             return null;

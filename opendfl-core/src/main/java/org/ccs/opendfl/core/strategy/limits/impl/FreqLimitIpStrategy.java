@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.TimeUnit;
 
 /**
- * IP限限制检查
+ * IP限限制检查，即同IP访问次数检查
  * limitIp的限制数=limit*2
  *
  * @author chenjh
@@ -41,31 +41,19 @@ public class FreqLimitIpStrategy implements FreqLimitStrategy {
         return LIMIT_TYPE.getCode();
     }
 
-    public String getRedisKey(FrequencyVo frequency, String ip, String attrValue) {
-        final String redisKey = frequencyConfiguration.getRedisPrefix();
-        String key = redisKey + ":" + LIMIT_TYPE.getCode() + ":" + frequency.getName() + ":" + frequency.getTime();
-        if (frequency.isResource() && frequency.getIpUserCount() > 0) {
-            key += ":" + attrValue;
-        }
+    public String getRedisKey(FrequencyVo frequency, String ip) {
+        String key = frequencyConfiguration.getRedisPrefix() + ":" + LIMIT_TYPE.getType() + ":" + frequency.getName() + ":" + frequency.getTime();
         return key + ":" + ip;
     }
 
     @Override
     public void doCheckLimit(String limitItems, FreqLimitChain limitChain, RequestStrategyParamsVo strategyParams) {
-        if (containLimit(limitItems, LIMIT_TYPE)) {
-            FrequencyVo frequency = strategyParams.getFrequency();
-            if (frequency.isResource() && frequency.getIpUserCount() == 0) {
-                limitChain.doCheckLimit(limitChain, strategyParams);
-                return;
-            }
+        FrequencyVo frequency = strategyParams.getFrequency();
+        if (LIMIT_TYPE == frequency.getFreqLimitType() && containLimit(limitItems, LIMIT_TYPE)) {
             String ip = strategyParams.getIp();
-            String attrValue = strategyParams.getAttrValue();
             Float limitFloat = frequency.getLimit() * frequencyConfiguration.getLimitIpRate();
-            int limit=limitFloat.intValue();
-            String redisKey = getRedisKey(frequency, ip, attrValue);
-            if (frequency.isResource()) {
-                limit = frequency.getIpUserCount();
-            }
+            int limit = limitFloat.intValue();
+            String redisKey = getRedisKey(frequency, ip);
             int time = frequency.getTime();
             long v = redisTemplate.opsForValue().increment(redisKey, 1);
             if (v == 1) {
@@ -73,10 +61,9 @@ public class FreqLimitIpStrategy implements FreqLimitStrategy {
             } else {
                 //主要用于避免服务重启造成部份key变成永久key
                 //低于60秒的也忽略，就让用户多等一下，否则就检查一下是否永久key
-                if(v<limit){
+                if (v < limit) {
                     RedisTemplateUtil.expireTimeHashFrequencyCache(redisTemplate, redisKey, time, v);
-                }
-                else if (v > limit) {
+                } else if (v > limit) {
                     strategyParams.getChainOper().setFail(true);
                     String userId = strategyParams.getUserId();
                     String lang = strategyParams.getLang();

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.Data;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
+import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.utils.CommUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -40,29 +41,19 @@ public class DflFrequencyPo implements Serializable {
         uriConfigVo.setAliasName(frequencyPo.getAlias());
         uriConfigVo.setAttrName(frequencyPo.getAttrName());
         uriConfigVo.setWhiteCode(frequencyPo.getWhiteCode());
-        uriConfigVo.setIpUser(frequencyPo.getIpUserCount());
-        uriConfigVo.setUserIp(frequencyPo.getIpUserCount());
+        uriConfigVo.setFreqLimitType(FreqLimitType.parse(frequencyPo.getFreqLimitType()));
         uriConfigVo.setErrMsg(frequencyPo.getErrMsg());
         uriConfigVo.setErrMsgEn(frequencyPo.getErrMsgEn());
         uriConfigVo.setMethod(frequencyPo.getMethod());
-        if(frequencyPo.getResource()!=null && frequencyPo.getResource()==1){
-            uriConfigVo.setResource(true);
-        }
 
-        if(uriConfigVo.getTime()==null){
+        if (uriConfigVo.getTime() == null) {
             uriConfigVo.setTime(0);
         }
-        if(uriConfigVo.getLimit()==null){
+        if (uriConfigVo.getLimit() == null) {
             uriConfigVo.setLimit(0);
         }
-        if(uriConfigVo.getIpUser()==null){
-            uriConfigVo.setIpUser(0);
-        }
-        if(uriConfigVo.getUserIp()==null){
-            uriConfigVo.setUserIp(0);
-        }
-        uriConfigVo.setErrMsg((String)CommUtils.nvl(uriConfigVo.getErrMsg(), ""));
-        uriConfigVo.setErrMsgEn((String)CommUtils.nvl(uriConfigVo.getErrMsgEn(), ""));
+        uriConfigVo.setErrMsg((String) CommUtils.nvl(uriConfigVo.getErrMsg(), ""));
+        uriConfigVo.setErrMsgEn((String) CommUtils.nvl(uriConfigVo.getErrMsgEn(), ""));
         return uriConfigVo;
     }
 
@@ -121,14 +112,8 @@ public class DflFrequencyPo implements Serializable {
     /**
      * 一个用户允许IP个数
      */
-    @Column(name = "user_ip_count")
-    private Integer userIpCount;
-
-    /**
-     * 一个IP允许用户个数
-     */
-    @Column(name = "ip_user_count")
-    private Integer ipUserCount;
+    @Column(name = "freq_limit_type")
+    private Integer freqLimitType;
 
     /**
      * 白名单编码
@@ -141,12 +126,6 @@ public class DflFrequencyPo implements Serializable {
      */
     @Column(name = "limit_type")
     private String limitType;
-
-    /**
-     * ifResource 是否资源限制
-     */
-    @Column(name = "resource")
-    private Integer resource;
 
     /**
      * 限制属性名

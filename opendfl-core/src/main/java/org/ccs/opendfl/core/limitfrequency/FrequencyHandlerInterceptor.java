@@ -450,7 +450,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         if (!freqMap.containsKey(key)) {
             frequency.setCreateTime(curTime);
             freqMap.put(key, frequency.toCopy());
-            log.info("----logFirstload--redisPrefix={} name={} time={} limit={} ipUser={} userIp={}", frequencyConfiguration.getRedisPrefix(), frequency.getName(), frequency.getTime(), frequency.getLimit(), frequency.getIpUserCount(), frequency.getUserIpCount());
+            log.info("----logFirstload--redisPrefix={} name={} time={} limit={} freqLimitType={}", frequencyConfiguration.getRedisPrefix(), frequency.getName(), frequency.getTime(), frequency.getLimit(), frequency.getFreqLimitType());
         }
     }
 

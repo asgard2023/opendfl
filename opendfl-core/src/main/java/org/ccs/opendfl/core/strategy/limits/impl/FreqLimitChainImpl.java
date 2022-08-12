@@ -35,6 +35,10 @@ public class FreqLimitChainImpl implements FreqLimitChain {
     private FreqLimitStrategy freqLimitUserCountStrategy;
     @Resource(name = "freqLimitUserIpStrategy")
     private FreqLimitStrategy freqLimitUserIpStrategy;
+    @Resource(name = "freqLimitResIpStrategy")
+    private FreqLimitStrategy freqLimitResIpStrategy;
+    @Resource(name = "freqLimitResUserStrategy")
+    private FreqLimitStrategy freqLimitResUserStrategy;
 
     /**
      * 新增策略需要在这里注册
@@ -45,6 +49,8 @@ public class FreqLimitChainImpl implements FreqLimitChain {
         this.addLimit(this.freqLimitUserIpStrategy);
         this.addLimit(this.freqLimitUserCountStrategy);
         this.addLimit(this.freqLimitIpStrategy);
+        this.addLimit(this.freqLimitResIpStrategy);
+        this.addLimit(this.freqLimitResUserStrategy);
     }
 
 

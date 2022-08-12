@@ -107,11 +107,9 @@
                 <th align="center" field="alias" width="50" sortable="false">别名，相当于分组</th>
                 <th align="center" field="time" width="50" sortable="true">时间间隔</th>
                 <th align="center" field="limitCount" width="50" sortable="true">限制次数</th>
-                <th align="center" field="userIpCount" width="50" sortable="true">一个用户允许IP个数</th>
-                <th align="center" field="ipUserCount" width="50" sortable="true">一个IP允许用户个数</th>
+                <th align="center" field="freqLimitType" width="50" sortable="true">频率限制类型</th>
                 <th align="center" field="whiteCode" width="50" sortable="true">白名单编码</th>
                 <th align="center" field="limitType" width="50" sortable="true">限制类型</th>
-                <th align="center" field="resource" width="50" sortable="true">是否资源限制</th>
                 <th align="center" field="attrName" width="50" sortable="false">限制属性名</th>
                 <th align="center" field="needLogin" width="50" sortable="false">是否需要登入</th>
                 <th align="center" field="errMsg" width="50" sortable="true" hidden="true">异常消息</th>
@@ -163,12 +161,8 @@
             <input name="limitCount" class="easyui-validatebox" required="true">
         </div>
         <div class="fitem">
-            <label>一个用户允许IP个数:</label>
-            <input name="userIpCount" class="easyui-validatebox">
-        </div>
-        <div class="fitem">
-            <label>一个IP允许用户个数:</label>
-            <input name="ipUserCount" class="easyui-validatebox">
+            <label>频率限制类型:</label>
+            <input name="freqLimitType" class="easyui-validatebox">
         </div>
         <div class="fitem">
             <label>白名单编码:</label>

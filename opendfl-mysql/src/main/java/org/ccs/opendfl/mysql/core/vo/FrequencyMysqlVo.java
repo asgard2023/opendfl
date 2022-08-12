@@ -18,8 +18,7 @@ public class FrequencyMysqlVo extends FrequencyVo implements Serializable {
         frequencyMysqlVo.setAliasName(frequencyVo.getAliasName());
         frequencyMysqlVo.setErrMsg(frequencyVo.getErrMsg());
         frequencyMysqlVo.setErrMsgEn(frequencyVo.getErrMsgEn());
-        frequencyMysqlVo.setIpUserCount(frequencyVo.getIpUserCount());
-        frequencyMysqlVo.setUserIpCount(frequencyVo.getUserIpCount());
+        frequencyMysqlVo.setFreqLimitType(frequencyVo.getFreqLimitType());
         frequencyMysqlVo.setNeedLogin(frequencyVo.isNeedLogin());
         frequencyMysqlVo.setRequestUri(frequencyVo.getRequestUri());
         frequencyMysqlVo.setWhiteCode(frequencyVo.getWhiteCode());

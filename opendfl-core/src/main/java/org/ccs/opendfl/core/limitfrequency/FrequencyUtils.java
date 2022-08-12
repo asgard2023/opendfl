@@ -86,7 +86,7 @@ public class FrequencyUtils {
         outLimitCount(strategyParams, typeCode);
         FrequencyVo frequencyVo = strategyParams.getFrequency();
         Integer ifResource = 0;
-        if (frequencyVo!=null && frequencyVo.isResource()) {
+        if (frequencyVo!=null && frequencyVo.getFreqLimitType().isResource()) {
             ifResource = 1;
         }
         outLogBiz.addFreqLog(strategyParams, limit, v, outLimitType, subLimit, ifResource, typeCode, strategyParams.getAttrValue());

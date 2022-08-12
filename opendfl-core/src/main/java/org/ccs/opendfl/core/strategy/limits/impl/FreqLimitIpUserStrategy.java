@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.TimeUnit;
 
 /**
- * IP用户数检查
+ * 同IP用户数检查
  *
  * @author chenjh
  */
@@ -46,41 +46,38 @@ public class FreqLimitIpUserStrategy implements FreqLimitStrategy {
         if (StringUtils.ifYes(frequencyConfiguration.getLimit().getIpLimitSplitFunction())) {
             function = ":" + frequency.getName();
         }
-        return frequencyConfiguration.getRedisPrefix() + ":" + LIMIT_TYPE.getCode() + function + ":" + frequency.getTime() + ":" + ip;
+        String key = frequencyConfiguration.getRedisPrefix() + ":" + LIMIT_TYPE.getType() + function + ":" + frequency.getTime();
+        return key + ":" + ip;
     }
 
     @Override
     public void doCheckLimit(String limitItems, FreqLimitChain limitChain, RequestStrategyParamsVo strategyParams) {
-        if (containLimit(limitItems, LIMIT_TYPE)) {
-            FrequencyVo frequency = strategyParams.getFrequency();
-            if(!LIMIT_TYPE.isResource() && frequency.isResource()){
-                limitChain.doCheckLimit(limitChain, strategyParams);
-                return;
-            }
-            int limit = frequency.getIpUserCount();
-            if (limit > 0) {
-                String userId = strategyParams.getUserId();
-                String lang = strategyParams.getLang();
-                String ip = strategyParams.getIp();
-                String redisKey = getRedisKey(frequency, ip);
-                long v = redisTemplate.opsForSet().size(redisKey);
-                if (v < limit + FreqLimitType.REDIS_SET_OUT_LIMIT) {
-                    v += redisTemplate.opsForSet().add(redisKey, userId);
-                    if (v == 1) {
-                        redisTemplate.expire(redisKey, frequency.getTime(), TimeUnit.SECONDS);
-                    }
+        FrequencyVo frequency = strategyParams.getFrequency();
+        int limit = frequency.getLimit();
+        if (LIMIT_TYPE == frequency.getFreqLimitType() && limit > 0 && containLimit(limitItems, LIMIT_TYPE)) {
+            String userId = strategyParams.getUserId();
+            String lang = strategyParams.getLang();
+            String ip = strategyParams.getIp();
+            String redisKey = getRedisKey(frequency, ip);
+            long v = redisTemplate.opsForSet().size(redisKey);
+            logger.info("----ipUser--redisKey={} limit={} v={}", redisKey, limit, v);
+            if (v < limit + FreqLimitType.REDIS_SET_OUT_LIMIT) {
+                v += redisTemplate.opsForSet().add(redisKey, userId);
+                if (v == 1) {
+                    redisTemplate.expire(redisKey, frequency.getTime(), TimeUnit.SECONDS);
                 }
-                if (v > limit) {
-                    strategyParams.getChainOper().setFail(true);
-                    //再次过期处理，以免有变成永久的key
-                    RedisTemplateUtil.expireTimeTTL(redisTemplate, redisKey, frequency.getTime());
-                    final int time = frequency.getTime();
-                    logger.warn("----doCheckLimit-ipUser--redisKey={} userId={} time={} count={} limit={} ip={}", redisKey, userId, time, v, limit, ip);
+            }
+            if (v > limit) {
+                strategyParams.getChainOper().setFail(true);
+                //再次过期处理，以免有变成永久的key
+                RedisTemplateUtil.expireTimeTTL(redisTemplate, redisKey, frequency.getTime());
+                final int time = frequency.getTime();
+                logger.warn("----doCheckLimit-ipUser--redisKey={} userId={} time={} count={} limit={} ip={}", redisKey, userId, time, v, limit, ip);
 
-                    FrequencyUtils.addFreqLog(strategyParams, limit, v, LIMIT_TYPE);
-                    FrequencyUtils.failExceptionMsg(getLimitType(), frequency, lang);
-                }
+                FrequencyUtils.addFreqLog(strategyParams, limit, v, LIMIT_TYPE);
+                FrequencyUtils.failExceptionMsg(getLimitType(), frequency, lang);
             }
+
         }
         limitChain.doCheckLimit(limitChain, strategyParams);
     }

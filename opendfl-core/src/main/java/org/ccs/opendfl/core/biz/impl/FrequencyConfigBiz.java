@@ -39,7 +39,7 @@ public class FrequencyConfigBiz implements IFrequencyConfigBiz {
             isChanged = true;
         }
         if (isChanged) {
-            log.info("----checkChange--name={} time={} limit={} ipUser={} userIp={}", frequency.getName(), frequency.getTime(), frequency.getLimit(), frequency.getIpUserCount(), frequency.getUserIpCount());
+            log.info("----checkChange--name={} time={} limit={} freqLimitType={}", frequency.getName(), frequency.getTime(), frequency.getLimit(), frequency.getFreqLimitType());
         }
         return isChanged;
     }
@@ -67,8 +67,7 @@ public class FrequencyConfigBiz implements IFrequencyConfigBiz {
 
         if (frequencyExist != null) {
             frequency.setLimit(frequencyExist.getLimit());
-            frequency.setIpUserCount(frequencyExist.getIpUserCount());
-            frequency.setUserIpCount(frequencyExist.getUserIpCount());
+            frequency.setFreqLimitType(frequencyExist.getFreqLimitType());
             frequency.setSysconfig(frequencyExist.isSysconfig());
         }
     }
@@ -92,8 +91,7 @@ public class FrequencyConfigBiz implements IFrequencyConfigBiz {
 
         if (frequencyConfigVo != null) {
             frequency.setLimit(frequencyConfigVo.getLimit());
-            frequency.setIpUserCount(frequencyConfigVo.getIpUser());
-            frequency.setUserIpCount(frequencyConfigVo.getUserIp());
+            frequency.setFreqLimitType(frequencyConfigVo.getFreqLimitType());
             return frequency;
         }
 

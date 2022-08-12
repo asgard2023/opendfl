@@ -10,9 +10,8 @@
         <result column="name" property="name" jdbcType="VARCHAR"/>
         <result column="alias" property="alias" jdbcType="VARCHAR"/>
         <result column="time" property="time" jdbcType="INTEGER"/>
-        <result column="limit" property="limit" jdbcType="INTEGER"/>
-        <result column="user_ip_count" property="userIpCount" jdbcType="INTEGER"/>
-        <result column="ip_user_count" property="ipUserCount" jdbcType="INTEGER"/>
+        <result column="limit_count" property="limitCount" jdbcType="INTEGER"/>
+        <result column="freq_limit_type" property="freqLimitType" jdbcType="INTEGER"/>
         <result column="white_code" property="whiteCode" jdbcType="VARCHAR"/>
         <result column="limit_type" property="limitType" jdbcType="VARCHAR"/>
         <result column="attr_name" property="attrName" jdbcType="VARCHAR"/>
@@ -36,9 +35,8 @@
 		name, 
 		alias, 
 		time, 
-		limit, 
-		user_ip_count, 
-		ip_user_count, 
+		limit_count,
+		freq_limit_type,
 		white_code, 
 		limit_type, 
 		attr_name, 
@@ -63,9 +61,8 @@
                 <if test="name != null">name = #{name, jdbcType = VARCHAR} and</if>
                 <if test="alias != null">alias = #{alias, jdbcType = VARCHAR} and</if>
                 <if test="time != null">time = #{time, jdbcType = INTEGER} and</if>
-                <if test="limit != null">limit = #{limit, jdbcType = INTEGER} and</if>
-                <if test="userIpCount != null">user_ip_count = #{userIpCount, jdbcType = INTEGER} and</if>
-                <if test="ipUserCount != null">ip_user_count = #{ipUserCount, jdbcType = INTEGER} and</if>
+                <if test="limitCount != null">limit_count = #{limitCount, jdbcType = INTEGER} and</if>
+                <if test="freqLimitType != null">freq_limit_type = #{freqLimitType, jdbcType = INTEGER} and</if>
                 <if test="whiteCode != null">white_code = #{whiteCode, jdbcType = VARCHAR} and</if>
                 <if test="limitType != null">limit_type = #{limitType, jdbcType = VARCHAR} and</if>
                 <if test="attrName != null">attr_name = #{attrName, jdbcType = VARCHAR} and</if>
@@ -87,9 +84,8 @@
                     or name like concat(concat('%', #{keywords}),'%')
                     or alias like concat(concat('%', #{keywords}),'%')
                     or time like concat(concat('%', #{keywords}),'%')
-                    or limit like concat(concat('%', #{keywords}),'%')
-                    or user_ip_count like concat(concat('%', #{keywords}),'%')
-                    or ip_user_count like concat(concat('%', #{keywords}),'%')
+                    or limit_count like concat(concat('%', #{keywords}),'%')
+                    or freq_limit_type like concat(concat('%', #{keywords}),'%')
                     or white_code like concat(concat('%', #{keywords}),'%')
                     or limit_type like concat(concat('%', #{keywords}),'%')
                     or attr_name like concat(concat('%', #{keywords}),'%')
@@ -146,9 +142,8 @@
                 <if test="name != null">name = #{name, jdbcType = VARCHAR} and</if>
                 <if test="alias != null">alias = #{alias, jdbcType = VARCHAR} and</if>
                 <if test="time != null">time = #{time, jdbcType = INTEGER} and</if>
-                <if test="limit != null">limit = #{limit, jdbcType = INTEGER} and</if>
-                <if test="userIpCount != null">user_ip_count = #{userIpCount, jdbcType = INTEGER} and</if>
-                <if test="ipUserCount != null">ip_user_count = #{ipUserCount, jdbcType = INTEGER} and</if>
+                <if test="limitCount != null">limit_count = #{limitCount, jdbcType = INTEGER} and</if>
+                <if test="freqLimitType != null">freq_limit_type = #{freqLimitType jdbcType = INTEGER} and</if>
                 <if test="whiteCode != null">white_code = #{whiteCode, jdbcType = VARCHAR} and</if>
                 <if test="limitType != null">limit_type = #{limitType, jdbcType = VARCHAR} and</if>
                 <if test="attrName != null">attr_name = #{attrName, jdbcType = VARCHAR} and</if>
@@ -185,9 +180,8 @@
             <if test="name != null">name,</if>
             <if test="alias != null">alias,</if>
             <if test="time != null">time,</if>
-            <if test="limit != null">limit,</if>
-            <if test="userIpCount != null">user_ip_count,</if>
-            <if test="ipUserCount != null">ip_user_count,</if>
+            <if test="limitCount != null">limit_count,</if>
+            <if test="freqLimitType != null">freq_limit_type,</if>
             <if test="whiteCode != null">white_code,</if>
             <if test="limitType != null">limit_type,</if>
             <if test="attrName != null">attr_name,</if>
@@ -210,9 +204,8 @@
             <if test="name != null">#{name, jdbcType = VARCHAR},</if>
             <if test="alias != null">#{alias, jdbcType = VARCHAR},</if>
             <if test="time != null">#{time, jdbcType = INTEGER},</if>
-            <if test="limit != null">#{limit, jdbcType = INTEGER},</if>
-            <if test="userIpCount != null">#{userIpCount, jdbcType = INTEGER},</if>
-            <if test="ipUserCount != null">#{ipUserCount, jdbcType = INTEGER},</if>
+            <if test="limitCount != null">#{limitCount, jdbcType = INTEGER},</if>
+            <if test="freqLimitType != null">#{freqLimitType, jdbcType = INTEGER},</if>
             <if test="whiteCode != null">#{whiteCode, jdbcType = VARCHAR},</if>
             <if test="limitType != null">#{limitType, jdbcType = VARCHAR},</if>
             <if test="attrName != null">#{attrName, jdbcType = VARCHAR},</if>
@@ -239,9 +232,8 @@
                 <if test="name != null">name = #{name},</if>
                 <if test="alias != null">alias = #{alias},</if>
                 <if test="time != null">time = #{time},</if>
-                <if test="limit != null">limit = #{limit},</if>
-                <if test="userIpCount != null">user_ip_count = #{userIpCount},</if>
-                <if test="ipUserCount != null">ip_user_count = #{ipUserCount},</if>
+                <if test="limitCount != null">limit_count = #{limitCount},</if>
+                <if test="freqLimitType != null">freq_limit_type = #{freqLimitType},</if>
                 <if test="whiteCode != null">white_code = #{whiteCode},</if>
                 <if test="limitType != null">limit_type = #{limitType},</if>
                 <if test="attrName != null">attr_name = #{attrName},</if>

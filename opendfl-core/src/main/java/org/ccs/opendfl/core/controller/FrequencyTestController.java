@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IMaxRunTimeBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
+import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.constants.ReqLockType;
 import org.ccs.opendfl.core.exception.FailedException;
@@ -12,7 +13,6 @@ import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.limitfrequency.Frequency;
 import org.ccs.opendfl.core.limitfrequency.Frequency2;
 import org.ccs.opendfl.core.limitfrequency.Frequency3;
-import org.ccs.opendfl.core.limitfrequency.Frequency4;
 import org.ccs.opendfl.core.limitlock.RequestLock;
 import org.ccs.opendfl.core.utils.RequestParams;
 import org.ccs.opendfl.core.utils.RequestUtils;
@@ -73,17 +73,61 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTimeFreq")
-    @Frequency(time = 5, limit = 50, name = "serverTimeFreq")
-    @Frequency2(time = 3600, limit = 100, name = "serverTimeFreq")
-    @Frequency3(time = 60, limit = 10, resource = true, attrName = "dataId", name = "serverTimeFreqRes")
-    @Frequency4(time = 60, limit = 10, resource = true, attrName = "dataId", ipUserCount = 10, name = "serverTimeFreqIp")
+    @Frequency(time = 5, limit = 10, name = "serverTimeFreq")
+    @Frequency2(time = 3600, limit = 20, name = "serverTimeFreq")
     public Object serverTimeFreq(HttpServletRequest request) {
         log.info("----serverTimeFreq--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();
     }
 
+    @GetMapping("/serverTimeFreqAttr")
+    @Frequency(time = 5, limit = 50, name = "serverTimeFreqAttr", attrName = "dataId")
+    @Frequency2(time = 3600, limit = 100, name = "serverTimeFreqAttr", attrName = "dataId")
+    public Object serverTimeFreqAttr(HttpServletRequest request) {
+        log.info("----serverTimeFreq--userId={}", request.getParameter(RequestParams.USER_ID));
+        return System.currentTimeMillis();
+    }
+
+    @GetMapping("/serverTimeFreqAttrCheck")
+    @Frequency(time = 5, limit = 50, name = "serverTimeFreqAttrCheck", attrName = "dataId")
+    @Frequency2(time = 3600, limit = 100, name = "serverTimeFreqAttrCheck", attrName = "dataId")
+    public Object serverTimeFreqAttrCheck(HttpServletRequest request) {
+        log.info("----serverTimeFreq--userId={}", request.getParameter(RequestParams.USER_ID));
+        String dataId=request.getParameter("dataId");
+        ValidateUtils.notNull(dataId, "dataId is null");
+        return System.currentTimeMillis();
+    }
+
+    @GetMapping("/serverTimeFreqResIp")
+    @Frequency2(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_IP, attrName = "dataId", name = "serverTimeFreqResIp")
+    public Object serverTimeFreqResIp(HttpServletRequest request) {
+        String dataId=request.getParameter("dataId");
+        log.info("----serverTimeFreqResIp--userId={} dataId={}", request.getParameter(RequestParams.USER_ID), dataId);
+        ValidateUtils.notNull(dataId, "dataId is null");
+        return System.currentTimeMillis();
+    }
+
+    @GetMapping("/serverTimeFreqResUser")
+    @Frequency2(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_USER, attrName = "dataId", name = "serverTimeFreqResUser")
+    public Object serverTimeFreqResUser(HttpServletRequest request) {
+        String dataId=request.getParameter("dataId");
+        log.info("----serverTimeFreqResUser--userId={} dataId={}", request.getParameter(RequestParams.USER_ID), dataId);
+        ValidateUtils.notNull(dataId, "dataId is null");
+        return System.currentTimeMillis();
+    }
+
+    @GetMapping("/serverTimeFreqRes")
+    @Frequency2(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_IP, attrName = "dataId", name = "serverTimeFreqResIpCount")
+    @Frequency3(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_USER, attrName = "dataId", name = "serverTimeFreqResUserCount")
+    public Object serverTimeFreqRes(HttpServletRequest request) {
+        String dataId=request.getParameter("dataId");
+        log.info("----serverTimeFreqRes--userId={} dataId={}", request.getParameter(RequestParams.USER_ID), dataId);
+        ValidateUtils.notNull(dataId, "dataId is null");
+        return System.currentTimeMillis();
+    }
+
     @GetMapping("/serverTimeFreqLimitIp")
-    @Frequency(time = 5, limit = 10, name = "serverTimeFreqLimitIp")
+    @Frequency(time = 5, limit = 10, name = "serverTimeFreqLimitIp", freqLimitType = FreqLimitType.LIMIT_IP)
     public Object serverTimeFreqLimitIp(HttpServletRequest request) {
         log.info("----serverTimeFreqLimitIp--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();
@@ -106,21 +150,22 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTimeFreqIpUser")
-    @Frequency(time = 5, limit = 5, ipUserCount = 7, name = "serverTimeFreqIpUser")
+    @Frequency(time = 5, limit = 5, freqLimitType = FreqLimitType.IP_USER_COUNT, name = "serverTimeFreqIpUser")
     public Object serverTimeFreqIpUser(HttpServletRequest request) {
         log.info("----serverTimeFreqIpUser--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();
     }
 
     @GetMapping("/serverTimeFreqUserIp")
-    @Frequency(time = 5, limit = 100, userIpCount = 7, name = "serverTimeFreqUserIp")
+    @Frequency(time = 5, limit = 10, freqLimitType = FreqLimitType.USER_IP_COUNT, name = "serverTimeFreqUserIp")
     public Object serverTimeFreqUserIp(HttpServletRequest request) {
         log.info("----serverTimeFreqUserIp--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();
     }
 
     @GetMapping("/serverTimeFreqIp")
-    @Frequency(time = 30, limit = 100, userIpCount = 7, ipUserCount = 7, name = "serverTimeFreqIp")
+    @Frequency(time = 30, limit = 10, freqLimitType = FreqLimitType.IP_USER_COUNT, name = "serverTimeFreqIpUser")
+    @Frequency2(time = 30, limit = 10, freqLimitType = FreqLimitType.USER_IP_COUNT, name = "serverTimeFreqUserIp")
     public Object serverTimeFreqIp(HttpServletRequest request) {
         log.info("----serverTimeFreqIp--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();
@@ -146,7 +191,7 @@ public class FrequencyTestController {
      * @return current time
      */
     @PostMapping("/serverTimeJsonFreq")
-    @Frequency(time = 5, limit = 5, name = "serverTimeJsonFreq")
+    @Frequency(time = 5, limit = 5, name = "serverTimeJsonFreq", freqLimitType = FreqLimitType.LIMIT)
     public Object serverTimeJsonFreq(@RequestBody RequestTestVo requestTest) {
         ValidateUtils.notNull(requestTest.getUserId(), "userId is null");
         log.info("----serverTimeJsonFreq--userId={}", requestTest.getUserId());
