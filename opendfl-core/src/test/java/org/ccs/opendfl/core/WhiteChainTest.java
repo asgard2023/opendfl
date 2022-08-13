@@ -71,6 +71,7 @@ class WhiteChainTest {
             try {
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, "130" + i);
+                strategyParamsVo.getChainOper().clearChain();
                 this.whiteChain.doCheckLimit(whiteChain, strategyParamsVo);
                 successCount++;
             } catch (BaseException e) {
@@ -108,6 +109,7 @@ class WhiteChainTest {
             try {
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, "130" + i);
+                strategyParamsVo.getChainOper().clearChain();
                 this.whiteChain.doCheckLimit(whiteChain, strategyParamsVo);
                 successCount++;
             } catch (BaseException e) {
@@ -146,6 +148,7 @@ class WhiteChainTest {
                 ip = "" + RequestUtils.getIpConvertNum(ip);
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, whiteUser);
+                strategyParamsVo.getChainOper().clearChain();
                 this.whiteChain.doCheckLimit(whiteChain, strategyParamsVo);
                 successCount++;
             } catch (BaseException e) {
