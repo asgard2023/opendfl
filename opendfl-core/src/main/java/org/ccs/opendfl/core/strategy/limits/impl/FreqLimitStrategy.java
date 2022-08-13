@@ -42,7 +42,7 @@ public class FreqLimitStrategy implements org.ccs.opendfl.core.strategy.limits.F
     }
 
     public static String getRedisKey(FrequencyVo frequency, String userId, String ip) {
-        String key = frequencyConfiguration.getRedisPrefix() + "e:" + LIMIT_TYPE.getType() + ":" + frequency.getName() + ":" + frequency.getTime();
+        String key = frequencyConfiguration.getRedisPrefix() + ":" + LIMIT_TYPE.getType() + ":" + frequency.getName() + ":" + frequency.getTime();
         if (userId == null) {
             key += ":noUser:" + ip;
         } else {
