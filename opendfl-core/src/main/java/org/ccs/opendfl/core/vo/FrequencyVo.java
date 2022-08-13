@@ -183,7 +183,7 @@ public class FrequencyVo {
                 "name='" + name + '\'' +
                 ", time=" + time +
                 ", limit=" + limit +
-                ", freqLimitType=" + freqLimitType.getCode() +
+                ", freqLimitType=" + (freqLimitType!=null?freqLimitType.getCode():"") +
 //                ", pageReachLog=" + pageReachLog +
                 ", attrName='" + attrName + '\'' +
                 ", whiteCode=" + whiteCode +

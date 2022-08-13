@@ -10,30 +10,30 @@ public enum FreqLimitType {
      * 同用户次数频率
      * 限制数=frequency.limit
      */
-    LIMIT(20, "limit", "同用户次数频率", false),
+    LIMIT(1, "limit", "同用户次数频率", false),
     /**
      * 同IP次数频率
      * 限制数=frequency.limit*{limitIpRate}，以免有用户共用IP
      */
-    LIMIT_IP(21, "limitIp", "同IP次数频率", false),
+    LIMIT_IP(2, "limitIp", "同IP次数频率", false),
     /**
      * 同用户多IP数限制
      * 限制数=frequency.userIpCount
      */
-    USER_IP_COUNT(22, "userIp", "同用户多IP数限制", false),
+    USER_IP(3, "userIp", "同用户多IP数限制", false),
     /**
      * 同IP多用户数限制
      * 限制数=frequency.ipUserCount
      */
-    IP_USER_COUNT(23, "ipUser", "同IP多用户数限制", false),
+    IP_USER(4, "ipUser", "同IP多用户数限制", false),
     /**
      * 同资源ID同IP访问次数限制
      */
-    RES_IP(24, "resIp", "同资源ID同IP访问次数限制", true),
+    RES_IP(5, "resIp", "同资源ID同IP访问次数限制", true),
     /**
      * 同资源ID同用户访问次数限制
      */
-    RES_USER(25, "resUser", "同资源ID用户访问次数限制", true);
+    RES_USER(6, "resUser", "同资源ID用户访问次数限制", true);
 
     /**
      * IP限制的redis的zset 超限个数，允许多存2个ip

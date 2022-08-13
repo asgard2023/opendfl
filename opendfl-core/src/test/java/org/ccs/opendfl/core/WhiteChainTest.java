@@ -33,7 +33,7 @@ class WhiteChainTest {
     @BeforeEach
     void init() {
         System.out.println("----init----");
-        String freqTypeItems = "whiteUser,whiteIp,";
+        String freqTypeItems = "user,ip,";
         whiteChain.sortStrategies(freqTypeItems);
     }
 
@@ -62,7 +62,7 @@ class WhiteChainTest {
         frequencyVo.setName("serverTime");
         frequencyVo.setLimit(1000);
 
-        String freqTypeItems = "whiteIp,whiteUser,";
+        String freqTypeItems = "ip,user,";
         whiteChain.sortStrategies(freqTypeItems);
         long time = System.currentTimeMillis();
         int successCount = 0;
@@ -99,7 +99,7 @@ class WhiteChainTest {
         frequencyVo.setName("serverTime");
         frequencyVo.setLimit(1000);
 
-        String freqTypeItems = "whiteIp,whiteUser,";
+        String freqTypeItems = "ip,user,";
         whiteChain.sortStrategies(freqTypeItems);
         long time = System.currentTimeMillis();
         int successCount = 0;
@@ -135,7 +135,7 @@ class WhiteChainTest {
 
         String whiteUser = "5101";
 
-        String freqTypeItems = "whiteIp,whiteUser,";
+        String freqTypeItems = "ip,user,";
         whiteChain.sortStrategies(freqTypeItems);
         long time = System.currentTimeMillis();
         int successCount = 0;

@@ -88,7 +88,8 @@
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="onEdit()">Edit</a>
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
                onclick="onClear()">Clear list</a>
-            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="onEvict()">Evict</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+               onclick="onEvict()">Evict</a>
         </div>
         <table id="dg" class="easyui-datagrid" data-options="onDblClickRow:onDblClick"
                toolbar="#toolbar"
@@ -297,53 +298,88 @@
         });
     }
 
-    function onEvict(){
+    function onEvict() {
         var row = $('#dg').datagrid('getSelected');
-        if(!row){
-            showToastmessage('Error', '请先选中行')
-        }
-        var errMsg=row.errMsg;
-        if(!errMsg){
-            showToastmessage('Error', '选中行无效，请先输入attrValue(userId)值或IP值查询一下');
+        if (!row) {
+            showToastmessage('Error', '请先选中行');
             return;
         }
         var jsonParam = $('#search-form').serializeJson();
-        if(errMsg.indexOf('limit:')==0 || errMsg.indexOf('userIp:')==0){
-            if(!jsonParam.userId){
-                showToastmessage('Error', 'attrValue(userId)值为空')
-                return;
-            }
-        }
-        else if(errMsg.indexOf('ipUser:')==0){
-            if(!jsonParam.ip){
-                showToastmessage('Error', 'IP值为空')
-                return;
-            }
-        }
-
-
-        if (row){
-            $.messager.confirm('Confirm', '确定要清空当前的数据，以便于再次首次加载吗?', function (r) {
-                if(r){
-                    var errMsg=row.errMsg;
-                    if(errMsg){
-                        if(errMsg.indexOf('limit:')==0){
-                            evict(row.name, row.time, jsonParam.userId)
-                        }
-                        else if(errMsg.indexOf('userIp:')==0){
-                            evictUserIp(row.name, row.time, jsonParam.userId)
-                        }
-                        else if(errMsg.indexOf('ipUser:')==0){
-                            evictIpUser(row.name, row.time, jsonParam.ip)
-                        }
-                    }
+        var freqLimitType = row.freqLimitType;
+        $.messager.confirm('Confirm', '确定要清空当前的数据，以便于再次首次加载吗?', function (r) {
+            if (r) {
+                if(freqLimitType=='LIMIT'){
+                    evictLimit(row.name, row.time, jsonParam.userId)
                 }
-            });
-        }
+                else if(freqLimitType=='LIMIT_IP'){
+                    evictLimitIp(row.name, row.time, jsonParam.ip)
+                }
+                else if(freqLimitType=='USER_IP'){
+                    evictUserIp(row.name, row.time, jsonParam.userId)
+                }
+                else if(freqLimitType=='IP_USER'){
+                    evictIpUser(row.name, row.time, jsonParam.ip)
+                }
+                else if(freqLimitType=='RES_USER'){
+                    evictResIp(row.name, row.time, jsonParam.dataId, jsonParam.userId);
+                }
+                else if(freqLimitType=='RES_IP'){
+                    evictResIp(row.name, row.time, jsonParam.dataId, jsonParam.ip);
+                }
+            }
+        });
     }
 
-    function evictUserIp(name, time, userId){
-        var data={name: name, time: time, userId: userId}
+    function evictLimit(name, time, userId) {
+        if(!userId){
+            showToastmessage('Error', 'attrValue(userId)值为空')
+            return;
+        }
+        var data = {name: name, time: time, userId: userId}
+        var url = '/frequency/evict';
+        $.ajax({
+            type: "post",
+            headers: app.headers,
+            url: url,
+            data: data,
+            success: function (data) {
+                if (data.success) {
+                    doSearchReload();    // reload the user data
+                } else {
+                    showToastmessage('Error', data.errorMsg)
+                }
+            }
+        });
+    }
+
+    function evictLimitIp(name, time, userId) {
+        if(!ip){
+            showToastmessage('Error', 'IP值为空')
+            return;
+        }
+        var data = {name: name, time: time, userId: userId}
+        var url = '/frequency/evictLimitIp';
+        $.ajax({
+            type: "post",
+            headers: app.headers,
+            url: url,
+            data: data,
+            success: function (data) {
+                if (data.success) {
+                    doSearchReload();    // reload the user data
+                } else {
+                    showToastmessage('Error', data.errorMsg)
+                }
+            }
+        });
+    }
+
+    function evictUserIp(name, time, userId) {
+        if(!userId){
+            showToastmessage('Error', 'attrValue(userId)值为空')
+            return;
+        }
+        var data = {name: name, time: time, userId: userId}
         var url = '/frequency/evictUserIp';
         $.ajax({
             type: "post",
@@ -360,8 +396,12 @@
         });
     }
 
-    function evictIpUser(name, time, ip){
-        var data={name: name, time: time, ip: ip}
+    function evictIpUser(name, time, ip) {
+        if(!ip){
+            showToastmessage('Error', 'IP值为空')
+            return;
+        }
+        var data = {name: name, time: time, ip: ip}
         var url = '/frequency/evictIpUser';
         $.ajax({
             type: "post",
@@ -378,9 +418,43 @@
         });
     }
 
-    function evict(name, time, userId){
-        var data={name: name, time: time, userId: userId}
-        var url = '/frequency/evict';
+    function evictResIp(name, time, dataId, ip) {
+        if(!ip){
+            showToastmessage('Error', 'IP值为空')
+            return;
+        }
+        if(!dataId){
+            showToastmessage('Error', 'dataId为空')
+            return;
+        }
+        var data = {name: name, time: time, dataId: dataId, ip: ip}
+        var url = '/frequency/evictLimitResIp';
+        $.ajax({
+            type: "post",
+            headers: app.headers,
+            url: url,
+            data: data,
+            success: function (data) {
+                if (data.success) {
+                    doSearchReload();    // reload the user data
+                } else {
+                    showToastmessage('Error', data.errorMsg)
+                }
+            }
+        });
+    }
+
+    function evictResUser(name, time, dataId, userId) {
+        if(!userId){
+            showToastmessage('Error', 'IP值为空')
+            return;
+        }
+        if(!dataId){
+            showToastmessage('Error', 'dataId为空')
+            return;
+        }
+        var data = {name: name, time: time, dataId: dataId, userId: userId}
+        var url = '/frequency/evictLimitResUser';
         $.ajax({
             type: "post",
             headers: app.headers,

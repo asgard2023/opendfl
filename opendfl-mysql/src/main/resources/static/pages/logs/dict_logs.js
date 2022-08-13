@@ -1,8 +1,10 @@
 var dict_freqLimitType = [
     {id: 'limit', name: 'limit用户限制'},
-    {id: 'limitIp', name: 'limitIp同IP次数频率'},
-    {id: 'userIp', name: 'userIp用户IP数限制'},
-    {id: 'ipUser', name: 'ipUserIP用户数限制'}
+    {id: 'limitIp', name: 'limitIp同IP次数频率', color: "red"},
+    {id: 'userIp', name: 'userIp用户IP数限制', color: "blue"},
+    {id: 'ipUser', name: 'ipUserIP用户数限制', color: "blue"},
+    {id: 'ResIp', name: "RES_IP同资源ID同IP访问次数", color: "green"},
+    {id: 'ResUser', name: "RES_USER同资源ID同用户访问次数", color: "green"}
 ]
 
 var dict_whiteBlackCheckType = [

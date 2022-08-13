@@ -5,7 +5,6 @@ import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.limitfrequency.FrequencyUtils;
 import org.ccs.opendfl.core.strategy.limits.FreqLimitChain;
-import org.ccs.opendfl.core.strategy.limits.FreqLimitStrategy;
 import org.ccs.opendfl.core.utils.RedisTemplateUtil;
 import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
@@ -22,9 +21,9 @@ import java.util.concurrent.TimeUnit;
  *
  * @author chenjh
  */
-@Service(value = "freqLimitUserCountStrategy")
-public class FreqLimitUserCountStrategy implements FreqLimitStrategy {
-    private static final Logger logger = LoggerFactory.getLogger(FreqLimitUserCountStrategy.class);
+@Service(value = "freqLimitStrategy")
+public class FreqLimitStrategy implements org.ccs.opendfl.core.strategy.limits.FreqLimitStrategy {
+    private static final Logger logger = LoggerFactory.getLogger(FreqLimitStrategy.class);
     public static final FreqLimitType LIMIT_TYPE = FreqLimitType.LIMIT;
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -34,7 +33,7 @@ public class FreqLimitUserCountStrategy implements FreqLimitStrategy {
 
     @Autowired
     public void setFrequencyConfiguration(FrequencyConfiguration frequencyConfiguration) {
-        FreqLimitUserCountStrategy.frequencyConfiguration = frequencyConfiguration;
+        FreqLimitStrategy.frequencyConfiguration = frequencyConfiguration;
     }
 
     @Override
@@ -43,7 +42,7 @@ public class FreqLimitUserCountStrategy implements FreqLimitStrategy {
     }
 
     public static String getRedisKey(FrequencyVo frequency, String userId, String ip) {
-        String key = frequencyConfiguration.getRedisPrefix() + ":" + LIMIT_TYPE.getType() + ":" + frequency.getName() + ":" + frequency.getTime();
+        String key = frequencyConfiguration.getRedisPrefix() + "e:" + LIMIT_TYPE.getType() + ":" + frequency.getName() + ":" + frequency.getTime();
         if (userId == null) {
             key += ":noUser:" + ip;
         } else {
@@ -63,6 +62,7 @@ public class FreqLimitUserCountStrategy implements FreqLimitStrategy {
             final String ip = strategyParams.getIp();
             String redisKey = getRedisKey(frequency, userId, ip);
             long v = redisTemplate.opsForValue().increment(redisKey, 1);
+//            logger.info("----limitCount--redisKey={} limit={} v={}", redisKey, limit, v);
             if (v == 1) {
                 redisTemplate.expire(redisKey, frequency.getTime(), TimeUnit.SECONDS);
             } else {

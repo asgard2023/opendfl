@@ -39,10 +39,9 @@ class FreqLimitChainTest {
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo;
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.USER_IP);
         frequencyVo.setName("serverTimeFreqUserIp");
-        frequencyVo.setLimit(1000);
-        frequencyVo.setFreqLimitType(FreqLimitType.USER_IP_COUNT);
+        frequencyVo.setLimit(10);
 
         String freqTypeItems = "limit,limitIp,userIp,ipUser,";
         freqLimitChain.sortStrategies(freqTypeItems);
@@ -54,6 +53,7 @@ class FreqLimitChainTest {
             try {
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip + i, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, "130");
+                strategyParamsVo.getChainOper().clearChain();
                 this.freqLimitChain.doCheckLimit(freqLimitChain, strategyParamsVo);
                 successCount++;
             } catch (BaseException e) {
@@ -66,11 +66,12 @@ class FreqLimitChainTest {
         Assertions.assertEquals(10, failCount, "failCount:" + failCount);
     }
 
-    private FrequencyVo getFrequencyServerTime(String requestUri) {
+    private FrequencyVo getFrequencyServerTime(String requestUri, FreqLimitType freqLimitType) {
         FrequencyVo frequencyVo = new FrequencyVo();
         frequencyVo.setRequestUri(requestUri);
         frequencyVo.setName("serverTimeFreq");
-        frequencyVo.setTime(5);
+        frequencyVo.setTime(30);
+        frequencyVo.setFreqLimitType(freqLimitType);
         frequencyVo.setErrMsg(ResultCode.USER_FREQUENCY_ERROR.getMsg());
         frequencyVo.setErrMsgEn(ResultCode.USER_FREQUENCY_ERROR.getMsg());
         return frequencyVo;
@@ -86,9 +87,8 @@ class FreqLimitChainTest {
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
-        frequencyVo.setLimit(1000);
-        frequencyVo.setFreqLimitType(FreqLimitType.IP_USER_COUNT);
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.IP_USER);
+        frequencyVo.setLimit(10);
         frequencyVo.setName("serverTimeFreqIpUser");
 
         String freqTypeItems = "limit,limitIp,userIp,ipUser,";
@@ -100,6 +100,7 @@ class FreqLimitChainTest {
         for (int i = 0; i < 20; i++) {
             try {
                 strategyParamsVo.load(frequencyVo, "130" + i);
+                strategyParamsVo.getChainOper().clearChain();
                 this.freqLimitChain.doCheckLimit(freqLimitChain, strategyParamsVo);
                 successCount++;
             } catch (BaseException e) {
@@ -122,7 +123,7 @@ class FreqLimitChainTest {
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip,deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.LIMIT);
         frequencyVo.setLimit(1000);
 
         String freqTypeItems = "limit,limitIp,userIp,ipUser,";
@@ -134,6 +135,7 @@ class FreqLimitChainTest {
         for (int i = 0; i < 1020; i++) {
             try {
                 strategyParamsVo.load(frequencyVo, "131");
+                strategyParamsVo.getChainOper().clearChain();
                 this.freqLimitChain.doCheckLimit(freqLimitChain, strategyParamsVo);
                 successCount++;
             } catch (BaseException e) {
@@ -157,7 +159,7 @@ class FreqLimitChainTest {
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip,deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.LIMIT);
         frequencyVo.setLimit(1000);
 
         String freqTypeItems = "limit,";
@@ -169,6 +171,7 @@ class FreqLimitChainTest {
         for (int i = 0; i < 1020; i++) {
             try {
                 strategyParamsVo.load(frequencyVo, "132");
+                strategyParamsVo.getChainOper().clearChain();
                 this.freqLimitChain.doCheckLimit(freqLimitChain, strategyParamsVo);
                 successCount++;
             } catch (BaseException e) {
@@ -183,6 +186,42 @@ class FreqLimitChainTest {
     }
 
     @Test
+    void doCheckLimit_limit5() {
+        String lang = null;
+        String ip = "192.168.5.101";
+        String requestUri = "/frequencyTest/serverTimeFreq";
+        ReqSysType reqSysType =ReqSysType.PC;
+        String methodName = "serverTimeFreq";
+        Long curTime = System.currentTimeMillis();
+        RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip,deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
+
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.LIMIT);
+        frequencyVo.setLimit(3);
+
+        String freqTypeItems = "limit,";
+
+        freqLimitChain.sortStrategies(freqTypeItems);
+        long time = System.currentTimeMillis();
+        int successCount = 0;
+        int failCount = 0;
+        for (int i = 0; i < 5; i++) {
+            try {
+                strategyParamsVo.load(frequencyVo, "132");
+                strategyParamsVo.getChainOper().clearChain();
+                this.freqLimitChain.doCheckLimit(freqLimitChain, strategyParamsVo);
+                successCount++;
+                log.debug("-----i={} time={}", i, System.currentTimeMillis()-time);
+            } catch (BaseException e) {
+                failCount++;
+                log.error("-----count={} methodName={} title={} error={}", i, methodName, e.getTitle(), e.getMessage());
+            }
+        }
+        log.info("-----doCheckLimit_limit--successCount={} failCount={} runTime={}/{}", successCount, failCount, System.currentTimeMillis() - time,System.currentTimeMillis() - curTime);
+//        Assertions.assertEquals(1000, successCount, "successCount:" + successCount);
+//        Assertions.assertEquals(20, failCount, "failCount:" + failCount);
+    }
+
+    @Test
     void doCheckLimit_noLimit() {
         String lang = null;
         String ip = "192.168.5.101";
@@ -192,7 +231,7 @@ class FreqLimitChainTest {
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.LIMIT);
         frequencyVo.setLimit(1000);
 
         String freqTypeItems = "userCount,userIp,ipUser,";
@@ -204,6 +243,7 @@ class FreqLimitChainTest {
         for (int i = 0; i < 1020; i++) {
             try {
                 strategyParamsVo.load(frequencyVo, "133");
+                strategyParamsVo.getChainOper().clearChain();
                 this.freqLimitChain.doCheckLimit(freqLimitChain, strategyParamsVo);
                 successCount++;
             } catch (BaseException e) {

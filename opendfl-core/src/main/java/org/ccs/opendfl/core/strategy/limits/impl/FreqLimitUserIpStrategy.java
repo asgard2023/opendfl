@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Service(value = "freqLimitUserIpStrategy")
 public class FreqLimitUserIpStrategy implements FreqLimitStrategy {
-    public static final FreqLimitType LIMIT_TYPE = FreqLimitType.USER_IP_COUNT;
+    public static final FreqLimitType LIMIT_TYPE = FreqLimitType.USER_IP;
     private static final Logger logger = LoggerFactory.getLogger(FreqLimitUserIpStrategy.class);
 
     @Autowired
@@ -43,11 +43,7 @@ public class FreqLimitUserIpStrategy implements FreqLimitStrategy {
     }
 
     public static String getRedisKey(FrequencyVo frequency, String userId) {
-        String function = "";
-        if (StringUtils.ifYes(frequencyConfiguration.getLimit().getIpLimitSplitFunction())) {
-            function = ":" + frequency.getName();
-        }
-        return frequencyConfiguration.getRedisPrefix() + ":" + LIMIT_TYPE.getType() + function + ":" + frequency.getTime() + ":" + userId;
+        return frequencyConfiguration.getRedisPrefix() + ":" + LIMIT_TYPE.getType() + ":" + frequency.getName() + ":" + frequency.getTime() + ":" + userId;
     }
 
     @Override
@@ -60,7 +56,7 @@ public class FreqLimitUserIpStrategy implements FreqLimitStrategy {
             String ip = strategyParams.getIp();
             String redisKey = getRedisKey(frequency, userId);
             long v = redisTemplate.opsForSet().size(redisKey);
-            logger.info("----userIp--redisKey={} limit={} v={}", redisKey, limit, v);
+//            logger.info("----userIp--redisKey={} limit={} v={}", redisKey, limit, v);
             if (v < limit + FreqLimitType.REDIS_SET_OUT_LIMIT) {
                 v += redisTemplate.opsForSet().add(redisKey, ip);
                 if (v == 1) {

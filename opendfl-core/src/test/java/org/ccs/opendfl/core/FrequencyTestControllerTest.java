@@ -76,8 +76,39 @@ class FrequencyTestControllerTest {
             System.out.println("----serverTimeFreq_dataId status=" + status + " content=" + content);
         }
         System.out.println("----serverTimeFreq_dataId  successCount=" + successCount + " limtCount=" + limtCount+" time="+(System.currentTimeMillis()-time));
-        Assertions.assertTrue(successCount > 0, "successCount:" + successCount);
-        Assertions.assertTrue(limtCount == 0, "limtCount:" + limtCount);
+        Assertions.assertEquals(10, successCount, "successCount:" + successCount);
+        Assertions.assertEquals(10, limtCount, "limtCount:" + limtCount);
+    }
+
+    /**
+     * 用户访问频率-没有用户（默认走IP）
+     * user request limit-- no userId use IP as default
+     */
+    @Test
+    void serverTimeFreq_userId() throws Exception {
+
+        int limtCount = 0;
+        int successCount = 0;
+        long time=System.currentTimeMillis();
+        String errorLimitType = "frequency:limit";
+        for (int i = 0; i < 20; i++) {
+            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreq")
+                            .param("dataId", "data"+i)
+                            .param("userId", "test1234")
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andReturn();
+            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+            if (content.contains(errorLimitType)) {
+                limtCount++;
+            } else {
+                successCount++;
+            }
+            System.out.println("----serverTimeFreq_dataId status=" + status + " content=" + content);
+        }
+        System.out.println("----serverTimeFreq_dataId  successCount=" + successCount + " limtCount=" + limtCount+" time="+(System.currentTimeMillis()-time));
+        Assertions.assertEquals(10, successCount, "successCount:" + successCount);
+        Assertions.assertEquals(10, limtCount, "limtCount:" + limtCount);
     }
 
     /**
@@ -835,234 +866,5 @@ class FrequencyTestControllerTest {
         System.out.println("----serverTimeFreqUserIp  successCount=" + successCount + " limtCount=" + limtCount);
         Assertions.assertTrue(successCount > 0, "successCount:" + successCount);
         Assertions.assertTrue(limtCount > 0, "ipUserCount:" + limtCount);
-    }
-
-    /**
-     * 分布式锁-用户锁
-     */
-    @Test
-    void waitLockTestUser() {
-        AtomicInteger lockedCounter = new AtomicInteger();
-        AtomicInteger successCounter = new AtomicInteger();
-        Integer sleepTime = 2;//单位秒(s)
-        String errorLimitType = "frequency:lock";
-
-        ExecutorService executorService = Executors.newFixedThreadPool(20);
-        for (int i = 0; i < 20; i++) {
-            final int iOper = i;
-            final String ip = "192.168.0." + i;
-            executorService.execute(new Runnable() {
-                public void run() {
-                    try {
-                        this.waitLockTest();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                private void waitLockTest() throws Exception {
-                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/waitLockTestUser")
-                                    .param("userId", "123" + (iOper / 4))
-                                    .param("sleepTime", "" + sleepTime)
-                                    .header(HEADER_IP, ip)
-                                    .accept(MediaType.APPLICATION_JSON))
-                            .andReturn();
-                    int status = mvcResult.getResponse().getStatus();                 //得到返回代码
-                    String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
-                    if (content.contains(errorLimitType)) {
-                        lockedCounter.incrementAndGet();
-                    } else {
-                        successCounter.incrementAndGet();
-                    }
-                    System.out.println("----waitLockTestUser  status=" + status + " content=" + content);
-                }
-            });
-        }
-
-        executorService.shutdown();
-        try {
-            while (!executorService.awaitTermination(1, TimeUnit.SECONDS)) {
-                System.out.println("等待中");
-            }
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
-        System.out.println("----waitLockTestUser  successCount=" + successCounter.get() + " limtCount=" + lockedCounter.get());
-        Assertions.assertTrue(successCounter.get() >= 4, "successCount:" + successCounter.get());
-        Assertions.assertTrue(lockedCounter.get() >= 15, "lockedCount:" + lockedCounter.get());
-    }
-
-    /**
-     * 分布式气密-订单号
-     */
-    @Test
-    void waitLockTestOrder() {
-        AtomicInteger lockedCounter = new AtomicInteger();
-        AtomicInteger successCounter = new AtomicInteger();
-        Integer sleepTime = 2;//单位秒(s)
-        String errorLimitType = "frequency:lock";
-        String orderId = "testOrder123";
-
-        int size = 20;
-        ExecutorService executorService = Executors.newFixedThreadPool(20);
-        for (int i = 0; i < size; i++) {
-            final int iOper = i;
-            final String ip = "192.168.0." + i;
-            executorService.execute(new Runnable() {
-                public void run() {
-                    try {
-                        this.waitLockTest();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                private void waitLockTest() throws Exception {
-                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/waitLockTestOrder")
-                                    .param("userId", "123" + (iOper / 4))
-                                    .param("sleepTime", "" + sleepTime)
-                                    .param("orderId", orderId)
-                                    .header(HEADER_IP, ip)
-                                    .accept(MediaType.APPLICATION_JSON))
-                            .andReturn();
-                    int status = mvcResult.getResponse().getStatus();                 //得到返回代码
-                    String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
-                    if (content.contains(errorLimitType)) {
-                        lockedCounter.incrementAndGet();
-                    } else {
-                        successCounter.incrementAndGet();
-                    }
-                    System.out.println("----waitLockTestOrder  status=" + status + " content=" + content);
-                }
-            });
-        }
-
-        executorService.shutdown();
-        try {
-            while (!executorService.awaitTermination(1, TimeUnit.SECONDS)) {
-                System.out.println("等待中");
-            }
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
-        System.out.println("----waitLockTestOrder  successCount=" + successCounter.get() + " limtCount=" + lockedCounter.get());
-        Assertions.assertEquals(1, successCounter.get(), "successCount:" + successCounter.get());
-        Assertions.assertEquals(size - 1, lockedCounter.get(), "lockedCount:" + lockedCounter.get());
-    }
-
-    /**
-     * 分布式气密-订单号
-     */
-    @Test
-    void waitLockTestOrderEtcdKv() {
-        AtomicInteger lockedCounter = new AtomicInteger();
-        AtomicInteger successCounter = new AtomicInteger();
-        Integer sleepTime = 2;//单位秒(s)
-        String errorLimitType = "frequency:lock";
-        String orderId = "testOrder123";
-
-        int size = 20;
-        ExecutorService executorService = Executors.newFixedThreadPool(20);
-        for (int i = 0; i < size; i++) {
-            final int iOper = i;
-            final String ip = "192.168.0." + i;
-            executorService.execute(new Runnable() {
-                public void run() {
-                    try {
-                        this.waitLockTest();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                private void waitLockTest() throws Exception {
-                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/waitLockTestOrderEtcdKv")
-                                    .param("userId", "123" + (iOper / 4))
-                                    .param("sleepTime", "" + sleepTime)
-                                    .param("orderId", orderId)
-                                    .header(HEADER_IP, ip)
-                                    .accept(MediaType.APPLICATION_JSON))
-                            .andReturn();
-                    int status = mvcResult.getResponse().getStatus();                 //得到返回代码
-                    String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
-                    if (content.contains(errorLimitType)) {
-                        lockedCounter.incrementAndGet();
-                    } else {
-                        successCounter.incrementAndGet();
-                    }
-                    System.out.println("----waitLockTestOrderEtcdKv  status=" + status + " content=" + content);
-                }
-            });
-        }
-
-        executorService.shutdown();
-        try {
-            while (!executorService.awaitTermination(1, TimeUnit.SECONDS)) {
-                System.out.println("等待中");
-            }
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
-        System.out.println("----waitLockTestOrderEtcdKv  successCount=" + successCounter.get() + " limtCount=" + lockedCounter.get());
-        Assertions.assertEquals(1, successCounter.get(), "successCount:" + successCounter.get());
-        Assertions.assertEquals(size - 1, lockedCounter.get(), "lockedCount:" + lockedCounter.get());
-    }
-
-    /**
-     * 分布式气密-订单号
-     */
-    @Test
-    void waitLockTestOrderZk() {
-        AtomicInteger lockedCounter = new AtomicInteger();
-        AtomicInteger successCounter = new AtomicInteger();
-        Integer sleepTime = 2;//单位秒(s)
-        String errorLimitType = "frequency:lock";
-        String orderId = "testOrder123";
-
-        int size = 20;
-        ExecutorService executorService = Executors.newFixedThreadPool(20);
-        for (int i = 0; i < size; i++) {
-            final int iOper = i;
-            final String ip = "192.168.0." + i;
-            executorService.execute(new Runnable() {
-                public void run() {
-                    try {
-                        this.waitLockTest();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                private void waitLockTest() throws Exception {
-                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/waitLockTestOrderZk")
-                                    .param("userId", "123" + (iOper / 4))
-                                    .param("sleepTime", "" + sleepTime)
-                                    .param("orderId", orderId)
-                                    .header(HEADER_IP, ip)
-                                    .accept(MediaType.APPLICATION_JSON))
-                            .andReturn();
-                    int status = mvcResult.getResponse().getStatus();                 //得到返回代码
-                    String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
-                    if (content.contains(errorLimitType)) {
-                        lockedCounter.incrementAndGet();
-                    } else {
-                        successCounter.incrementAndGet();
-                    }
-                    System.out.println("----waitLockTestOrderZk  status=" + status + " content=" + content);
-                }
-            });
-        }
-
-        executorService.shutdown();
-        try {
-            while (!executorService.awaitTermination(1, TimeUnit.SECONDS)) {
-                System.out.println("等待中");
-            }
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
-        System.out.println("----waitLockTestOrderZk  successCount=" + successCounter.get() + " limtCount=" + lockedCounter.get());
-        Assertions.assertEquals(1, successCounter.get(), "successCount:" + successCounter.get());
-        Assertions.assertEquals(size - 1, lockedCounter.get(), "lockedCount:" + lockedCounter.get());
     }
 }

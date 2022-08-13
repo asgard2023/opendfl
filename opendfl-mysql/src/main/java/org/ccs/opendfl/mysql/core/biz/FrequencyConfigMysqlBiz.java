@@ -73,7 +73,8 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
         if (StringUtils.equals(FrequencyType.URI_CONFIG.getType(), frequency.getLimitType())) {
             return;
         }
-        String key = frequency.getName() + ":" + frequency.getTime();
+        int freqLimitType = frequency.getFreqLimitType().getType();
+        String key = frequency.getName()+":"+freqLimitType + ":" + frequency.getTime();
         Long time = loadSysconfigTimeMap.get(key);
         FrequencyMysqlVo frequencyExist = sysconfigLimitMap.get(key);
         //缓存10秒，10秒加载一次
@@ -142,7 +143,20 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
      */
     private FrequencyMysqlVo limitBySysconfig(FrequencyVo frequency) {
         String key = frequency.getName();
-        DflFrequencyPo frequencyPo = dflFrequencyBiz.getFrequencyByCode(key, frequency.getTime());
+        DflFrequencyPo frequencyPo = dflFrequencyBiz.getFrequencyByCode(key, frequency.getFreqLimitType().getType(), frequency.getTime());
+        if(frequencyPo==null) {
+            DflFrequencyPo frequencyPoExist = dflFrequencyBiz.getFrequencyByCode(key, null, frequency.getTime());
+            if(frequencyPoExist!=null){
+                DflFrequencyPo update=new DflFrequencyPo();
+                update.setId(frequencyPoExist.getId());
+                update.setFreqLimitType(frequency.getFreqLimitType().getType());
+                this.dflFrequencyBiz.updateDflFrequency(update);
+                frequencyPoExist.setFreqLimitType(update.getFreqLimitType());
+                frequencyPoExist.setModifyTime(update.getModifyTime());
+                frequencyPo=frequencyPoExist;
+            }
+        }
+
         if (frequencyPo != null) {
             return getFrequencyMysqlVo(frequency, frequencyPo);
         } else {
@@ -325,7 +339,7 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
             if(StringUtils.isBlank(modifyInfo.getCode())||modifyInfo.getTime()==null){
                 continue;
             }
-            cacheKey= modifyInfo.getCode()+":"+modifyInfo.getTime();
+            cacheKey= modifyInfo.getCode()+":"+modifyInfo.getFreqLimitType()+":"+modifyInfo.getTime();
             FrequencyMysqlVo frequencyMysqlExist = sysconfigLimitMap.get(cacheKey);
             if (frequencyMysqlExist == null) {
                 log.warn("----reloadNewlyFrequency--cacheKey={} uri={} unexist", cacheKey, modifyInfo.getUri());

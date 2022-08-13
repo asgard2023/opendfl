@@ -40,17 +40,20 @@ frequency:
     uriConfigs:
       - uri: /frequencyTest/serverTimeUri
         method: GET
+        freqLimitType: limit
         time: 5
         limit: 8
         attrName: account
       - uri: /frequencyTest/serverTimeUri
         time: 3600
         limit: 30
+        freqLimitType: limit
         userIp: 7
         ipUser: 7
         attrName: account
     #基于注解的频率限制
     frequencyConfigs:
       - name: serverTimeFreq
+        freqLimitType: limit
         time: 5
         limit: 10

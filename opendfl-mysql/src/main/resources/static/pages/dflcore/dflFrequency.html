@@ -107,7 +107,7 @@
                 <th align="center" field="alias" width="50" sortable="false">别名，相当于分组</th>
                 <th align="center" field="time" width="50" sortable="true">时间间隔</th>
                 <th align="center" field="limitCount" width="50" sortable="true">限制次数</th>
-                <th align="center" field="freqLimitType" width="50" sortable="true">频率限制类型</th>
+                <th align="center" field="freqLimitType" width="50" sortable="true" formatter="formatterFreqLimitType">频率限制类型</th>
                 <th align="center" field="whiteCode" width="50" sortable="true">白名单编码</th>
                 <th align="center" field="limitType" width="50" sortable="true">限制类型</th>
                 <th align="center" field="attrName" width="50" sortable="false">限制属性名</th>
@@ -162,7 +162,11 @@
         </div>
         <div class="fitem">
             <label>频率限制类型:</label>
-            <input name="freqLimitType" class="easyui-validatebox">
+            <input class="easyui-combobox" name="freqLimitType" id="dflFrequency_freqLimitType" required="true" data-options="
+									valueField: 'id',
+									textField: 'name',
+									//multiple:true, //多选增加此项
+									data: dict_freqLimitType"/>
         </div>
         <div class="fitem">
             <label>白名单编码:</label>
@@ -267,6 +271,7 @@
     function onAdd() {
         $('#dlg').dialog('open').dialog('setTitle', 'New DflFrequency');
         $('#fm').form('clear');
+        $('#dflFrequency_freqLimitType').combobox("enable");
         $('#dflFrequency_status').combobox('select', '1');
         //$("#dflFrequency_remark").val('test');
     }
@@ -288,6 +293,7 @@
             var entityName = 'dflFrequency';
             $('#fm').form('clear');
             var obj = getRowData(entityName, row);
+            $('#dflFrequency_freqLimitType').combobox("disable");
             $('#dlg').dialog('open').dialog('setTitle', 'Edit DflFrequency');
             $('#fm').form('load', obj);
         }

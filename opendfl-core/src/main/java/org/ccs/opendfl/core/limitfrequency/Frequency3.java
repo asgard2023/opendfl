@@ -32,10 +32,9 @@ public @interface Frequency3 {
     FreqLimitType freqLimitType() default FreqLimitType.LIMIT;
 
     /**
-     * 方法参数名，默认userId
      * 可以用于指定为其他的参数，比如account，username等
-     * 没有可以不填，不填默认走用户或者IP
-     * 但是如果填了属性，那如果属性为空则，直接忽略(接口本身应该有些参数的非空判断，即抛非空异常)，会造成该频率限制不起作用
+     * 没有可以不填
+     * 但是如果填了属性，那如果属性为空则，直接忽略(接口本身应该有些参数的非空判断，即抛非空异常)，即该频率限制不起作用
      * @return
      */
     String attrName() default "";

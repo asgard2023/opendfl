@@ -47,7 +47,7 @@ class FreqLimitChainMysqlTest {
         FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
         frequencyVo.setName("serverTimeFreqUserIp");
         frequencyVo.setLimit(1000);
-        frequencyVo.setFreqLimitType(FreqLimitType.USER_IP_COUNT);
+        frequencyVo.setFreqLimitType(FreqLimitType.USER_IP);
 
         String freqTypeItems = "limit,limitIp,userIp,ipUser,";
         freqLimitChain.sortStrategies(freqTypeItems);
@@ -95,7 +95,7 @@ class FreqLimitChainMysqlTest {
 
         FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
         frequencyVo.setLimit(1000);
-        frequencyVo.setFreqLimitType(FreqLimitType.IP_USER_COUNT);
+        frequencyVo.setFreqLimitType(FreqLimitType.IP_USER);
         frequencyVo.setName("serverTimeFreqIpUser");
 
         String freqTypeItems = "limit,limitIp,userIp,ipUser,";

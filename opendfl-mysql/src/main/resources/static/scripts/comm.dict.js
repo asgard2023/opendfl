@@ -100,6 +100,13 @@ function formatterBlackWhiteLimitType(value) {
     return value;
 }
 
+function formatterFreqLimitType(value){
+    if (value) {
+        return formatterCombobox(dict_freqLimitType, value);
+    }
+    return value;
+}
+
 
 function dgUserNickname(val) {
     if (val) {
@@ -167,4 +174,13 @@ dict_reqLockType = [
     {"id": "etcdKv", "name": "etcdKv快速失败模式"},
     {"id": "etcdLock", "name": "etcdLock同步模式"},
     {"id": "zk", "name": "zookeeper模式"}
+]
+
+dict_freqLimitType = [
+    {id: 1, name: "LIMIT访问次数"},
+    {id: 2, name: "LIMIT_IP同IP访问次数", color: "red"},
+    {id: 3, name: "USER_IP同用户多IP数", color: "blue"},
+    {id: 4, name: "IP_USER同IP多用户数", color: "blue"},
+    {id: 5, name: "RES_IP同资源ID同IP访问次数", color: "green"},
+    {id: 6, name: "RES_USER同资源ID同用户访问次数", color: "green"}
 ]

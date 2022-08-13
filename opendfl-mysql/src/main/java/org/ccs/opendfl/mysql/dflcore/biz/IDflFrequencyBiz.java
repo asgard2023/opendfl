@@ -48,10 +48,10 @@ public interface IDflFrequencyBiz extends IBaseService<DflFrequencyPo> {
      */
     Integer deleteDflFrequency(Integer id, Integer operUser, String remark);
 
-    public void getFrequencyByCode_evict(String code, Integer time);
-    DflFrequencyPo getFrequencyByCode(String code, Integer time);
+    public void getFrequencyByCode_evict(String code, Integer freqLimitType, Integer time);
+    DflFrequencyPo getFrequencyByCode(String code, Integer freqLimitType, Integer time);
 
-    public Integer getFrequencyIdByCode(String code, Integer time);
+    public Integer getFrequencyIdByCode(String code, Integer freqLimitType, Integer time);
 
     public void getFrequencyByUri_evict(String uri);
     public List<DflFrequencyPo> getFrequencyByUri(String uri);

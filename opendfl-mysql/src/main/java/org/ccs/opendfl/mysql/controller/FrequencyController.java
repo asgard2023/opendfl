@@ -615,6 +615,77 @@ public class FrequencyController extends BaseController {
         return ResultData.success(evictKey);
     }
 
+    @RequestMapping(value = "/evictLimitIp", method = {RequestMethod.POST, RequestMethod.GET})
+    @CheckLogin
+    @CheckAuthorization("admin")
+    public ResultData evictLimitIp(HttpServletRequest request, FrequencyVo frequency) {
+        String token = RequestUtils.getToken(request);
+        UserVo userVo = dflUserLoginBiz.getUserByToken(token);
+        UserOperType operType = UserOperType.EVICT;
+        checkUserPermission(userVo, operType);
+
+        String ip = request.getParameter("ip");
+        ValidateUtils.notNull(ip, "ip is null");
+
+        ValidateUtils.notNull(frequency.getName(), "name is null");
+        ValidateUtils.notNull(frequency.getTime(), "time is null");
+        ip = "" + RequestUtils.getIpConvertNum(ip);
+
+        AuditLogUtils.addAuditLog(request, userVo, operType.getType(), ip, frequency.getTime());
+        String evictKey = frequencyDataBiz.freqEvictLimitIp(frequency, ip);
+        return ResultData.success(evictKey);
+    }
+
+    @RequestMapping(value = "/evictLimitResIp", method = {RequestMethod.POST, RequestMethod.GET})
+    @CheckLogin
+    @CheckAuthorization("admin")
+    public ResultData evictLimitResIp(HttpServletRequest request, FrequencyVo frequency) {
+        String token = RequestUtils.getToken(request);
+        UserVo userVo = dflUserLoginBiz.getUserByToken(token);
+        UserOperType operType = UserOperType.EVICT;
+        checkUserPermission(userVo, operType);
+
+        String ip = request.getParameter("ip");
+        ValidateUtils.notNull(ip, "ip is null");
+        String dataId = request.getParameter("dataId");
+        ValidateUtils.notNull(dataId, "dataId is null");
+
+        ValidateUtils.notNull(frequency.getName(), "name is null");
+        ValidateUtils.notNull(frequency.getTime(), "time is null");
+        ip = "" + RequestUtils.getIpConvertNum(ip);
+
+        AuditLogUtils.addAuditLog(request, userVo, operType.getType(), ip, frequency.getTime());
+        String evictKey = frequencyDataBiz.freqResIpEvict(frequency, ip, dataId);
+        return ResultData.success(evictKey);
+    }
+
+    @RequestMapping(value = "/evictLimitResUser", method = {RequestMethod.POST, RequestMethod.GET})
+    @CheckLogin
+    @CheckAuthorization("admin")
+    public ResultData evictLimitResUser(HttpServletRequest request, FrequencyVo frequency) {
+        String token = RequestUtils.getToken(request);
+        UserVo userVo = dflUserLoginBiz.getUserByToken(token);
+        UserOperType operType = UserOperType.EVICT;
+        checkUserPermission(userVo, operType);
+
+        String dataId = request.getParameter("dataId");
+        ValidateUtils.notNull(dataId, "dataId is null");
+        ValidateUtils.notNull(frequency.getName(), "name is null");
+        ValidateUtils.notNull(frequency.getTime(), "time is null");
+
+        String userId = request.getParameter(RequestParams.USER_ID);
+        checkInputFrequency(frequency, userId);
+
+        String userIdByCode = userBiz.getUserId(userId);
+        if (userIdByCode != null) {
+            userId = userIdByCode;
+        }
+
+        AuditLogUtils.addAuditLog(request, userVo, operType.getType(), userId, frequency.getTime());
+        String evictKey = frequencyDataBiz.freqResUserEvict(frequency, userId, dataId);
+        return ResultData.success(evictKey);
+    }
+
     private void checkInputFrequency(FrequencyVo frequency, String userId) {
         ValidateUtils.notNull(frequency.getName(), "name is null");
         ValidateUtils.notNull(frequency.getTime(), "time is null");

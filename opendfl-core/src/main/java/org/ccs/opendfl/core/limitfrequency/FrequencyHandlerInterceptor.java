@@ -408,22 +408,18 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         if (frequency.isNeedLogin()) {
             userBiz.checkUser(userId);
         }
-        String attrName = opendflConfiguration.getDefaultAttrName();
+
+        String attrValue=null;
         if (StringUtils.isNotBlank(frequency.getAttrName())) {
-            attrName = frequency.getAttrName();
-        }
-        String attrValue = FrequencyUtils.getAttrNameValue(params, attrName);
-        //如果未登入模式，attrName的属性值为空，则不处理，由功能本身做参数验证
-        if(!frequency.isNeedLogin()){
+            String attrName = frequency.getAttrName();
+            attrValue = FrequencyUtils.getAttrNameValue(params, attrName);
+            //attrName的属性值为空，则不处理，由功能本身做参数验证
             if(StringUtils.isBlank(attrValue)){
                 log.warn("----handleFrequency={} attrName={} attrValue is null ignore limit, need checkNull on interface", frequency.getName(), attrName);
                 throw new FrequencyAttrNameBlankException(attrName+" is blank,need checkNull on interface");
             }
         }
 
-        if (attrValue == null) {
-            attrValue = userId;
-        }
         logFirstload(frequency, curTime);
 
         strategyParams.load(frequency, userId, attrValue);
@@ -446,7 +442,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
      * @param frequency FrequencyVo
      */
     private void logFirstload(FrequencyVo frequency, long curTime) {
-        String key = frequency.getName() + ":" + frequency.getTime();
+        String key = frequency.getName()+":"+frequency.getFreqLimitType().getType() + ":" + frequency.getTime();
         if (!freqMap.containsKey(key)) {
             frequency.setCreateTime(curTime);
             freqMap.put(key, frequency.toCopy());

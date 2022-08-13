@@ -5,9 +5,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.ccs.opendfl.core.limitfrequency.Frequency;
-import org.ccs.opendfl.core.limitfrequency.Frequency2;
-import org.ccs.opendfl.core.limitfrequency.Frequency3;
+import org.ccs.opendfl.core.limitfrequency.*;
 import org.ccs.opendfl.core.limitlock.RequestLock;
 import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestLockVo;
@@ -320,10 +318,18 @@ public class AnnotationControllerUtils {
         FrequencyVo frequencyVo = null;
         if (annotation instanceof Frequency) {
             frequencyVo = FrequencyVo.toFrequencyVo((Frequency) annotation, FrequencyVo.newInstance());
-        } else if (annotation instanceof Frequency2) {
+        }
+        else if (annotation instanceof Frequency2) {
             frequencyVo = FrequencyVo.toFrequencyVo((Frequency2) annotation, FrequencyVo.newInstance());
-        } else if (annotation instanceof Frequency3) {
+        }
+        else if (annotation instanceof Frequency3) {
             frequencyVo = FrequencyVo.toFrequencyVo((Frequency3) annotation, FrequencyVo.newInstance());
+        }
+        else if (annotation instanceof Frequency4) {
+            frequencyVo = FrequencyVo.toFrequencyVo((Frequency4) annotation, FrequencyVo.newInstance());
+        }
+        else if (annotation instanceof Frequency5) {
+            frequencyVo = FrequencyVo.toFrequencyVo((Frequency5) annotation, FrequencyVo.newInstance());
         }
         if (frequencyVo != null) {
             frequencyVos.add(frequencyVo);

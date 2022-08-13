@@ -52,7 +52,7 @@ public class FrequencyConfigBiz implements IFrequencyConfigBiz {
 
     @Override
     public void limitBySysconfigLoad(FrequencyVo frequency, Long curTime) {
-        String key = frequency.getName() + ":" + frequency.getTime();
+        String key = frequency.getName()+":"+frequency.getFreqLimitType().getType() + ":" + frequency.getTime();
         Long time = loadSysconfigTimeMap.get(key);
         FrequencyVo frequencyExist = sysconfigLimitMap.get(key);
         if (time == null || curTime - time > FrequencyConstant.LOAD_CONFIG_INTERVAL) {
@@ -82,7 +82,8 @@ public class FrequencyConfigBiz implements IFrequencyConfigBiz {
         List<LimitFrequencyConfigVo> frequencyConfigList = frequencyConfiguration.getLimit().getFrequencyConfigs();
         LimitFrequencyConfigVo frequencyConfigVo = null;
         for (LimitFrequencyConfigVo configVo : frequencyConfigList) {
-            if (StringUtils.equals(key, configVo.getName()) && frequency.getTime() == configVo.getTime()) {
+            if (StringUtils.equals(key, configVo.getName()) && frequency.getTime() == configVo.getTime()
+                    && configVo.getFreqLimitType()==frequency.getFreqLimitType()) {
                 frequencyConfigVo = configVo;
                 frequency.setSysconfig(true);
                 break;
@@ -91,7 +92,6 @@ public class FrequencyConfigBiz implements IFrequencyConfigBiz {
 
         if (frequencyConfigVo != null) {
             frequency.setLimit(frequencyConfigVo.getLimit());
-            frequency.setFreqLimitType(frequencyConfigVo.getFreqLimitType());
             return frequency;
         }
 

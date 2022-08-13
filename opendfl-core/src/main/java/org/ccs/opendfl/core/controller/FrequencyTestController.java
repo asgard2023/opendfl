@@ -84,7 +84,7 @@ public class FrequencyTestController {
     @Frequency(time = 5, limit = 50, name = "serverTimeFreqAttr", attrName = "dataId")
     @Frequency2(time = 3600, limit = 100, name = "serverTimeFreqAttr", attrName = "dataId")
     public Object serverTimeFreqAttr(HttpServletRequest request) {
-        log.info("----serverTimeFreq--userId={}", request.getParameter(RequestParams.USER_ID));
+        log.info("----serverTimeFreqAttr--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();
     }
 
@@ -92,7 +92,7 @@ public class FrequencyTestController {
     @Frequency(time = 5, limit = 50, name = "serverTimeFreqAttrCheck", attrName = "dataId")
     @Frequency2(time = 3600, limit = 100, name = "serverTimeFreqAttrCheck", attrName = "dataId")
     public Object serverTimeFreqAttrCheck(HttpServletRequest request) {
-        log.info("----serverTimeFreq--userId={}", request.getParameter(RequestParams.USER_ID));
+        log.info("----serverTimeFreqAttrCheck--userId={}", request.getParameter(RequestParams.USER_ID));
         String dataId=request.getParameter("dataId");
         ValidateUtils.notNull(dataId, "dataId is null");
         return System.currentTimeMillis();
@@ -150,22 +150,22 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTimeFreqIpUser")
-    @Frequency(time = 5, limit = 5, freqLimitType = FreqLimitType.IP_USER_COUNT, name = "serverTimeFreqIpUser")
+    @Frequency(time = 5, limit = 5, freqLimitType = FreqLimitType.IP_USER, name = "serverTimeFreqIpUser")
     public Object serverTimeFreqIpUser(HttpServletRequest request) {
         log.info("----serverTimeFreqIpUser--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();
     }
 
     @GetMapping("/serverTimeFreqUserIp")
-    @Frequency(time = 5, limit = 10, freqLimitType = FreqLimitType.USER_IP_COUNT, name = "serverTimeFreqUserIp")
+    @Frequency(time = 5, limit = 10, freqLimitType = FreqLimitType.USER_IP, name = "serverTimeFreqUserIp")
     public Object serverTimeFreqUserIp(HttpServletRequest request) {
         log.info("----serverTimeFreqUserIp--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();
     }
 
     @GetMapping("/serverTimeFreqIp")
-    @Frequency(time = 30, limit = 10, freqLimitType = FreqLimitType.IP_USER_COUNT, name = "serverTimeFreqIpUser")
-    @Frequency2(time = 30, limit = 10, freqLimitType = FreqLimitType.USER_IP_COUNT, name = "serverTimeFreqUserIp")
+    @Frequency(time = 30, limit = 10, freqLimitType = FreqLimitType.IP_USER, name = "serverTimeFreqIpUser")
+    @Frequency2(time = 30, limit = 10, freqLimitType = FreqLimitType.USER_IP, name = "serverTimeFreqUserIp")
     public Object serverTimeFreqIp(HttpServletRequest request) {
         log.info("----serverTimeFreqIp--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();
@@ -220,92 +220,6 @@ public class FrequencyTestController {
         RequestTestVo requestTest = JSON.parseObject(params, RequestTestVo.class);
         ValidateUtils.notNull(requestTest.getUserId(), "userId is null");
         log.debug("----serverTimeStreamFreq--userId={}", requestTest.getUserId());
-        return System.currentTimeMillis();
-    }
-
-
-    private Integer getSleepTimeIfNull(Integer sleepTime) {
-        return getSleepTimeIfNull(sleepTime, 1);
-    }
-
-    private Integer getSleepTimeIfNull(Integer sleepTime, Integer defaultValue) {
-        int maxSleepTime = 100;
-        if (sleepTime == null || sleepTime > maxSleepTime) {
-            sleepTime = defaultValue;
-        }
-        return sleepTime;
-    }
-
-    /**
-     * 分布式锁测试，按用户，该用户前面请求未完成，再次请求全部拒绝
-     *
-     * @param sleepTime 测试线程 休睡时间(秒)
-     * @param sleepTime 休眼时间秒数
-     * @param request   HttpServletRequest
-     * @return currentTime
-     */
-    @GetMapping("/waitLockTestUser")
-    @RequestLock(name = "waitLockTestUser", time = 5, errMsg = "任务%s正在执行")
-    public Object waitLockTestUser(@RequestParam(name = "sleepTime", required = false) Integer sleepTime, HttpServletRequest request) {
-        log.info("----waitLockTestUser--userId={} ip={}", request.getParameter(RequestParams.USER_ID), RequestUtils.getIpAddress(request));
-        sleepByTime(sleepTime);
-        return System.currentTimeMillis();
-    }
-
-
-    /**
-     * 分布式锁测试，按用户，按oderId的分布式锁，只能一个请求能处理，其他全部拒绝
-     *
-     * @param sleepTime 测试线程 休睡时间(秒)
-     * @param request   HttpServletRequest
-     * @return currentTime
-     */
-    @GetMapping("/waitLockTestOrder")
-    @RequestLock(name = "waitLockTestOrder", attrName = "orderId", time = 5, errMsg = "任务%s正在执行")
-    public Object waitLockTestOrder(@RequestParam(name = "sleepTime", required = false) Integer sleepTime, HttpServletRequest request) {
-        String orderId = request.getParameter("orderId");
-        log.info("----waitLockTestOrder--userId={} orderId={} ip={}", request.getParameter(RequestParams.USER_ID), orderId, RequestUtils.getIpAddress(request));
-        sleepByTime(sleepTime);
-        return System.currentTimeMillis();
-    }
-
-    @GetMapping("/waitLockTestOrderEtcdKv")
-    @RequestLock(name = "waitLockTestOrderEtcdKv", attrName = "orderId", time = 5, errMsg = "任务%s正在执行", lockType = ReqLockType.ETCD_KV)
-    public Object waitLockTestOrderEtcdKv(@RequestParam(name = "sleepTime", required = false) Integer sleepTime, HttpServletRequest request) {
-        String orderId = request.getParameter("orderId");
-        log.info("----waitLockTestOrderEtcdKv--userId={} orderId={} ip={}", request.getParameter(RequestParams.USER_ID), orderId, RequestUtils.getIpAddress(request));
-        sleepByTime(sleepTime);
-        return System.currentTimeMillis();
-    }
-
-    private void sleepByTime(Integer sleepTime) {
-        sleepTime = getSleepTimeIfNull(sleepTime, 0);
-        try {
-            if (sleepTime > 0) {
-                Thread.sleep(sleepTime * FrequencyConstant.TIME_MILLISECOND_TO_SECOND);
-            }
-        } catch (InterruptedException e) {
-            log.warn("---sleepByTime--Interrupted!", e);
-            Thread.currentThread().interrupt();
-            throw new FailedException(e.getMessage());
-        }
-    }
-
-    @GetMapping("/waitLockTestOrderEtcdLock")
-    @RequestLock(name = "waitLockTestOrderEtcdLock", attrName = "orderId", time = 5, errMsg = "任务%s正在执行", lockType = ReqLockType.ETCD_LOCK)
-    public Object waitLockTestOrderEtcdLock(@RequestParam(name = "sleepTime", required = false) Integer sleepTime, HttpServletRequest request) {
-        String orderId = request.getParameter("orderId");
-        log.info("----waitLockTestOrderEtcdSync--userId={} orderId={} ip={}", request.getParameter(RequestParams.USER_ID), orderId, RequestUtils.getIpAddress(request));
-        sleepByTime(sleepTime);
-        return System.currentTimeMillis();
-    }
-
-    @GetMapping("/waitLockTestOrderZk")
-    @RequestLock(name = "waitLockTestOrderZk", attrName = "orderId", time = 5, errMsg = "任务%s正在执行", lockType = ReqLockType.ZK)
-    public Object waitLockTestOrderZk(@RequestParam(name = "sleepTime", required = false) Integer sleepTime, HttpServletRequest request) {
-        String orderId = request.getParameter("orderId");
-        log.info("----waitLockTestOrderZk--userId={} orderId={} ip={}", request.getParameter(RequestParams.USER_ID), orderId, RequestUtils.getIpAddress(request));
-        sleepByTime(sleepTime);
         return System.currentTimeMillis();
     }
 }

@@ -14,4 +14,8 @@ public class LimitFrequencyConfigVo {
     private String errMsg= FrequencyConstant.FREQ_ERR_MSG;
     private String errMsgEn=FrequencyConstant.FREQ_ERR_MSG_EN;
     private String whiteCode=FrequencyConstant.NONE;
+
+    public void setFreqLimitType(String freqLimitType){
+        this.freqLimitType=FreqLimitType.parseCode(freqLimitType);
+    }
 }

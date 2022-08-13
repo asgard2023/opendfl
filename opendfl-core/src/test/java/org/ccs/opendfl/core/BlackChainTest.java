@@ -30,7 +30,7 @@ class BlackChainTest {
     @BeforeEach
     void init() {
         System.out.println("----init----");
-        String freqTypeItems = "blackUser,blackIp,";
+        String freqTypeItems = "user,ip,";
         blackChain.sortStrategies(freqTypeItems);
     }
 
@@ -58,7 +58,7 @@ class BlackChainTest {
         frequencyVo.setName("serverTime");
         frequencyVo.setLimit(1000);
 
-        String freqTypeItems = "blackIp,blackUser,";
+        String freqTypeItems = "ip,user,";
         blackChain.sortStrategies(freqTypeItems);
         long time = System.currentTimeMillis();
         int successCount = 0;
@@ -67,7 +67,7 @@ class BlackChainTest {
             try {
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip, null, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, "130" + i);
-                strategyParamsVo.getChainOper().setPos(0);
+                strategyParamsVo.getChainOper().clearChain();
                 boolean isBlack = this.blackChain.doCheckLimit(blackChain, strategyParamsVo);
                 if (isBlack) {
                     failCount++;
@@ -100,7 +100,7 @@ class BlackChainTest {
         frequencyVo.setName("serverTime");
         frequencyVo.setLimit(1000);
 
-        String freqTypeItems = "blackIp,blackUser,";
+        String freqTypeItems = "ip,user,";
         blackChain.sortStrategies(freqTypeItems);
         long time = System.currentTimeMillis();
         int successCount = 0;
@@ -109,6 +109,7 @@ class BlackChainTest {
             try {
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip, null, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, "130" + i);
+                strategyParamsVo.getChainOper().clearChain();
                 boolean isBlack = this.blackChain.doCheckLimit(blackChain, strategyParamsVo);
                 if (isBlack) {
                     failCount++;
@@ -136,11 +137,11 @@ class BlackChainTest {
 
         FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
         frequencyVo.setName("serverTime");
-        frequencyVo.setLimit(1000);
+        frequencyVo.setLimit(100);
 
         String blackUser = "5103";
 
-        String freqTypeItems = "blackIp,blackUser,";
+        String freqTypeItems = "ip,user,";
         blackChain.sortStrategies(freqTypeItems);
         long time = System.currentTimeMillis();
         int successCount = 0;
@@ -151,6 +152,7 @@ class BlackChainTest {
                 ip= ""+RequestUtils.getIpConvertNum(ip);
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip, null, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, blackUser);
+                strategyParamsVo.getChainOper().clearChain();
                 boolean isBlack = this.blackChain.doCheckLimit(blackChain, strategyParamsVo);
                 if (isBlack) {
                     failCount++;

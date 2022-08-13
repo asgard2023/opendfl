@@ -52,8 +52,7 @@ public class OutLogMysqlBiz implements IOutLogBiz {
         FrequencyVo frequencyVo = strategyParams.getFrequency();
         if (frequencyVo != null) {
             logPo.setTimeSecond(frequencyVo.getTime());
-
-            logPo.setFrequencyId(dflFrequencyBiz.getFrequencyIdByCode(frequencyVo.getName(), frequencyVo.getTime()));
+            logPo.setFrequencyId(dflFrequencyBiz.getFrequencyIdByCode(frequencyVo.getName(), frequencyVo.getFreqLimitType().getType(), frequencyVo.getTime()));
         }
         logPo.setOutLimitType(outType.getType());
         logPo.setSubType(subType);

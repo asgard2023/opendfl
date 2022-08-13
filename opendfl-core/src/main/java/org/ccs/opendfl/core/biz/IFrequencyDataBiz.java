@@ -45,6 +45,16 @@ public interface IFrequencyDataBiz {
      */
     String freqEvict(FrequencyVo frequency, String account);
 
+
+    /**
+     * 重置IP频率限制次数
+     *
+     * @param frequency 对应的频限制
+     * @param ip   ip的值
+     * @return 删除成功对应的key
+     */
+    String freqEvictLimitIp(FrequencyVo frequency, String ip);
+
     /**
      * 重置同一用户多个IP登入限制
      *
@@ -62,5 +72,15 @@ public interface IFrequencyDataBiz {
      * @return 删除的Key及数量
      */
     String freqUserIpEvict(FrequencyVo frequency, String account);
+
+    /**
+     * 重置资源ID与用户访问次数限制
+     */
+    public String freqResUserEvict(FrequencyVo frequency, String userId, String dataId);
+
+    /**
+     * 重置资源ID与IP访问次数限制
+     */
+    public String freqResIpEvict(FrequencyVo frequency, String ip, String dataId);
 
 }

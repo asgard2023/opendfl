@@ -143,7 +143,7 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
         entity.setModifyTime(new Date());
         int v = this.updateByPrimaryKeySelective(entity);
         if (v > 0) {
-            this._self.getFrequencyByCode_evict(exist.getCode(), exist.getTime());
+            this._self.getFrequencyByCode_evict(exist.getCode(), exist.getFreqLimitType(), exist.getTime());
             this._self.getFrequencyByUri_evict(exist.getUri());
             this._self.getFrequencyByUriMaxUpdateTime_evict(exist.getUri());
             this._self.getFrequencyMaxUpdateTime_evict();
@@ -162,7 +162,7 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
         int v = this.updateByPrimaryKeySelective(po);
         if (v > 0) {
             DflFrequencyPo exist = this.findById(id);
-            this._self.getFrequencyByCode_evict(exist.getCode(), exist.getTime());
+            this._self.getFrequencyByCode_evict(exist.getCode(), exist.getFreqLimitType(), exist.getTime());
             this._self.getFrequencyByUri_evict(exist.getUri());
             this._self.getFrequencyByUriMaxUpdateTime_evict(exist.getUri());
             this._self.getFrequencyMaxUpdateTime_evict();
@@ -171,19 +171,20 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
     }
 
     @Override
-    @CacheEvict(value = CacheTimeType.CACHE30S, key = "'opendfl:getFrequencyByCode:'+#time+':'+#code")
-    public void getFrequencyByCode_evict(String code, Integer time) {
-        logger.info("-----getFrequencyByCode_evict--code={} time={}", code, time);
+    @CacheEvict(value = CacheTimeType.CACHE30S, key = "'opendfl:getFrequencyByCode:'+#time+':'+#freqLimitType+':'+#code")
+    public void getFrequencyByCode_evict(String code, Integer freqLimitType, Integer time) {
+        logger.info("-----getFrequencyByCode_evict--code={} freqLimitType={} time={}", code, freqLimitType, time);
     }
 
     @Override
-    @Cacheable(value = CacheTimeType.CACHE30S, key = "'opendfl:getFrequencyByCode:'+#time+':'+#code")
-    public DflFrequencyPo getFrequencyByCode(String code, Integer time) {
+    @Cacheable(value = CacheTimeType.CACHE30S, key = "'opendfl:getFrequencyByCode:'+#time+':'+#freqLimitType+':'+#code")
+    public DflFrequencyPo getFrequencyByCode(String code, Integer freqLimitType, Integer time) {
         ValidateUtils.notNull(code, "code is null");
         ValidateUtils.notNull(time, "time is null");
         DflFrequencyPo search = new DflFrequencyPo();
         search.setCode(code);
         search.setTime(time);
+        search.setFreqLimitType(freqLimitType);
         search.setIfDel(CommonIf.NO.getType());
         return this.mapper.selectOne(search);
     }
@@ -192,14 +193,14 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
             .maximumSize(2000).build();
 
     @Override
-    public Integer getFrequencyIdByCode(String code, Integer time){
+    public Integer getFrequencyIdByCode(String code, Integer freqLimitType, Integer time){
         if(code==null||time==null){
             return 0;
         }
         String key=code+":"+time;
         Integer id=frequencyIdMap.getIfPresent(key);
         if(id==null){
-            DflFrequencyPo frequencyPo= this._self.getFrequencyByCode(code, time);
+            DflFrequencyPo frequencyPo= this._self.getFrequencyByCode(code, freqLimitType, time);
             if(frequencyPo!=null){
                 id=frequencyPo.getId();
             }
