@@ -63,7 +63,6 @@ public enum SystemConfigCodes {
      */
     LIMIT_OUT_LIMIT_MIN_TIME("limit:outLimitMinTime", "频率限制日志记录间格时间最小值", ConfigValueType.INT, "3600", Constants.PID_FREQUENCY),
     LIMIT_RULE_ITEMS("limit:ruleItems", "频率限制策略", ConfigValueType.STRING, "limit,limitIp,userIp,ipUser,", Constants.PID_FREQUENCY),
-    LIMIT_IP_SPLIT("limit:ipLimitSplitFunction", "IP限制是否区分功能，如果不区分功能，则缓存有效期相同，以及ip数或用户数共享", ConfigValueType.INT, "0", Constants.PID_FREQUENCY),
 
 
     BLACKLIST_IF_ACTIVE("blacklist:ifActive", "黑名单是否启用", ConfigValueType.INT, "1", Constants.PID_BLACK),

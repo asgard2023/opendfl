@@ -172,18 +172,14 @@ public class FrequencyUtils {
     }
 
 
-    public static String getAttrNameValue(Map<String, Object> params, String attrName) {
+    public static String getAttrNameValue(Map<String, Object> params, JSONObject jsonObject, String attrName) {
         Object attrValue = params.get(attrName);
         String clientIdRsa = (String) params.get("clientIdRsa");
 
-        if (attrValue == null) {
-            String reqBody = (String) params.get(RequestUtils.REQ_BODYS);
-            if (reqBody!=null && reqBody.startsWith("{")) {
-                JSONObject jsonObject = JSON.parseObject(reqBody);
-                attrValue = jsonObject.getString(attrName);
-                if (clientIdRsa == null) {
-                    clientIdRsa = jsonObject.getString(clientIdRsa);
-                }
+        if (attrValue == null && jsonObject!=null) {
+            attrValue = jsonObject.getString(attrName);
+            if (clientIdRsa == null) {
+                clientIdRsa = jsonObject.getString(clientIdRsa);
             }
         }
         if (attrValue == null) {
@@ -191,6 +187,15 @@ public class FrequencyUtils {
         }
         return decryptValue(clientIdRsa, "" + attrValue);
     }
+
+    public static JSONObject getJsonObject(String reqBody){
+        if (reqBody!=null && reqBody.startsWith("{")) {
+            return JSON.parseObject(reqBody);
+        }
+        return null;
+    }
+
+
 
     /**
      * 用于支持加密的数据解密，比如登入账号，否则不好限制
@@ -274,4 +279,21 @@ public class FrequencyUtils {
 
     public static final String FREQUENCY_INVALID_INFO = "{\"resultCode\":\"100030\",\"errorMsg\":\"Frequency limit\",\"errorType\":\"time=0 or limit=0\",\"success\":false}";
     public static final String OUT_INFO = "{\"resultCode\":\"%s\",\"errorMsg\":\"%s\",\"errorType\":\"%s\",\"success\":false}";
+
+    /**
+     * key拼接：pedisPrefix + ":" + LIMIT_TYPE.getType() + ":" + name + ":" + time
+     * @param frequency
+     * @return
+     */
+    public static StringBuilder getRedisKeyBase(FrequencyVo frequency){
+        StringBuilder sb = new StringBuilder();
+        sb.append(frequencyConfiguration.getRedisPrefix());
+        sb.append("e:");
+        sb.append(frequency.getFreqLimitType().getType());
+        sb.append(":");
+        sb.append(frequency.getName());
+        sb.append(":");
+        sb.append(frequency.getTime());
+        return sb;
+    }
 }

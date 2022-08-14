@@ -42,8 +42,10 @@ public class FreqLimitIpStrategy implements FreqLimitStrategy {
     }
 
     public static String getRedisKey(FrequencyVo frequency, String ip) {
-        String key = frequencyConfiguration.getRedisPrefix() + ":" + LIMIT_TYPE.getType() + ":" + frequency.getName() + ":" + frequency.getTime();
-        return key + ":" + ip;
+        StringBuilder sb = FrequencyUtils.getRedisKeyBase(frequency);
+        sb.append(":");
+        sb.append(ip);
+        return sb.toString();
     }
 
     @Override
@@ -56,6 +58,9 @@ public class FreqLimitIpStrategy implements FreqLimitStrategy {
             String redisKey = getRedisKey(frequency, ip);
             int time = frequency.getTime();
             long v = redisTemplate.opsForValue().increment(redisKey, 1);
+            if(frequency.isLog()) {
+                logger.info("----limitIp--redisKey={} limit={} v={}", redisKey, limit, v);
+            }
             if (v == 1) {
                 redisTemplate.expire(redisKey, frequency.getTime(), TimeUnit.SECONDS);
             } else {

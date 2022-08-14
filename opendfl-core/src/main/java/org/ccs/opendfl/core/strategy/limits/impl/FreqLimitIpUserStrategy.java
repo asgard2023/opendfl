@@ -1,12 +1,10 @@
 package org.ccs.opendfl.core.strategy.limits.impl;
 
-import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.limitfrequency.FrequencyUtils;
 import org.ccs.opendfl.core.strategy.limits.FreqLimitChain;
 import org.ccs.opendfl.core.strategy.limits.FreqLimitStrategy;
 import org.ccs.opendfl.core.utils.RedisTemplateUtil;
-import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
 import org.slf4j.Logger;
@@ -29,12 +27,6 @@ public class FreqLimitIpUserStrategy implements FreqLimitStrategy {
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
-    private static FrequencyConfiguration frequencyConfiguration;
-
-    @Autowired
-    public void setFrequencyConfiguration(FrequencyConfiguration frequencyConfiguration) {
-        FreqLimitIpUserStrategy.frequencyConfiguration = frequencyConfiguration;
-    }
 
     @Override
     public String getLimitType() {
@@ -42,8 +34,10 @@ public class FreqLimitIpUserStrategy implements FreqLimitStrategy {
     }
 
     public static String getRedisKey(FrequencyVo frequency, String ip) {
-        String key = frequencyConfiguration.getRedisPrefix() + ":" + LIMIT_TYPE.getType() + ":" + frequency.getName() + ":" + frequency.getTime();
-        return key + ":" + ip;
+        StringBuilder sb = FrequencyUtils.getRedisKeyBase(frequency);
+        sb.append(":");
+        sb.append(ip);
+        return sb.toString();
     }
 
     @Override
@@ -56,7 +50,9 @@ public class FreqLimitIpUserStrategy implements FreqLimitStrategy {
             String ip = strategyParams.getIp();
             String redisKey = getRedisKey(frequency, ip);
             long v = redisTemplate.opsForSet().size(redisKey);
-//            logger.info("----ipUser--redisKey={} limit={} v={}", redisKey, limit, v);
+            if(frequency.isLog()) {
+                logger.info("----ipUser--redisKey={} limit={} v={}", redisKey, limit, v);
+            }
             if (v < limit + FreqLimitType.REDIS_SET_OUT_LIMIT) {
                 v += redisTemplate.opsForSet().add(redisKey, userId);
                 if (v == 1) {

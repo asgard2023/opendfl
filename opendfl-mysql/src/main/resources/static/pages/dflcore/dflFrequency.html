@@ -110,8 +110,9 @@
                 <th align="center" field="freqLimitType" width="50" sortable="true" formatter="formatterFreqLimitType">频率限制类型</th>
                 <th align="center" field="whiteCode" width="50" sortable="true">白名单编码</th>
                 <th align="center" field="limitType" width="50" sortable="true">限制类型</th>
-                <th align="center" field="attrName" width="50" sortable="false">限制属性名</th>
-                <th align="center" field="needLogin" width="50" sortable="false">是否需要登入</th>
+                <th align="center" field="attrName" width="50" sortable="true">限制属性名</th>
+                <th align="center" field="needLogin" width="50" sortable="true">是否需要登入</th>
+                <th align="center" field="log" width="50" sortable="true">是否日志</th>
                 <th align="center" field="errMsg" width="50" sortable="true" hidden="true">异常消息</th>
                 <th align="center" field="errMsgEn" width="50" sortable="true" hidden="true">异常消息en</th>
                 <th align="center" field="ifDel" width="50" sortable="true" hidden="true">是否删除</th>
@@ -183,6 +184,10 @@
         <div class="fitem">
             <label>是否需要登入:</label>
             <input name="needLogin" class="easyui-validatebox">
+        </div>
+        <div class="fitem">
+            <label>是否日志:</label>
+            <input name="log" class="easyui-validatebox">
         </div>
         <div class="fitem">
             <label>异常消息:</label>

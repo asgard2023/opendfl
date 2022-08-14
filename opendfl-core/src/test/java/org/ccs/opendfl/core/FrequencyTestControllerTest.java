@@ -64,6 +64,7 @@ class FrequencyTestControllerTest {
         for (int i = 0; i < 20; i++) {
             MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreq")
                             .param("dataId", "data"+i)
+                            .param("userId", "123")
                             .accept(MediaType.APPLICATION_JSON))
                     .andReturn();
             int status = mvcResult.getResponse().getStatus();                 //得到返回代码
@@ -125,6 +126,7 @@ class FrequencyTestControllerTest {
         for (int i = 0; i < 20; i++) {
             MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqAttr")
                             .param("dataId", "data"+i)
+                            .param("userId", "1234")
                             .accept(MediaType.APPLICATION_JSON))
                     .andReturn();
             int status = mvcResult.getResponse().getStatus();                 //得到返回代码

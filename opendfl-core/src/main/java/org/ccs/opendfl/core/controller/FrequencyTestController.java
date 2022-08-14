@@ -73,8 +73,8 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTimeFreq")
-    @Frequency(time = 5, limit = 10, name = "serverTimeFreq")
-    @Frequency2(time = 3600, limit = 20, name = "serverTimeFreq")
+    @Frequency(time = 5, limit = 10, name = "serverTimeFreq", log=true)
+    @Frequency2(time = 3600, limit = 20, name = "serverTimeFreq", log=true)
     public Object serverTimeFreq(HttpServletRequest request) {
         log.info("----serverTimeFreq--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();

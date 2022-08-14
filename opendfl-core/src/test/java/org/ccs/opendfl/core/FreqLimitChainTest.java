@@ -234,7 +234,7 @@ class FreqLimitChainTest {
         FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.LIMIT);
         frequencyVo.setLimit(1000);
 
-        String freqTypeItems = "userCount,userIp,ipUser,";
+        String freqTypeItems = "limit,userIp,ipUser,";
 
         freqLimitChain.sortStrategies(freqTypeItems);
         long time = System.currentTimeMillis();
@@ -252,8 +252,8 @@ class FreqLimitChainTest {
             }
         }
         log.info("-----doCheckLimit_noLimit--successCount={} failCount={} runTime={}", successCount, failCount, System.currentTimeMillis() - time);
-        Assertions.assertEquals(1020, successCount, "successCount:" + successCount);
-        Assertions.assertEquals(0, failCount, "failCount:" + failCount);
+        Assertions.assertEquals(1000, successCount, "successCount:" + successCount);
+        Assertions.assertEquals(20, failCount, "failCount:" + failCount);
 
     }
 }

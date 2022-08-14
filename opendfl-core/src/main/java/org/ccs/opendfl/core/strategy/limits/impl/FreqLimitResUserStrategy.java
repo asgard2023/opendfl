@@ -42,8 +42,12 @@ public class FreqLimitResUserStrategy implements FreqLimitStrategy {
     }
 
     public static String getRedisKey(FrequencyVo frequency, String userId, String attrValue) {
-        String key = frequencyConfiguration.getRedisPrefix() + ":" + LIMIT_TYPE.getType() + ":" + frequency.getName() + ":" + userId + ":" + frequency.getTime();
-        return key + ":" + attrValue;
+        StringBuilder sb = FrequencyUtils.getRedisKeyBase(frequency);
+        sb.append(":");
+        sb.append(userId);
+        sb.append(":");
+        sb.append(attrValue);
+        return sb.toString();
     }
 
     @Override
@@ -51,31 +55,44 @@ public class FreqLimitResUserStrategy implements FreqLimitStrategy {
         FrequencyVo frequency = strategyParams.getFrequency();
         final int limit = frequency.getLimit();
         if (LIMIT_TYPE == frequency.getFreqLimitType() && limit > 0 && containLimit(limitItems, LIMIT_TYPE)) {
-
             String userId = strategyParams.getUserId();
-            String lang = strategyParams.getLang();
-            String ip = strategyParams.getIp();
-            String redisKey = getRedisKey(frequency, userId, strategyParams.getAttrValue());
-            long v = redisTemplate.opsForValue().increment(redisKey, 1);
-//            logger.info("----resUser--redisKey={} limit={} v={}", redisKey, limit, v);
-            final int time = frequency.getTime();
-            if (v == 1) {
-                redisTemplate.expire(redisKey, time, TimeUnit.SECONDS);
-            } else {
-                //主要用于避免服务重启造成部份key变成永久key
-                if (v < limit) {
-                    RedisTemplateUtil.expireTimeHashFrequencyCache(redisTemplate, redisKey, time, v);
-                } else if (v > limit) {
-                    strategyParams.getChainOper().setFail(true);
-                    //再次过期处理，以免有变成永久的key
-                    RedisTemplateUtil.expireTimeTTL(redisTemplate, redisKey, frequency.getTime());
-                    logger.warn("----doCheckLimit-resUser--redisKey={} userId={} time={} count={} limit={} ip={}", redisKey, userId, time, v, limit, ip);
-
-                    FrequencyUtils.addFreqLog(strategyParams, limit, v, LIMIT_TYPE);
-                    FrequencyUtils.failExceptionMsg(getLimitType(), frequency, lang);
+            if (StringUtils.isBlank(userId)) {
+                if(frequency.isLog()) {
+                    logger.warn("requestUri={} time={} userId is blank, ignore limit, need checkNull userId on interface", frequency.getRequestUri(), frequency.getTime());
                 }
+            }
+            else {
+                checkLimit(strategyParams, frequency, limit);
             }
         }
         limitChain.doCheckLimit(limitChain, strategyParams);
+    }
+
+    private void checkLimit(RequestStrategyParamsVo strategyParams, FrequencyVo frequency, int limit) {
+        String userId = strategyParams.getUserId();
+        String lang = strategyParams.getLang();
+        String ip = strategyParams.getIp();
+        String redisKey = getRedisKey(frequency, userId, strategyParams.getAttrValue());
+        long v = redisTemplate.opsForValue().increment(redisKey, 1);
+        if(frequency.isLog()) {
+            logger.info("----resUser--redisKey={} limit={} v={}", redisKey, limit, v);
+        }
+        final int time = frequency.getTime();
+        if (v == 1) {
+            redisTemplate.expire(redisKey, time, TimeUnit.SECONDS);
+        } else {
+            //主要用于避免服务重启造成部份key变成永久key
+            if (v < limit) {
+                RedisTemplateUtil.expireTimeHashFrequencyCache(redisTemplate, redisKey, time, v);
+            } else if (v > limit) {
+                strategyParams.getChainOper().setFail(true);
+                //再次过期处理，以免有变成永久的key
+                RedisTemplateUtil.expireTimeTTL(redisTemplate, redisKey, frequency.getTime());
+                logger.warn("----doCheckLimit-resUser--redisKey={} userId={} time={} count={} limit={} ip={}", redisKey, userId, time, v, limit, ip);
+
+                FrequencyUtils.addFreqLog(strategyParams, limit, v, LIMIT_TYPE);
+                FrequencyUtils.failExceptionMsg(getLimitType(), frequency, lang);
+            }
+        }
     }
 }

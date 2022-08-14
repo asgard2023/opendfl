@@ -3,7 +3,6 @@ package org.ccs.opendfl.core.config;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IWhiteBlackCheckBiz;
-import org.ccs.opendfl.core.biz.IWhiteBlackListBiz;
 import org.ccs.opendfl.core.config.vo.LimitConfigVo;
 import org.ccs.opendfl.core.config.vo.WhiteBlackConfigVo;
 import org.ccs.opendfl.core.utils.RequestUtils;

@@ -19,6 +19,7 @@ public @interface Frequency {
 
     /**
      * 编码，uniqueKey
+     * 如果多个接口的name相同，则支持跨接口限制，即：访问次数一起算，但limit是区分的
      *
      * @return
      */
@@ -69,6 +70,12 @@ public @interface Frequency {
      * @return
      */
     boolean needLogin() default false;
+
+    /**
+     * 是否显示日志
+     * @return
+     */
+    boolean log() default false;
 
     /**
      * 方法级用户白名单

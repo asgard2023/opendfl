@@ -1,6 +1,7 @@
 package org.ccs.opendfl.core.limitlock;
 
 
+import com.alibaba.fastjson.JSONObject;
 import org.ccs.opendfl.core.biz.IOutLogBiz;
 import org.ccs.opendfl.core.biz.IRequestLockConfigBiz;
 import org.ccs.opendfl.core.config.OpendflConfiguration;
@@ -126,7 +127,9 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
             final Integer time = requestLockVo.getTime();
             final String errMsg = requestLockVo.getErrMsg();
             Map<String, Object> reqParams = RequestUtils.getParamsObject(request);
-            attrValue = FrequencyUtils.getAttrNameValue(reqParams, attrName);
+            String reqBody = (String) reqParams.get(RequestUtils.REQ_BODYS);
+            JSONObject reqObj=FrequencyUtils.getJsonObject(reqBody);
+            attrValue = FrequencyUtils.getAttrNameValue(reqParams, reqObj, attrName);
 
             if (attrValue != null) {
                 lockDataId.set(attrValue);
@@ -135,6 +138,9 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
                 String rndId = count + "-" + random.nextInt(1000);
                 boolean isLimit = false;
                 userId = (String) reqParams.get(RequestParams.USER_ID);
+                if(userId==null && reqObj!=null){
+                    userId = reqObj.getString(RequestParams.USER_ID);
+                }
                 deviceId = RequestUtils.getDeviceId(request);
                 String lockKey = LockUtils.getLockKey(reqLimit, attrValue);
                 if (StringUtils.equals(DataSourceType.ETCD.getType(), reqLimit.lockType().getSource())) {

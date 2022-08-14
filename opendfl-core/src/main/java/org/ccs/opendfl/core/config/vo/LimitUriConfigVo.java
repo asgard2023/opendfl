@@ -14,6 +14,12 @@ public class LimitUriConfigVo {
     private FreqLimitType freqLimitType;
     private String attrName = "";
     private Integer status=0;
+    /**
+     * 是否显示日志
+     * @return
+     */
+    private boolean log;
+    private boolean needLogin;
     private String errMsg = FrequencyConstant.FREQ_ERR_MSG;
     private String errMsgEn = FrequencyConstant.FREQ_ERR_MSG_EN;
     private String whiteCode = FrequencyConstant.NONE;

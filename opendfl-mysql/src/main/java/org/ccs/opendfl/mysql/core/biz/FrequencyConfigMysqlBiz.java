@@ -1,5 +1,6 @@
 package org.ccs.opendfl.mysql.core.biz;
 
+import cn.hutool.core.util.NumberUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IFrequencyConfigBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
@@ -74,7 +75,7 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
             return;
         }
         int freqLimitType = frequency.getFreqLimitType().getType();
-        String key = frequency.getName()+":"+freqLimitType + ":" + frequency.getTime();
+        String key = frequency.getName() + ":" + freqLimitType + ":" + frequency.getTime();
         Long time = loadSysconfigTimeMap.get(key);
         FrequencyMysqlVo frequencyExist = sysconfigLimitMap.get(key);
         //缓存10秒，10秒加载一次
@@ -121,7 +122,7 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
                 frequencyConfiguration.setRedisPrefix(SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_REDIS_PREFIX));
                 frequencyConfiguration.setRunTimeMonitor(("" + runTimeMonitor).charAt(0));
                 frequencyConfiguration.setInitLogCount(SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_INIT_LOG_DEBUG_COUNT));
-                String limitIpRate=SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_LIMIT_IP_RATE);
+                String limitIpRate = SystemConfig.getByCache(SystemConfigCodes.FREQUENCY_LIMIT_IP_RATE);
                 frequencyConfiguration.setLimitIpRate(Float.parseFloat(limitIpRate));
                 frequencyConfiguration.getLimit().setItems(SystemConfig.getByCache(SystemConfigCodes.LIMIT_RULE_ITEMS));
                 frequencyConfiguration.getLimit().setOutLimitLogTime(SystemConfig.getByCache(SystemConfigCodes.LIMIT_OUT_LIMIT_MIN_TIME));
@@ -144,19 +145,6 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
     private FrequencyMysqlVo limitBySysconfig(FrequencyVo frequency) {
         String key = frequency.getName();
         DflFrequencyPo frequencyPo = dflFrequencyBiz.getFrequencyByCode(key, frequency.getFreqLimitType().getType(), frequency.getTime());
-        if(frequencyPo==null) {
-            DflFrequencyPo frequencyPoExist = dflFrequencyBiz.getFrequencyByCode(key, null, frequency.getTime());
-            if(frequencyPoExist!=null){
-                DflFrequencyPo update=new DflFrequencyPo();
-                update.setId(frequencyPoExist.getId());
-                update.setFreqLimitType(frequency.getFreqLimitType().getType());
-                this.dflFrequencyBiz.updateDflFrequency(update);
-                frequencyPoExist.setFreqLimitType(update.getFreqLimitType());
-                frequencyPoExist.setModifyTime(update.getModifyTime());
-                frequencyPo=frequencyPoExist;
-            }
-        }
-
         if (frequencyPo != null) {
             return getFrequencyMysqlVo(frequency, frequencyPo);
         } else {
@@ -188,10 +176,8 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
         entity.setErrMsg(frequency.getErrMsg());
         entity.setErrMsgEn(frequency.getErrMsgEn());
         entity.setLimitType(frequency.getLimitType());
-        entity.setNeedLogin(0);
-        if (frequency.isNeedLogin()) {
-            entity.setNeedLogin(1);
-        }
+        entity.setLog(frequency.isLog() ? 1 : 0);
+        entity.setNeedLogin(frequency.isNeedLogin() ? 1 : 0);
         entity.setWhiteCode(frequency.getWhiteCode());
         entity.setUri(frequency.getRequestUri());
         entity.setIfDel(0);
@@ -207,6 +193,7 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
         entity.setIfDel(0);
         entity.setStatus(1);
         entity.setNeedLogin(0);
+        entity.setLog(0);
         this.dflFrequencyBiz.saveDflFrequency(entity);
     }
 
@@ -303,8 +290,8 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
         if (CollectionUtils.isEmpty(modifys)) {
             return;
         }
-        List<DflFrequencyPo> modifyFrequencys = modifys.stream().filter(t ->t.getTime()!=null &&  !FrequencyType.URI_CONFIG.getType().equals(t.getLimitType())).collect(Collectors.toList());
-        Map<String, List<DflFrequencyPo>> modifyUriConfigs = modifys.stream().filter(t -> t.getTime()!=null && FrequencyType.URI_CONFIG.getType().equals(t.getLimitType())).collect(Collectors.groupingBy(DflFrequencyPo::getUri));
+        List<DflFrequencyPo> modifyFrequencys = modifys.stream().filter(t -> t.getTime() != null && !FrequencyType.URI_CONFIG.getType().equals(t.getLimitType())).collect(Collectors.toList());
+        Map<String, List<DflFrequencyPo>> modifyUriConfigs = modifys.stream().filter(t -> t.getTime() != null && FrequencyType.URI_CONFIG.getType().equals(t.getLimitType())).collect(Collectors.groupingBy(DflFrequencyPo::getUri));
         log.info("-------reloadNewlyModify---modifyTime={} modifys={} modifyFrequencys={} modifyUriConfigs={}", modifyTime, modifys.size(), modifyFrequencys.size(), modifyUriConfigs.size());
         reloadNewlyFrequency(modifyFrequencys, curTime);
 
@@ -336,10 +323,10 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
     private void reloadNewlyFrequency(List<DflFrequencyPo> modifyFrequencys, Long curTime) {
         String cacheKey;
         for (DflFrequencyPo modifyInfo : modifyFrequencys) {
-            if(StringUtils.isBlank(modifyInfo.getCode())||modifyInfo.getTime()==null){
+            if (StringUtils.isBlank(modifyInfo.getCode()) || modifyInfo.getTime() == null) {
                 continue;
             }
-            cacheKey= modifyInfo.getCode()+":"+modifyInfo.getFreqLimitType()+":"+modifyInfo.getTime();
+            cacheKey = modifyInfo.getCode() + ":" + modifyInfo.getFreqLimitType() + ":" + modifyInfo.getTime();
             FrequencyMysqlVo frequencyMysqlExist = sysconfigLimitMap.get(cacheKey);
             if (frequencyMysqlExist == null) {
                 log.warn("----reloadNewlyFrequency--cacheKey={} uri={} unexist", cacheKey, modifyInfo.getUri());
@@ -351,7 +338,8 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
             frequencyVo.setRequestUri(modifyInfo.getUri());
             frequencyVo.setLimitType(modifyInfo.getLimitType());
             frequencyVo.setAttrName(modifyInfo.getAttrName());
-            frequencyVo.setNeedLogin(modifyInfo.getNeedLogin()!=null && modifyInfo.getNeedLogin()==1);
+            frequencyVo.setNeedLogin(NumberUtil.equals(modifyInfo.getNeedLogin(), 1));
+            frequencyVo.setLog(NumberUtil.equals(modifyInfo.getLog(), 1));
             frequencyVo.setWhiteCode(modifyInfo.getWhiteCode());
             frequencyVo.setCreateTime(modifyInfo.getCreateTime().getTime());
             loadSysconfigTimeMap.put(cacheKey, curTime);

@@ -50,6 +50,11 @@ public @interface Frequency4 {
      *
      */
     boolean needLogin() default false;
+    /**
+     * 是否显示日志
+     * @return
+     */
+    boolean log() default false;
 
     /**
      * 白名单编码

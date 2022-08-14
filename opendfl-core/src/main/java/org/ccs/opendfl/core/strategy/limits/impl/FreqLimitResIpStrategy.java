@@ -1,12 +1,10 @@
 package org.ccs.opendfl.core.strategy.limits.impl;
 
-import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.limitfrequency.FrequencyUtils;
 import org.ccs.opendfl.core.strategy.limits.FreqLimitChain;
 import org.ccs.opendfl.core.strategy.limits.FreqLimitStrategy;
 import org.ccs.opendfl.core.utils.RedisTemplateUtil;
-import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
 import org.slf4j.Logger;
@@ -29,13 +27,6 @@ public class FreqLimitResIpStrategy implements FreqLimitStrategy {
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
-    private static FrequencyConfiguration frequencyConfiguration;
-
-    @Autowired
-    public void setFrequencyConfiguration(FrequencyConfiguration frequencyConfiguration) {
-        FreqLimitResIpStrategy.frequencyConfiguration = frequencyConfiguration;
-    }
-
 
     @Override
     public String getLimitType() {
@@ -43,7 +34,12 @@ public class FreqLimitResIpStrategy implements FreqLimitStrategy {
     }
 
     public static String getRedisKey(FrequencyVo frequency, String ip, String attrValue) {
-        return frequencyConfiguration.getRedisPrefix() + ":" + LIMIT_TYPE.getType() + ":" + frequency.getName() + ":" + frequency.getTime() + ":" + ip + ":" + attrValue;
+        StringBuilder sb = FrequencyUtils.getRedisKeyBase(frequency);
+        sb.append(":");
+        sb.append(ip);
+        sb.append(":");
+        sb.append(attrValue);
+        return sb.toString();
     }
 
     @Override
@@ -58,7 +54,9 @@ public class FreqLimitResIpStrategy implements FreqLimitStrategy {
                 String redisKey = getRedisKey(frequency, ip, strategyParams.getAttrValue());
                 long v = redisTemplate.opsForValue().increment(redisKey, 1);
                 final int time = frequency.getTime();
-//                logger.info("----resIp--redisKey={} limit={} v={}", redisKey, limit, v);
+                if(frequency.isLog()) {
+                    logger.info("----resIp--redisKey={} limit={} v={}", redisKey, limit, v);
+                }
                 if (v == 1) {
                     redisTemplate.expire(redisKey, time, TimeUnit.SECONDS);
                 } else {

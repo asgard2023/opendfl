@@ -1,6 +1,8 @@
 package org.ccs.opendfl.core.limitfrequency;
 
 
+import com.alibaba.fastjson.JSONObject;
+import io.vertx.core.json.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IFrequencyConfigBiz;
 import org.ccs.opendfl.core.biz.IUserBiz;
@@ -405,19 +407,28 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         }
 
         String userId = strategyParams.getUserId();
+        String attrValue=null;
+        //用于支持读取post的body中的userId或attrName数据
+        if(userId==null || StringUtils.isNotBlank(frequency.getAttrName())){
+            String reqBody = (String) params.get(RequestUtils.REQ_BODYS);
+            JSONObject reqObj=FrequencyUtils.getJsonObject(reqBody);
+            if(reqObj!=null){
+                userId = reqObj.getString(RequestParams.USER_ID);
+                strategyParams.setUserId(userId);
+                if (StringUtils.isNotBlank(frequency.getAttrName())) {
+                    String attrName = frequency.getAttrName();
+                    attrValue = FrequencyUtils.getAttrNameValue(params, reqObj, attrName);
+                    //attrName的属性值为空，则不处理，由功能本身做参数验证
+                    if(StringUtils.isBlank(attrValue)){
+                        log.warn("----handleFrequency={} attrName={} attrValue is null ignore limit, need checkNull on interface", frequency.getName(), attrName);
+                        throw new FrequencyAttrNameBlankException(attrName+" is blank,need checkNull on interface");
+                    }
+                }
+            }
+
+        }
         if (frequency.isNeedLogin()) {
             userBiz.checkUser(userId);
-        }
-
-        String attrValue=null;
-        if (StringUtils.isNotBlank(frequency.getAttrName())) {
-            String attrName = frequency.getAttrName();
-            attrValue = FrequencyUtils.getAttrNameValue(params, attrName);
-            //attrName的属性值为空，则不处理，由功能本身做参数验证
-            if(StringUtils.isBlank(attrValue)){
-                log.warn("----handleFrequency={} attrName={} attrValue is null ignore limit, need checkNull on interface", frequency.getName(), attrName);
-                throw new FrequencyAttrNameBlankException(attrName+" is blank,need checkNull on interface");
-            }
         }
 
         logFirstload(frequency, curTime);

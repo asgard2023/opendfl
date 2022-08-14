@@ -24,6 +24,11 @@ public class FrequencyVo {
     private String errMsgEn;
     private boolean sysconfig;
     private boolean needLogin;
+    /**
+     * 是否显示日志
+     * @return
+     */
+    private boolean log;
     private Long createTime;
     public static final FrequencyVo instance = new FrequencyVo();
 
@@ -58,6 +63,7 @@ public class FrequencyVo {
         vo.errMsgEn = uriConfigVo.getErrMsgEn();
         vo.whiteCode = uriConfigVo.getWhiteCode();
         vo.attrName = uriConfigVo.getAttrName();
+        vo.log=uriConfigVo.isLog();
         return vo;
     }
 
@@ -77,6 +83,7 @@ public class FrequencyVo {
         vo.attrName = frequency.attrName();
         vo.sysconfig = frequency.sysconfig();
         vo.needLogin = frequency.needLogin();
+        vo.log=frequency.log();
         return vo;
     }
 
@@ -101,6 +108,7 @@ public class FrequencyVo {
         vo.attrName = frequency.attrName();
         vo.sysconfig = frequency.sysconfig();
         vo.needLogin = frequency.needLogin();
+        vo.log=frequency.log();
         return vo;
     }
 
@@ -125,6 +133,7 @@ public class FrequencyVo {
         vo.attrName = frequency.attrName();
         vo.sysconfig = frequency.sysconfig();
         vo.needLogin = frequency.needLogin();
+        vo.log=frequency.log();
         return vo;
     }
 
@@ -149,6 +158,7 @@ public class FrequencyVo {
         vo.sysconfig = frequency.sysconfig();
         vo.freqLimitType = frequency.freqLimitType();
         vo.needLogin = frequency.needLogin();
+        vo.log=frequency.log();
         return vo;
     }
 
@@ -173,6 +183,7 @@ public class FrequencyVo {
         vo.attrName = frequency.attrName();
         vo.sysconfig = frequency.sysconfig();
         vo.needLogin = frequency.needLogin();
+        vo.log=frequency.log();
         return vo;
     }
 
@@ -190,12 +201,13 @@ public class FrequencyVo {
                 ", errMsg='" + errMsg + '\'' +
                 ", errMsgEn='" + errMsgEn + '\'' +
                 ", sysconfig=" + sysconfig +
+                ", log=" + log +
                 '}';
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, time, limit, freqLimitType.getType(), attrName, errMsg, errMsgEn);
+        return Objects.hash(name, time, limit, freqLimitType.getType(), attrName, errMsg, errMsgEn, log);
     }
 
 

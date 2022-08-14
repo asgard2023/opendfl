@@ -1,5 +1,6 @@
 package org.ccs.opendfl.mysql.dflcore.po;
 
+import cn.hutool.core.util.NumberUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.Data;
@@ -45,6 +46,8 @@ public class DflFrequencyPo implements Serializable {
         uriConfigVo.setErrMsg(frequencyPo.getErrMsg());
         uriConfigVo.setErrMsgEn(frequencyPo.getErrMsgEn());
         uriConfigVo.setMethod(frequencyPo.getMethod());
+        uriConfigVo.setNeedLogin(NumberUtil.equals(frequencyPo.getNeedLogin(), 1));
+        uriConfigVo.setLog(NumberUtil.equals(frequencyPo.getLog(), 1));
 
         if (uriConfigVo.getTime() == null) {
             uriConfigVo.setTime(0);
@@ -138,6 +141,9 @@ public class DflFrequencyPo implements Serializable {
      */
     @Column(name = "need_login")
     private Integer needLogin;
+
+    @Column(name = "log")
+    private Integer log;
 
     /**
      * 异常消息

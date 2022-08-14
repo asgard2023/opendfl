@@ -254,7 +254,7 @@ class FreqLimitChainMysqlTest {
         frequencyVo.setLimit(100);
         frequencyVo.setTime(60);
 
-        String freqTypeItems = "userCount,userIp,ipUser,";
+        String freqTypeItems = "limit,userIp,ipUser,";
 
         freqLimitChain.sortStrategies(freqTypeItems);
         long time = System.currentTimeMillis();

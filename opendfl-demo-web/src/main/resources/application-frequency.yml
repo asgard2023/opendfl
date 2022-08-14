@@ -23,8 +23,6 @@ frequency:
   #接口限制
   limit:
     items: 'limit,limitIp,userIp,ipUser,'
-    #IP限制是否区分功能，如果不区分功能，则缓存有效期相同，以及ip数或用户数共享
-    ipLimitSplitFunction: '0'
     #间格时间内超限日志，例如>=3600时超限后的每次访问都将记录
     outLimitLogTime: 3600
     #基于uri的限制
