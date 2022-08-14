@@ -6,7 +6,7 @@
 
     <groupId>cn.org.opendfl</groupId>
     <artifactId>opendfl-parent</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1</version>
 	<packaging>pom</packaging>
     <modules>
         <module>opendfl-core</module>
@@ -28,11 +28,11 @@
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
         <!-- config -->
-        <opendfl-core.version>1.1-SNAPSHOT</opendfl-core.version>
-        <opendfl-console.version>1.1-SNAPSHOT</opendfl-console.version>
-        <opendfl-mysql.version>1.1-SNAPSHOT</opendfl-mysql.version>
-        <opendfl-spring-boot-starter.version>1.1-SNAPSHOT</opendfl-spring-boot-starter.version>
-        <opendfl-mysql-spring-boot-starter.version>1.1-SNAPSHOT</opendfl-mysql-spring-boot-starter.version>
+        <opendfl-core.version>1.1</opendfl-core.version>
+        <opendfl-console.version>1.1</opendfl-console.version>
+        <opendfl-mysql.version>1.1</opendfl-mysql.version>
+        <opendfl-spring-boot-starter.version>1.1</opendfl-spring-boot-starter.version>
+        <opendfl-mysql-spring-boot-starter.version>1.1</opendfl-mysql-spring-boot-starter.version>
     </properties>
 
     <dependencyManagement>

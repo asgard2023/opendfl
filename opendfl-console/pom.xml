@@ -5,10 +5,10 @@
     <parent>
 		<groupId>cn.org.opendfl</groupId>
 		<artifactId>opendfl-parent</artifactId>
-		<version>1.1-SNAPSHOT</version>
+		<version>1.1</version>
 	</parent>
     <artifactId>opendfl-console</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1</version>
     <name>opendfl-console</name>
     <packaging>jar</packaging>
     <description>opendfl console</description>
