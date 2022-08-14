@@ -288,7 +288,7 @@ public class FrequencyUtils {
     public static StringBuilder getRedisKeyBase(FrequencyVo frequency){
         StringBuilder sb = new StringBuilder();
         sb.append(frequencyConfiguration.getRedisPrefix());
-        sb.append("e:");
+        sb.append(":");
         sb.append(frequency.getFreqLimitType().getType());
         sb.append(":");
         sb.append(frequency.getName());
