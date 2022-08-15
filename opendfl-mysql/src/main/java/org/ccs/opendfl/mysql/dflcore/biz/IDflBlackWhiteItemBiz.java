@@ -7,11 +7,11 @@ import org.ccs.opendfl.mysql.dflcore.vo.DflBlackWhiteVo;
 import java.util.List;
 
 /**
- * @Version V1.0
- * @Title: IDflBlackWhiteItemBiz
- * @Description: 黑名单 业务接口
- * @Author: Created by chenjh
- * @Date: 2022-5-18 21:45:02
+ * IDflBlackWhiteItemBiz
+ * 黑名单 业务接口
+ *
+ * @author chenjh
+ * @date 2022-5-18 21:45:02
  */
 public interface IDflBlackWhiteItemBiz extends IBaseService<DflBlackWhiteItemPo> {
 
@@ -48,8 +48,10 @@ public interface IDflBlackWhiteItemBiz extends IBaseService<DflBlackWhiteItemPo>
     Integer deleteDflBlackWhiteItem(Integer id, Integer operUser, String remark);
 
     public void findBlackWhiteList_evict(String type, Integer limitType);
+
     public List<DflBlackWhiteVo> findBlackWhiteList(String type, Integer limitType);
 
     public void findBlackWhiteMaxUpdateTime_evict(String type, Integer limitType);
+
     public Long findBlackWhiteMaxUpdateTime(String type, Integer limitType);
 }

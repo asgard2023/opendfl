@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * @Version V1.0
- * @Title: DflServicecontroller
- * @Description: 服务表 Controller
- * @Author: Created by chenjh
- * @Date: 2022-5-4 11:19:02
+ * DflServicecontroller
+ * 服务表 Controller
+ *
+ * @author chenjh
+ * @date 2022-5-4 11:19:02
  */
 @RestController
 @RequestMapping("/dflSystem/dflService")
@@ -41,11 +41,10 @@ public class DflServiceController extends BaseController {
     /**
      * 服务表列表查询
      *
-     * @param request
-     * @param entity
-     * @param pageInfo
-     * @return java.lang.Object
-     * @author chenjh
+     * @param request 请求
+     * @param entity 对象
+     * @param pageInfo 翻页对象
+     * @return MyPageInfo<> 翻页结果
      * @date 2022-5-4 11:19:02
      */
 

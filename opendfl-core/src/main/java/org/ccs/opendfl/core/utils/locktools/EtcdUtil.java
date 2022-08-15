@@ -46,10 +46,11 @@ public class EtcdUtil {
     /**
      * 新增或者修改指定的配置
      *
-     * @param key
-     * @param value
+     * @param key     key
+     * @param value   value
      * @param leaseId 租约ID
-     * @throws Exception
+     * @return 是否put成功
+     * @throws Exception 异常
      */
     public static boolean putKVIfAbsent(String key, String value, Long leaseId) throws Exception {
         String v = getKV(key);
@@ -63,9 +64,9 @@ public class EtcdUtil {
     /**
      * 新增或者修改指定的配置
      *
-     * @param key
-     * @param value
-     * @throws Exception
+     * @param key   key
+     * @param value value
+     * @throws Exception 异常
      */
     public static void putKV(String key, String value) throws Exception {
         putKV(key, value, null);
@@ -74,9 +75,10 @@ public class EtcdUtil {
     /**
      * 新增或者修改指定的配置
      *
-     * @param key
-     * @param value
-     * @throws Exception
+     * @param key     key
+     * @param value   value
+     * @param leaseId 租约ID
+     * @throws Exception 异常
      */
     public static void putKV(String key, String value, Long leaseId) throws Exception {
         PutOption putOption = null;
@@ -96,9 +98,9 @@ public class EtcdUtil {
     /**
      * 查询指定的key名称对应的value
      *
-     * @param key
+     * @param key key
      * @return value值
-     * @throws Exception
+     * @throws Exception 异常
      */
     public static String getKV(String key) throws Exception {
         Client client = EtcdUtil.getEtclClient();
@@ -116,9 +118,9 @@ public class EtcdUtil {
     /**
      * 删除指定的配置
      *
-     * @param key
-     * @throws InterruptedException
-     * @throws ExecutionException
+     * @param key key
+     * @throws InterruptedException 中断异常
+     * @throws ExecutionException   执行异常
      * @author zhangyanhua
      * @date 2019年10月29日 下午4:53:24
      */
@@ -133,8 +135,8 @@ public class EtcdUtil {
      * watch type= "PUT", key= "zyh1", value= "zyh1-value111"
      * watch type= "DELETE", key= "zyh1", value= ""
      *
-     * @param key
-     * @throws Exception
+     * @param key key
+     * @throws Exception 异常
      * @author zhangyanhua
      * @date 2019年10月29日 下午5:26:09
      */
@@ -172,9 +174,10 @@ public class EtcdUtil {
 
     /**
      * etcd租约
-     * @param ttl
-     * @return
-     * @throws Exception
+     *
+     * @param ttl 时间(秒)
+     * @return leaseId 租约id
+     * @throws Exception 异常
      */
     public static long grantLease(long ttl) throws Exception {
         CompletableFuture<LeaseGrantResponse> feature = etcdClient.getLeaseClient().grant(ttl);

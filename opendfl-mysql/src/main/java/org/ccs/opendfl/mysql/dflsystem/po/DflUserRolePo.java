@@ -16,11 +16,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Version V1.0
- * @Title: DflUserRolePo
- * @Description: 用户角色 实体
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:26:31
+ * DflUserRolePo
+ * 用户角色 实体
+ *
+ * @author chenjh
+ * @date 2022-5-3 20:26:31
  */
 @Data
 @Table(name = "dfl_user_role")
@@ -112,12 +112,12 @@ public class DflUserRolePo implements Serializable {
     @Column(name = "modify_user")
     private Integer modifyUser;
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getStartTime() {
         return this.startTime;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getEndTime() {
         return this.endTime;
     }

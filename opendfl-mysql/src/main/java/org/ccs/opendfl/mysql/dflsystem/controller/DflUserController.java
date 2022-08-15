@@ -26,11 +26,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @Version V1.0
- * @Title: DflUsercontroller
- * @Description: Controller
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:24:48
+ * DflUsercontroller
+ *
+ * @author chenjh
+ * @date 2022-5-3 20:24:48
  */
 @RestController
 @RequestMapping("/dflSystem/dflUser")
@@ -49,11 +48,10 @@ public class DflUserController extends BaseController {
     /**
      * 列表查询
      *
-     * @param request
-     * @param entity
-     * @param pageInfo
-     * @return java.lang.Object
-     * @author chenjh
+     * @param request 请求
+     * @param entity 对象
+     * @param pageInfo 翻页对象
+     * @return MyPageInfo<> 翻页结果
      * @date 2022-5-3 20:24:48
      */
 

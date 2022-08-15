@@ -8,11 +8,11 @@ import tk.mybatis.mapper.common.Mapper;
 import java.util.Date;
 
 /**
- * @Version V1.0
- * @Title: DflBlackWhiteItemMapper
- * @Description: 黑名单 Mapper
- * @Author: Created by chenjh
- * @Date: 2022-5-18 21:45:02
+ * DflBlackWhiteItemMapper
+ * 黑名单 Mapper
+ *
+ * @author chenjh
+ * @date 2022-5-18 21:45:02
  */
 public interface DflBlackWhiteItemMapper extends Mapper<DflBlackWhiteItemPo> {
     @Select("select if(typeMaxTime>itemMaxTime, typeMaxTime, itemMaxTime) from ( " +
@@ -20,5 +20,5 @@ public interface DflBlackWhiteItemMapper extends Mapper<DflBlackWhiteItemPo> {
             " from dfl_black_white bl,dfl_black_white_item item" +
             " where bl.id=item.blackwhite_id and  bl.type=#{type} and (#{limitType} is null || bl.limit_type=#{limitType})" +
             ") t ")
-    public Date findBlackWhiteMaxUpdateTime(@Param("type")String type, @Param("limitType") Integer limitType);
+    public Date findBlackWhiteMaxUpdateTime(@Param("type") String type, @Param("limitType") Integer limitType);
 }

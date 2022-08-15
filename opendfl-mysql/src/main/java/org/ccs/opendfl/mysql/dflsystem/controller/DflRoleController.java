@@ -24,11 +24,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
- * @Version V1.0
- * @Title: DflRolecontroller
- * @Description: 角色表 Controller
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:25:42
+ * DflRolecontroller
+ * 角色表 Controller
+ *
+ * @author chenjh
+ * @date 2022-5-3 20:25:42
  */
 @RestController
 @RequestMapping("/dflSystem/dflRole")
@@ -47,10 +47,10 @@ public class DflRoleController extends BaseController {
     /**
      * 角色表列表查询
      *
-     * @param request
-     * @param entity
-     * @param pageInfo
-     * @return java.lang.Object
+     * @param request 请求
+     * @param entity 对象
+     * @param pageInfo 翻页对象
+     * @return MyPageInfo<> 翻页结果
      * @author chenjh
      * @date 2022-5-3 20:25:42
      */

@@ -21,7 +21,7 @@ import java.util.TreeMap;
 /**
  * 捕获异常统一处理
  *
- * @version v1.0
+
  * @modified by chenjh
  */
 @ControllerAdvice

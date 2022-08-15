@@ -29,11 +29,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * @Version V1.0
- * @Title: DflAuditLogcontroller
- * @Description: 后台管理审计日志 Controller
- * @Author: Created by chenjh
- * @Date: 2022-5-6 23:20:31
+ * DflAuditLogcontroller
+ * 后台管理审计日志 Controller
+ *
+ * @author chenjh
+ * @date 2022-5-6 23:20:31
  */
 @RestController
 @RequestMapping("/dflLogs/dflAuditLog")
@@ -56,10 +56,10 @@ public class DflAuditLogController extends BaseController {
     /**
      * 后台管理审计日志列表查询
      *
-     * @param request
-     * @param entity
-     * @param pageInfo
-     * @return java.lang.Object
+     * @param request 请求
+     * @param entity 对象
+     * @param pageInfo 翻页对象
+     * @return MyPageInfo<> 翻页结果
      * @author chenjh
      * @date 2022-5-6 23:20:31
      */
@@ -75,7 +75,7 @@ public class DflAuditLogController extends BaseController {
             pageInfo.setPageSize(getPageSize());
         }
         Map<String, Object> params = this.createAllParams(request);
-        ValidateUtils.checkTimeDateLimit(params,"uri,uriId,ip,uid,user.nickname");
+        ValidateUtils.checkTimeDateLimit(params, "uri,uriId,ip,uid,user.nickname");
         if (StringUtils.isNotBlank(entity.getIp())) {
             entity.setIp(RequestUtils.convertIpv4(entity.getIp()));
             params.put("ip", entity.getIp());

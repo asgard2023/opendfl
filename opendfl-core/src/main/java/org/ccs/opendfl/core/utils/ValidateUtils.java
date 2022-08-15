@@ -239,9 +239,10 @@ public class ValidateUtils {
     /**
      * 检查天数
      *
-     * @param params      map参数
-     * @param noDayLimits 如果这些参数有值，就不限制天数条件
-     * @param limitDay    天数限制
+     * @param params       map参数
+     * @param noDayLimits  如果这些参数有值，就不限制天数条件
+     * @param limitDay     天数查询限制
+     * @param limitUserDay 用户天数查询限制
      * @throws BaseException 异常
      */
     public static void checkTimeDateLimit(Map<String, Object> params, String noDayLimits, int limitDay, int limitUserDay) throws BaseException {

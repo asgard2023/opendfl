@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Version V1.0
- * @Title: DflSystemConfigMapper
- * @Description: 系统参数配置(树形结构) Mapper
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:27:48
+ * DflSystemConfigMapper
+ * 系统参数配置(树形结构) Mapper
+ *
+ * @author chenjh
+ * @date 2022-5-3 20:27:48
  */
 public interface DflSystemConfigMapper extends Mapper<DflSystemConfigPo> {
     @Select("select max(modify_time) from dfl_system_config where if_del=0")

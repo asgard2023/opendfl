@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
- *
+ * 用户管理
  */
 @RestController
 @RequestMapping("/user")
@@ -38,11 +38,10 @@ public class UserController extends BaseController {
     /**
      * 列表查询
      *
-     * @param request
-     * @param entity
-     * @param pageInfo
-     * @return java.lang.Object
-     * @author Chenjh
+     * @param request 请求
+     * @param entity 对象
+     * @param pageInfo 翻页对象
+     * @return MyPageInfo<> 翻页结果
      * @date 2022-3-30 21:27:43
      */
 

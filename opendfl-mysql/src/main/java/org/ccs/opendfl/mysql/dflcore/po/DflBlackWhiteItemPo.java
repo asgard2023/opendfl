@@ -13,11 +13,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Version V1.0
- * @Title: DflBlackWhiteItemPo
- * @Description: 黑名单 实体
- * @Author: Created by chenjh
- * @Date: 2022-5-18 21:45:02
+ * DflBlackWhiteItemPo
+ * 黑名单 实体
+ *
+ * @author chenjh
+ * @date 2022-5-18 21:45:02
  */
 @Data
 @Table(name = "dfl_black_white_item")

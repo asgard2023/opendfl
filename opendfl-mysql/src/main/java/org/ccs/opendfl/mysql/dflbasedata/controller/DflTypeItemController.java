@@ -26,11 +26,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * @Version V1.0
- * @Title: DflTypeItemcontroller
- * @Description: Controller
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:31:25
+ * DflTypeItemcontroller
+ *
+ * @author chenjh
+ * @date 2022-5-3 20:31:25
  */
 @RestController
 @RequestMapping("/dflBasedata/dflTypeItem")
@@ -51,14 +50,12 @@ public class DflTypeItemController extends BaseController {
     /**
      * 列表查询
      *
-     * @param request
-     * @param entity
-     * @param pageInfo
-     * @return java.lang.Object
-     * @author chenjh
+     * @param request  请求
+     * @param entity   对象
+     * @param pageInfo 翻页对象
+     * @return MyPageInfo<> 翻页结果
      * @date 2022-5-3 20:31:25
      */
-
     @RequestMapping(value = "/list", method = {RequestMethod.POST, RequestMethod.GET})
     @CheckLogin
     public MyPageInfo<DflTypeItemPo> queryPage(HttpServletRequest request, DflTypeItemPo entity, MyPageInfo<DflTypeItemPo> pageInfo) {
@@ -104,10 +101,9 @@ public class DflTypeItemController extends BaseController {
     /**
      * 新增
      *
-     * @param request
-     * @param entity
+     * @param entity  对象
+     * @param request 请求
      * @return ResultData
-     * @author chenjh
      * @date 2022-5-3 20:31:25
      */
 
@@ -126,10 +122,9 @@ public class DflTypeItemController extends BaseController {
     /**
      * 更新
      *
-     * @param request
-     * @param entity
+     * @param request 请求
+     * @param entity  对象
      * @return ResultData
-     * @author chenjh
      * @date 2022-5-3 20:31:25
      */
 
@@ -144,10 +139,9 @@ public class DflTypeItemController extends BaseController {
     /**
      * 删除
      *
-     * @param request
-     * @param dflTypeItem
+     * @param request     请求
+     * @param dflTypeItem 对象
      * @return ResultData
-     * @author chenjh
      * @date 2022-5-3 20:31:25
      */
 

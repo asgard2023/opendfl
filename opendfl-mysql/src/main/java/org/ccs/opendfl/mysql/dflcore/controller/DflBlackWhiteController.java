@@ -19,11 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * @Version V1.0
- * @Title: DflBlackWhitecontroller
- * @Description: 黑白名单 Controller
- * @Author: Created by chenjh
- * @Date: 2022-5-18 21:44:47
+ * DflBlackWhitecontroller
+ * 黑白名单 Controller
+ *
+ * @author chenjh
+ * @date 2022-5-18 21:44:47
  */
 @RestController
 @RequestMapping("/dflcore/dflBlackWhite")
@@ -42,10 +42,10 @@ public class DflBlackWhiteController extends BaseController {
     /**
      * 黑白名单列表查询
      *
-     * @param request
-     * @param entity
-     * @param pageInfo
-     * @return java.lang.Object
+     * @param request 请求
+     * @param entity 对象
+     * @param pageInfo 翻页对象
+     * @return MyPageInfo<> 翻页结果
      * @author chenjh
      * @date 2022-5-18 21:44:47
      */

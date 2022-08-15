@@ -29,11 +29,11 @@ import tk.mybatis.mapper.util.StringUtil;
 import java.util.*;
 
 /**
- * @Version V1.0
- * @Title: DflSystemConfigBiz
- * @Description: 系统参数配置(树形结构) 业务实现
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:27:48
+ * DflSystemConfigBiz
+ * 系统参数配置(树形结构) 业务实现
+ *
+ * @author chenjh
+ * @date 2022-5-3 20:27:48
  */
 @Slf4j
 @Service(value = "dflSystemConfigBiz")
@@ -133,7 +133,8 @@ public class DflSystemConfigBiz extends BaseService<DflSystemConfigPo> implement
         DflSystemConfigPo exist = this.findById(id);
         DflSystemConfigPo po = new DflSystemConfigPo();
         po.setId(id);
-        po.setIfDel(1); // 0未删除,1已删除
+        // 0未删除,1已删除
+        po.setIfDel(1);
         po.setModifyUser(operUser);
         po.setRemark(remark);
         po.setModifyTime(new Date());

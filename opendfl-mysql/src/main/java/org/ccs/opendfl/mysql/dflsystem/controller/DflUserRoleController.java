@@ -27,11 +27,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * @Version V1.0
- * @Title: DflUserRolecontroller
- * @Description: 用户角色 Controller
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:26:31
+ * DflUserRolecontroller
+ * 用户角色 Controller
+ *
+ * @author chenjh
+ * @date 2022-5-3 20:26:31
  */
 @RestController
 @RequestMapping("/dflSystem/dflUserRole")
@@ -54,11 +54,10 @@ public class DflUserRoleController extends BaseController {
     /**
      * 用户角色列表查询
      *
-     * @param request
-     * @param entity
-     * @param pageInfo
-     * @return java.lang.Object
-     * @author chenjh
+     * @param request 请求
+     * @param entity 对象
+     * @param pageInfo 翻页对象
+     * @return MyPageInfo<> 翻页结果
      * @date 2022-5-3 20:26:31
      */
 

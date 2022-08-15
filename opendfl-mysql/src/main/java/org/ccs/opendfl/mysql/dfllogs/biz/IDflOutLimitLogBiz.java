@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Version V1.0
- * @Title: IDflOutLimitLogBiz
- * @Description: 频率限制超限日志 业务接口
- * @Author: Created by chenjh
- * @Date: 2022-5-6 23:21:44
+ * IDflOutLimitLogBiz
+ * 频率限制超限日志 业务接口
+ *
+ * @author chenjh
+ * @date 2022-5-6 23:21:44
  */
 public interface IDflOutLimitLogBiz extends IBaseService<DflOutLimitLogPo> {
 
@@ -51,9 +51,10 @@ public interface IDflOutLimitLogBiz extends IBaseService<DflOutLimitLogPo> {
 
     /**
      * 频率超限日志统计
-     * @param entity
+     *
+     * @param entity 对象
+     * @param pageInfo 翻页对象
      * @param paramsMap
-     * @param pageInfo
      * @return
      */
     public List<DflOutLimitLogCountVo> countFreqLogs(DflOutLimitLogPo entity, Map<String, Object> paramsMap, MyPageInfo pageInfo);

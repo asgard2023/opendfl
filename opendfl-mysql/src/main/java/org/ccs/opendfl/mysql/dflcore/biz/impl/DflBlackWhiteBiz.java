@@ -24,10 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Description: 黑白名单 业务实现
- * @Title: DflBlackWhiteBiz
- * @Author: Created by chenjh
- * @Date: 2022-5-18 21:44:47
+ * 黑白名单 业务实现
+ * DflBlackWhiteBiz
+ *
+ * @author chenjh
+ * @date 2022-5-18 21:44:47
  */
 @Service(value = "dflBlackWhiteBiz")
 public class DflBlackWhiteBiz extends BaseService<DflBlackWhitePo> implements IDflBlackWhiteBiz, ISelfInject {

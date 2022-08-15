@@ -12,10 +12,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- *
+ * dfl_user
 */
-
-
 @Data
 @Table(name = "dfl_user")
 @JsonInclude(Include.ALWAYS)

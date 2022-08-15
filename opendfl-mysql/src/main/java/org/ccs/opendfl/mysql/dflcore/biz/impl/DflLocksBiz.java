@@ -24,10 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Description: 分布式锁配置表 业务实现
- * @Title: DflLocksBiz
- * @Author: Created by chenjh
- * @Date: 2022-5-18 21:44:08
+ * 分布式锁配置表 业务实现
+ * DflLocksBiz
+ *
+ * @author chenjh
+ * @date 2022-5-18 21:44:08
  */
 @Service(value = "dflLocksBiz")
 public class DflLocksBiz extends BaseService<DflLocksPo> implements IDflLocksBiz, ISelfInject {
@@ -120,7 +121,8 @@ public class DflLocksBiz extends BaseService<DflLocksPo> implements IDflLocksBiz
         DflLocksPo exist = this.findById(id);
         DflLocksPo po = new DflLocksPo();
         po.setId(id);
-        po.setIfDel(1); // 0未删除,1已删除
+        // 0未删除,1已删除
+        po.setIfDel(1);
         po.setModifyUser(operUser);
 //        po.setRemark(remark);
         po.setModifyTime(new Date());

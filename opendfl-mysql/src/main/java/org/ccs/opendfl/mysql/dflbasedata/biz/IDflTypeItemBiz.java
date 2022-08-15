@@ -9,11 +9,11 @@ import java.util.Map;
 
 
 /**
- * @Version V1.0
- * @Title: IDflTypeItemBiz
- * @Description: 业务接口
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:31:24
+
+ * IDflTypeItemBiz
+ * 业务接口
+ * @author chenjh
+ * @date 2022-5-3 20:31:24
  */
 public interface IDflTypeItemBiz extends IBaseService<DflTypeItemPo> {
     public Map<String, List<TypeItemVo>> getItemsByTypes(String lang, String codes);

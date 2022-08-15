@@ -146,7 +146,7 @@ public class FrequencyResetController {
         String clientId = request.getSession().getId();
         String userId = request.getParameter(RequestParams.USER_ID);
         log.info("----getResetTicket--funcCode={} type={} userId={}", funcCode, type, userId);
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>(8);
         map.put("clientId", clientId);
         map.put("funcCode", funcCode);
         map.put("type", type);

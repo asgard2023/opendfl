@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Version V1.0
- * @Title: DflResourceBiz
- * @Description: 业务实现
- * @Author: Created by chenjh
- * @Date: 2022-5-4 11:09:36
+
+ * DflResourceBiz
+ * 业务实现
+ * @author chenjh
+ * @date 2022-5-4 11:09:36
  */
 @Service(value = "dflResourceBiz")
 public class DflResourceBiz extends BaseService<DflResourcePo> implements IDflResourceBiz, ISelfInject {
@@ -84,6 +84,7 @@ public class DflResourceBiz extends BaseService<DflResourcePo> implements IDflRe
         return new MyPageInfo<>(list);
     }
 
+    @Override
     public Integer saveDflResource(DflResourcePo entity) {
         if (entity.getCreateTime() == null) {
             entity.setCreateTime(new Date());
@@ -96,6 +97,7 @@ public class DflResourceBiz extends BaseService<DflResourcePo> implements IDflRe
         return v;
     }
 
+    @Override
     public Integer updateDflResource(DflResourcePo entity) {
         entity.setModifyTime(new Date());
         if (entity.getIfDel() == null) {
@@ -105,10 +107,12 @@ public class DflResourceBiz extends BaseService<DflResourcePo> implements IDflRe
         return v;
     }
 
+    @Override
     public Integer deleteDflResource(Integer id, Integer operUser, String remark) {
         DflResourcePo po = new DflResourcePo();
         po.setId(id);
-        po.setIfDel(1); // 0未删除,1已删除
+        // 0未删除,1已删除
+        po.setIfDel(1);
         po.setModifyUser(operUser);
 //		po.setRemark(remark);
         po.setModifyTime(new Date());

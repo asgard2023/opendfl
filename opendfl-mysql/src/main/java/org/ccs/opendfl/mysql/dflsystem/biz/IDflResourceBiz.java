@@ -4,11 +4,11 @@ import org.ccs.opendfl.mysql.base.IBaseService;
 import org.ccs.opendfl.mysql.dflsystem.po.DflResourcePo;
 
 /**
- * @Version V1.0
- * @Title: IDflResourceBiz
- * @Description: 业务接口
- * @Author: Created by chenjh
- * @Date: 2022-5-4 10:55:38
+ * IDflResourceBiz
+ * 业务接口
+ *
+ * @author chenjh
+ * @date 2022-5-4 10:55:38
  */
 public interface IDflResourceBiz extends IBaseService<DflResourcePo> {
 

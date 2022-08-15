@@ -13,11 +13,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Version V1.0
- * @Title: DflRequestScansPo
- * @Description: 所有接口方法（通过扫码所有controller接口） 实体
- * @Author: Created by chenjh
- * @Date: 2022-5-10 22:12:24
+ * DflRequestScansPo
+ * 所有接口方法（通过扫码所有controller接口） 实体
+ *
+ * @author chenjh
+ * @date 2022-5-10 22:12:24
  */
 @Data
 @Table(name = "dfl_request_scans")

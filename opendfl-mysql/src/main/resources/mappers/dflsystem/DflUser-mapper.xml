@@ -129,7 +129,8 @@
         </where>
     </select>
 
-    <insert id="insertXML" parameterType="org.ccs.opendfl.mysql.dflsystem.po.DflUserPo" useGeneratedKeys="true" keyProperty="id"
+    <insert id="insertXML" parameterType="org.ccs.opendfl.mysql.dflsystem.po.DflUserPo" useGeneratedKeys="true"
+            keyProperty="id"
             flushCache="true">
         insert dfl_user
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -195,4 +196,24 @@
             id = #{id}
         </where>
     </delete>
+
+    <!-- 查询条件 -->
+    <sql id="findUserListByPage_Where_Clause">
+        WHERE if_del=0
+    </sql>
+
+    <!-- 分页查询结果集 -->
+    <select id="findUserListByPage" resultMap="dflUserMap">
+        SELECT
+        <include refid="field"/>
+        FROM dfl_user
+        <include refid="findUserListByPage_Where_Clause"/>
+        limit #{page.pageBegin} , #{page.pageSize}
+    </select>
+
+    <!-- 查询记录数 -->
+    <select id="findUserListByPageCount" resultType="int">
+        SELECT COUNT(*) FROM dfl_user
+        <include refid="findUserListByPage_Where_Clause"/>
+    </select>
 </mapper>

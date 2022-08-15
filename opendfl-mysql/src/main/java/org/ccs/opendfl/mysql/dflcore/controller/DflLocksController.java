@@ -19,11 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * @Version V1.0
- * @Title: DflLockscontroller
- * @Description: 分布式锁配置表 Controller
- * @Author: Created by chenjh
- * @Date: 2022-5-18 21:44:08
+ * DflLockscontroller
+ * 分布式锁配置表 Controller
+ *
+ * @author chenjh
+ * @date 2022-5-18 21:44:08
  */
 @RestController
 @RequestMapping("/dflcore/dflLocks")
@@ -42,10 +42,10 @@ public class DflLocksController extends BaseController {
     /**
      * 分布式锁配置表列表查询
      *
-     * @param request
-     * @param entity
-     * @param pageInfo
-     * @return java.lang.Object
+     * @param request 请求
+     * @param entity 对象
+     * @param pageInfo 翻页对象
+     * @return MyPageInfo<> 翻页结果
      * @author chenjh
      * @date 2022-5-18 21:44:08
      */

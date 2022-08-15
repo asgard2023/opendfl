@@ -15,11 +15,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Version V1.0
- * @Title: DflAuditLogPo
- * @Description: 后台管理审计日志 实体
- * @Author: Created by chenjh
- * @Date: 2022-5-6 23:20:31
+ * DflAuditLogPo
+ * 后台管理审计日志 实体
+ *
+ * @author chenjh
+ * @date 2022-5-6 23:20:31
  */
 @Data
 @Table(name = "dfl_audit_log")

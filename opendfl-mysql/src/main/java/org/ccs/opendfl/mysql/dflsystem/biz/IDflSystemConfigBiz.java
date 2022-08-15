@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Version V1.0
- * @Title: IDflSystemConfigBiz
- * @Description: 系统参数配置(树形结构) 业务接口
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:27:48
+ * IDflSystemConfigBiz
+ * 系统参数配置(树形结构) 业务接口
+ *
+ * @author chenjh
+ * @date 2022-5-3 20:27:48
  */
 public interface IDflSystemConfigBiz extends IBaseService<DflSystemConfigPo> {
 
@@ -39,8 +39,9 @@ public interface IDflSystemConfigBiz extends IBaseService<DflSystemConfigPo> {
 
     /**
      * 将系统参数常量保存到数据库
+     *
      * @param systemConfigCodes 系统参数
-     * @param parentId 要保存的父节点
+     * @param parentId          要保存的父节点
      * @return
      */
     public DflSystemConfigPo saveSysConfigAsync(SystemConfigCodes systemConfigCodes, Integer parentId);
@@ -69,6 +70,7 @@ public interface IDflSystemConfigBiz extends IBaseService<DflSystemConfigPo> {
     /**
      * 如果状态无效，则自动取默认值
      * 如果已删除，有调用会重新生成新数据
+     *
      * @param configCode
      * @param <E>
      * @return
@@ -79,12 +81,14 @@ public interface IDflSystemConfigBiz extends IBaseService<DflSystemConfigPo> {
 
     /**
      * 取未删除的最大修改时间
+     *
      * @return
      */
     public Long getSysconfigMaxUpdateTime();
 
     /**
      * 查询有新修改的数据
+     *
      * @param modifyTime
      * @return
      */

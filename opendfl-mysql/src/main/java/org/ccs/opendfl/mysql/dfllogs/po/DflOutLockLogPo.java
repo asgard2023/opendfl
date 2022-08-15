@@ -14,11 +14,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Version V1.0
- * @Title: DflOutLockLogPo
- * @Description: 分布式锁超限日志 实体
- * @Author: Created by chenjh
- * @Date: 2022-5-6 23:22:04
+ * DflOutLockLogPo
+ * 分布式锁超限日志 实体
+ *
+ * @author chenjh
+ * @date 2022-5-6 23:22:04
  */
 @Data
 @Table(name = "dfl_out_lock_log")

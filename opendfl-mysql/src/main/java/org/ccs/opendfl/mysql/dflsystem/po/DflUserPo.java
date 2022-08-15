@@ -14,11 +14,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Version V1.0
- * @Title: DflUserPo
- * @Description: 实体
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:24:48
+ * DflUserPo
+ * 实体
+ *
+ * @author chenjh
+ * @date 2022-5-3 20:24:48
  */
 @Data
 @Table(name = "dfl_user")

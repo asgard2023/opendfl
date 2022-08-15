@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Version V1.0
- * @Title: DflOutLimitLogBiz
- * @Description: 频率限制超限日志 业务实现
- * @Author: Created by chenjh
- * @Date: 2022-5-6 23:21:44
+ * DflOutLimitLogBiz
+ * 频率限制超限日志 业务实现
+ *
+ * @author chenjh
+ * @date 2022-5-6 23:21:44
  */
 @Service(value = "dflOutLimitLogBiz")
 public class DflOutLimitLogBiz extends BaseService<DflOutLimitLogPo> implements IDflOutLimitLogBiz, ISelfInject {
@@ -123,6 +123,7 @@ public class DflOutLimitLogBiz extends BaseService<DflOutLimitLogPo> implements 
         return v;
     }
 
+    @Override
     public List<DflOutLimitLogCountVo> countFreqLogs(DflOutLimitLogPo entity, Map<String, Object> paramsMap, MyPageInfo pageInfo) {
         String startTime = (String) paramsMap.get("startTime");
         String endTime = (String) paramsMap.get("endTime");
@@ -141,9 +142,9 @@ public class DflOutLimitLogBiz extends BaseService<DflOutLimitLogPo> implements 
             entity.setUid(userUid);
         }
 
-        if(endTime==null){
+        if (endTime == null) {
             Date curDate = new Date();
-            endTime= DateUtil.formatDateTime(curDate);
+            endTime = DateUtil.formatDateTime(curDate);
         }
         logger.info("----countFreqLogs--startTime={} endTime={} userId={} orderBy={}", startTime, endTime, userId, orderBy);
         String order = orderBy + " " + pageInfo.getOrder();

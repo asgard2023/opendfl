@@ -20,11 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * @Version V1.0
- * @Title: DflRequestScanscontroller
- * @Description: 所有接口方法（通过扫码所有controller接口） Controller
- * @Author: Created by chenjh
- * @Date: 2022-5-10 22:12:23
+ * DflRequestScanscontroller
+ * 所有接口方法（通过扫码所有controller接口） Controller
+ *
+ * @author chenjh
+ * @date 2022-5-10 22:12:23
  */
 @RestController
 @RequestMapping("/dflLogs/dflRequestScans")
@@ -43,10 +43,10 @@ public class DflRequestScansController extends BaseController {
     /**
      * 所有接口方法（通过扫码所有controller接口）列表查询
      *
-     * @param request
-     * @param entity
-     * @param pageInfo
-     * @return java.lang.Object
+     * @param request 请求
+     * @param entity 对象
+     * @param pageInfo 翻页对象
+     * @return MyPageInfo<> 翻页结果
      * @author chenjh
      * @date 2022-5-10 22:12:23
      */

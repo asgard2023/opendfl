@@ -325,8 +325,8 @@ public abstract class BaseService<T> implements IBaseService<T> {
     /**
      * 分页查询
      *
-     * @param entity
-     * @param pageInfo
+     * @param entity 对象
+     * @param pageInfo 翻页对象
      * @return
      * @throws Exception
      */
@@ -366,7 +366,7 @@ public abstract class BaseService<T> implements IBaseService<T> {
             return;
         }
         List<T> tList = this.findByIds(ids, clazz);
-        Map<Object, Object> map = new HashMap<>();
+        Map<Object, Object> map = new HashMap<>(tList.size());
         for (T t : tList) {
             map.put(BeanUtils.getValue(t, propId), BeanUtils.getValue(t, propName));
         }

@@ -26,11 +26,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @Version V1.0
- * @Title: DflTypeItemBiz
- * @Description: 业务实现
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:31:24
+
+ * DflTypeItemBiz
+ * 业务实现
+ * @author chenjh
+ * @date 2022-5-3 20:31:24
  */
 @Service(value = "dflTypeItemBiz")
 public class DflTypeItemBiz extends BaseService<DflTypeItemPo> implements IDflTypeItemBiz, ISelfInject {
@@ -109,6 +109,7 @@ public class DflTypeItemBiz extends BaseService<DflTypeItemPo> implements IDflTy
         return this.mapper.selectByExample(example);
     }
 
+    @Override
     @Cacheable(value = CacheTimeType.CACHE30S, key = "'opendfl:dflType:getItemsByTypes:'+#lang+#codes")
     public Map<String, List<TypeItemVo>> getItemsByTypes(String lang, String codes){
         List<String> codeList = Arrays.asList(codes.split(","));
@@ -136,11 +137,13 @@ public class DflTypeItemBiz extends BaseService<DflTypeItemPo> implements IDflTy
         return typeMap;
     }
 
+    @Override
     public List<TypeItemVo> getItemsByType(String lang, String code){
         Map<String, List<TypeItemVo>> typeMap= getItemsByTypes(lang, code);
         return typeMap.get(code);
     }
 
+    @Override
     public Integer saveDflTypeItem(DflTypeItemPo entity) {
         if(entity.getStatus()==null){
             entity.setStatus(1);
@@ -156,16 +159,19 @@ public class DflTypeItemBiz extends BaseService<DflTypeItemPo> implements IDflTy
         return v;
     }
 
+    @Override
     public Integer updateDflTypeItem(DflTypeItemPo entity) {
         entity.setModifyTime(new Date());
         int v = this.updateByPrimaryKeySelective(entity);
         return v;
     }
 
+    @Override
     public Integer deleteDflTypeItem(Integer id, Integer operUser, String remark) {
         DflTypeItemPo po = new DflTypeItemPo();
         po.setId(id);
-        po.setIfDel(1); // 0未删除,1已删除
+        // 0未删除,1已删除
+        po.setIfDel(1);
         po.setModifyUser(operUser);
         po.setRemark(remark);
         po.setModifyTime(new Date());

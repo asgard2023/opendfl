@@ -19,11 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * @Version V1.0
- * @Title: DflFrequencycontroller
- * @Description: 频率限制配置表 Controller
- * @Author: Created by chenjh
- * @Date: 2022-5-18 21:43:11
+ * DflFrequencycontroller
+ * 频率限制配置表 Controller
+ *
+ * @author chenjh
+ * @date 2022-5-18 21:43:11
  */
 @RestController
 @RequestMapping("/dflcore/dflFrequency")
@@ -42,10 +42,10 @@ public class DflFrequencyController extends BaseController {
     /**
      * 频率限制配置表列表查询
      *
-     * @param request
-     * @param entity
-     * @param pageInfo
-     * @return java.lang.Object
+     * @param request 请求
+     * @param entity 对象
+     * @param pageInfo 翻页对象o
+     * @return MyPageInfo<> 翻页结果
      * @author chenjh
      * @date 2022-5-18 21:43:11
      */

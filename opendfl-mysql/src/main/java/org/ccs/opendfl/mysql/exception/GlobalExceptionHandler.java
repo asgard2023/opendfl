@@ -30,7 +30,6 @@ import java.util.TreeMap;
 /**
  * 捕获异常统一处理
  *
- * @version v1.0
  * @modified by chenjh
  */
 @ControllerAdvice
@@ -68,7 +67,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
     public Object handleException(HttpServletRequest request, Exception ex) {
-        if(ex==null){
+        if (ex == null) {
             return null;
         }
         if (ex instanceof HttpRequestMethodNotSupportedException
@@ -112,19 +111,19 @@ public class GlobalExceptionHandler {
 
 
     private static String logExceptionTypeBase = "simple";
-    private static Long baseExceptionTypeTime=0L;
-    private static final int CACHE_TIME=120000;
+    private static Long baseExceptionTypeTime = 0L;
+    private static final int CACHE_TIME = 120000;
 
     private static String getLogExceptionTypeBase() {
-        long curTime=System.currentTimeMillis();
-        if(logExceptionTypeBase==null ||curTime-baseExceptionTypeTime>CACHE_TIME) {//2分钟内配置值不用重新读取
+        long curTime = System.currentTimeMillis();
+        if (logExceptionTypeBase == null || curTime - baseExceptionTypeTime > CACHE_TIME) {//2分钟内配置值不用重新读取
             synchronized (GlobalExceptionHandler.class) {
                 if (curTime - baseExceptionTypeTime > CACHE_TIME) {
-                    baseExceptionTypeTime=curTime;
-                    String expType= SystemConfig.getByCache(SystemConfigCodes.BASE_LIMIT_LOG_EXP_TYPE);
-                    if(!StringUtils.equals(logExceptionTypeBase, expType)){
+                    baseExceptionTypeTime = curTime;
+                    String expType = SystemConfig.getByCache(SystemConfigCodes.BASE_LIMIT_LOG_EXP_TYPE);
+                    if (!StringUtils.equals(logExceptionTypeBase, expType)) {
                         logger.info("-----getLogExceptionTypeBase--logExceptionTypeBase={} time={}", expType, baseExceptionTypeTime);
-                        logExceptionTypeBase=expType;
+                        logExceptionTypeBase = expType;
                     }
                 }
             }

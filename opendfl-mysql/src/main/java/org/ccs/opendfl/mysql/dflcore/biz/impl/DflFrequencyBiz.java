@@ -30,10 +30,11 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Description: 频率限制配置表 业务实现
- * @Title: DflFrequencyBiz
- * @Author: Created by chenjh
- * @Date: 2022-5-18 21:43:11
+ * 频率限制配置表 业务实现
+ * DflFrequencyBiz
+ *
+ * @author chenjh
+ * @date 2022-5-18 21:43:11
  */
 @Service(value = "dflFrequencyBiz")
 public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDflFrequencyBiz, ISelfInject {
@@ -98,7 +99,7 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
     }
 
     @Override
-    public Map<Integer, DflFrequencyPo> getFrequencyByIds(List<Integer> freqencyIdList){
+    public Map<Integer, DflFrequencyPo> getFrequencyByIds(List<Integer> freqencyIdList) {
         if (CollectionUtils.isEmpty(freqencyIdList)) {
             return Collections.emptyMap();
         }
@@ -107,7 +108,7 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
         criteria.andEqualTo("ifDel", 0);
         criteria.andIn("id", freqencyIdList);
         List<DflFrequencyPo> uriList = this.mapper.selectByExample(example);
-        Map<Integer, DflFrequencyPo> frequencyPoMap = new HashMap<>();
+        Map<Integer, DflFrequencyPo> frequencyPoMap = new HashMap<>(uriList.size());
         for (DflFrequencyPo scansPo : uriList) {
             frequencyPoMap.put(scansPo.getId(), scansPo);
         }
@@ -134,10 +135,10 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
     @Override
     public Integer updateDflFrequency(DflFrequencyPo entity) {
         DflFrequencyPo exist = this.findById(entity.getId());
-        if(StringUtils.isEmpty(exist.getLimitType())){
+        if (StringUtils.isEmpty(exist.getLimitType())) {
             entity.setLimitType(FrequencyType.URI_CONFIG.getType());
         }
-        if(entity.getTime()==null||entity.getLimitCount()==null){
+        if (entity.getTime() == null || entity.getLimitCount() == null) {
             entity.setLimitType(null);
         }
         entity.setModifyTime(new Date());
@@ -193,19 +194,19 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
             .maximumSize(2000).build();
 
     @Override
-    public Integer getFrequencyIdByCode(String code, Integer freqLimitType, Integer time){
-        if(code==null||time==null){
+    public Integer getFrequencyIdByCode(String code, Integer freqLimitType, Integer time) {
+        if (code == null || time == null) {
             return 0;
         }
-        String key=code+":"+time;
-        Integer id=frequencyIdMap.getIfPresent(key);
-        if(id==null){
-            DflFrequencyPo frequencyPo= this._self.getFrequencyByCode(code, freqLimitType, time);
-            if(frequencyPo!=null){
-                id=frequencyPo.getId();
+        String key = code + ":" + time;
+        Integer id = frequencyIdMap.getIfPresent(key);
+        if (id == null) {
+            DflFrequencyPo frequencyPo = this._self.getFrequencyByCode(code, freqLimitType, time);
+            if (frequencyPo != null) {
+                id = frequencyPo.getId();
             }
-            if(id==null){
-                id=-1;
+            if (id == null) {
+                id = -1;
             }
             frequencyIdMap.put(key, id);
         }

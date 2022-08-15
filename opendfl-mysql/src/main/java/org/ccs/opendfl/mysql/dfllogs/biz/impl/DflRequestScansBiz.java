@@ -29,10 +29,11 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Description: 所有接口方法（通过扫码所有controller接口） 业务实现
- * @Title: DflRequestScansBiz
- * @Author: Created by chenjh
- * @Date: 2022-5-10 22:12:23
+ * 所有接口方法（通过扫码所有controller接口） 业务实现
+ * DflRequestScansBiz
+ *
+ * @author chenjh
+ * @date 2022-5-10 22:12:23
  */
 @Service(value = "dflRequestScansBiz")
 public class DflRequestScansBiz extends BaseService<DflRequestScansPo> implements IDflRequestScansBiz, ISelfInject {
@@ -185,7 +186,7 @@ public class DflRequestScansBiz extends BaseService<DflRequestScansPo> implement
         criteria.andEqualTo("ifDel", 0);
         criteria.andIn("id", uriIdList);
         List<DflRequestScansPo> uriList = this.mapper.selectByExample(example);
-        Map<Integer, DflRequestScansPo> uriMap = new HashMap<>();
+        Map<Integer, DflRequestScansPo> uriMap = new HashMap<>(uriList.size());
         for (DflRequestScansPo scansPo : uriList) {
             uriMap.put(scansPo.getId(), scansPo);
         }
@@ -219,7 +220,8 @@ public class DflRequestScansBiz extends BaseService<DflRequestScansPo> implement
     public Integer deleteDflRequestScans(Integer id, Integer operUser, String remark) {
         DflRequestScansPo po = new DflRequestScansPo();
         po.setId(id);
-        po.setIfDel(1); // 0未删除,1已删除
+        // 0未删除,1已删除
+        po.setIfDel(1);
         po.setModifyUser(operUser);
         po.setRemark(remark);
         po.setModifyTime(new Date());

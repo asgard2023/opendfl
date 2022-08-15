@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Version V1.0
- * @Title: IDflRequestScansBiz
- * @Description: 所有接口方法（通过扫码所有controller接口） 业务接口
- * @Author: Created by chenjh
- * @Date: 2022-5-10 22:12:23
+ * IDflRequestScansBiz
+ * 所有接口方法（通过扫码所有controller接口） 业务接口
+ *
+ * @author chenjh
+ * @date 2022-5-10 22:12:23
  */
 public interface IDflRequestScansBiz extends IBaseService<DflRequestScansPo> {
 

@@ -8,11 +8,11 @@ import java.util.Map;
 
 
 /**
- * @Version V1.0
- * @Title: IDflRoleBiz
- * @Description: 角色表 业务接口
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:25:42
+ * IDflRoleBiz
+ * 角色表 业务接口
+ *
+ * @author chenjh
+ * @date 2022-5-3 20:25:42
  */
 public interface IDflRoleBiz extends IBaseService<DflRolePo> {
     public Map<Integer, DflRolePo> getRoleMapByIds(List<Integer> roleIds);

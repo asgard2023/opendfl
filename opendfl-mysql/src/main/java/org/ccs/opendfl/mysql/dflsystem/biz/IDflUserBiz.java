@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Version V1.0
- * @Title: IDflUserBiz
- * @Description: 业务接口
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:24:48
+ * IDflUserBiz
+ * 业务接口
+ *
+ * @author chenjh
+ * @date 2022-5-3 20:24:48
  */
 public interface IDflUserBiz extends IBaseService<DflUserPo> {
     public enum loginType {
@@ -20,10 +20,12 @@ public interface IDflUserBiz extends IBaseService<DflUserPo> {
         TELEPHONE("telephone"),
         EMAIL("emmail");
         private String code;
-        loginType(String code){
+
+        loginType(String code) {
             this.code = code;
         }
     }
+
     public Map<Integer, UserVo> getUserMapByIds(List<Integer> userIds);
 
 
@@ -74,6 +76,7 @@ public interface IDflUserBiz extends IBaseService<DflUserPo> {
 
     /**
      * 用户自已改密码
+     *
      * @param userId
      * @param oldPassword
      * @param newPassword
@@ -83,6 +86,7 @@ public interface IDflUserBiz extends IBaseService<DflUserPo> {
 
     /**
      * 管理员改密码
+     *
      * @param userId
      * @param newPassword
      * @param remark

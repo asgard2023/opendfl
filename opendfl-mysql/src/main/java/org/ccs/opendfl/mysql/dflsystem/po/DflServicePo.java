@@ -13,11 +13,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Version V1.0
- * @Title: DflServicePo
- * @Description: 服务表 实体
- * @Author: Created by chenjh
- * @Date: 2022-5-4 11:19:03
+ * DflServicePo
+ * 服务表 实体
+ *
+ * @author chenjh
+ * @date 2022-5-4 11:19:03
  */
 @Data
 @Table(name = "dfl_service")

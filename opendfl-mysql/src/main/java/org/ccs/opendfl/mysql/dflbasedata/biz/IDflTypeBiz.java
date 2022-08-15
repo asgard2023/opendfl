@@ -8,11 +8,11 @@ import java.util.Map;
 
 
 /**
- * @Version V1.0
- * @Title: IDflTypeBiz
- * @Description: 业务接口
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:31:07
+
+ * IDflTypeBiz
+ * 业务接口
+ * @author chenjh
+ * @date 2022-5-3 20:31:07
  */
 public interface IDflTypeBiz extends IBaseService<DflTypePo> {
     public Map<Integer, DflTypePo> getTypeMapByIds(List<Integer> typeIds);

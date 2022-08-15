@@ -6,11 +6,11 @@ import org.ccs.opendfl.mysql.dflcore.po.DflBlackWhitePo;
 import java.util.List;
 
 /**
- * @Version V1.0
- * @Title: IDflBlackWhiteBiz
- * @Description: 黑白名单 业务接口
- * @Author: Created by chenjh
- * @Date: 2022-5-18 21:44:47
+ * IDflBlackWhiteBiz
+ * 黑白名单 业务接口
+ *
+ * @author chenjh
+ * @date 2022-5-18 21:44:47
  */
 public interface IDflBlackWhiteBiz extends IBaseService<DflBlackWhitePo> {
 

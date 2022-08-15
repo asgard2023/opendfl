@@ -41,7 +41,7 @@ public class RSAUtils {
      * @throws NoSuchAlgorithmException 异常
      */
     public static Map<String, Object> getKeys() throws NoSuchAlgorithmException {
-        HashMap<String, Object> map = new HashMap<>();
+        HashMap<String, Object> map = new HashMap<>(4);
         KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("RSA",
                 new org.bouncycastle.jce.provider.BouncyCastleProvider());
         keyPairGen.initialize(1024);

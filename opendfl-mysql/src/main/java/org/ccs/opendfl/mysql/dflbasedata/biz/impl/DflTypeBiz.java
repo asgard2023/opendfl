@@ -19,11 +19,11 @@ import tk.mybatis.mapper.util.StringUtil;
 import java.util.*;
 
 /**
- * @Version V1.0
- * @Title: DflTypeBiz
- * @Description: 业务实现
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:31:07
+
+ * DflTypeBiz
+ * 业务实现
+ * @author chenjh
+ * @date 2022-5-3 20:31:07
  */
 @Service(value = "dflTypeBiz")
 public class DflTypeBiz extends BaseService<DflTypePo> implements IDflTypeBiz, ISelfInject {
@@ -142,7 +142,8 @@ public class DflTypeBiz extends BaseService<DflTypePo> implements IDflTypeBiz, I
     public Integer deleteDflType(Integer id, Integer operUser, String remark) {
         DflTypePo po = new DflTypePo();
         po.setId(id);
-        po.setIfDel(1); // 0未删除,1已删除
+        // 0未删除,1已删除
+        po.setIfDel(1);
         po.setModifyUser(operUser);
         po.setRemark(remark);
         po.setModifyTime(new Date());

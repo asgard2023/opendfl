@@ -8,11 +8,11 @@ import tk.mybatis.mapper.common.Mapper;
 import java.util.List;
 
 /**
- * @Version V1.0
- * @Title: DflOutLimitLogMapper
- * @Description: 频率限制超限日志 Mapper
- * @Author: Created by chenjh
- * @Date: 2022-5-6 23:21:44
+ * DflOutLimitLogMapper
+ * 频率限制超限日志 Mapper
+ *
+ * @author chenjh
+ * @date 2022-5-6 23:21:44
  */
 public interface DflOutLimitLogMapper extends Mapper<DflOutLimitLogPo> {
     /**

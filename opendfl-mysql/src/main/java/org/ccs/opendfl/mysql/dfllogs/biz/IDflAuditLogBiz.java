@@ -4,11 +4,11 @@ import org.ccs.opendfl.mysql.base.IBaseService;
 import org.ccs.opendfl.mysql.dfllogs.po.DflAuditLogPo;
 
 /**
- * @Version V1.0
- * @Title: IDflAuditLogBiz
- * @Description: 后台管理审计日志 业务接口
- * @Author: Created by chenjh
- * @Date: 2022-5-6 23:20:31
+ * IDflAuditLogBiz
+ * 后台管理审计日志 业务接口
+ *
+ * @author chenjh
+ * @date 2022-5-6 23:20:31
  */
 public interface IDflAuditLogBiz extends IBaseService<DflAuditLogPo> {
 

@@ -11,9 +11,6 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * starter管理类
- *
- * @author JustryDeng
- * @date 2022-07-17 06:48:27
  */
 @Configuration
 @EnableConfigurationProperties({FrequencyConfiguration.class

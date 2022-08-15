@@ -7,13 +7,18 @@ import java.util.List;
 
 
 /**
- * @Version V1.0
- * @Title: IDflUserRoleBiz
- * @Description: 用户角色 业务接口
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:26:31
+ * IDflUserRoleBiz
+ * 用户角色 业务接口
+ *
+ * @author chenjh
+ * @date 2022-5-3 20:26:31
  */
 public interface IDflUserRoleBiz extends IBaseService<DflUserRolePo> {
+    /**
+     * 按用户查用户角色
+     * @param userId
+     * @return 用户角色关系表
+     */
     public List<DflUserRolePo> findUserRoles(Integer userId);
 
     /**

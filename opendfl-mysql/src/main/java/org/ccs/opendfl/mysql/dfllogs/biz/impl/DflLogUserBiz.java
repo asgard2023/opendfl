@@ -27,10 +27,11 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Description: 用于非数字的userId转Long型uid，以减少日志存储量，并提高性能 业务实现
- * @Title: DflLogUserBiz
- * @Author: Created by chenjh
- * @Date: 2022-5-10 22:16:27
+ * 用于非数字的userId转Long型uid，以减少日志存储量，并提高性能 业务实现
+ * DflLogUserBiz
+ *
+ * @author chenjh
+ * @date 2022-5-10 22:16:27
  */
 @Service(value = "dflLogUserBiz")
 public class DflLogUserBiz extends BaseService<DflLogUserPo> implements IDflLogUserBiz, ISelfInject {
@@ -115,7 +116,7 @@ public class DflLogUserBiz extends BaseService<DflLogUserPo> implements IDflLogU
     }
 
     @Override
-    public Long getUid(String userId){
+    public Long getUid(String userId) {
         return getUid(userId, null, null);
     }
 
@@ -189,7 +190,7 @@ public class DflLogUserBiz extends BaseService<DflLogUserPo> implements IDflLogU
         criteria.andEqualTo("ifDel", 0);
         criteria.andIn("id", userUidList);
         List<DflLogUserPo> userList = this.mapper.selectByExample(example);
-        Map<Long, DflLogUserPo> userMap = new HashMap<>();
+        Map<Long, DflLogUserPo> userMap = new HashMap<>(userList.size());
         for (DflLogUserPo scansPo : userList) {
             userMap.put(scansPo.getId(), scansPo);
         }
@@ -224,7 +225,8 @@ public class DflLogUserBiz extends BaseService<DflLogUserPo> implements IDflLogU
     public Integer deleteDflLogUser(Long id, Integer operUser, String remark) {
         DflLogUserPo po = new DflLogUserPo();
         po.setId(id);
-        po.setIfDel(1); // 0未删除,1已删除
+        // 0未删除,1已删除
+        po.setIfDel(1);
 //		po.setModifyUser(operUser);
         po.setRemark(remark);
 //		po.setModifyTime(new Date());

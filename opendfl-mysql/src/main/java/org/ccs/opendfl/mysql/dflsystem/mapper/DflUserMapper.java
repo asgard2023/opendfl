@@ -9,11 +9,11 @@ import tk.mybatis.mapper.common.Mapper;
 import java.util.List;
 
 /**
- * @Version V1.0
- * @Title: DflUserMapper
- * @Description: Mapper
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:24:48
+ * DflUserMapper
+ * Mapper
+ *
+ * @author chenjh
+ * @date 2022-5-3 20:24:48
  */
 public interface DflUserMapper extends Mapper<DflUserPo> {
     List<UserVo> findUserListByPage(@Param("param") DflUserPo param, @Param("page") PageVO<DflUserPo> page);

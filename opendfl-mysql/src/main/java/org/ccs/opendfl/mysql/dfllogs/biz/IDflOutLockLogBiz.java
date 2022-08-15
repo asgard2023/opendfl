@@ -4,11 +4,11 @@ import org.ccs.opendfl.mysql.base.IBaseService;
 import org.ccs.opendfl.mysql.dfllogs.po.DflOutLockLogPo;
 
 /**
- * @Version V1.0
- * @Title: IDflOutLockLogBiz
- * @Description: 分布式锁超限日志 业务接口
- * @Author: Created by chenjh
- * @Date: 2022-5-6 23:22:04
+ * IDflOutLockLogBiz
+ * 分布式锁超限日志 业务接口
+ *
+ * @author chenjh
+ * @date 2022-5-6 23:22:04
  */
 public interface IDflOutLockLogBiz extends IBaseService<DflOutLockLogPo> {
 

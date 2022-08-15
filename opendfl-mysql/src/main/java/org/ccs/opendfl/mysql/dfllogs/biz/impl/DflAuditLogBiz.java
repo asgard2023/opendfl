@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Version V1.0
- * @Title: DflAuditLogBiz
- * @Description: 后台管理审计日志 业务实现
- * @Author: Created by chenjh
- * @Date: 2022-5-6 23:20:31
+ * DflAuditLogBiz
+ * 后台管理审计日志 业务实现
+ *
+ * @author chenjh
+ * @date 2022-5-6 23:20:31
  */
 @Service(value = "dflAuditLogBiz")
 public class DflAuditLogBiz extends BaseService<DflAuditLogPo> implements IDflAuditLogBiz, ISelfInject {

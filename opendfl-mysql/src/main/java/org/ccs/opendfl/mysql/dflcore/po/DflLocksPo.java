@@ -13,11 +13,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Version V1.0
- * @Title: DflLocksPo
- * @Description: 分布式锁配置表 实体
- * @Author: Created by chenjh
- * @Date: 2022-5-18 21:44:08
+ * DflLocksPo
+ * 分布式锁配置表 实体
+ *
+ * @author chenjh
+ * @date 2022-5-18 21:44:08
  */
 @Data
 @Table(name = "dfl_locks")

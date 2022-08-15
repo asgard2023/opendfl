@@ -60,7 +60,6 @@ public class FrequencyLoginController {
     /**
      * clientIdRsa和将公钥传到前端
      *
-     * @author chenjh
      */
     @GetMapping(value = "/rsaKey")
     public ResultData getRsaKey(HttpServletRequest request, @RequestParam(value = "funcCode", required = false) String funcCode) {

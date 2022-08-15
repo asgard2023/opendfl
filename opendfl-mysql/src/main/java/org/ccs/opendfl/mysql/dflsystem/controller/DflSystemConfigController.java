@@ -23,11 +23,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @Version V1.0
- * @Title: DflSystemConfigcontroller
- * @Description: 系统参数配置(树形结构) Controller
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:27:48
+ * DflSystemConfigcontroller
+ * 系统参数配置(树形结构) Controller
+ *
+ * @author chenjh
+ * @date 2022-5-3 20:27:48
  */
 @RestController
 @RequestMapping("/dflSystem/dflSystemConfig")
@@ -46,11 +46,10 @@ public class DflSystemConfigController extends BaseController {
     /**
      * 系统参数配置(树形结构)列表查询
      *
-     * @param request
-     * @param entity
-     * @param pageInfo
-     * @return java.lang.Object
-     * @author chenjh
+     * @param request 请求
+     * @param entity 对象
+     * @param pageInfo 翻页对象
+     * @return MyPageInfo<> 翻页结果
      * @date 2022-5-3 20:27:48
      */
 
@@ -96,13 +95,13 @@ public class DflSystemConfigController extends BaseController {
     @RequestMapping(value = {"findSysconfigByParentId"})
 //    @CheckAuthorization("admin")
     public List<HashMap<String, Object>> findSysconfigByParentId(Integer confType, Integer parentId) {
-        logger.info("-------findSysconfigByParentId--parentId={}" , parentId);
+        logger.info("-------findSysconfigByParentId--parentId={}", parentId);
         if (parentId == null) {
             parentId = 0;
         }
         List<Integer> idList = Arrays.asList(parentId);
         List<DflSystemConfigPo> list = this.dflSystemConfigBiz.findSysconfigByParentIds(confType, idList);
-        idList=list.stream().map(DflSystemConfigPo::getId).collect(Collectors.toList());
+        idList = list.stream().map(DflSystemConfigPo::getId).collect(Collectors.toList());
         //用于检查是否有子节点
         List<Map<String, Object>> mCountMapList = this.dflSystemConfigBiz.findSysconfigByParentIdsCount(confType, idList);
         List<HashMap<String, Object>> mapList = new ArrayList();
@@ -111,7 +110,7 @@ public class DflSystemConfigController extends BaseController {
         Integer pId = null;
         Integer pCount = null;
         for (DflSystemConfigPo sysconfig : list) {
-            map = new HashMap<>();
+            map = new HashMap<>(8);
             map.put("id", sysconfig.getId());
             map.put("parentId", parentId);
             map.put("text", sysconfig.getName());

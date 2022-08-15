@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Version V1.0
- * @Title: DflOutLockLogBiz
- * @Description: 分布式锁超限日志 业务实现
- * @Author: Created by chenjh
- * @Date: 2022-5-6 23:22:04
+ * DflOutLockLogBiz
+ * 分布式锁超限日志 业务实现
+ *
+ * @author chenjh
+ * @date 2022-5-6 23:22:04
  */
 @Service(value = "dflOutLockLogBiz")
 public class DflOutLockLogBiz extends BaseService<DflOutLockLogPo> implements IDflOutLockLogBiz, ISelfInject {

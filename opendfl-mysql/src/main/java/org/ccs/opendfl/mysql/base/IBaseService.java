@@ -84,8 +84,8 @@ public interface IBaseService<T> {
     /**
      * 分页查询
      *
-     * @param entity
-     * @param pageInfo
+     * @param entity 对象
+     * @param pageInfo 翻页对象
      * @param otherParams
      * @return
      */

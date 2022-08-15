@@ -29,11 +29,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * @Version V1.0
- * @Title: DflOutLockLogcontroller
- * @Description: 分布式锁超限日志 Controller
- * @Author: Created by chenjh
- * @Date: 2022-5-6 23:22:04
+ * DflOutLockLogcontroller
+ * 分布式锁超限日志 Controller
+ *
+ * @author chenjh
+ * @date 2022-5-6 23:22:04
  */
 @RestController
 @RequestMapping("/dflLogs/dflOutLockLog")
@@ -59,10 +59,10 @@ public class DflOutLockLogController extends BaseController {
     /**
      * 分布式锁超限日志列表查询
      *
-     * @param request
-     * @param entity
-     * @param pageInfo
-     * @return java.lang.Object
+     * @param request 请求
+     * @param entity 对象
+     * @param pageInfo 翻页对象
+     * @return MyPageInfo<> 翻页结果
      * @author chenjh
      * @date 2022-5-6 23:22:04
      */
@@ -73,8 +73,8 @@ public class DflOutLockLogController extends BaseController {
         if (entity == null) {
             entity = new DflOutLockLogPo();
         }
-        Map<String, Object> params=this.createAllParams(request);
-        ValidateUtils.checkTimeDateLimit(params,"uri,ip,uid,userId",90);
+        Map<String, Object> params = this.createAllParams(request);
+        ValidateUtils.checkTimeDateLimit(params, "uri,ip,uid,userId", 90);
         if (this.mysqlConfiguration.getUserIdToNum() == 1) {
             if (StringUtils.isNotBlank(entity.getUserId())) {
                 entity.setUid(this.dflLogUserBiz.getUid(entity.getUserId(), null, null));
@@ -83,7 +83,7 @@ public class DflOutLockLogController extends BaseController {
                 params.remove("userId");
             }
         }
-        if(StringUtils.isNotBlank(entity.getIp())) {
+        if (StringUtils.isNotBlank(entity.getIp())) {
             entity.setIp(RequestUtils.convertIpv4(entity.getIp()));
             params.put("ip", entity.getIp());
         }
@@ -93,7 +93,7 @@ public class DflOutLockLogController extends BaseController {
         pageInfo = dflOutLockLogBiz.findPageBy(entity, pageInfo, params);
         List<DflOutLockLogPo> list = pageInfo.getList();
 
-        final Map<Long, DflLogUserPo> userMap = new HashMap<>();
+        final Map<Long, DflLogUserPo> userMap = new HashMap<>(list.size());
         if (mysqlConfiguration.getUserIdToNum() == 1) {
             List<Long> userIdList = list.stream().filter(t -> t.getUid() != null).map(DflOutLockLogPo::getUid).distinct().collect(Collectors.toList());
             userMap.putAll(dflLogUserBiz.getUserPos(userIdList));
@@ -108,7 +108,7 @@ public class DflOutLockLogController extends BaseController {
             if (t.getUriPo() != null) {
                 t.setUri(t.getUriPo().getUri());
             }
-            if(StringUtils.isNumeric(t.getIp())) {
+            if (StringUtils.isNumeric(t.getIp())) {
                 t.setIp(RequestUtils.getNumConvertIp(Long.parseLong(t.getIp())));
             }
         });

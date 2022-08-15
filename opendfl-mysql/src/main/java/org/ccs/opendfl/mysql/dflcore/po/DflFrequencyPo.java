@@ -17,11 +17,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Version V1.0
- * @Title: DflFrequencyPo
- * @Description: 频率限制配置表 实体
- * @Author: Created by chenjh
- * @Date: 2022-5-18 21:43:11
+ * DflFrequencyPo
+ * 频率限制配置表 实体
+ *
+ * @author chenjh
+ * @date 2022-5-18 21:43:11
  */
 @Data
 @Table(name = "dfl_frequency")

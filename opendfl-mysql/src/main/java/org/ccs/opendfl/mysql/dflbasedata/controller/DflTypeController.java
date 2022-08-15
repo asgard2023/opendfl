@@ -19,11 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * @Version V1.0
- * @Title: DflTypecontroller
- * @Description: Controller
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:31:07
+ * DflTypecontroller
+ *
+ * @author chenjh
+ * @date 2022-5-3 20:31:07
  */
 @RestController
 @RequestMapping("/dflBasedata/dflType")
@@ -42,10 +41,10 @@ public class DflTypeController extends BaseController {
     /**
      * 列表查询
      *
-     * @param request
-     * @param entity
-     * @param pageInfo
-     * @return java.lang.Object
+     * @param request 请求
+     * @param entity 对象
+     * @param pageInfo 翻页对象
+     * @return MyPageInfo<> 翻页结果
      * @author chenjh
      * @date 2022-5-3 20:31:07
      */

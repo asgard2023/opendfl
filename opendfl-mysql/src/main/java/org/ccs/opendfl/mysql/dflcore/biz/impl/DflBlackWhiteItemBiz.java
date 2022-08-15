@@ -27,10 +27,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @Description: 黑名单 业务实现
- * @Title: DflBlackWhiteItemBiz
- * @Author: Created by chenjh
- * @Date: 2022-5-18 21:45:02
+ * 黑名单 业务实现
+ * DflBlackWhiteItemBiz
+ *
+ * @author chenjh
+ * @date 2022-5-18 21:45:02
  */
 @Service(value = "dflBlackWhiteItemBiz")
 public class DflBlackWhiteItemBiz extends BaseService<DflBlackWhiteItemPo> implements IDflBlackWhiteItemBiz, ISelfInject {
@@ -127,7 +128,8 @@ public class DflBlackWhiteItemBiz extends BaseService<DflBlackWhiteItemPo> imple
         DflBlackWhiteItemPo exist = this.findById(id);
         DflBlackWhiteItemPo po = new DflBlackWhiteItemPo();
         po.setId(id);
-        po.setIfDel(1); // 0未删除,1已删除
+        // 0未删除,1已删除
+        po.setIfDel(1);
         po.setModifyUser(operUser);
         po.setRemark(remark);
         po.setModifyTime(new Date());

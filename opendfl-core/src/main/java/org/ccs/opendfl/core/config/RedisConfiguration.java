@@ -94,8 +94,8 @@ public class RedisConfiguration extends CachingConfigurerSupport {
     }
 
     private Map<String, RedisCacheConfiguration> getRedisCacheConfigurationMap() {
-        Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>();
         CacheTimeType[] timeTypes = CacheTimeType.values();
+        Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>(timeTypes.length);
         for (CacheTimeType timeType : timeTypes) {
             if (timeType == CacheTimeType.CACHE_DEFAULT) {
                 continue;

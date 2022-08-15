@@ -35,13 +35,13 @@ public @interface Frequency4 {
      * 可以用于指定为其他的参数，比如account，username等
      * 没有可以不填
      * 但是如果填了属性，那如果属性为空则，直接忽略(接口本身应该有些参数的非空判断，即抛非空异常)，即该频率限制不起作用
-     * @return
+     * @return attrName
      */
     String attrName() default "";
 
     /**
      * 是否支持系统参数配置
-     * @return
+     * @return 是否系统配置
      */
     boolean sysconfig() default false;
 
@@ -52,7 +52,7 @@ public @interface Frequency4 {
     boolean needLogin() default false;
     /**
      * 是否显示日志
-     * @return
+     * @return 是否
      */
     boolean log() default false;
 

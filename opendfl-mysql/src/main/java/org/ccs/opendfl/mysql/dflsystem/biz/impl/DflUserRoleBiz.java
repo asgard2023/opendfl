@@ -22,11 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Version V1.0
- * @Title: DflUserRoleBiz
- * @Description: 用户角色 业务实现
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:26:31
+ * DflUserRoleBiz
+ * 用户角色 业务实现
+ *
+ * @author chenjh
+ * @date 2022-5-3 20:26:31
  */
 @Service(value = "dflUserRoleBiz")
 public class DflUserRoleBiz extends BaseService<DflUserRolePo> implements IDflUserRoleBiz, ISelfInject {
@@ -113,7 +113,7 @@ public class DflUserRoleBiz extends BaseService<DflUserRolePo> implements IDflUs
 
     @Override
     public Integer saveDflUserRole(DflUserRolePo entity) {
-        if(entity.getStatus()==null){
+        if (entity.getStatus() == null) {
             entity.setStatus(1);
         }
         if (entity.getCreateTime() == null) {
@@ -138,7 +138,8 @@ public class DflUserRoleBiz extends BaseService<DflUserRolePo> implements IDflUs
     public Integer deleteDflUserRole(Integer id, Integer operUser, String remark) {
         DflUserRolePo po = new DflUserRolePo();
         po.setId(id);
-        po.setIfDel(1); // 0未删除,1已删除
+        // 0未删除,1已删除
+        po.setIfDel(1);
         po.setModifyUser(operUser);
 //		po.setRemark(remark);
         po.setModifyTime(new Date());

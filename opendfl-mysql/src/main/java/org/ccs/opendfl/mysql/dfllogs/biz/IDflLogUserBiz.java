@@ -8,14 +8,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Version V1.0
- * @Title: IDflLogUserBiz
- * @Description: 用于非数字的userId转Long型uid，以减少日志存储量，并提高性能 业务接口
- * @Author: Created by chenjh
- * @Date: 2022-5-10 22:16:27
+ * IDflLogUserBiz
+ * 用于非数字的userId转Long型uid，以减少日志存储量，并提高性能 业务接口
+ *
+ * @author chenjh
+ * @date 2022-5-10 22:16:27
  */
 public interface IDflLogUserBiz extends IBaseService<DflLogUserPo> {
     public Long getUid(String userId);
+
     public Long getUid(String userId, String sysType, String ip);
 
     public Map<Long, DflLogUserPo> getUserPos(List<Long> uriIdList);

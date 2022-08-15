@@ -29,11 +29,11 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Version V1.0
- * @Title: DflUserBiz
- * @Description: 业务实现
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:24:48
+ * DflUserBiz
+ * 业务实现
+ *
+ * @author chenjh
+ * @date 2022-5-3 20:24:48
  */
 @Service(value = "dflUserBiz")
 public class DflUserBiz extends BaseService<DflUserPo> implements IDflUserBiz, ISelfInject {
@@ -119,7 +119,7 @@ public class DflUserBiz extends BaseService<DflUserPo> implements IDflUserBiz, I
         Example.Criteria criteria = example.createCriteria();
         criteria.andIn("id", userIds);
         List<DflUserPo> userList = this.mapper.selectByExample(example);
-        Map<Integer, UserVo> userMap = new HashMap<>();
+        Map<Integer, UserVo> userMap = new HashMap<>(userList.size());
         UserVo vo = null;
         for (DflUserPo userPo : userList) {
             vo = DflUserPo.toUserVo(userPo);
@@ -239,7 +239,8 @@ public class DflUserBiz extends BaseService<DflUserPo> implements IDflUserBiz, I
     public Integer deleteDflUser(Integer id, Integer operUser, String remark) {
         DflUserPo po = new DflUserPo();
         po.setId(id);
-        po.setIfDel(1); // 0未删除,1已删除
+        // 0未删除,1已删除
+        po.setIfDel(1);
         po.setModifyUser(operUser);
         po.setRemark(remark);
         po.setModifyTime(new Date());

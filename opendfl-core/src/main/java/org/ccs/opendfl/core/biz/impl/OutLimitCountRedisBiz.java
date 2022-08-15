@@ -42,8 +42,8 @@ public class OutLimitCountRedisBiz implements IOutLimitCountBiz {
 
     @Override
     public Map<String, Integer> getTypeUriCount(Long curTime) {
-        Map<String, Integer> map = new HashMap<>();
         WhiteBlackCheckType[] types = WhiteBlackCheckType.values();
+        Map<String, Integer> map = new HashMap<>(types.length);
         for (WhiteBlackCheckType type : types) {
             int size = getRunTypeSize(type, curTime);
             map.put(type.getCode(), size);
@@ -105,7 +105,7 @@ public class OutLimitCountRedisBiz implements IOutLimitCountBiz {
     public Map<String, Integer> saveLimitCount() {
         Long curTime = System.currentTimeMillis();
         WhiteBlackCheckType[] types = WhiteBlackCheckType.values();
-        Map<String, Integer> typeCountMap = new HashMap<>();
+        Map<String, Integer> typeCountMap = new HashMap<>(types.length);
         for (WhiteBlackCheckType type : types) {
             int count = saveLimitCountByType(type);
             typeCountMap.put(type.getCode(), count);

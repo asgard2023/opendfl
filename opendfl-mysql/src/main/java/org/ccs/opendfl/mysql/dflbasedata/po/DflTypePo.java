@@ -13,11 +13,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Version V1.0
- * @Title: DflTypePo
- * @Description: 实体
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:31:07
+ * DflTypePo
+ * 实体
+ *
+ * @author chenjh
+ * @date 2022-5-3 20:31:07
  */
 @Table(name = "dfl_type")
 @XmlRootElement(name = "dflType")

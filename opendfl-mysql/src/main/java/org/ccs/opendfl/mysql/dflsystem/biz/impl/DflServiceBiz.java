@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Version V1.0
- * @Title: DflServiceBiz
- * @Description: 服务表 业务实现
- * @Author: Created by chenjh
- * @Date: 2022-5-4 11:19:02
+ * DflServiceBiz
+ * 服务表 业务实现
+ *
+ * @author chenjh
+ * @date 2022-5-4 11:19:02
  */
 @Service(value = "dflServiceBiz")
 public class DflServiceBiz extends BaseService<DflServicePo> implements IDflServiceBiz, ISelfInject {
@@ -108,7 +108,8 @@ public class DflServiceBiz extends BaseService<DflServicePo> implements IDflServ
     public Integer deleteDflService(Integer id, Integer operUser, String remark) {
         DflServicePo po = new DflServicePo();
         po.setId(id);
-        po.setIfDel(1); // 0未删除,1已删除
+        // 0未删除,1已删除
+        po.setIfDel(1);
         po.setModifyUser(operUser);
 //        po.setRemark(remark);
         po.setModifyTime(new Date());

@@ -46,8 +46,8 @@ public class RunCountRedisBiz implements IRunCountBiz {
 
     @Override
     public Map<String, Integer> getTypeUriCount(Long curTime) {
-        Map<String, Integer> map = new HashMap<>();
         RunCountType[] types = RunCountType.values();
+        Map<String, Integer> map = new HashMap<>(types.length);
         for (RunCountType type : types) {
             int size = getRunTypeSize(type, curTime);
             map.put(type.getCode(), size);

@@ -250,7 +250,7 @@ public class AnnotationControllerUtils {
         AnnotationInfoVo info = new AnnotationInfoVo();
         info.setType(annotation.annotationType().getSimpleName());
         Method[] methods = annotation.getClass().getDeclaredMethods();
-        Map<String, Object> paramMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>(methods.length);
         String ignoreMethods = ",hashCode,equals,toString,annotationType,";
         for (Method method : methods) {
             String name = method.getName();

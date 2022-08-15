@@ -13,11 +13,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Version V1.0
- * @Title: DflSystemConfigPo
- * @Description: 系统参数配置(树形结构) 实体
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:27:48
+ * DflSystemConfigPo
+ * 系统参数配置(树形结构) 实体
+ *
+ * @author chenjh
+ * @date 2022-5-3 20:27:48
  */
 @Data
 @Table(name = "dfl_system_config")

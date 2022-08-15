@@ -19,11 +19,11 @@ import tk.mybatis.mapper.util.StringUtil;
 import java.util.*;
 
 /**
- * @Version V1.0
- * @Title: DflRoleBiz
- * @Description: 角色表 业务实现
- * @Author: Created by chenjh
- * @Date: 2022-5-3 20:25:42
+
+ * DflRoleBiz
+ * 角色表 业务实现
+ * @author chenjh
+ * @date 2022-5-3 20:25:42
  */
 @Service(value = "dflRoleBiz")
 public class DflRoleBiz extends BaseService<DflRolePo> implements IDflRoleBiz, ISelfInject {
@@ -93,7 +93,7 @@ public class DflRoleBiz extends BaseService<DflRolePo> implements IDflRoleBiz, I
         Example.Criteria criteria = example.createCriteria();
         criteria.andIn("id", roleIds);
         List<DflRolePo> roleList = this.mapper.selectByExample(example);
-        Map<Integer, DflRolePo> rolePoMap = new HashMap<>();
+        Map<Integer, DflRolePo> rolePoMap = new HashMap<>(roleIds.size());
         for (DflRolePo rolePo : roleList) {
             rolePoMap.put(rolePo.getId(), rolePo);
         }
@@ -127,7 +127,8 @@ public class DflRoleBiz extends BaseService<DflRolePo> implements IDflRoleBiz, I
     public Integer deleteDflRole(Integer id, Integer operUser, String remark) {
         DflRolePo po = new DflRolePo();
 //		po.setId(id);
-        po.setIfDel(1); // 0未删除,1已删除
+        // 0未删除,1已删除
+        po.setIfDel(1);
         po.setModifyUser(operUser);
         po.setRemark(remark);
         po.setModifyTime(new Date());

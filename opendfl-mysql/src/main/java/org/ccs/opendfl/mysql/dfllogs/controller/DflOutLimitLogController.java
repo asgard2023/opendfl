@@ -34,11 +34,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * @Version V1.0
- * @Title: DflOutLimitLogcontroller
- * @Description: 频率限制超限日志 Controller
- * @Author: Created by chenjh
- * @Date: 2022-5-6 23:21:44
+ * DflOutLimitLogcontroller
+ * 频率限制超限日志 Controller
+ *
+ * @author chenjh
+ * @date 2022-5-6 23:21:44
  */
 @RestController
 @RequestMapping("/dflLogs/dflOutLimitLog")
@@ -65,10 +65,10 @@ public class DflOutLimitLogController extends BaseController {
     /**
      * 频率限制超限日志列表查询
      *
-     * @param request
-     * @param entity
-     * @param pageInfo
-     * @return java.lang.Object
+     * @param request 请求
+     * @param entity 对象
+     * @param pageInfo 翻页对象
+     * @return MyPageInfo<> 翻页结果
      * @author chenjh
      * @date 2022-5-6 23:21:44
      */
@@ -108,7 +108,7 @@ public class DflOutLimitLogController extends BaseController {
         pageInfo = dflOutLimitLogBiz.findPageBy(entity, pageInfo, params);
         List<DflOutLimitLogPo> list = pageInfo.getList();
 
-        final Map<Long, DflLogUserPo> userMap = new HashMap<>();
+        final Map<Long, DflLogUserPo> userMap = new HashMap<>(list.size());
         if (mysqlConfiguration.getUserIdToNum() == 1) {
             List<Long> userIdList = list.stream().filter(t -> t.getUid() != null).map(DflOutLimitLogPo::getUid).distinct().collect(Collectors.toList());
             userMap.putAll(dflLogUserBiz.getUserPos(userIdList));

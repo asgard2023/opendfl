@@ -31,7 +31,7 @@ public class RsaBiz implements IRsaBiz {
             // 保存私钥到 redis，也可以保存到数据库
             redisTemplate.opsForValue().set(clientId, privateKey, 30, TimeUnit.SECONDS);
             // 将公钥传到前端
-            Map<String, String> map = new HashMap<>();
+            Map<String, String> map = new HashMap<>(8);
             // 注意返回modulus和exponent以16为基数的BigInteger的字符串表示形式
             map.put("modulus", publicKey.getModulus().toString(16));
             map.put("exponent", publicKey.getPublicExponent().toString(16));

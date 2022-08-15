@@ -5,6 +5,10 @@ import org.ccs.opendfl.mysql.vo.UserVo;
 
 import java.util.List;
 
+/**
+ * 用户登入
+ * @author chenjh
+ */
 public interface IDflUserLoginBiz {
     /**
      * 用户登入
@@ -45,5 +49,5 @@ public interface IDflUserLoginBiz {
      * @param userId 角色编码
      * @return 角色权限RolePermitVo
      */
-    public List<DflUserRolePo> getRolePermit(Integer userId) ;
+    public List<DflUserRolePo> getRolePermit(Integer userId);
 }
