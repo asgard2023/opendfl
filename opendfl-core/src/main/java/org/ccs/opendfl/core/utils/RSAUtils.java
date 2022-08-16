@@ -18,6 +18,7 @@ import java.util.Map;
 
 /**
  * 公钥、密钥生成和校验
+ *
  * @author p7
  **/
 public class RSAUtils {
@@ -38,6 +39,7 @@ public class RSAUtils {
     /**
      * 生成公钥和私钥
      *
+     * @return keys
      * @throws NoSuchAlgorithmException 异常
      */
     public static Map<String, Object> getKeys() throws NoSuchAlgorithmException {
@@ -100,7 +102,7 @@ public class RSAUtils {
     /**
      * 公钥加密
      *
-     * @param data 数据
+     * @param data      数据
      * @param publicKey 公钥
      * @return 加密公钥key
      * @throws Exception 异常
@@ -123,7 +125,7 @@ public class RSAUtils {
     /**
      * 私钥解密
      *
-     * @param data 数据
+     * @param data       数据
      * @param privateKey 私钥
      * @return 私钥解密
      * @throws Exception 异常
@@ -146,7 +148,8 @@ public class RSAUtils {
 
     /**
      * ASCII码转BCD码
-     * @param ascii ascii字节流
+     *
+     * @param ascii  ascii字节流
      * @param ascLen 长度
      */
     public static byte[] asciiToBCD(byte[] ascii, int ascLen) {
@@ -175,6 +178,9 @@ public class RSAUtils {
 
     /**
      * BCD转字符串
+     *
+     * @param bytes byte数组
+     * @return String 字符串
      */
     public static String bcd2Str(byte[] bytes) {
         char temp[] = new char[bytes.length * 2], val;
@@ -191,6 +197,10 @@ public class RSAUtils {
 
     /**
      * 拆分字符串
+     *
+     * @param string 字符
+     * @param len    拆分长度
+     * @return String[]
      */
     public static String[] splitString(String string, int len) {
         int x = string.length() / len;
@@ -214,8 +224,9 @@ public class RSAUtils {
 
     /**
      * 拆分数组
+     *
      * @param data 数据
-     * @param len 长度
+     * @param len  长度
      * @return 数组
      */
     public static byte[][] splitArray(byte[] data, int len) {

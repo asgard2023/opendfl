@@ -21,14 +21,14 @@ public @interface Frequency {
      * 编码，uniqueKey
      * 如果多个接口的name相同，则支持跨接口限制，即：访问次数一起算，但limit是区分的
      *
-     * @return
+     * @return name
      */
     String name() default "all";
 
     /**
      * 只相当于分组，没有实际作用，允许重复
      *
-     * @return
+     * @return aliasName
      */
     String aliasName() default "";
 
@@ -42,10 +42,15 @@ public @interface Frequency {
     /**
      * 限制次数，为0不限次数
      *
-     * @return
+     * @return 次数
      */
     int limit() default 0;
 
+    /**
+     * 频率限制类型
+     *
+     * @return 类型
+     */
     FreqLimitType freqLimitType() default FreqLimitType.LIMIT;
 
     /**
@@ -66,6 +71,8 @@ public @interface Frequency {
 
     /**
      * 是否需要登入
+     *
+     * @return 是否
      */
     boolean needLogin() default false;
 
@@ -79,11 +86,21 @@ public @interface Frequency {
     /**
      * 方法级用户白名单
      *
-     * @return
+     * @return 白名单编码
      */
     String whiteCode() default FrequencyConstant.NONE;
 
+    /**
+     * 异常消息内容
+     *
+     * @return 消息
+     */
     String errMsg() default "";
 
+    /**
+     * 异常消息内容(英语)
+     *
+     * @return 消息
+     */
     String errMsgEn() default "";
 }

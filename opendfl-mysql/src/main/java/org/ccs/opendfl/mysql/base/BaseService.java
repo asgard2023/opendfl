@@ -88,8 +88,8 @@ public abstract class BaseService<T> implements IBaseService<T> {
     /**
      * 支持JqGrid的动态查询filters参数处理
      *
-     * @param criteria
-     * @param otherParams
+     * @param criteria    Criteria
+     * @param otherParams Map
      */
     public void addFilters(Example.Criteria criteria, Map<String, Object> otherParams) {
         String filters = (String) otherParams.get("filters");
@@ -145,8 +145,8 @@ public abstract class BaseService<T> implements IBaseService<T> {
     /**
      * 删除
      *
-     * @param key
-     * @return
+     * @param key 数据主键值
+     * @return int
      */
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -157,8 +157,8 @@ public abstract class BaseService<T> implements IBaseService<T> {
     /**
      * 更新对象所有属性，包括空值
      *
-     * @param entity
-     * @return
+     * @param entity 更新对象
+     * @return int
      */
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -169,8 +169,8 @@ public abstract class BaseService<T> implements IBaseService<T> {
     /**
      * 只更新有值的属性
      *
-     * @param entity
-     * @return
+     * @param entity 更新对象
+     * @return int
      */
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -182,10 +182,10 @@ public abstract class BaseService<T> implements IBaseService<T> {
     /**
      * 软删除
      *
-     * @param entity
-     * @param propertyName
-     * @param deleteStatus
-     * @return
+     * @param entity       entity
+     * @param propertyName 属性值
+     * @param deleteStatus 修改状态
+     * @return int
      * @throws Exception
      */
     @Override
@@ -197,6 +197,9 @@ public abstract class BaseService<T> implements IBaseService<T> {
 
     /**
      * 根据id查询
+     *
+     * @param id 主键id值
+     * @return 对象
      */
     @Override
     public T findById(Object id) {
@@ -206,10 +209,10 @@ public abstract class BaseService<T> implements IBaseService<T> {
     /**
      * 按id列表查询
      *
-     * @param ids
+     * @param ids         id主键id值
      * @param entityClass
-     * @return
-     * @throws Exception
+     * @return 对象list
+     * @throws Exception 异常
      */
     @Override
     public List<T> findByIds(List<Object> ids, Class<?> entityClass) {
@@ -231,10 +234,11 @@ public abstract class BaseService<T> implements IBaseService<T> {
     /**
      * 按id列表查询 like ： orderByClause: example.setOrderByClause("create_time desc");
      *
-     * @param ids
-     * @param entityClass
-     * @return
-     * @throws Exception
+     * @param propName    属性名
+     * @param propotys    属性值list
+     * @param entityClass 类
+     * @return 对象list
+     * @throws Exception 异常
      */
     @Override
     public List<T> findByPropotys(String propName, List<Object> propotys, Class<?> entityClass, String orderByClause) throws Exception {
@@ -257,9 +261,8 @@ public abstract class BaseService<T> implements IBaseService<T> {
     /**
      * 按照实体查找
      *
-     * @param entity
-     * @return
-     * @throws Exception
+     * @param entity 查询对象
+     * @return 数据list
      */
     @Override
     public List<T> findBy(T entity) {
@@ -269,11 +272,11 @@ public abstract class BaseService<T> implements IBaseService<T> {
     /**
      * 按属性进行唯一查询，如果有多个则会抛出异常
      *
-     * @param propoty
-     * @param value
-     * @param entity
-     * @return
-     * @throws Exception
+     * @param propoty 查询属性名
+     * @param value   查询属性值
+     * @param entity  数据对象
+     * @return 数据对象
+     * @throws Exception 异常
      */
     @Override
     public T findOne(String propoty, Object value, Class<T> entity) {
@@ -290,11 +293,11 @@ public abstract class BaseService<T> implements IBaseService<T> {
     /**
      * 按属性查询list
      *
-     * @param propoty
-     * @param value
-     * @param entity
-     * @return
-     * @throws Exception
+     * @param propoty 查询属性名
+     * @param value   查询属性值
+     * @param entity  数据对象
+     * @return 数据对象
+     * @throws Exception 异常
      */
     @Override
     public List<T> findByPropoty(String propoty, Object value, Class<T> entity) {
@@ -304,12 +307,12 @@ public abstract class BaseService<T> implements IBaseService<T> {
     /**
      * 按属性查询list
      *
-     * @param propoty
-     * @param value
-     * @param entity
+     * @param propoty            查询属性名
+     * @param value              查询属性值
+     * @param entity             数据对象
      * @param orderByClause，like ： example.setOrderByClause("create_time desc");
-     * @return
-     * @throws Exception
+     * @return 数据对象list
+     * @throws Exception 异常
      */
     @Override
     public List<T> findByPropoty(String propoty, Object value, Class<T> entity, String orderByClause) {
@@ -325,10 +328,10 @@ public abstract class BaseService<T> implements IBaseService<T> {
     /**
      * 分页查询
      *
-     * @param entity 对象
+     * @param entity   对象
      * @param pageInfo 翻页对象
-     * @return
-     * @throws Exception
+     * @return 翻页数据
+     * @throws Exception 异常
      */
     @SuppressWarnings({"unchecked", "null"})
     @Override
@@ -353,8 +356,8 @@ public abstract class BaseService<T> implements IBaseService<T> {
      * @param byProp   通过哪个属性去关联
      * @param propId   关联对象的ID
      * @param propName 要加载的属性
-     * @param clazz
-     * @throws Exception
+     * @param clazz    类
+     * @throws Exception 异常
      */
     @Override
     public void loadProperty(List<?> list, String byProp, String propId, String propName, Class<T> clazz) throws Exception {

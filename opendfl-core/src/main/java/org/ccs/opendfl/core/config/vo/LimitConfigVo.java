@@ -4,6 +4,11 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * 频率限制配置
+ *
+ * @author chenjh
+ */
 @Data
 public class LimitConfigVo {
     private String items;

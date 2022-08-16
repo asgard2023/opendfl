@@ -46,7 +46,7 @@ public class DflRequestScansController extends BaseController {
      * @param request 请求
      * @param entity 对象
      * @param pageInfo 翻页对象
-     * @return MyPageInfo<> 翻页结果
+     * @return MyPageInfo 翻页结果
      * @author chenjh
      * @date 2022-5-10 22:12:23
      */

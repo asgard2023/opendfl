@@ -54,8 +54,7 @@ public interface IBaseService<T> {
      *
      * @param ids
      * @param entityClass
-     * @return
-     * @throws Exception
+     * @return list
      */
     public List<T> findByIds(List<Object> ids, Class<?> entityClass);
 
@@ -64,7 +63,6 @@ public interface IBaseService<T> {
      *
      * @param entity
      * @return
-     * @throws Exception
      */
     public List<T> findBy(T entity);
 
@@ -84,8 +82,8 @@ public interface IBaseService<T> {
     /**
      * 分页查询
      *
-     * @param entity 对象
-     * @param pageInfo 翻页对象
+     * @param entity      对象
+     * @param pageInfo    翻页对象
      * @param otherParams
      * @return
      */
@@ -104,12 +102,11 @@ public interface IBaseService<T> {
     /**
      * 按属性查询list  orderByClause ： example.setOrderByClause("create_time desc");
      *
-     * @param propoty
-     * @param value
-     * @param entity
-     * @param orderByClause，
-     * @return
-     * @throws Exception
+     * @param propoty       propoty
+     * @param value         value
+     * @param entity        entity
+     * @param orderByClause order条件
+     * @return list
      */
     List<T> findByPropoty(String propoty, Object value, Class<T> entity, String orderByClause);
 
@@ -125,9 +122,10 @@ public interface IBaseService<T> {
     /**
      * 通过ids转成Map
      *
-     * @param ids
-     * @return
-     * @throws Exception
+     * @param ids    ids
+     * @param entity entity
+     * @return Map
+     * @throws Exception entity
      */
     Map<String, T> findMapByIds(List<Object> ids, Class<T> entity) throws Exception;
 }

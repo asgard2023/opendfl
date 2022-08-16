@@ -4,11 +4,13 @@ import lombok.Data;
 
 /**
  * 基本限制
+ *
+ * @author chenjh
  */
 @Data
 public class BaseLimitVo {
-    private int pageNumMax=1000;
-    private int pageSizeMax=1000;
-    private int totalRowMax=100000;
-    private int searchDateMaxDay=90;
+    private int pageNumMax = 1000;
+    private int pageSizeMax = 1000;
+    private int totalRowMax = 100000;
+    private int searchDateMaxDay = 90;
 }

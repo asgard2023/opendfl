@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * 分布式锁测试
+ *
+ * @author chenjh
  */
 @RestController
 @RequestMapping("/lockTest")

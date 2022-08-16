@@ -23,7 +23,7 @@ public abstract class BaseController {
     /**
      * 得到request对象
      *
-     * @return
+     * @return HttpServletRequest
      */
     public HttpServletRequest getRequest() {
         return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
@@ -65,7 +65,7 @@ public abstract class BaseController {
     /**
      * 获取当前登录的用户ID
      *
-     * @return
+     * @return Integer
      */
     public Integer getCurrentUserId() {
         UserVo userVo = getCurrentUser();
@@ -80,7 +80,7 @@ public abstract class BaseController {
     /**
      * 获取当前登录的用户名
      *
-     * @return
+     * @return UserVo
      */
     public UserVo getCurrentUser() {
         String token = RequestUtils.getToken(getRequest());
@@ -100,7 +100,7 @@ public abstract class BaseController {
     /**
      * 获取当前登录的用户名
      *
-     * @return
+     * @return String
      */
     public String getCurrentUsername() {
         String token = RequestUtils.getToken(getRequest());

@@ -4,6 +4,11 @@ import lombok.Data;
 import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
 
+/**
+ * uri频率限制配置
+ *
+ * @author chenjh
+ */
 @Data
 public class LimitUriConfigVo {
     private String uri;
@@ -13,10 +18,9 @@ public class LimitUriConfigVo {
     private Integer limit = 0;
     private FreqLimitType freqLimitType;
     private String attrName = "";
-    private Integer status=0;
+    private Integer status = 0;
     /**
      * 是否显示日志
-     * @return
      */
     private boolean log;
     private boolean needLogin;

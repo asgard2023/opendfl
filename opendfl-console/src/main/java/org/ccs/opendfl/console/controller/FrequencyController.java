@@ -63,8 +63,8 @@ public class FrequencyController {
     /**
      * IP转数字转换
      *
-     * @param request
-     * @return
+     * @param request request
+     * @return Object
      */
     @GetMapping("/ipConvert")
     public Object ipConvert(HttpServletRequest request) {
@@ -79,8 +79,8 @@ public class FrequencyController {
     /**
      * 日期选择下拉框
      *
-     * @param request
-     * @return List<ComboxItemVo>
+     * @param request request
+     * @return List
      */
     @RequestMapping(value = "/getRunDays", method = {RequestMethod.GET, RequestMethod.POST})
     public List<ComboxItemVo> getRunDays(HttpServletRequest request) {
@@ -90,8 +90,9 @@ public class FrequencyController {
     /**
      * 限制次数类型
      *
-     * @param request
-     * @return List<ComboxItemVo>
+     * @param request request
+     * @param day     day
+     * @return List
      */
     @RequestMapping(value = "/getRunCountTypeByDay", method = {RequestMethod.GET, RequestMethod.POST})
     public List<ComboxItemVo> getRunCountTypeByDay(HttpServletRequest request
@@ -112,9 +113,9 @@ public class FrequencyController {
      * 有调用的接口信息
      * 有调用才会有记录
      *
-     * @param request
-     * @param requestVo
-     * @return
+     * @param request   request
+     * @param requestVo requestVo
+     * @return ResultData
      */
     @RequestMapping(value = "/requests", method = {RequestMethod.POST, RequestMethod.GET})
     public ResultData requests(HttpServletRequest request, RequestVo requestVo) {
@@ -168,8 +169,8 @@ public class FrequencyController {
     /**
      * 接口访问最大执行时间查询
      *
-     * @param showList
-     * @param curTime
+     * @param showList showList
+     * @param curTime  curTime
      */
     private void requestMaxRunTimeByDay(List<RequestShowVo> showList, Long curTime) {
         List<MaxRunTimeVo> list = maxRunTimeBiz.getNewlyMaxRunTime(curTime, 24 * 3600, 100);
@@ -275,6 +276,8 @@ public class FrequencyController {
      *
      * @param request   HttpServletRequest
      * @param requestVo RequestVo
+     * @param type      type
+     * @param day       day
      * @return ResultData
      */
     @RequestMapping(value = "/requestScans", method = {RequestMethod.POST, RequestMethod.GET})
@@ -321,6 +324,8 @@ public class FrequencyController {
      *
      * @param request   HttpServletRequest
      * @param requestVo RequestVo
+     * @param second    秋数，默认10
+     * @param count     count次数，默认20
      * @return ResultData
      */
     @RequestMapping(value = "/requestMaxRunTimes", method = {RequestMethod.POST, RequestMethod.GET})
@@ -416,7 +421,7 @@ public class FrequencyController {
      * @param frequency FrequencyVo
      * @param ip        IP地址
      * @param userId    用户ID
-     * @return
+     * @return ResultData
      */
     @RequestMapping(value = "/limits", method = {RequestMethod.POST, RequestMethod.GET})
     public ResultData limits(HttpServletRequest request, FrequencyVo frequency

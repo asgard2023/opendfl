@@ -84,7 +84,7 @@ public class FrequencyController extends BaseController {
      * 日期选择下拉框
      *
      * @param request
-     * @return List<ComboxItemVo>
+     * @return List
      */
 
     @RequestMapping(value = "/getRunDays", method = {RequestMethod.GET, RequestMethod.POST})
@@ -96,7 +96,7 @@ public class FrequencyController extends BaseController {
      * 限制次数类型
      *
      * @param request
-     * @return List<ComboxItemVo>
+     * @return List
      */
 
     @RequestMapping(value = "/getRunCountTypeByDay", method = {RequestMethod.GET, RequestMethod.POST})

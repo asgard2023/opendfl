@@ -13,7 +13,6 @@ import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.FrequencyException;
 import org.ccs.opendfl.core.exception.ResultCode;
 import org.ccs.opendfl.core.utils.LangType;
-import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
@@ -72,9 +71,10 @@ public class FrequencyUtils {
     /**
      * 频率超限日志，超出部分才记录
      *
-     * @param strategyParams
+     * @param strategyParams 策略参数
      * @param limit          limitCount, use when not null
      * @param type           limit type
+     * @param v              访问次数
      */
     public static void addFreqLog(RequestStrategyParamsVo strategyParams, Integer limit, long v, FreqLimitType type) {
 
@@ -86,7 +86,7 @@ public class FrequencyUtils {
         outLimitCount(strategyParams, typeCode);
         FrequencyVo frequencyVo = strategyParams.getFrequency();
         Integer ifResource = 0;
-        if (frequencyVo!=null && frequencyVo.getFreqLimitType().isResource()) {
+        if (frequencyVo != null && frequencyVo.getFreqLimitType().isResource()) {
             ifResource = 1;
         }
         outLogBiz.addFreqLog(strategyParams, limit, v, outLimitType, subLimit, ifResource, typeCode, strategyParams.getAttrValue());
@@ -148,7 +148,8 @@ public class FrequencyUtils {
      * 是否启动时前1000次
      * 以便于显示日志信息
      *
-     * @param key
+     * @param key key
+     * @return 是否日志
      */
     public static boolean isInitLog(String key) {
         Boolean isLog = initLogrMap.get(key);
@@ -176,7 +177,7 @@ public class FrequencyUtils {
         Object attrValue = params.get(attrName);
         String clientIdRsa = (String) params.get("clientIdRsa");
 
-        if (attrValue == null && jsonObject!=null) {
+        if (attrValue == null && jsonObject != null) {
             attrValue = jsonObject.getString(attrName);
             if (clientIdRsa == null) {
                 clientIdRsa = jsonObject.getString(clientIdRsa);
@@ -188,13 +189,12 @@ public class FrequencyUtils {
         return decryptValue(clientIdRsa, "" + attrValue);
     }
 
-    public static JSONObject getJsonObject(String reqBody){
-        if (reqBody!=null && reqBody.startsWith("{")) {
+    public static JSONObject getJsonObject(String reqBody) {
+        if (reqBody != null && reqBody.startsWith("{")) {
             return JSON.parseObject(reqBody);
         }
         return null;
     }
-
 
 
     /**
@@ -211,22 +211,22 @@ public class FrequencyUtils {
         return attrValue;
     }
 
-    public static String getErrMsg(String errMsg, int time, int limit){
-        if(errMsg==null){
+    public static String getErrMsg(String errMsg, int time, int limit) {
+        if (errMsg == null) {
             return null;
         }
         try {
-            return errMsg.replace("#{time}", ""+time).replace("#{limit}", ""+limit);
+            return errMsg.replace("#{time}", "" + time).replace("#{limit}", "" + limit);
         } catch (Exception e) {
             return errMsg;
         }
     }
 
-    public static String getErrMsg(FrequencyVo frequency, LangType langType){
-        if(frequency==null){
+    public static String getErrMsg(FrequencyVo frequency, LangType langType) {
+        if (frequency == null) {
             return null;
         }
-        if(langType==LangType.EN){
+        if (langType == LangType.EN) {
             return getErrMsg(frequency.getErrMsgEn(), frequency.getTime(), frequency.getLimit());
         }
         return getErrMsg(frequency.getErrMsg(), frequency.getTime(), frequency.getLimit());
@@ -237,42 +237,40 @@ public class FrequencyUtils {
         title = "frequency:" + title;
         LangType langType = LangType.parse(lang);
         String limitInfo = getLimitInfo(langType);
-        if(frequency==null){
+        if (frequency == null) {
             BaseException exception = new FrequencyException(limitInfo);
             exception.setTitle(title);
             throw exception;
         }
 
-        String errMsg=getErrMsg(frequency, langType);
-        BaseException exception = new FrequencyException(limitInfo+ ":" + errMsg);
+        String errMsg = getErrMsg(frequency, langType);
+        BaseException exception = new FrequencyException(limitInfo + ":" + errMsg);
         exception.setTitle(title);
         throw exception;
     }
 
     private static String getLimitInfo(LangType langType) {
         String limitInfo;
-        if(LangType.ZH== langType){
+        if (LangType.ZH == langType) {
             limitInfo = "访问频率限制";
-        }
-        else{
+        } else {
             limitInfo = "Frequency limit";
         }
         return limitInfo;
     }
 
-    public static String getFailErrMsg(OutLimitType limitType, String title, FrequencyVo frequency, String lang){
+    public static String getFailErrMsg(OutLimitType limitType, String title, FrequencyVo frequency, String lang) {
         LangType langType = LangType.parse(lang);
         String errMsg = getLimitInfo(langType);
-        if(frequency!=null){
-            errMsg=FrequencyUtils.getErrMsg(frequency, langType);
+        if (frequency != null) {
+            errMsg = FrequencyUtils.getErrMsg(frequency, langType);
         }
 
-        String limitCode="100030";
-        if(OutLimitType.BLACK==limitType){
-            limitCode= ResultCode.USER_BLACK_ERROR.getCode();
-        }
-        else if(OutLimitType.WHITE==limitType){
-            limitCode= ResultCode.USER_WHITE_ERROR.getCode();
+        String limitCode = "100030";
+        if (OutLimitType.BLACK == limitType) {
+            limitCode = ResultCode.USER_BLACK_ERROR.getCode();
+        } else if (OutLimitType.WHITE == limitType) {
+            limitCode = ResultCode.USER_WHITE_ERROR.getCode();
         }
         return String.format(FrequencyUtils.OUT_INFO, limitCode, errMsg, title);
     }
@@ -282,10 +280,11 @@ public class FrequencyUtils {
 
     /**
      * key拼接：pedisPrefix + ":" + LIMIT_TYPE.getType() + ":" + name + ":" + time
-     * @param frequency
-     * @return
+     *
+     * @param frequency 频率限制对象
+     * @return StringBuilder
      */
-    public static StringBuilder getRedisKeyBase(FrequencyVo frequency){
+    public static StringBuilder getRedisKeyBase(FrequencyVo frequency) {
         StringBuilder sb = new StringBuilder();
         sb.append(frequencyConfiguration.getRedisPrefix());
         sb.append(":");

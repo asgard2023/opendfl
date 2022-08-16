@@ -11,7 +11,6 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.ccs.opendfl.core.utils.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
@@ -29,8 +28,11 @@ import java.util.concurrent.CountDownLatch;
 @Data
 @Component
 public class ZookeeperConfiguration {
-    @Autowired
-    private ZookeeperProperties zookeeperProperties;
+    public ZookeeperConfiguration(ZookeeperProperties zookeeperProperties) {
+        this.zookeeperProperties = zookeeperProperties;
+    }
+
+    private final ZookeeperProperties zookeeperProperties;
 
     @Bean(name = "zkClient")
     public ZooKeeper zkClient() {
@@ -56,7 +58,7 @@ public class ZookeeperConfiguration {
             countDownLatch.await();
             log.info("【初始化ZooKeeper连接状态....】={}", zooKeeper.getState());
         } catch (Exception e) {
-            log.error("初始化ZooKeeper连接异常....】={}", e);
+            log.error("初始化ZooKeeper连接异常....】={}", zookeeperProperties.getAddress(), e);
         }
         return zooKeeper;
     }
@@ -64,9 +66,9 @@ public class ZookeeperConfiguration {
 
     /**
      * Zookeeper开源客户端框架Curator简介
+     * 参考文档: https://www.iteye.com/blog/macrochen-1366136
      *
-     * @return
-     * @document https://www.iteye.com/blog/macrochen-1366136
+     * @return CuratorFramework
      */
     @Bean
     public CuratorFramework curatorFramework() {

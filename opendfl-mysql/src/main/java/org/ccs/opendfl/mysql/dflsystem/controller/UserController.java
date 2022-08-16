@@ -41,7 +41,7 @@ public class UserController extends BaseController {
      * @param request 请求
      * @param entity 对象
      * @param pageInfo 翻页对象
-     * @return MyPageInfo<> 翻页结果
+     * @return MyPageInfo 翻页结果
      * @date 2022-3-30 21:27:43
      */
 

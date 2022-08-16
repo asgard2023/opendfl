@@ -44,7 +44,7 @@ public class DflTypeController extends BaseController {
      * @param request 请求
      * @param entity 对象
      * @param pageInfo 翻页对象
-     * @return MyPageInfo<> 翻页结果
+     * @return MyPageInfo 翻页结果
      * @author chenjh
      * @date 2022-5-3 20:31:07
      */

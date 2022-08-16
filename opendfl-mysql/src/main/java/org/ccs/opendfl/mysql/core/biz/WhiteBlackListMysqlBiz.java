@@ -152,7 +152,7 @@ public class WhiteBlackListMysqlBiz implements IWhiteBlackListBiz {
     /**
      * 功能用户白名单
      *
-     * @return Map<String, String> whiteCode: users
+     * @return Map whiteCode: users
      */
     @Override
     public Map<String, String> getWhiteCodeUsers() {

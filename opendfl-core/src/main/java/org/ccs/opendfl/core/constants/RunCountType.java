@@ -9,8 +9,8 @@ public enum RunCountType {
     COUNT("count", "调用总次数"),
     OUT_LIMIT("outLimit", "超限总次数");
 
-    private String type;
-    private String typeName;
+    private final String type;
+    private final String typeName;
 
     RunCountType(String type, String typeName) {
         this.type = type;

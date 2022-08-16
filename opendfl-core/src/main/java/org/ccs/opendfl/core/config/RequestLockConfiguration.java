@@ -9,6 +9,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * requestLock 接口分布式锁配置
+ * @author chenjh
+ */
 @Configuration
 @ConfigurationProperties(prefix = "requestlock")
 @Component("requestLockConfiguration")

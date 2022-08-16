@@ -2,6 +2,8 @@ package org.ccs.opendfl.core.constants;
 
 /**
  * 黑名单，白名单检查类型
+ *
+ * @author chenjh
  */
 public enum WhiteBlackCheckType {
     /**
@@ -25,9 +27,9 @@ public enum WhiteBlackCheckType {
      */
     TYPE_TOKEN(5, "type_token", "type_token");
 
-    private Integer type;
-    private String code;
-    private String typeName;
+    private final Integer type;
+    private final String code;
+    private final String typeName;
 
     WhiteBlackCheckType(Integer type, String code, String typeName) {
         this.type = type;

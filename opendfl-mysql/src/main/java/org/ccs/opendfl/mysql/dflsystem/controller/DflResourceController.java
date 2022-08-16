@@ -43,7 +43,7 @@ public class DflResourceController extends BaseController {
      * @param request 请求
      * @param entity 对象
      * @param pageInfo 翻页对象
-     * @return MyPageInfo<> 翻页结果
+     * @return MyPageInfo 翻页结果
      * @author chenjh
      * @date 2022-5-4 11:09:37
      */

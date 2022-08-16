@@ -23,6 +23,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * 重置频率限制
+ *
+ * @author chenjh
+ */
 @RestController
 @RequestMapping("/frequencyReset")
 @Slf4j
@@ -75,6 +80,7 @@ public class FrequencyResetController {
      * @param type       功能类型
      * @param funcCode   功能编码
      * @param verifyCode 验证码值
+     * @param frequency  频率限制对象
      * @return 返回结果
      */
     @RequestMapping(value = "/resetLimits", method = {RequestMethod.GET, RequestMethod.POST})

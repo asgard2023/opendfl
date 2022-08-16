@@ -119,7 +119,7 @@ public class ValidateUtils {
      * @param value  查检对象
      * @param maxLen 最大长度
      * @param msg    异常消息
-     * @throws BaseException
+     * @throws BaseException 异常
      */
     public static void maxLen(Object value, int maxLen, String msg) throws BaseException {
         if (value != null && value.toString().length() > maxLen) {
@@ -134,7 +134,7 @@ public class ValidateUtils {
      * @param value  查检对象
      * @param minLen 最短长度
      * @param msg    异常消息
-     * @throws BaseException
+     * @throws BaseException 异常
      */
     public static void minLen(Object value, int minLen, String msg) throws BaseException {
         if (value == null || value.toString().length() < minLen) {
@@ -149,7 +149,7 @@ public class ValidateUtils {
      * @param value  查检对象
      * @param maxVal 最大值
      * @param msg    异常消息
-     * @throws BaseException
+     * @throws BaseException 异常
      */
     public static void maxIntegerVal(Integer value, int maxVal, String msg) throws BaseException {
         if (value != null && value > maxVal) {

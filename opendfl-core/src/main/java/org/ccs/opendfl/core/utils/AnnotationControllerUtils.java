@@ -45,23 +45,24 @@ public class AnnotationControllerUtils {
 
     /**
      * 加载后缓存10分钟
-     * @param packageName
-     * @return
+     *
+     * @param packageName 包名
+     * @return list
      */
     public static List<RequestVo> getControllerRequests(String packageName) {
-        List<RequestVo> list=pkgRequestCache.getIfPresent(packageName);
-        if(list==null){
-            list=getControllerRequestsRead(packageName);
+        List<RequestVo> list = pkgRequestCache.getIfPresent(packageName);
+        if (list == null) {
+            list = getControllerRequestsRead(packageName);
             pkgRequestCache.put(packageName, list);
         }
         return list;
     }
+
     /**
      * 找出Controller下的所有注解，以及频率限制、分布式锁配置参数
      *
-     * @author chenjh
-     * 异常对象:@param packageName
-     * 异常对象:@return
+     * @param packageName 包名
+     * @return controller接口list
      */
     public static List<RequestVo> getControllerRequestsRead(String packageName) {
         //第一个class类的集合
@@ -133,7 +134,7 @@ public class AnnotationControllerUtils {
      *
      * @param classAnnotations 类注解
      * @param basePath         controller的路径
-     * @return
+     * @return 是否controller接口类
      */
     private static boolean isController(Annotation[] classAnnotations, StringBuilder basePath) {
         boolean isController = false;
@@ -155,7 +156,7 @@ public class AnnotationControllerUtils {
      *
      * @param method controller的接口方法
      * @param c      controller类
-     * @return
+     * @return RequestVo
      */
     private static RequestVo toRequest(Method method, Class<?> c) {
         RequestVo requestVo = new RequestShowVo();
@@ -223,9 +224,8 @@ public class AnnotationControllerUtils {
     /**
      * 支持从注解Annotation获取所有的属性值
      *
-     * @param annotations
-     * @return String
-     * @author chenjh
+     * @param annotations 注解对象
+     * @return String 注释json数据
      */
     public static String getAnnotationJson(List<Annotation> annotations) {
         if (CollectionUtils.isEmpty(annotations)) {
@@ -242,8 +242,8 @@ public class AnnotationControllerUtils {
     /**
      * 支持从注解Annotation获取所有的属性值
      *
-     * @param annotation
-     * @return AnnotationInfoVo
+     * @param annotation 注解对象
+     * @return AnnotationInfoVo 注解对象信息
      * @author chenjh
      */
     public static AnnotationInfoVo toAnnotationInfoVo(Annotation annotation) {
@@ -318,17 +318,13 @@ public class AnnotationControllerUtils {
         FrequencyVo frequencyVo = null;
         if (annotation instanceof Frequency) {
             frequencyVo = FrequencyVo.toFrequencyVo((Frequency) annotation, FrequencyVo.newInstance());
-        }
-        else if (annotation instanceof Frequency2) {
+        } else if (annotation instanceof Frequency2) {
             frequencyVo = FrequencyVo.toFrequencyVo((Frequency2) annotation, FrequencyVo.newInstance());
-        }
-        else if (annotation instanceof Frequency3) {
+        } else if (annotation instanceof Frequency3) {
             frequencyVo = FrequencyVo.toFrequencyVo((Frequency3) annotation, FrequencyVo.newInstance());
-        }
-        else if (annotation instanceof Frequency4) {
+        } else if (annotation instanceof Frequency4) {
             frequencyVo = FrequencyVo.toFrequencyVo((Frequency4) annotation, FrequencyVo.newInstance());
-        }
-        else if (annotation instanceof Frequency5) {
+        } else if (annotation instanceof Frequency5) {
             frequencyVo = FrequencyVo.toFrequencyVo((Frequency5) annotation, FrequencyVo.newInstance());
         }
         if (frequencyVo != null) {

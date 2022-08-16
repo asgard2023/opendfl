@@ -122,7 +122,6 @@ public class EtcdUtil {
      * @throws InterruptedException 中断异常
      * @throws ExecutionException   执行异常
      * @author zhangyanhua
-     * @date 2019年10月29日 下午4:53:24
      */
     public static void deleteKV(String key) throws InterruptedException, ExecutionException {
         Client client = EtcdUtil.getEtclClient();
@@ -138,7 +137,6 @@ public class EtcdUtil {
      * @param key key
      * @throws Exception 异常
      * @author zhangyanhua
-     * @date 2019年10月29日 下午5:26:09
      */
     public static void watchEtcdKey(String key) throws Exception {
         Client client = EtcdUtil.getEtclClient();

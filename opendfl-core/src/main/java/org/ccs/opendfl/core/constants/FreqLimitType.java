@@ -40,10 +40,10 @@ public enum FreqLimitType {
      */
     public static final int REDIS_SET_OUT_LIMIT = 2;
 
-    private Integer type;
-    private String code;
-    private String typeName;
-    private boolean resource;
+    private final Integer type;
+    private final String code;
+    private final String typeName;
+    private final boolean resource;
 
     FreqLimitType(Integer type, String code, String typeName, boolean resource) {
         this.type = type;
