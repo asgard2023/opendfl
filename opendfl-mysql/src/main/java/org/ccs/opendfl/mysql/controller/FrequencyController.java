@@ -69,7 +69,6 @@ public class FrequencyController extends BaseController {
      * @param request
      * @return
      */
-
     @GetMapping("/ipConvert")
     public Object ipConvert(HttpServletRequest request) {
         String ip = request.getParameter("ip");
@@ -86,7 +85,6 @@ public class FrequencyController extends BaseController {
      * @param request
      * @return List
      */
-
     @RequestMapping(value = "/getRunDays", method = {RequestMethod.GET, RequestMethod.POST})
     public List<ComboxItemVo> getRunDays(HttpServletRequest request) {
         return runCountBiz.getRunDays();
@@ -98,7 +96,6 @@ public class FrequencyController extends BaseController {
      * @param request
      * @return List
      */
-
     @RequestMapping(value = "/getRunCountTypeByDay", method = {RequestMethod.GET, RequestMethod.POST})
     public List<ComboxItemVo> getRunCountTypeByDay(HttpServletRequest request
             , @RequestParam(value = "day", required = false, defaultValue = "0") Integer day) {
@@ -122,7 +119,6 @@ public class FrequencyController extends BaseController {
      * @param requestVo
      * @return
      */
-
     @RequestMapping(value = "/requests", method = {RequestMethod.POST, RequestMethod.GET})
     @CheckLogin
     public ResultData requests(HttpServletRequest request, RequestVo requestVo) {
@@ -147,7 +143,6 @@ public class FrequencyController extends BaseController {
      * @param requestVo
      * @return
      */
-
     @DeleteMapping(value = "/requests")
     @CheckAuthorization("admin")
     public ResultData requestsClear(HttpServletRequest request, RequestVo requestVo) {
@@ -379,7 +374,6 @@ public class FrequencyController extends BaseController {
      * @param requestVo RequestVo
      * @return ResultData
      */
-
     @RequestMapping(value = "/requestMaxRunTimes", method = {RequestMethod.POST, RequestMethod.GET})
     @CheckLogin
     public ResultData requestMaxRunTimes(HttpServletRequest request, RequestVo requestVo
@@ -474,7 +468,6 @@ public class FrequencyController extends BaseController {
      * @param userId    用户ID
      * @return
      */
-
     @RequestMapping(value = "/limits", method = {RequestMethod.POST, RequestMethod.GET})
     @CheckLogin
     public ResultData limits(HttpServletRequest request, FrequencyVo frequency
@@ -535,7 +528,6 @@ public class FrequencyController extends BaseController {
      * @param userId  String
      * @return
      */
-
     @RequestMapping(value = "/locks", method = {RequestMethod.POST, RequestMethod.GET})
     @CheckLogin
     public ResultData locks(HttpServletRequest request, RequestLockVo lockVo, @RequestParam(value = "userId", required = false) String userId) {
