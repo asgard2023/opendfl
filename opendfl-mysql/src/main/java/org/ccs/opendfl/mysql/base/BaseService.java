@@ -26,6 +26,7 @@ package org.ccs.opendfl.mysql.base;
 
 
 import cn.hutool.core.lang.UUID;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -33,7 +34,6 @@ import com.github.pagehelper.PageHelper;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import tk.mybatis.mapper.common.Mapper;
 import tk.mybatis.mapper.entity.EntityColumn;
 import tk.mybatis.mapper.entity.Example;
@@ -42,10 +42,15 @@ import tk.mybatis.mapper.mapperhelper.EntityHelper;
 import java.util.*;
 
 /**
- * Created by caco on 2017/07/21.
+ * @author chenjh
  */
 public abstract class BaseService<T> implements IBaseService<T> {
 
+    /**
+     * mapper信息
+     *
+     * @return Mapper
+     */
     public abstract Mapper<T> getMapper();
 
     @Override
@@ -93,7 +98,7 @@ public abstract class BaseService<T> implements IBaseService<T> {
      */
     public void addFilters(Example.Criteria criteria, Map<String, Object> otherParams) {
         String filters = (String) otherParams.get("filters");
-        if (!StringUtils.isEmpty(filters)) {
+        if (!StrUtil.isEmpty(filters)) {
             JSONObject jsonFilter = (JSONObject) JSON.toJSON(filters);
             String groupOp = jsonFilter.getString("groupOp");
             JSONArray rules = jsonFilter.getJSONArray("rules");
@@ -104,36 +109,54 @@ public abstract class BaseService<T> implements IBaseService<T> {
                     String field = rule.getString("field");
                     Object data = rule.get("data");
                     String op = rule.getString("op");
-                    if ("eq".equals(op)) {//等于
+                    //等于
+                    if ("eq".equals(op)) {
                         criteria.andEqualTo(field, data);
-                    } else if ("ne".equals(op)) {//不等于
+                    }
+                    //不等于
+                    else if ("ne".equals(op)) {
                         criteria.andNotEqualTo(field, data);
-                    } else if ("nn".equals(op)) {//存在
+                    }
+                    //存在
+                    else if ("nn".equals(op)) {
                         criteria.andIsNotNull(field);
-                    } else if ("nu".equals(op)) {//不存在
+                    }
+                    //不存在
+                    else if ("nu".equals(op)) {
                         criteria.andIsNull(field);
-                    } else if ("in".equals(op)) {//属于
+                    }
+                    //属于
+                    else if ("in".equals(op)) {
                         String datas = (String) data;
                         criteria.andIn(field, Arrays.asList(datas.split(",")));
-                    } else if ("ni".equals(op)) {//不属于
+                    }
+                    //不属于
+                    else if ("ni".equals(op)) {
                         String datas = (String) data;
                         criteria.andNotIn(field, Arrays.asList(datas.split(",")));
-                    } else if ("cn".equals(op)) {//包含
-                        String datas = (String) data;
-                        criteria.andLike(field, datas);
-                    } else if ("nc".equals(op)) {//不包含
-                        String datas = (String) data;
-                        criteria.andNotLike(field, datas);
-                    } else if ("bw".equals(op)) {//开始于
+                    }
+                    //包含
+                    else if ("cn".equals(op)) {
+                        criteria.andLike(field, (String) data);
+                    }
+                    //不包含
+                    else if ("nc".equals(op)) {
+                        criteria.andNotLike(field, (String) data);
+                    }
+                    //开始于
+                    else if ("bw".equals(op)) {
                         criteria.andGreaterThanOrEqualTo(field, data);
                     }
-//					else if("gt".equals(op)){
-//						criteria.andGreaterThan(field, data);
-//					}
-//					else if("lt".equals(op)){
-//						criteria.andLessThan(field, data);
-//					}
-                    else if ("ew".equals(op)) {//结束于
+                    //大于
+                    else if ("gt".equals(op)) {
+                        criteria.andGreaterThan(field, data);
+                    }
+                    //小于
+                    else if ("lt".equals(op)) {
+                        criteria.andLessThan(field, data);
+                    }
+                    //结束于
+                    else if ("ew".equals(op)) {
                         criteria.andLessThanOrEqualTo(field, data);
                     }
                 }
@@ -186,7 +209,7 @@ public abstract class BaseService<T> implements IBaseService<T> {
      * @param propertyName 属性值
      * @param deleteStatus 修改状态
      * @return int
-     * @throws Exception
+     * @throws Exception 异常
      */
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -210,7 +233,7 @@ public abstract class BaseService<T> implements IBaseService<T> {
      * 按id列表查询
      *
      * @param ids         id主键id值
-     * @param entityClass
+     * @param entityClass 查询类
      * @return 对象list
      * @throws Exception 异常
      */
@@ -222,7 +245,8 @@ public abstract class BaseService<T> implements IBaseService<T> {
         if (columnList.size() != 1) {
             throw new RuntimeException("主键 不唯一");
         }
-        criteria.andIn(BeanUtils.getPKPropertyName(entityClass), ids);//只取一个主键
+        //只取一个主键
+        criteria.andIn(BeanUtils.getPKPropertyName(entityClass), ids);
         return this.getMapper().selectByExample(example);
     }
 
@@ -392,10 +416,16 @@ public abstract class BaseService<T> implements IBaseService<T> {
         }
     }
 
+    /**
+     *
+     * @param entity 查询对象
+     * @param otherParams 其他参数
+     * @return 查询Example对象
+     */
     public abstract Example createConditions(T entity, Map<String, Object> otherParams);
 
     @Override
-    public Map<String, T> findMapByIds(List<Object> ids, Class<T> entity) throws Exception {
+    public Map<String, T> findMapByIds(List<Object> ids, Class<T> entity) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyMap();
         }
@@ -403,10 +433,12 @@ public abstract class BaseService<T> implements IBaseService<T> {
         if (CollectionUtils.isEmpty(pos)) {
             return Collections.emptyMap();
         }
-        Map<String, T> map = new HashMap<String, T>();
+        Map<String, T> map = new HashMap<String, T>(8);
         for (T po : pos) {
             Object tid = BeanUtils.getValue(po, "id");
-            map.put(tid.toString(), po);
+            if (tid != null) {
+                map.put(tid.toString(), po);
+            }
         }
         return map;
     }
