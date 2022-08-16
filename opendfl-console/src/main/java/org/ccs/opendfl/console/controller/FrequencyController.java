@@ -150,7 +150,7 @@ public class FrequencyController {
         if (StringUtils.equals("current", type)) {
             type = RunCountType.COUNT.getCode();
         }
-        Long curTime = System.currentTimeMillis();
+        long curTime = System.currentTimeMillis();
         if (day > 0) {
             curTime = curTime - day * FrequencyConstant.TIME_MILLISECOND_TO_HOUR * 24;
         }

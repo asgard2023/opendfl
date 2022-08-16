@@ -325,10 +325,10 @@ public class ValidateUtils {
     private static Integer limitPageSize = 1000;
     private static Integer limitPageMax = 1000;
     private static Integer limitPageTotalRow = 10000;
-    private static Long limitLoadTime = 0L;
+    private static long limitLoadTime = 0L;
 
     public static void loadLimit() {
-        Long curTime = System.currentTimeMillis();
+        long curTime = System.currentTimeMillis();
         if (limitPageSize == null || curTime - limitLoadTime > 60000) {
             limitLoadTime = curTime;
             limitPageSize = opendflConfiguration.getBaseLimit().getPageSizeMax();

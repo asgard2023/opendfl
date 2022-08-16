@@ -47,8 +47,8 @@ public class FrequencyConfigBiz implements IFrequencyConfigBiz {
     /**
      * 主要按接口缓存，理论上接口数不会太多，用Map做持久缓存，不会占太多内存
      */
-    private static Map<String, Long> loadSysconfigTimeMap = new ConcurrentHashMap<>(64);
-    private static Map<String, FrequencyVo> sysconfigLimitMap = new ConcurrentHashMap<>(64);
+    private static final Map<String, Long> loadSysconfigTimeMap = new ConcurrentHashMap<>(64);
+    private static final Map<String, FrequencyVo> sysconfigLimitMap = new ConcurrentHashMap<>(64);
 
     @Override
     public void limitBySysconfigLoad(FrequencyVo frequency, Long curTime) {

@@ -64,7 +64,7 @@ public class SystemConfig {
             return ConfigValueType.getValue(valueType, defualt);
         }
         String cacheKey = configCode;
-        Long curTime = System.currentTimeMillis();
+        long curTime = System.currentTimeMillis();
         loadAnyChange(curTime);
         Long loadTime = configLoadTimeMap.get(cacheKey);
         if (loadTime == null) {

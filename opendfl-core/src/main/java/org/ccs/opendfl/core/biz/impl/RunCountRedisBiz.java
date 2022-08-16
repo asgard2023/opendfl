@@ -90,8 +90,8 @@ public class RunCountRedisBiz implements IRunCountBiz {
     @Override
     public List<ComboxItemVo> getRunCountTypeByDay(Integer day) {
         List<ComboxItemVo> list = new ArrayList<>();
-        Long curTime = System.currentTimeMillis();
-        Long curTimeBefore = curTime;
+        long curTime = System.currentTimeMillis();
+        long curTimeBefore = curTime;
         if (day > 0) {
             curTimeBefore = curTime - day * TIME_MILLISECOND_TO_DAY;
         }
@@ -106,7 +106,7 @@ public class RunCountRedisBiz implements IRunCountBiz {
 
     @Override
     public List<ComboxItemVo> getRunDays() {
-        Long curTime = System.currentTimeMillis();
+        long curTime = System.currentTimeMillis();
         List<ComboxItemVo> list = new ArrayList<>();
 
         list.add(new ComboxItemVo("-1", "当前(近30s)", true));

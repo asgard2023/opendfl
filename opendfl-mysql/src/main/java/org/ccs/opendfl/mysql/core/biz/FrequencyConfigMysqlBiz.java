@@ -205,7 +205,7 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
     @Override
     public void limitBySysconfigUri(RequestVo requestVo) {
         String requestUri = requestVo.getRequestUri();
-        Long curTime = System.currentTimeMillis();
+        long curTime = System.currentTimeMillis();
         String key = "uri:" + requestVo.getRequestUri();
         String keyLoad = "uriLoad:" + requestVo.getRequestUri();
         Long time = loadSysconfigTimeMap.get(key);

@@ -60,7 +60,7 @@ public class WhiteBlackListMysqlBiz implements IWhiteBlackListBiz {
     private WhiteBlackConfigVo getConfigCached(BlackWhiteType blackWhiteType) {
         String key = blackWhiteType.getCode();
         String keyMaxTime = blackWhiteType.getCode() + ":maxTime";
-        Long curTime = System.currentTimeMillis();
+        long curTime = System.currentTimeMillis();
         WhiteBlackConfigVo blackConfig = configMap.get(key);
         Long lastTime = loadTimeMap.get(key);
         if (blackConfig == null || lastTime == null || curTime - lastTime > FrequencyConstant.LOAD_CONFIG_INTERVAL) {
