@@ -6,7 +6,7 @@
 
     <groupId>cn.org.opendfl</groupId>
     <artifactId>opendfl-parent</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
 	<packaging>pom</packaging>
     <modules>
         <module>opendfl-core</module>
@@ -25,12 +25,29 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
+    <!--scm信息-->
+    <scm>
+        <url>http://console.mysql.opendfl.org.cn/index.html</url>
+        <connection>scm:git:https://github.com/asgard2023/opendfl.git</connection>
+        <developerConnection>scm:git:https://github.com/asgard2023/opendfl.git</developerConnection>
+    </scm>
+
+    <!--发布者信息-->
+    <developers>
+        <developer>
+            <name>chenjh</name>
+            <email>asgard2023@outlook.com</email>
+            <organization>http://console.mysql.opendfl.org.cn/index.html</organization>
+            <organizationUrl>http://console.mysql.opendfl.org.cn/index.html</organizationUrl>
+        </developer>
+    </developers>
+
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
         <!-- config -->
-        <opendfl-core.version>1.1</opendfl-core.version>
-        <opendfl-console.version>1.1</opendfl-console.version>
-        <opendfl-mysql.version>1.1</opendfl-mysql.version>
+        <opendfl-core.version>1.2</opendfl-core.version>
+        <opendfl-console.version>1.2</opendfl-console.version>
+        <opendfl-mysql.version>1.2</opendfl-mysql.version>
         <opendfl-spring-boot-starter.version>1.1</opendfl-spring-boot-starter.version>
         <opendfl-mysql-spring-boot-starter.version>1.1</opendfl-mysql-spring-boot-starter.version>
     </properties>
@@ -75,4 +92,90 @@
             <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
+
+    <profiles>
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-source-plugin</artifactId>
+                            <version>3.2.1</version>
+                            <executions>
+                                <execution>
+                                    <id>attach-sources</id>
+                                    <goals>
+                                        <goal>jar-no-fork</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-javadoc-plugin</artifactId>
+                            <version>3.3.1</version>
+                            <configuration>
+                                <nohelp>true</nohelp>
+                                <charset>UTF-8</charset>
+                                <encoding>UTF-8</encoding>
+                                <docencoding>UTF-8</docencoding>
+                                <failOnError>false</failOnError>
+                                <doclint>none</doclint>
+                                <tags>
+                                    <tag>
+                                        <head>date</head>
+                                        <name>date</name>
+                                        <placement>a</placement>
+                                    </tag>
+                                </tags>
+                            </configuration>
+                            <executions>
+                                <execution>
+                                    <id>attach-javadocs</id>
+                                    <goals>
+                                        <goal>jar</goal>
+                                    </goals>
+                                    <phase>package</phase>
+                                </execution>
+                            </executions>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.sonatype.plugins</groupId>
+                            <artifactId>nexus-staging-maven-plugin</artifactId>
+                            <version>1.6.8</version>
+                            <extensions>true</extensions>
+                            <configuration>
+                                <serverId>ossrh</serverId>
+                                <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                                <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-gpg-plugin</artifactId>
+                            <version>3.0.1</version>
+                            <executions>
+                                <execution>
+                                    <id>sign-artifacts</id>
+                                    <phase>verify</phase>
+                                    <goals>
+                                        <goal>sign</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+    </profiles>
 </project>
