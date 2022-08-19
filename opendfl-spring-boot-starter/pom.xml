@@ -10,14 +10,14 @@
     </parent>
     <groupId>cn.org.opendfl</groupId>
     <artifactId>opendfl-spring-boot-starter</artifactId>
-    <version>1.2</version>
+    <version>1.3</version>
     <name>opendfl-spring-boot-starter</name>
     <description>opendfl of spring-boot-starter</description>
 
     <properties>
         <java.version>1.8</java.version>
 
-        <opendfl-core.version>1.2</opendfl-core.version>
+        <opendfl-core.version>1.3</opendfl-core.version>
     </properties>
 
     <dependencies>
@@ -97,6 +97,9 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.3.1</version>
                 <configuration>
+                    <charset>UTF-8</charset>
+                    <encoding>UTF-8</encoding>
+                    <docencoding>UTF-8</docencoding>
                     <failOnError>false</failOnError>
                     <doclint>none</doclint>
                     <tags>
