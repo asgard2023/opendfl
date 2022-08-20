@@ -8,7 +8,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -20,7 +19,6 @@ import java.util.Date;
  * @date 2022-5-3 20:31:07
  */
 @Table(name = "dfl_type")
-@XmlRootElement(name = "dflType")
 @JsonInclude(Include.ALWAYS)
 @Data
 public class DflTypePo implements Serializable {

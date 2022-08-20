@@ -8,7 +8,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -21,7 +20,6 @@ import java.util.Date;
  */
 @Data
 @Table(name = "dfl_resource")
-@XmlRootElement(name = "dflResource")
 @JsonInclude(Include.ALWAYS)
 public class DflResourcePo implements Serializable {
     /**

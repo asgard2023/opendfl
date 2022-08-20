@@ -10,7 +10,6 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -23,7 +22,6 @@ import java.util.Date;
  */
 @Data
 @Table(name = "dfl_out_limit_log")
-@XmlRootElement(name = "dflOutLimitLog")
 @JsonInclude(Include.ALWAYS)
 public class DflOutLimitLogPo implements Serializable {
     /**

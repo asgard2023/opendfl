@@ -9,7 +9,6 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -22,7 +21,6 @@ import java.util.Date;
  */
 @Data
 @Table(name = "dfl_type_item")
-@XmlRootElement(name = "dflTypeItem")
 @JsonInclude(Include.ALWAYS)
 public class DflTypeItemPo implements Serializable {
     /**
