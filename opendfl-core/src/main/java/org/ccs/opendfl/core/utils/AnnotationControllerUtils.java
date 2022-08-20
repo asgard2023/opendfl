@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -218,6 +217,7 @@ public class AnnotationControllerUtils {
         if (uri != null) {
             requestVo.setRequestUri(CommUtils.appendUrl(basePath, uri));
         }
+        log.info("------basePath={} json={}", basePath, cn.hutool.json.JSONUtil.toJsonStr(requestVo));
         return requestVo;
     }
 
@@ -239,6 +239,8 @@ public class AnnotationControllerUtils {
         return JSON.toJSONString(infoVos);
     }
 
+    public static final String ANNOTATION_IGNORE_METHODS = ",hashCode,equals,toString,proxyClassLookup,annotationType,";
+
     /**
      * 支持从注解Annotation获取所有的属性值
      *
@@ -251,10 +253,9 @@ public class AnnotationControllerUtils {
         info.setType(annotation.annotationType().getSimpleName());
         Method[] methods = annotation.getClass().getDeclaredMethods();
         Map<String, Object> paramMap = new HashMap<>(methods.length);
-        String ignoreMethods = ",hashCode,equals,toString,annotationType,";
         for (Method method : methods) {
             String name = method.getName();
-            if (ignoreMethods.contains("," + name + ",")) {
+            if (ANNOTATION_IGNORE_METHODS.contains("," + name + ",")) {
                 continue;
             }
             Object value = null;
