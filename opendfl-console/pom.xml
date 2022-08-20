@@ -13,7 +13,6 @@
     <packaging>jar</packaging>
     <description>opendfl console</description>
     <properties>
-        <java.version>1.8</java.version>
     </properties>
     <dependencies>
         <dependency>
