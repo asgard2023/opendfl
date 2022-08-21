@@ -16,6 +16,7 @@
 
     <properties>
         <opendfl-core.version>1.4</opendfl-core.version>
+        <opendfl-core-locks.version>1.4</opendfl-core-locks.version>
     </properties>
 
     <dependencies>
@@ -28,6 +29,11 @@
             <artifactId>opendfl-core</artifactId>
             <version>${opendfl-core.version}</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>cn.org.opendfl</groupId>-->
+<!--            <artifactId>opendfl-core-locks</artifactId>-->
+<!--            <version>${opendfl-core-locks.version}</version>-->
+<!--        </dependency>-->
 <!--        <dependency>-->
 <!--            <groupId>cn.org.opendfl</groupId>-->
 <!--            <artifactId>opendfl-console</artifactId>-->
