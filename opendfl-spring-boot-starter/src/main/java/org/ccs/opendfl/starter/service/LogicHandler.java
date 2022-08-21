@@ -2,7 +2,7 @@ package org.ccs.opendfl.starter.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
-import org.ccs.opendfl.locks.config.RequestLockConfiguration;
+//import org.ccs.opendfl.locks.config.RequestLockConfiguration;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,15 +16,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class LogicHandler {
     @Autowired
     private FrequencyConfiguration frequencyConfiguration;
-    @Autowired
-    private RequestLockConfiguration requestLockConfiguration;
+//    @Autowired
+//    private RequestLockConfiguration requestLockConfiguration;
 
     public void handle() {
         if (StringUtils.ifYes(frequencyConfiguration.getIfActive())) {
             log.info("---frequency--enable");
         }
-        if (StringUtils.ifYes(requestLockConfiguration.getIfActive())) {
-            log.info("---requestLock--enable");
-        }
+//        if (StringUtils.ifYes(requestLockConfiguration.getIfActive())) {
+//            log.info("---requestLock--enable");
+//        }
     }
 }
