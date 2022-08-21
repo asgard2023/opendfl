@@ -2,7 +2,7 @@ package org.ccs.opendfl.console.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
-import org.ccs.opendfl.core.config.RequestLockConfiguration;
+import org.ccs.opendfl.locks.config.RequestLockConfiguration;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

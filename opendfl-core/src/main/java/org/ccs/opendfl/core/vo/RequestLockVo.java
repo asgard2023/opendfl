@@ -10,7 +10,7 @@ import org.springframework.beans.BeanUtils;
  * @author chenjh
  */
 @Data
-public class RequestLockVo{
+public class RequestLockVo {
     public static RequestLockVo toLockVo(RequestLock lock){
         RequestLockVo lockVo = new RequestLockVo();
         lockVo.setName(lock.name());

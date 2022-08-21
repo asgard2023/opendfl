@@ -1,8 +1,8 @@
 package org.ccs.opendfl.mysql.core.biz;
 
 import lombok.extern.slf4j.Slf4j;
-import org.ccs.opendfl.core.biz.IRequestLockConfigBiz;
-import org.ccs.opendfl.core.config.RequestLockConfiguration;
+import org.ccs.opendfl.locks.biz.IRequestLockConfigBiz;
+import org.ccs.opendfl.locks.config.RequestLockConfiguration;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.vo.RequestLockVo;

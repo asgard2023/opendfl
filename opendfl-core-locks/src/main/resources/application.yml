@@ -1,0 +1,25 @@
+info:
+  app:
+    name: OpenDFL Open Ddstributed frequency limitation
+    version: 0.1
+
+starter:
+  #支持关闭这个服务的Redis配置，由外其他类提供
+  redisCacheEnable: 1
+
+spring:
+  profiles:
+    include:
+      - opendfl
+      - requestlock
+  etcd:
+    endpoints: http://localhost:2379
+  redis:
+    host: localhost
+    password: ''
+    port: 6379
+    jedis:
+      pool:
+        max-idle: 100
+        max-wait: 1000ms
+

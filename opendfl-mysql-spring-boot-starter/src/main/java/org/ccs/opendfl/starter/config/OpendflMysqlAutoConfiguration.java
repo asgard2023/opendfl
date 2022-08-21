@@ -1,7 +1,7 @@
 package org.ccs.opendfl.starter.config;
 
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
-import org.ccs.opendfl.core.config.RequestLockConfiguration;
+import org.ccs.opendfl.locks.config.RequestLockConfiguration;
 import org.ccs.opendfl.starter.service.LogicMysqlHandler;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

@@ -7,7 +7,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 /**
  * @author chenjh
  */
-@SpringBootApplication(scanBasePackages = {"org.ccs.opendfl.core", "org.ccs.opendfl.demo"})
+@SpringBootApplication(scanBasePackages = {"org.ccs.opendfl.core"
+//        , "org.ccs.opendfl.locks"
+        , "org.ccs.opendfl.demo"})
 @EnableConfigurationProperties
 public class DemoApplication {
     public static void main(String[] args) {

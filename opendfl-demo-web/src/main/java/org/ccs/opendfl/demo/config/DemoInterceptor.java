@@ -1,7 +1,7 @@
 package org.ccs.opendfl.demo.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.ccs.opendfl.core.config.RequestLockConfiguration;
+//import org.ccs.opendfl.locks.config.RequestLockConfiguration;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +19,7 @@ import javax.annotation.Resource;
 @Configuration
 @Slf4j
 public class DemoInterceptor extends WebMvcConfigurationSupport {
-    @Resource(name = "requestLockHandlerInterceptor")
-    private HandlerInterceptor requestLockHandlerInterceptor;
+
 
     @Resource(name = "frequencyHandlerInterceptor")
     private HandlerInterceptor frequencyHandlerInterceptor;
@@ -28,18 +27,21 @@ public class DemoInterceptor extends WebMvcConfigurationSupport {
     @Autowired
     private FrequencyConfiguration frequencyConfiguration;
 
-    @Autowired
-    private RequestLockConfiguration requestLockConfiguration;;
+//    @Resource(name = "requestLockHandlerInterceptor")
+//    private HandlerInterceptor requestLockHandlerInterceptor;
+//
+//    @Autowired
+//    private RequestLockConfiguration requestLockConfiguration;;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        if(StringUtils.ifYes(requestLockConfiguration.getIfActive())) {
-            log.info("----addInterceptors--RequestLock");
-            registry.addInterceptor(requestLockHandlerInterceptor)
-                    .addPathPatterns("/**")
-                    .excludePathPatterns("/login")
-                    .excludePathPatterns("/loginPost");
-        }
+//        if(StringUtils.ifYes(requestLockConfiguration.getIfActive())) {
+//            log.info("----addInterceptors--RequestLock");
+//            registry.addInterceptor(requestLockHandlerInterceptor)
+//                    .addPathPatterns("/**")
+//                    .excludePathPatterns("/login")
+//                    .excludePathPatterns("/loginPost");
+//        }
 
         if(StringUtils.ifYes(frequencyConfiguration.getIfActive())) {
             log.info("----addInterceptors--Frequency");

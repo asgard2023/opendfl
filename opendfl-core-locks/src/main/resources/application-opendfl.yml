@@ -1,0 +1,9 @@
+opendfl:
+  defaultAttrName: userId
+  defaultDeviceId: device_id
+  baseLimit:
+    pageSizeMax: 20
+    pageNumMax: 20
+    totalRowMax: 100
+    #默认查询时段最大天数
+    searchDateMaxDay: 90
