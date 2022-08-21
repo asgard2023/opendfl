@@ -1,9 +1,9 @@
-package org.ccs.opendfl.core.biz.impl;
+package org.ccs.opendfl.locks.biz.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.ccs.opendfl.core.biz.IRequestLockDataBiz;
-import org.ccs.opendfl.core.limitlock.RequestLockHandlerInterceptor;
-import org.ccs.opendfl.core.utils.locktools.LockUtils;
+import org.ccs.opendfl.locks.biz.IRequestLockDataBiz;
+import org.ccs.opendfl.locks.limitlock.RequestLockHandlerInterceptor;
+import org.ccs.opendfl.locks.utils.locktools.LockUtils;
 import org.ccs.opendfl.core.vo.RequestLockVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;

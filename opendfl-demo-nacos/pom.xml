@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>opendfl-demo-nacos</artifactId>
-    <version>1.0</version>
+    <version>1.4</version>
     <name>opendfl-demo-nacos</name>
     <packaging>war</packaging>
     <description>opendfl demo nacos</description>
@@ -20,7 +20,8 @@
         <spring.boot.version>2.4.2</spring.boot.version>
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.javadoc.skip>true</maven.javadoc.skip>
-        <opendfl-core.version>1.1</opendfl-core.version>
+        <opendfl-core.version>1.4</opendfl-core.version>
+        <opendfl-core-locks.version>1.4</opendfl-core-locks.version>
     </properties>
     <dependencies>
         <dependency>
@@ -28,6 +29,11 @@
             <artifactId>opendfl-core</artifactId>
             <version>${opendfl-core.version}</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>cn.org.opendfl</groupId>-->
+<!--            <artifactId>opendfl-core-locks</artifactId>-->
+<!--            <version>${opendfl-core-locks.version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>

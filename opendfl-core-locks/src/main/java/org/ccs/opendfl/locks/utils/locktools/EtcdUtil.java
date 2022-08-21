@@ -1,4 +1,4 @@
-package org.ccs.opendfl.core.utils.locktools;
+package org.ccs.opendfl.locks.utils.locktools;
 
 
 import io.etcd.jetcd.ByteSequence;

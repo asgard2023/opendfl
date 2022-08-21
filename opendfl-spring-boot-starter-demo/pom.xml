@@ -10,7 +10,7 @@
     </parent>
     <groupId>cn.org.opendfl</groupId>
     <artifactId>opendfl-spring-boot-demo</artifactId>
-    <version>1.1</version>
+    <version>1.4</version>
     <name>opendfl-spring-boot-demo</name>
     <description>opendfl spring-boot-demo</description>
 

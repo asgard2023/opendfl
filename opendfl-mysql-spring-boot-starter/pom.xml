@@ -10,15 +10,16 @@
     </parent>
     <groupId>cn.org.opendfl</groupId>
     <artifactId>opendfl-mysql-spring-boot-starter</artifactId>
-    <version>1.3</version>
+    <version>1.4</version>
     <name>opendfl-mysql-spring-boot-starter</name>
     <description>opendfl-mysql of spring-boot-starter</description>
     <url>https://github.com/asgard2023/opendfl</url>
 
     <properties>
         <java.version>1.8</java.version>
-        <opendfl-core.version>1.3</opendfl-core.version>
-        <opendfl-mysql.version>1.3</opendfl-mysql.version>
+        <opendfl-core.version>1.4</opendfl-core.version>
+        <opendfl-core-locks.version>1.4</opendfl-core-locks.version>
+        <opendfl-mysql.version>1.4</opendfl-mysql.version>
     </properties>
 
     <dependencies>
@@ -30,6 +31,11 @@
             <groupId>cn.org.opendfl</groupId>
             <artifactId>opendfl-core</artifactId>
             <version>${opendfl-core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.org.opendfl</groupId>
+            <artifactId>opendfl-core-locks</artifactId>
+            <version>${opendfl-core-locks.version}</version>
         </dependency>
         <dependency>
             <groupId>cn.org.opendfl</groupId>

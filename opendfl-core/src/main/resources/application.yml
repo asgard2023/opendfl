@@ -12,9 +12,6 @@ spring:
     include:
       - opendfl
       - frequency
-      - requestlock
-  etcd:
-    endpoints: http://localhost:2379
   redis:
     host: localhost
     password: ''

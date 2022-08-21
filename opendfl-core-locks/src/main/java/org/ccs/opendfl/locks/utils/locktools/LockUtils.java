@@ -1,6 +1,6 @@
-package org.ccs.opendfl.core.utils.locktools;
+package org.ccs.opendfl.locks.utils.locktools;
 
-import org.ccs.opendfl.core.config.RequestLockConfiguration;
+import org.ccs.opendfl.locks.config.RequestLockConfiguration;
 import org.ccs.opendfl.core.constants.DataSourceType;
 import org.ccs.opendfl.core.limitlock.RequestLock;
 import org.ccs.opendfl.core.utils.StringUtils;

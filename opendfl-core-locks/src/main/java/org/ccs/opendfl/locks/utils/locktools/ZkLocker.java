@@ -1,4 +1,4 @@
-package org.ccs.opendfl.core.utils.locktools;
+package org.ccs.opendfl.locks.utils.locktools;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;

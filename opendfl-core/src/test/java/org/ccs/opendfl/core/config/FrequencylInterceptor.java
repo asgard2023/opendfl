@@ -19,26 +19,15 @@ import javax.annotation.Resource;
  */
 @Configuration
 @Slf4j
-public class OpendflInterceptor extends WebMvcConfigurationSupport {
-    @Resource(name = "requestLockHandlerInterceptor")
-    private HandlerInterceptor requestLockHandlerInterceptor;
-
+public class FrequencylInterceptor extends WebMvcConfigurationSupport {
     @Resource(name = "frequencyHandlerInterceptor")
     private HandlerInterceptor frequencyHandlerInterceptor;
 
     @Autowired
     private FrequencyConfiguration frequencyConfiguration;
 
-    @Autowired
-    private RequestLockConfiguration requestLockConfiguration;
-
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        if (StringUtils.ifYes(requestLockConfiguration.getIfActive())) {
-            log.info("----addInterceptors--RequestLock");
-            registry.addInterceptor(requestLockHandlerInterceptor)
-                    .addPathPatterns("/**");
-        }
         if (StringUtils.ifYes(frequencyConfiguration.getIfActive())) {
             log.info("----addInterceptors--Frequency");
             registry.addInterceptor(frequencyHandlerInterceptor)

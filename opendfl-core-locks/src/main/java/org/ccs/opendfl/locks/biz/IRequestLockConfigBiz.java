@@ -1,4 +1,4 @@
-package org.ccs.opendfl.core.biz;
+package org.ccs.opendfl.locks.biz;
 
 import org.ccs.opendfl.core.vo.RequestLockVo;
 

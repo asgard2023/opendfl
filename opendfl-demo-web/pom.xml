@@ -5,10 +5,10 @@
     <parent>
 		<groupId>cn.org.opendfl</groupId>
 		<artifactId>opendfl-parent</artifactId>
-		<version>1.3</version>
+		<version>1.4</version>
 	</parent>
     <artifactId>opendfl-demo-web</artifactId>
-    <version>1.3</version>
+    <version>1.4</version>
     <name>opendfl-demo-web</name>
     <packaging>war</packaging>
     <description>opendfl demo web</description>
@@ -22,6 +22,10 @@
             <groupId>cn.org.opendfl</groupId>
             <artifactId>opendfl-core</artifactId>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>cn.org.opendfl</groupId>-->
+<!--            <artifactId>opendfl-core-locks</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>

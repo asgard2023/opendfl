@@ -2,7 +2,6 @@ package org.ccs.opendfl.core.limitfrequency;
 
 
 import com.alibaba.fastjson.JSONObject;
-import io.vertx.core.json.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IFrequencyConfigBiz;
 import org.ccs.opendfl.core.biz.IUserBiz;

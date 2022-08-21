@@ -1,4 +1,4 @@
-package org.ccs.opendfl.core.controller;
+package org.ccs.opendfl.locks.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.constants.FrequencyConstant;

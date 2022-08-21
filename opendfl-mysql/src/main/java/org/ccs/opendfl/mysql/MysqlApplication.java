@@ -8,9 +8,9 @@ import tk.mybatis.spring.annotation.MapperScan;
 /**
  * @author chenjh
  */
-@SpringBootApplication(scanBasePackages = {"org.ccs.opendfl.core", "org.ccs.opendfl.mysql"})
+@SpringBootApplication(scanBasePackages = {"org.ccs.opendfl.core", "org.ccs.opendfl.locks", "org.ccs.opendfl.mysql"})
 @EnableConfigurationProperties
-@MapperScan(basePackages ="org.ccs.opendfl.mysql")
+@MapperScan(basePackages = "org.ccs.opendfl.mysql")
 public class MysqlApplication {
     public static void main(String[] args) {
         SpringApplication.run(MysqlApplication.class, args);
