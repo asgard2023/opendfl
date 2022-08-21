@@ -1,11 +1,11 @@
 package org.ccs.opendfl.mysql.core.biz;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.ccs.opendfl.core.constants.FrequencyConstant;
+import org.ccs.opendfl.core.vo.RequestLockVo;
 import org.ccs.opendfl.locks.biz.IRequestLockConfigBiz;
 import org.ccs.opendfl.locks.config.RequestLockConfiguration;
-import org.ccs.opendfl.core.constants.FrequencyConstant;
-import org.ccs.opendfl.core.utils.StringUtils;
-import org.ccs.opendfl.core.vo.RequestLockVo;
 import org.ccs.opendfl.mysql.constant.CommonStatus;
 import org.ccs.opendfl.mysql.core.vo.RequestLockConfigMysqlVo;
 import org.ccs.opendfl.mysql.dflcore.biz.IDflLocksBiz;
@@ -100,7 +100,7 @@ public class RequestLockConfigMysqlBiz implements IRequestLockConfigBiz {
         //如果数据状态无效，则用原来的默认值
         if (lockConfigVo != null && lockConfigVo.getStatus() == CommonStatus.VALID.getStatus()) {
             requestLockVo.setSysconfig(true);
-            if (StringUtils.isNotBlank(lockConfigVo.getAttrName())) {
+            if (CharSequenceUtil.isNotBlank(lockConfigVo.getAttrName())) {
                 requestLockVo.setAttrName(lockConfigVo.getAttrName());
             }
             if (lockConfigVo.getTime() != null) {

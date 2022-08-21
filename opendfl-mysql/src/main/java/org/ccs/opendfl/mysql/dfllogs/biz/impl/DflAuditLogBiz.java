@@ -1,8 +1,8 @@
 package org.ccs.opendfl.mysql.dfllogs.biz.impl;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import com.github.pagehelper.PageHelper;
 import org.ccs.opendfl.core.utils.RequestUtils;
-import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.mysql.base.BaseService;
 import org.ccs.opendfl.mysql.base.ISelfInject;
 import org.ccs.opendfl.mysql.base.MyPageInfo;
@@ -80,7 +80,7 @@ public class DflAuditLogBiz extends BaseService<DflAuditLogPo> implements IDflAu
         this.addEqualByKey(criteria, "roleId", otherParams);
 
         String userNickname = (String) otherParams.get("user.nickname");
-        if (StringUtils.isNotBlank(userNickname)) {
+        if (CharSequenceUtil.isNotBlank(userNickname)) {
             Integer userId = dflUserBiz.getUserIdByNickName(userNickname);
             if (userId == null) {
                 userId = -1;
@@ -102,7 +102,7 @@ public class DflAuditLogBiz extends BaseService<DflAuditLogPo> implements IDflAu
         PageHelper.startPage(pageInfo.getPageNum(), pageInfo.getPageSize());
         List<DflAuditLogPo> list = this.getMapper().selectByExample(example);
         list.forEach(t -> {
-            if (StringUtils.isNumeric(t.getIp())) {
+            if (CharSequenceUtil.isNumeric(t.getIp())) {
                 t.setIp(RequestUtils.getNumConvertIp(Long.parseLong(t.getIp())));
             }
         });

@@ -1,6 +1,7 @@
 package org.ccs.opendfl.core.limitfrequency;
 
 
+import cn.hutool.core.text.CharSequenceUtil;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IFrequencyConfigBiz;
@@ -9,6 +10,7 @@ import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.OpendflConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
+import org.ccs.opendfl.core.constants.FrequencyType;
 import org.ccs.opendfl.core.constants.OutLimitType;
 import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
 import org.ccs.opendfl.core.exception.BaseException;
@@ -82,7 +84,6 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     }
 
 
-
     private final ThreadLocal<Long> startTime = new ThreadLocal<>();
     private final ThreadLocal<String> requestKey = new ThreadLocal<>();
 
@@ -139,7 +140,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
                 }
                 this.frequencyReturn(requestVo, true);
                 FrequencyUtils.outLimitCount(strategyParams, freqLimitType);
-                String errMsg=FrequencyUtils.getFailErrMsg(OutLimitType.BLACK, title, frequencyVo, lang);
+                String errMsg = FrequencyUtils.getFailErrMsg(OutLimitType.BLACK, title, frequencyVo, lang);
                 response.setContentType("application/json; charset=UTF-8");
                 response.getWriter().println(errMsg);
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -168,7 +169,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
                 FrequencyUtils.outLimitCount(strategyParams, freqLimitType);
                 FrequencyUtils.addFreqLog(strategyParams, 1, 0, OutLimitType.WHITE, freqLimitType);
                 String title = "frequency:white:" + limitType;
-                String errMsg=FrequencyUtils.getFailErrMsg(OutLimitType.WHITE, title, frequencyVo, lang);
+                String errMsg = FrequencyUtils.getFailErrMsg(OutLimitType.WHITE, title, frequencyVo, lang);
                 response.setContentType("application/json; charset=UTF-8");
                 response.getWriter().println(errMsg);
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -188,12 +189,10 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             frequencyVo = null;
             params = null;
             return true;
-        }
-        catch (FrequencyAttrNameBlankException e ){
+        } catch (FrequencyAttrNameBlankException e) {
             log.warn("-----preHandle--uri={} error={}", requestUri, e.getMessage());
             return true;
-        }
-        catch (BaseException e) {
+        } catch (BaseException e) {
             log.error("-----preHandle--uri={} error={}", requestUri, e.getMessage());
             frequencyReturn(requestVo, true);
             throw e;
@@ -406,25 +405,11 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         }
 
         String userId = strategyParams.getUserId();
-        String attrValue=null;
+        String attrValue = null;
         //用于支持读取post的body中的userId或attrName数据
-        if(userId==null || StringUtils.isNotBlank(frequency.getAttrName())){
-            String reqBody = (String) params.get(RequestUtils.REQ_BODYS);
-            JSONObject reqObj=FrequencyUtils.getJsonObject(reqBody);
-            if(reqObj!=null){
-                userId = reqObj.getString(RequestParams.USER_ID);
-                strategyParams.setUserId(userId);
-                if (StringUtils.isNotBlank(frequency.getAttrName())) {
-                    String attrName = frequency.getAttrName();
-                    attrValue = FrequencyUtils.getAttrNameValue(params, reqObj, attrName);
-                    //attrName的属性值为空，则不处理，由功能本身做参数验证
-                    if(StringUtils.isBlank(attrValue)){
-                        log.warn("----handleFrequency={} attrName={} attrValue is null ignore limit, need checkNull on interface", frequency.getName(), attrName);
-                        throw new FrequencyAttrNameBlankException(attrName+" is blank,need checkNull on interface");
-                    }
-                }
-            }
-
+        if (userId == null || StringUtils.isNotBlank(frequency.getAttrName())) {
+            attrValue = getAttrValue(params, frequency, strategyParams);
+            userId = strategyParams.getUserId();
         }
         if (frequency.isNeedLogin()) {
             userBiz.checkUser(userId);
@@ -441,6 +426,38 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     }
 
     /**
+     * 支持从post报文中获取参数(userId, attrName)
+     *
+     * @param params         请求参数map
+     * @param frequency      频率限制配置
+     * @param strategyParams 策略参数
+     * @return
+     */
+    private String getAttrValue(Map<String, Object> params, FrequencyVo frequency, RequestStrategyParamsVo strategyParams) {
+        String reqBody = (String) params.get(RequestUtils.REQ_BODYS);
+        JSONObject reqObj = FrequencyUtils.getJsonObject(reqBody);
+        String attrValue = null;
+        if (reqObj != null) {
+            //支持从post的报文中获取userId
+            String userId = reqObj.getString(RequestParams.USER_ID);
+            if (CharSequenceUtil.isNotBlank(userId)) {
+                strategyParams.setUserId(userId);
+            }
+            //支持从post报文中获取attrName对应的值
+            if (StringUtils.isNotBlank(frequency.getAttrName())) {
+                String attrName = frequency.getAttrName();
+                attrValue = FrequencyUtils.getAttrNameValue(params, reqObj, attrName);
+                //attrName的属性值为空，则不处理，由功能本身做参数验证
+                if (StringUtils.isBlank(attrValue)) {
+                    log.warn("----handleFrequency={} attrName={} attrValue is null ignore limit, need checkNull on interface", frequency.getName(), attrName);
+                    throw new FrequencyAttrNameBlankException(attrName + " is blank,need checkNull on interface");
+                }
+            }
+        }
+        return attrValue;
+    }
+
+    /**
      * 主要按接口缓存，理论上接口数不会太多，用Map做持久缓存，不会占太多内存
      */
     public static final Map<String, FrequencyVo> freqMap = new ConcurrentHashMap<>(64);
@@ -452,7 +469,11 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
      * @param frequency FrequencyVo
      */
     private void logFirstload(FrequencyVo frequency, long curTime) {
-        String key = frequency.getName()+":"+frequency.getFreqLimitType().getType() + ":" + frequency.getTime();
+        String typeInfo = frequency.getLimitType();
+        if (!FrequencyType.URI_CONFIG.getType().equals(frequency.getLimitType())) {
+            typeInfo += ":" + frequency.getFreqLimitType().getType();
+        }
+        String key = frequency.getName() + ":" + typeInfo + ":" + frequency.getTime();
         if (!freqMap.containsKey(key)) {
             frequency.setCreateTime(curTime);
             freqMap.put(key, frequency.toCopy());

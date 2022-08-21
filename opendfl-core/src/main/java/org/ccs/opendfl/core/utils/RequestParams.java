@@ -1,5 +1,6 @@
 package org.ccs.opendfl.core.utils;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.config.OpendflConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +18,11 @@ public final class RequestParams {
     @Autowired
     public void setOpendflConfiguration(OpendflConfiguration opendflConfiguration) {
         RequestParams.opendflConfiguration = opendflConfiguration;
-        if(StringUtils.isNotBlank(opendflConfiguration.getDefaultAttrName())) {
+        if(CharSequenceUtil.isNotBlank(opendflConfiguration.getDefaultAttrName())) {
             RequestParams.USER_ID = opendflConfiguration.getDefaultAttrName();
             log.info("-----USER_ID use default attrName={}", RequestParams.USER_ID);
         }
-        if(StringUtils.isNotBlank(opendflConfiguration.getDefaultDeviceId())) {
+        if(CharSequenceUtil.isNotBlank(opendflConfiguration.getDefaultDeviceId())) {
             RequestParams.DEVICE_ID = opendflConfiguration.getDefaultDeviceId();
             log.info("-----DEVICE_ID use default value={}", RequestParams.DEVICE_ID);
         }

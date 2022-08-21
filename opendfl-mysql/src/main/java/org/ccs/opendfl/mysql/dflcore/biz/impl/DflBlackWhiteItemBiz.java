@@ -78,6 +78,7 @@ public class DflBlackWhiteItemBiz extends BaseService<DflBlackWhiteItemPo> imple
             criteria.andEqualTo("ifDel", entity.getIfDel());
         }
         this.addEqualByKey(criteria, "id", otherParams);
+        this.addEqualByKey(criteria, "status", otherParams);
         this.addEqualByKey(criteria, "blackwhiteId", otherParams);
     }
 

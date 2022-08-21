@@ -1,5 +1,6 @@
 package org.ccs.opendfl.mysql.controller;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IRsaBiz;
 import org.ccs.opendfl.core.exception.FailedException;
@@ -7,7 +8,6 @@ import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.limitfrequency.Frequency;
 import org.ccs.opendfl.core.limitfrequency.Frequency2;
 import org.ccs.opendfl.core.utils.RequestUtils;
-import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.utils.ValidateUtils;
 import org.ccs.opendfl.mysql.dflsystem.biz.IDflUserLoginBiz;
 import org.ccs.opendfl.mysql.utils.AuditLogUtils;
@@ -94,7 +94,7 @@ public class FrequencyLoginController {
         String username = user.getUsername();
         String pwd = user.getPwd();
         String ip = RequestUtils.getIpAddress(request);
-        if (StringUtils.isNotEmpty(clientIdRsa)) {
+        if (CharSequenceUtil.isNotEmpty(clientIdRsa)) {
             username = rsaBiz.checkRSAKey(clientIdRsa, username);
             pwd = rsaBiz.checkRSAKey(clientIdRsa, pwd);
         }

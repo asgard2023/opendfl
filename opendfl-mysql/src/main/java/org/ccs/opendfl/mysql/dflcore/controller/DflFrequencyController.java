@@ -1,5 +1,8 @@
 package org.ccs.opendfl.mysql.dflcore.controller;
 
+import cn.hutool.core.text.CharSequenceUtil;
+import org.ccs.opendfl.core.constants.FreqLimitType;
+import org.ccs.opendfl.core.constants.FrequencyType;
 import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.utils.ValidateUtils;
 import org.ccs.opendfl.mysql.auth.CheckAuthorization;
@@ -14,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,8 +46,8 @@ public class DflFrequencyController extends BaseController {
     /**
      * 频率限制配置表列表查询
      *
-     * @param request 请求
-     * @param entity 对象
+     * @param request  请求
+     * @param entity   对象
      * @param pageInfo 翻页对象o
      * @return MyPageInfo 翻页结果
      * @author chenjh
@@ -89,6 +93,48 @@ public class DflFrequencyController extends BaseController {
         entity.setModifyUser(getCurrentUserId());
         entity.setCreateUser(getCurrentUserId());
         dflFrequencyBiz.saveDflFrequency(entity);
+        return ResultData.success();
+    }
+
+    /**
+     * 频率限制配置表 新增
+     *
+     * @param request
+     * @param entity
+     * @return ResultData
+     * @author chenjh
+     * @date 2022-5-18 21:43:11
+     */
+    @RequestMapping(value = "/saveQuick", method = {RequestMethod.POST, RequestMethod.GET})
+    @CheckAuthorization("admin")
+    public ResultData saveQuick(DflFrequencyPo entity, @RequestParam("freqLimitTypes") String freqLimitTypes, HttpServletRequest request) {
+        entity.setModifyUser(getCurrentUserId());
+        entity.setCreateUser(getCurrentUserId());
+        String[] types = freqLimitTypes.split(",");
+        String[] methods = null;
+        if (CharSequenceUtil.isNotBlank(entity.getMethod())) {
+            methods = entity.getMethod().split(",");
+        }
+        for (String type : types) {
+            FreqLimitType freqLimitType = FreqLimitType.parse(Integer.parseInt(type));
+            if (freqLimitType != null) {
+                entity.setFreqLimitType(freqLimitType.getType());
+                entity.setId(null);
+                entity.setStatus(1);
+                entity.setLimitType(FrequencyType.URI_CONFIG.getType());
+                if (methods == null) {
+                    dflFrequencyBiz.saveDflFrequency(entity);
+                } else {
+                    for (String method : methods) {
+                        if(CharSequenceUtil.isBlank(method)){
+                            continue;
+                        }
+                        entity.setMethod(method.trim());
+                        dflFrequencyBiz.saveDflFrequency(entity);
+                    }
+                }
+            }
+        }
         return ResultData.success();
     }
 

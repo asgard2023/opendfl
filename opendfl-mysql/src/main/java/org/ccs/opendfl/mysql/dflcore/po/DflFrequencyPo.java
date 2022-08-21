@@ -7,6 +7,7 @@ import lombok.Data;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
 import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.utils.CommUtils;
+import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Column;
@@ -56,6 +57,26 @@ public class DflFrequencyPo implements Serializable {
         uriConfigVo.setErrMsg((String) CommUtils.nvl(uriConfigVo.getErrMsg(), ""));
         uriConfigVo.setErrMsgEn((String) CommUtils.nvl(uriConfigVo.getErrMsgEn(), ""));
         return uriConfigVo;
+    }
+
+    public static FrequencyVo toFrequencyVo(DflFrequencyPo po){
+        FrequencyVo vo=new FrequencyVo();
+        vo.setRequestUri(po.uri);
+        vo.setMethod(po.getMethod());
+        vo.setName(po.getCode());
+        vo.setFreqLimitType(FreqLimitType.parse(po.getFreqLimitType()));
+        vo.setLimitType(po.getLimitType());
+        if(po.getTime()!=null) {
+            vo.setTime(po.getTime());
+        }
+        vo.setLimit(po.getLimitCount());
+        vo.setErrMsg(po.getErrMsg());
+        vo.setErrMsgEn(po.getErrMsgEn());
+        vo.setNeedLogin(po.getNeedLogin()==1);
+        vo.setAttrName(po.getAttrName());
+        vo.setWhiteCode(po.getWhiteCode());
+        vo.setLog(po.getLog()==1);
+        return vo;
     }
 
     /**

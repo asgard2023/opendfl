@@ -76,6 +76,7 @@ public class DflBlackWhiteBiz extends BaseService<DflBlackWhitePo> implements ID
             criteria.andEqualTo("ifDel", entity.getIfDel());
         }
         this.addEqualByKey(criteria, "id", otherParams);
+        this.addEqualByKey(criteria, "status", otherParams);
         this.addEqualByKey(criteria, "code", otherParams);
         this.addEqualByKey(criteria, "name", otherParams);
     }

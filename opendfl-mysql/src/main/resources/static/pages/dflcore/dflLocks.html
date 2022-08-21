@@ -62,6 +62,14 @@
                         <input type="text" id="query_uri" name="uri" class="easyui-validatebox" placeholder="Input uri">
                     </td>
                     <td>
+                        状态::
+                        <input class="easyui-combobox" name="status" id="query_status" style="width: 100px" data-options="
+									valueField: 'id',
+									textField: 'name',
+									//multiple:true, //多选增加此项
+									data: dict_status_all"/>
+                    </td>
+                    <td>
                         <a class="easyui-linkbutton"
                            data-options="iconCls:'icon-search'" id="search-btn">查询</a>
                         <a class="easyui-linkbutton"

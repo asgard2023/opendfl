@@ -1,5 +1,6 @@
 package org.ccs.opendfl.core.utils;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import com.alibaba.fastjson.JSON;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -102,7 +102,7 @@ public class AnnotationControllerUtils {
             for (Method method : methods) {
                 requestVo = toRequest(method, clazz);
                 //未取到接口uri忽略
-                if (StringUtils.isBlank(requestVo.getRequestUri())) {
+                if (CharSequenceUtil.isBlank(requestVo.getRequestUri())) {
                     continue;
                 }
                 requestList.add(requestVo);

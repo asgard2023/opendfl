@@ -26,7 +26,7 @@ package org.ccs.opendfl.mysql.base;
 
 
 import cn.hutool.core.lang.UUID;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -98,7 +98,7 @@ public abstract class BaseService<T> implements IBaseService<T> {
      */
     public void addFilters(Example.Criteria criteria, Map<String, Object> otherParams) {
         String filters = (String) otherParams.get("filters");
-        if (!StrUtil.isEmpty(filters)) {
+        if (!CharSequenceUtil.isEmpty(filters)) {
             JSONObject jsonFilter = (JSONObject) JSON.toJSON(filters);
             String groupOp = jsonFilter.getString("groupOp");
             JSONArray rules = jsonFilter.getJSONArray("rules");

@@ -1,6 +1,6 @@
 package org.ccs.opendfl.mysql.dflcore.biz.impl;
 
-import com.alibaba.druid.util.StringUtils;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.github.pagehelper.PageHelper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -80,7 +80,10 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
             criteria.andEqualTo("ifDel", entity.getIfDel());
         }
         this.addEqualByKey(criteria, "id", otherParams);
-        this.addEqualByKey(criteria, "uri", otherParams);
+        this.addEqualByKey(criteria, "status", otherParams);
+        if(CharSequenceUtil.isNotEmpty(entity.getUri())){
+            criteria.andLike("uri", entity.getUri()+"%");
+        }
     }
 
     @Override
@@ -124,6 +127,12 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
         if (entity.getIfDel() == null) {
             entity.setIfDel(CommonIf.NO.getType());
         }
+        if(entity.getLog()==null){
+            entity.setLog(0);
+        }
+        if(entity.getNeedLogin()==null){
+            entity.setNeedLogin(0);
+        }
         entity.setUriId(this.dflRequestScansBiz.getUriId(entity.getUri()));
         int v = this.mapper.insert(entity);
         this._self.getFrequencyByUri_evict(entity.getUri());
@@ -135,7 +144,7 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
     @Override
     public Integer updateDflFrequency(DflFrequencyPo entity) {
         DflFrequencyPo exist = this.findById(entity.getId());
-        if (StringUtils.isEmpty(exist.getLimitType())) {
+        if (CharSequenceUtil.isEmpty(exist.getLimitType())) {
             entity.setLimitType(FrequencyType.URI_CONFIG.getType());
         }
         if (entity.getTime() == null || entity.getLimitCount() == null) {
@@ -211,6 +220,22 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
             frequencyIdMap.put(key, id);
         }
         return id;
+    }
+
+    @Override
+    public List<DflFrequencyPo> getFrequencyByUris(List<String> uris, String fields) {
+        if(CollectionUtils.isEmpty(uris)){
+            return Collections.emptyList();
+        }
+        Example example = new Example(DflFrequencyPo.class);
+        if(CharSequenceUtil.isNotEmpty(fields)) {
+            example.selectProperties(fields.split(","));
+        }
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("ifDel", 0);
+        criteria.andEqualTo("status", 1);
+        criteria.andIn("uri", uris);
+        return this.mapper.selectByExample(example);
     }
 
     @Override

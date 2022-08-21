@@ -2,6 +2,7 @@ package org.ccs.opendfl.core.utils;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.config.OpendflConfiguration;
 import org.ccs.opendfl.core.exception.*;
@@ -75,7 +76,7 @@ public class ValidateUtils {
      * @deprecated
      */
     public static void mustIn(Object value, String msg, String values) throws BaseException {
-        if (StringUtils.isEmpty(values)) {
+        if (CharSequenceUtil.isEmpty(values)) {
             return;
         }
         values += ",";
@@ -93,7 +94,7 @@ public class ValidateUtils {
      * @throws BaseException 异常
      */
     public static void mustIn(Object value, String fieldName, String... values) throws BaseException {
-        if (StringUtils.isBlank(fieldName)) {
+        if (CharSequenceUtil.isBlank(fieldName)) {
             throw new ParamErrorException(fieldName + " can not be null");
         }
         if (values == null || values.length == 0) {
@@ -247,7 +248,7 @@ public class ValidateUtils {
      */
     public static void checkTimeDateLimit(Map<String, Object> params, String noDayLimits, int limitDay, int limitUserDay) throws BaseException {
         boolean isParamValue = false;
-        if (StringUtils.isNotBlank(noDayLimits)) {
+        if (CharSequenceUtil.isNotBlank(noDayLimits)) {
             List<String> noLimitParams = Arrays.asList(noDayLimits.split(","));
             if (isParaValue(params, noLimitParams)) {
                 isParamValue = true;
@@ -264,15 +265,15 @@ public class ValidateUtils {
         if (endTime == null) {
             endTime = (String) params.get("endDate");
         }
-        if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
+        if (CharSequenceUtil.isBlank(startTime) && CharSequenceUtil.isBlank(endTime)) {
             throw new FailedException("开始时间，结束时间不能都为空");
         }
 
 
         Date startTimeDate = null;
         String timeValueDateFormat = "yyyyMMdd";
-        if (StringUtils.isNotBlank(startTime)) {
-            if (StringUtils.isNumeric(startTime) && startTime.length() == timeValueDateFormat.length()) {
+        if (CharSequenceUtil.isNotBlank(startTime)) {
+            if (CharSequenceUtil.isNumeric(startTime) && startTime.length() == timeValueDateFormat.length()) {
                 startTimeDate = DateUtil.parse(startTime, timeValueDateFormat);
             } else if (startTime.length() == DatePattern.NORM_DATE_PATTERN.length()) {
                 startTimeDate = DateUtil.parseDate(startTime);
@@ -285,8 +286,8 @@ public class ValidateUtils {
         }
 
         Date endTimeDate = null;
-        if (StringUtils.isNotBlank(endTime)) {
-            if (StringUtils.isNumeric(endTime) && endTime.length() == timeValueDateFormat.length()) {
+        if (CharSequenceUtil.isNotBlank(endTime)) {
+            if (CharSequenceUtil.isNumeric(endTime) && endTime.length() == timeValueDateFormat.length()) {
                 endTimeDate = DateUtil.parse(endTime, timeValueDateFormat);
             } else if (endTime.length() == DatePattern.NORM_DATE_PATTERN.length()) {
                 endTimeDate = DateUtil.parseDate(endTime);

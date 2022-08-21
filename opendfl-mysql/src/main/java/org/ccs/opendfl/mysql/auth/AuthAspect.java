@@ -1,12 +1,12 @@
 package org.ccs.opendfl.mysql.auth;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.ccs.opendfl.core.utils.RequestUtils;
-import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.mysql.utils.LoginUtils;
 import org.ccs.opendfl.mysql.vo.UserVo;
 import org.springframework.stereotype.Component;
@@ -36,7 +36,7 @@ public class AuthAspect {
 
 //            String token = request.getHeader("X-Token");
             String token = RequestUtils.getToken(request);
-            if(StringUtils.isBlank(token)){
+            if(CharSequenceUtil.isBlank(token)){
                 throw new SecurityException("Token null");
             }
             UserVo userVo = LoginUtils.getUserByToken(token);

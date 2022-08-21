@@ -1,5 +1,6 @@
 package org.ccs.opendfl.mysql.core.biz;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.NumberUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IFrequencyConfigBiz;
@@ -247,8 +248,8 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
             if (dflFrequencyPo.getTime() == null || dflFrequencyPo.getTime() == 0) {
                 continue;
             }
-            boolean isSameMethod = StringUtils.equals(dflFrequencyPo.getMethod(), method);
-            boolean isEmptyMethod = StringUtils.isBlank(dflFrequencyPo.getMethod());
+            boolean isSameMethod = CharSequenceUtil.equals(dflFrequencyPo.getMethod(), method);
+            boolean isEmptyMethod = CharSequenceUtil.isBlank(dflFrequencyPo.getMethod());
             //uriConfig支持请求方法,如GET/POST
             if (isEmptyMethod || !isEmptyMethod && isSameMethod) {
                 LimitUriConfigVo uriConfigVo = DflFrequencyPo.toConfigVo(dflFrequencyPo);
@@ -323,7 +324,7 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
     private void reloadNewlyFrequency(List<DflFrequencyPo> modifyFrequencys, Long curTime) {
         String cacheKey;
         for (DflFrequencyPo modifyInfo : modifyFrequencys) {
-            if (StringUtils.isBlank(modifyInfo.getCode()) || modifyInfo.getTime() == null) {
+            if (CharSequenceUtil.isBlank(modifyInfo.getCode()) || modifyInfo.getTime() == null) {
                 continue;
             }
             cacheKey = modifyInfo.getCode() + ":" + modifyInfo.getFreqLimitType() + ":" + modifyInfo.getTime();

@@ -1,8 +1,8 @@
 package org.ccs.opendfl.mysql.dfllogs.controller;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.utils.RequestUtils;
-import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.utils.ValidateUtils;
 import org.ccs.opendfl.mysql.auth.CheckAuthorization;
 import org.ccs.opendfl.mysql.auth.CheckLogin;
@@ -82,14 +82,14 @@ public class DflOutLimitLogController extends BaseController {
         Map<String, Object> params = this.createAllParams(request);
         ValidateUtils.checkTimeDateLimit(params, "uri,ip,uid,userId");
         if (this.mysqlConfiguration.getUserIdToNum() == 1) {
-            if (StringUtils.isNotBlank(entity.getUserId())) {
+            if (CharSequenceUtil.isNotBlank(entity.getUserId())) {
                 entity.setUid(this.dflLogUserBiz.getUid(entity.getUserId(), null, null));
                 entity.setUserId(null);
                 params.put("uid", entity.getUid());
                 params.remove("userId");
             }
         }
-        if (StringUtils.isNotBlank(entity.getUri())) {
+        if (CharSequenceUtil.isNotBlank(entity.getUri())) {
             Integer uriId = dflRequestScansBiz.getUriId(entity.getUri());
             if (uriId == null) {
                 uriId = -1;
@@ -98,7 +98,7 @@ public class DflOutLimitLogController extends BaseController {
             params.put("uriId", uriId);
             params.remove("uri");
         }
-        if (StringUtils.isNotBlank(entity.getIp())) {
+        if (CharSequenceUtil.isNotBlank(entity.getIp())) {
             entity.setIp(RequestUtils.convertIpv4(entity.getIp()));
             params.put("ip", entity.getIp());
         }
@@ -127,7 +127,7 @@ public class DflOutLimitLogController extends BaseController {
             if (t.getUriPo() != null) {
                 t.setUri(t.getUriPo().getUri());
             }
-            if (StringUtils.isNumeric(t.getIp())) {
+            if (CharSequenceUtil.isNumeric(t.getIp())) {
                 t.setIp(RequestUtils.getNumConvertIp(Long.parseLong(t.getIp())));
             }
         });
@@ -155,21 +155,21 @@ public class DflOutLimitLogController extends BaseController {
             entity = new DflOutLimitLogPo();
         }
         Map<String, Object> paramsMap = this.createAllParams(request);
-        if (StringUtils.isNotBlank(entity.getUserId())) {
+        if (CharSequenceUtil.isNotBlank(entity.getUserId())) {
             Long uid = dflLogUserBiz.getUid(entity.getUserId(), null, null);
             if (uid == null) {
                 uid = -1L;
             }
             entity.setUid(uid);
         }
-        if (StringUtils.isNotBlank(entity.getUri())) {
+        if (CharSequenceUtil.isNotBlank(entity.getUri())) {
             Integer uriId = dflRequestScansBiz.getUriId(entity.getUri());
             if (uriId == null) {
                 uriId = -1;
             }
             entity.setUriId(uriId);
         }
-        if (StringUtils.isNotBlank(entity.getIp())) {
+        if (CharSequenceUtil.isNotBlank(entity.getIp())) {
             entity.setIp(RequestUtils.convertIpv4(entity.getIp()));
             paramsMap.put("ip", entity.getIp());
         }
