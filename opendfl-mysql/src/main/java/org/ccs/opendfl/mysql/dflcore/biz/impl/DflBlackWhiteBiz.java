@@ -146,11 +146,13 @@ public class DflBlackWhiteBiz extends BaseService<DflBlackWhitePo> implements ID
 
     @Override
     public List<DflBlackWhitePo> findBlackWhiteByType(String type, Integer limitType) {
-        DflBlackWhitePo search = new DflBlackWhitePo();
-        search.setType(type);
-        search.setLimitType(limitType);
-        search.setIfDel(CommonIf.NO.getType());
-        search.setStatus(CommonStatus.VALID.getStatus());
-        return this.findBy(search);
+        Example example = new Example(DflBlackWhitePo.class);
+        example.selectProperties(DflBlackWhitePo.BLACK_WHITE_DATA.split(","));
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("type", type);
+        criteria.andEqualTo("limitType", limitType);
+        criteria.andEqualTo("ifDel", CommonIf.NO.getType());
+        criteria.andEqualTo("status", CommonStatus.VALID.getStatus());
+        return this.mapper.selectByExample(example);
     }
 }

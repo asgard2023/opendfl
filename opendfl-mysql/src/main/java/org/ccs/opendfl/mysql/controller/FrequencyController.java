@@ -338,8 +338,7 @@ public class FrequencyController extends BaseController {
      */
     private void loadFrequencyConfig(List<RequestShowVo> showList) {
         List<String> uriList = showList.stream().map(RequestVo::getRequestUri).collect(Collectors.toList());
-        String feidNames = "id,method,code,name,uri,limitCount,time,freqLimitType,limitType,attrName,needLogin,log,errMsg,errMsgEn";
-        List<DflFrequencyPo> freqList = dflFrequencyBiz.getFrequencyByUris(uriList, feidNames);
+        List<DflFrequencyPo> freqList = dflFrequencyBiz.getFrequencyByUris(uriList, DflFrequencyPo.FREQUENCY_DATA_FIELD);
         for (RequestShowVo showVo : showList) {
             List<FrequencyVo> voList = showVo.getLimitFrequencys();
 

@@ -11,6 +11,7 @@ import org.ccs.opendfl.mysql.base.BaseService;
 import org.ccs.opendfl.mysql.base.ISelfInject;
 import org.ccs.opendfl.mysql.base.MyPageInfo;
 import org.ccs.opendfl.mysql.constant.CommonIf;
+import org.ccs.opendfl.mysql.constant.CommonStatus;
 import org.ccs.opendfl.mysql.dflcore.biz.IDflFrequencyBiz;
 import org.ccs.opendfl.mysql.dflcore.mapper.DflFrequencyMapper;
 import org.ccs.opendfl.mysql.dflcore.po.DflFrequencyPo;
@@ -227,16 +228,24 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
         if(CollectionUtils.isEmpty(uris)){
             return Collections.emptyList();
         }
+        return getFrequencyByUrls(uris, fields, CommonStatus.VALID.getStatus());
+    }
+
+
+    private List<DflFrequencyPo> getFrequencyByUrls(List<String> uris, String fields, Integer status) {
         Example example = new Example(DflFrequencyPo.class);
         if(CharSequenceUtil.isNotEmpty(fields)) {
             example.selectProperties(fields.split(","));
         }
         Example.Criteria criteria = example.createCriteria();
-        criteria.andEqualTo("ifDel", 0);
-        criteria.andEqualTo("status", 1);
+        criteria.andEqualTo("ifDel", CommonIf.NO.getType());
+        if(status!=null) {
+            criteria.andEqualTo("status", status);
+        }
         criteria.andIn("uri", uris);
         return this.mapper.selectByExample(example);
     }
+
 
     @Override
     @CacheEvict(value = CacheTimeType.CACHE30S, key = "'opendfl:getFrequencyByUri:'+#uri")
@@ -248,10 +257,7 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
     @Cacheable(value = CacheTimeType.CACHE30S, key = "'opendfl:getFrequencyByUri:'+#uri")
     public List<DflFrequencyPo> getFrequencyByUri(String uri) {
         ValidateUtils.notNull(uri, "uri is null");
-        DflFrequencyPo search = new DflFrequencyPo();
-        search.setUri(uri);
-        search.setIfDel(CommonIf.NO.getType());
-        return this.mapper.select(search);
+        return this.getFrequencyByUrls(Arrays.asList(uri), DflFrequencyPo.FREQUENCY_DATA_FIELD, null);
     }
 
     @Override
@@ -289,6 +295,8 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
     @Override
     public List<DflFrequencyPo> findFrequencyByNewlyModify(Long modifyTime) {
         Example example = new Example(DflFrequencyPo.class);
+        String fields=DflFrequencyPo.FREQUENCY_DATA_FIELD+",modifyTime";
+        example.selectProperties(fields.split(","));
         Example.Criteria criteria = example.createCriteria();
         criteria.andEqualTo("ifDel", 0);
         criteria.andIsNotNull("time");

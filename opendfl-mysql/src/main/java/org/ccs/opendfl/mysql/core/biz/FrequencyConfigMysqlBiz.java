@@ -214,32 +214,38 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
         if (time == null || curTime - time > FrequencyConstant.LOAD_CONFIG_INTERVAL) {
             loadSysconfigTimeMap.put(key, curTime);
             this.recoverFrequencyConfig(curTime);
-            Long loadTime = loadSysconfigTimeMap.get(keyLoad);
             Long maxUpdateTime = dflFrequencyBiz.getFrequencyByUriMaxUpdateTime(requestUri);
             if (maxUpdateTime == null) {
                 maxUpdateTime = 0L;
             }
-            loadSysconfigTimeMap.put(key, curTime);
+            Long loadTime = loadSysconfigTimeMap.get(keyLoad);
             //检查数据是否有变化，如果有变化才重新加载到内存
             if (loadTime == null || (loadTime.longValue() != maxUpdateTime.longValue())) {
                 log.info("-----limitBySysconfigUri--uri={} maxUpdateTime={} reload config by modify_time changed loadTime={}", requestUri, maxUpdateTime, System.currentTimeMillis() - curTime);
-                loadSysconfigTimeMap.put(keyLoad, maxUpdateTime);
                 List<DflFrequencyPo> dflFrequencyPoList = dflFrequencyBiz.getFrequencyByUri(requestUri);
-                if (CollectionUtils.isEmpty(dflFrequencyPoList)) {
-                    //首次加载时自动保存
-                    autoCreateFrequencyByRequest(requestVo, requestUri);
-                    list = Collections.emptyList();
-                    uriLimitConfigsMap.put(requestUri, list);
-                } else {
-                    list = getLimitUriConfigVos(dflFrequencyPoList, requestVo.getMethod(), requestUri);
-                    uriLimitConfigsMap.put(requestUri, list);
-                }
+                list = cacheLimitUriConfigVos(requestVo, requestUri, keyLoad, maxUpdateTime, dflFrequencyPoList);
             }
         }
         if (list == null) {
             list = Collections.emptyList();
         }
         requestVo.setLimitRequests(list);
+    }
+
+    private List<LimitUriConfigVo> cacheLimitUriConfigVos(RequestVo requestVo, String requestUri, String keyLoad, Long maxUpdateTime, List<DflFrequencyPo> dflFrequencyPoList) {
+        loadSysconfigTimeMap.put(keyLoad, maxUpdateTime);
+        List<LimitUriConfigVo> list = null;
+        if (CollectionUtils.isEmpty(dflFrequencyPoList)) {
+            //首次加载时自动保存
+//                autoCreateFrequencyByRequest(requestVo, requestUri);
+            list = Collections.emptyList();
+            uriLimitConfigsMap.put(requestUri, list);
+        } else {
+            list = getLimitUriConfigVos(dflFrequencyPoList, requestVo.getMethod(), requestUri);
+            uriLimitConfigsMap.put(requestUri, list);
+        }
+
+        return list;
     }
 
     private List<LimitUriConfigVo> getLimitUriConfigVos(List<DflFrequencyPo> dflFrequencyPoList, String method, String requestUri) {
@@ -301,23 +307,29 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
 
     private void reloadNewlyUriConfigs(Long curTime, Map<String, List<DflFrequencyPo>> modifyUriConfigs) {
         Set<Map.Entry<String, List<DflFrequencyPo>>> sets = modifyUriConfigs.entrySet();
+        String keyLoad = null;
+        String key = null;
         for (Map.Entry<String, List<DflFrequencyPo>> entry : sets) {
             String requestUri = entry.getKey();
             List<DflFrequencyPo> dflFrequencyPoList = entry.getValue();
             String method = dflFrequencyPoList.get(0).getMethod();
-//            String cacheKey = "uri:" + requestUri;
-//            loadSysconfigTimeMap.put(cacheKey, curTime);
-//            String keyLoad = "uriLoad:" + requestUri;
-//            loadSysconfigTimeMap.put(keyLoad, curTime);
-//            List<LimitUriConfigVo> exists =uriLimitConfigsMap.get(requestUri);
-//            List<LimitUriConfigVo> list = getLimitUriConfigVos(dflFrequencyPoList, method, requestUri);
-//            uriLimitConfigsMap.put(requestUri, list);
 
             //复用已有方法
             RequestVo requestVo = new RequestVo();
             requestVo.setRequestUri(requestUri);
             requestVo.setMethod(method);
-            limitBySysconfigUri(requestVo);
+
+            List<DflFrequencyPo> frequencyPoList = entry.getValue();
+            Optional<DflFrequencyPo> maxOp = frequencyPoList.stream().max(Comparator.comparing(t -> t.getModifyTime().getTime()));
+            Long maxUpdateTime = 0L;
+            if (maxOp.isPresent()) {
+                maxUpdateTime = maxOp.get().getModifyTime().getTime();
+            }
+            key = "uri:" + requestVo.getRequestUri();
+            loadSysconfigTimeMap.put(key, curTime);
+            keyLoad = "uriLoad:" + requestVo.getRequestUri();
+            log.info("----reloadNewlyUriConfigs--cacheKey={} uri={}", keyLoad, requestVo.getRequestUri());
+            cacheLimitUriConfigVos(requestVo, requestUri, keyLoad, maxUpdateTime, frequencyPoList);
         }
     }
 
@@ -330,7 +342,7 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
             cacheKey = modifyInfo.getCode() + ":" + modifyInfo.getFreqLimitType() + ":" + modifyInfo.getTime();
             FrequencyMysqlVo frequencyMysqlExist = sysconfigLimitMap.get(cacheKey);
             if (frequencyMysqlExist == null) {
-                log.warn("----reloadNewlyFrequency--cacheKey={} uri={} unexist", cacheKey, modifyInfo.getUri());
+                log.info("----reloadNewlyFrequency--cacheKey={} uri={}", cacheKey, modifyInfo.getUri());
             }
             FrequencyVo frequencyVo = new FrequencyVo();
             frequencyVo.setName(modifyInfo.getCode());
@@ -342,7 +354,7 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
             frequencyVo.setNeedLogin(NumberUtil.equals(modifyInfo.getNeedLogin(), 1));
             frequencyVo.setLog(NumberUtil.equals(modifyInfo.getLog(), 1));
             frequencyVo.setWhiteCode(modifyInfo.getWhiteCode());
-            frequencyVo.setCreateTime(modifyInfo.getCreateTime().getTime());
+            frequencyVo.setCreateTime(modifyInfo.getModifyTime().getTime());
             loadSysconfigTimeMap.put(cacheKey, curTime);
             FrequencyMysqlVo frequencyMysqlNew = getFrequencyMysqlVo(frequencyVo, modifyInfo);
             sysconfigLimitMap.put(cacheKey, frequencyMysqlNew);

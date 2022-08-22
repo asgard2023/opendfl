@@ -26,6 +26,10 @@ public class DflBlackWhiteItemPo implements Serializable {
      *
      */
     private static final long serialVersionUID = 1L;
+    /**
+     * 用于不返回非必要字段，如创建人，修改人，操作时间等审计字段，以减少报文量
+     */
+    public static final String BLACK_LIST_DATA = "id,blackwhiteId,data,status";
 
     /**
      *
