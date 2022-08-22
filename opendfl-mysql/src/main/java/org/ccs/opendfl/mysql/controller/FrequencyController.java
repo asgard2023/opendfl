@@ -1,6 +1,7 @@
 package org.ccs.opendfl.mysql.controller;
 
 
+import cn.hutool.core.text.CharSequenceUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.*;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
@@ -9,16 +10,18 @@ import org.ccs.opendfl.core.constants.RunCountType;
 import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
 import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.limitfrequency.FrequencyHandlerInterceptor;
-import org.ccs.opendfl.locks.biz.IRequestLockDataBiz;
-import org.ccs.opendfl.locks.limitlock.RequestLockHandlerInterceptor;
 import org.ccs.opendfl.core.utils.*;
 import org.ccs.opendfl.core.vo.*;
+import org.ccs.opendfl.locks.biz.IRequestLockDataBiz;
+import org.ccs.opendfl.locks.limitlock.RequestLockHandlerInterceptor;
 import org.ccs.opendfl.mysql.auth.CheckAuthorization;
 import org.ccs.opendfl.mysql.auth.CheckLogin;
 import org.ccs.opendfl.mysql.base.BaseController;
 import org.ccs.opendfl.mysql.base.MyPageInfo;
 import org.ccs.opendfl.mysql.base.PageVO;
 import org.ccs.opendfl.mysql.constant.UserOperType;
+import org.ccs.opendfl.mysql.dflcore.biz.impl.DflFrequencyBiz;
+import org.ccs.opendfl.mysql.dflcore.po.DflFrequencyPo;
 import org.ccs.opendfl.mysql.dflsystem.biz.IDflUserLoginBiz;
 import org.ccs.opendfl.mysql.utils.AuditLogUtils;
 import org.ccs.opendfl.mysql.vo.UserVo;
@@ -54,6 +57,8 @@ public class FrequencyController extends BaseController {
     @Resource(name = "dflUserLoginBiz")
     private IDflUserLoginBiz dflUserLoginBiz;
     @Autowired
+    private DflFrequencyBiz dflFrequencyBiz;
+    @Autowired
     private IMaxRunTimeBiz maxRunTimeBiz;
     @Autowired
     private IRunCountBiz runCountBiz;
@@ -74,7 +79,7 @@ public class FrequencyController extends BaseController {
     public Object ipConvert(HttpServletRequest request) {
         String ip = request.getParameter("ip");
         ValidateUtils.notNull(ip, "ip is null");
-        if (StringUtils.isNumeric(ip)) {
+        if (CharSequenceUtil.isNumeric(ip)) {
             return RequestUtils.getNumConvertIp(Long.parseLong(ip));
         }
         return RequestUtils.getIpConvertNum(ip);
@@ -129,7 +134,7 @@ public class FrequencyController extends BaseController {
 
         AuditLogUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
         Collection<RequestVo> list = FrequencyHandlerInterceptor.requestVoMap.values();
-        if (StringUtils.isNotBlank(requestVo.getRequestUri())) {
+        if (CharSequenceUtil.isNotBlank(requestVo.getRequestUri())) {
             list = list.stream().filter(t -> t.getRequestUri().contains(requestVo.getRequestUri())).collect(Collectors.toList());
         }
         List<RequestShowVo> showList = toRequestShowList(list, requestVo);
@@ -299,7 +304,8 @@ public class FrequencyController extends BaseController {
     @CheckLogin
     public ResultData requestScans(HttpServletRequest request, RequestVo requestVo
             , @RequestParam(value = "type", required = false, defaultValue = "current") String type
-            , @RequestParam(value = "day", required = false, defaultValue = "-1") Integer day) {
+            , @RequestParam(value = "day", required = false, defaultValue = "-1") Integer day
+            , @RequestParam(value = "ifFreqData", required = false, defaultValue = "1") Integer ifFreqData) {
         String token = RequestUtils.getToken(request);
         UserVo userVo = dflUserLoginBiz.getUserByToken(token);
         checkUserPermission(userVo, UserOperType.VIEW);
@@ -318,20 +324,72 @@ public class FrequencyController extends BaseController {
         //显示从启动到现在各接口的调用情况（调用次数，调用时间超过1秒的最大时长，超限次数）
         requestRunCount(type, day, showList);
 
+        if (ifFreqData == 1) {
+            loadFrequencyConfig(showList);
+        }
+
         return ResultData.success(showList);
+    }
+
+    /**
+     * 加载mysql的配置信息
+     *
+     * @param showList
+     */
+    private void loadFrequencyConfig(List<RequestShowVo> showList) {
+        List<String> uriList = showList.stream().map(RequestVo::getRequestUri).collect(Collectors.toList());
+        List<DflFrequencyPo> freqList = dflFrequencyBiz.getFrequencyByUris(uriList, DflFrequencyPo.FREQUENCY_DATA_FIELD);
+        for (RequestShowVo showVo : showList) {
+            List<FrequencyVo> voList = showVo.getLimitFrequencys();
+
+            String[] methods = showVo.getMethod().split(",");
+            for (String method : methods) {
+                if (CharSequenceUtil.isBlank(method)) {
+                    continue;
+                }
+                List<DflFrequencyPo> freqPos = freqList.stream().filter(t -> CharSequenceUtil.equals(showVo.getRequestUri(), t.getUri())
+                        && (CharSequenceUtil.isBlank(t.getMethod()) || CharSequenceUtil.equals(method, t.getMethod()))).collect(Collectors.toList());
+                for (DflFrequencyPo freqPo : freqPos) {
+                    if (freqPo.getFreqLimitType() == null) {
+                        continue;
+                    }
+
+                    boolean isExist = isLoadExistVo(voList, freqPo);
+                    if (!isExist) {
+                        voList.add(DflFrequencyPo.toFrequencyVo(freqPo));
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean isLoadExistVo(List<FrequencyVo> voList, DflFrequencyPo freqPo) {
+        boolean isExist = false;
+        for (FrequencyVo freqVo : voList) {
+            if (freqVo.getTime() == freqPo.getTime()
+                    && freqVo.getFreqLimitType().getType().intValue() == freqPo.getFreqLimitType()
+                    && CharSequenceUtil.equals(freqVo.getMethod(), freqPo.getMethod())) {
+                freqVo.setLimit(freqPo.getLimitCount());
+                freqVo.setMethod(freqPo.getMethod());
+                isExist = true;
+                break;
+            }
+        }
+        return isExist;
     }
 
     @RequestMapping(value = "/requestScansPage", method = {RequestMethod.POST, RequestMethod.GET})
     @CheckLogin
     public PageVO<RequestShowVo> requestScansPage(HttpServletRequest request, RequestVo requestVo
             , @RequestParam(value = "type", required = false, defaultValue = "current") String type
-            , @RequestParam(value = "day", required = false, defaultValue = "-1") Integer day, MyPageInfo<RequestShowVo> pageInfo) {
+            , @RequestParam(value = "day", required = false, defaultValue = "-1") Integer day
+            , @RequestParam(value = "ifFreqData", required = false, defaultValue = "1") Integer ifFreqData, MyPageInfo<RequestShowVo> pageInfo) {
         this.pageSortBy(pageInfo);
         if (pageInfo.getPageSize() == 0) {
             pageInfo.setPageSize(getPageSize());
         }
 
-        ResultData resultData = requestScans(request, requestVo, type, day);
+        ResultData resultData = requestScans(request, requestVo, type, day, ifFreqData);
         List<RequestShowVo> showList = (List<RequestShowVo>) resultData.getData();
 
         List<RequestShowVo> pageList = new ArrayList<>();

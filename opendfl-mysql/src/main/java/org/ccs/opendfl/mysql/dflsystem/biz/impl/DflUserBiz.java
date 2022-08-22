@@ -1,10 +1,10 @@
 package org.ccs.opendfl.mysql.dflsystem.biz.impl;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.DesensitizedUtil;
 import com.github.pagehelper.PageHelper;
 import org.ccs.opendfl.core.constants.CacheTimeType;
 import org.ccs.opendfl.core.exception.*;
-import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.utils.ValidateUtils;
 import org.ccs.opendfl.mysql.base.BaseService;
 import org.ccs.opendfl.mysql.base.ISelfInject;
@@ -254,10 +254,10 @@ public class DflUserBiz extends BaseService<DflUserPo> implements IDflUserBiz, I
 
     @Override
     public int updatePassword(Integer userId, String oldPassword, String newPassword) {
-        if (StringUtils.isEmpty(oldPassword)) {
+        if (CharSequenceUtil.isEmpty(oldPassword)) {
             throw new ParamNullException("oldPassword旧密码为空");
         }
-        if (StringUtils.isEmpty(newPassword)) {
+        if (CharSequenceUtil.isEmpty(newPassword)) {
             throw new ParamNullException("password新密码为空");
         }
         if (oldPassword.equals(newPassword)) {

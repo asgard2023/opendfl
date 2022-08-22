@@ -1,8 +1,8 @@
 package org.ccs.opendfl.mysql.base;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import tk.mybatis.mapper.MapperException;
 import tk.mybatis.mapper.entity.EntityColumn;
 import tk.mybatis.mapper.mapperhelper.EntityHelper;
@@ -25,7 +25,7 @@ public class BeanUtils {
      * @return 首字母大写
      */
     public static String upperCaseFirst(String value) {
-        if (StringUtils.isEmpty(value)) {
+        if (CharSequenceUtil.isEmpty(value)) {
             return value;
         }
         char[] cs = value.toCharArray();
@@ -218,7 +218,7 @@ public class BeanUtils {
      */
     public static Object getObjectByProperty(Object bean, String property)
             throws IntrospectionException, IllegalAccessException, InvocationTargetException {
-        if (StringUtils.isEmpty(property)) {
+        if (CharSequenceUtil.isEmpty(property)) {
             return null;
         }
         property = property.trim();

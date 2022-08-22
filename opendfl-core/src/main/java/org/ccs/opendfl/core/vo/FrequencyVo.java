@@ -14,6 +14,7 @@ public class FrequencyVo {
     private String name;
     private String aliasName;
     private String requestUri;
+    private String method;
     private String limitType;
     private int time = 0;
     private int limit = 0;
@@ -54,11 +55,12 @@ public class FrequencyVo {
             vo = FrequencyVo.newInstance();
         }
         vo.setLimitType(FrequencyType.URI_CONFIG.getType());
+        vo.method=uriConfigVo.getMethod();
         vo.name = uriConfigVo.getUri();
         vo.aliasName = uriConfigVo.getAliasName();
         vo.time = uriConfigVo.getTime();
         vo.limit = uriConfigVo.getLimit();
-        vo.freqLimitType = frequency.freqLimitType;
+        vo.freqLimitType = uriConfigVo.getFreqLimitType();
         vo.errMsg = uriConfigVo.getErrMsg();
         vo.errMsgEn = uriConfigVo.getErrMsgEn();
         vo.whiteCode = uriConfigVo.getWhiteCode();

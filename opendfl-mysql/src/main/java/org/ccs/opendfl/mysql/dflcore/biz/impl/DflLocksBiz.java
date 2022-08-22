@@ -1,5 +1,6 @@
 package org.ccs.opendfl.mysql.dflcore.biz.impl;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import com.github.pagehelper.PageHelper;
 import org.ccs.opendfl.core.constants.CacheTimeType;
 import org.ccs.opendfl.mysql.base.BaseService;
@@ -74,6 +75,10 @@ public class DflLocksBiz extends BaseService<DflLocksPo> implements IDflLocksBiz
             criteria.andEqualTo("ifDel", entity.getIfDel());
         }
         this.addEqualByKey(criteria, "id", otherParams);
+        this.addEqualByKey(criteria, "status", otherParams);
+        if(CharSequenceUtil.isNotEmpty(entity.getUri())){
+            criteria.andLike("uri", entity.getUri()+"%");
+        }
     }
 
     @Override

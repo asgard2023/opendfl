@@ -42,7 +42,7 @@
         }
 
         input, textarea {
-            width: 160px;
+            width: 250px;
             border: 1px solid #ccc;
             padding: 2px;
         }
@@ -60,6 +60,14 @@
                 <tr>
                     <td>
                         <input type="text" id="query_uri" name="uri" class="easyui-validatebox" placeholder="Input uri">
+                    </td>
+                    <td>
+                        状态::
+                        <input class="easyui-combobox" name="status" id="query_status" style="width: 100px" data-options="
+									valueField: 'id',
+									textField: 'name',
+									//multiple:true, //多选增加此项
+									data: dict_status_all"/>
                     </td>
                     <td>
                         <a class="easyui-linkbutton"
@@ -85,6 +93,8 @@
         <div id="toolbar" style="display:none;">
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true"
                onclick="onAdd()">新增</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true"
+               onclick="onAddQuick()">快速新增</a>
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="onEdit()">修改</a>
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
                onclick="onDestroy()">删除</a>
@@ -128,7 +138,7 @@
     </div>
 </div>
 
-<div id="dlg" class="easyui-dialog" style="width:400px;height:500px;padding:5px 10px;display:none;"
+<div id="dlg" class="easyui-dialog" style="width:450px;height:500px;padding:5px 10px;display:none;"
      closed="true" buttons="#dlg-buttons">
     <form id="fm" method="post" novalidate>
         <input type="hidden" name="id">
@@ -207,13 +217,69 @@
         </div>
         <div class="fitem">
             <label>备注:</label>
-            <textarea name="remark" style="height:60px;width:220px"></textarea>
+            <textarea name="remark" style="height:60px;width:300px"></textarea>
         </div>
     </form>
     <div id="dlg-buttons">
         <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-ok" onclick="onSave()">Save</a>
         <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel"
            onclick="javascript:$('#dlg').dialog('close')">Cancel</a>
+    </div>
+</div>
+
+<div id="dlg-quick" class="easyui-dialog" style="width:450px;height:500px;padding:5px 10px;display:none;"
+     closed="true" buttons="#dlg-buttons-quick">
+    <form id="fm-quick" method="post" novalidate>
+        <input type="hidden" name="id">
+        <input type="hidden" name="uriId">
+        <div class="fitem">
+            <label>说明：</label>
+            <span>@Frequency优先于直接配置uri限制</span>
+        </div>
+        <div class="fitem">
+            <label>uri:</label>
+            <input name="uri" class="easyui-validatebox" required="true">
+        </div>
+        <div class="fitem">
+            <label>时间间隔:</label>
+            <input name="time" class="easyui-validatebox" required="true">
+        </div>
+        <div class="fitem">
+            <label>限制次数:</label>
+            <input name="limitCount" class="easyui-validatebox" required="true">
+        </div>
+        <div class="fitem">
+            <label>频率限制类型:</label>
+            <input class="easyui-combobox" name="freqLimitType" id="quick-freqLimitType" required="true" data-options="
+									valueField: 'id',
+									textField: 'name',
+									multiple:true, //多选增加此项
+									data: dict_freqLimitType"/>
+        </div>
+        <div class="fitem">
+            <label>限制类型:</label>
+            <input name="limitType" class="easyui-validatebox" id="quick-limitType" readonly="true" disabled>
+        </div>
+        <div class="fitem">
+            <label>限制属性名1:</label>
+            <input name="attrName" class="easyui-validatebox">
+        </div>
+        <div class="fitem">
+            <label>是否需要登入:</label>
+            <input class="easyui-combobox" name="needLogin" id="quick-needLogin" required="true" data-options="
+									valueField: 'id',
+									textField: 'name',
+									data: dict_if"/>
+        </div>
+        <div class="fitem">
+            <label>备注:</label>
+            <textarea name="remark" style="height:100px;width:300px"></textarea>
+        </div>
+    </form>
+    <div id="dlg-buttons-quick">
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-ok" onclick="onSaveQuick()">Save</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel"
+           onclick="javascript:$('#dlg-quick').dialog('close')">Cancel</a>
     </div>
 </div>
 
@@ -281,6 +347,13 @@
         //$("#dflFrequency_remark").val('test');
     }
 
+    function onAddQuick() {
+        $('#dlg-quick').dialog('open').dialog('setTitle', 'Quick add DflFrequency');
+        $('#fm-quick').form('clear');
+        $("#quick-limitType").val('uriConfig');
+        $("#quick-needLogin").combobox('setValue','1');
+    }
+
     function getRowData(entityName, row) {
         var tmp;
         var obj = {}
@@ -328,6 +401,47 @@
                 success: function (result) {
                     if (result.success) {
                         $('#dlg').dialog('close');        // close the dialog
+                        $.messager.show({
+                            title: '系统消息',
+                            msg: result.errorMsg
+                        });
+                        doSearchReload();    // reload the user data
+                    } else {
+                        $.messager.show({
+                            title: '错误消息:' + result.resultCode,
+                            msg: result.errorMsg
+                        });
+                    }
+                },
+                error: function (d, e) {
+                    $.messager.show({
+                        title: e,
+                        msg: d.responseJSON.errorMsg,
+                        timeout: 3000,
+                        showType: 'slide'
+                    });
+                }
+            });
+        }
+    }
+
+    function onSaveQuick() {
+        var url = '/dflcore/dflFrequency/saveQuick';
+        var jsonParam = $('#fm-quick').serializeJson();
+        var freqLimitTypes=$('#quick-freqLimitType').combobox('getValues');
+        if(freqLimitTypes){
+            jsonParam.freqLimitTypes=freqLimitTypes.join(',');
+        }
+        if ($('#fm-quick').form('validate')) {
+            $.ajax({
+                method: 'post',
+                url: url,
+                data: jsonParam,
+                headers: app.headers,
+                dataType: 'json',
+                success: function (result) {
+                    if (result.success) {
+                        $('#dlg-quick').dialog('close');        // close the dialog
                         $.messager.show({
                             title: '系统消息',
                             msg: result.errorMsg

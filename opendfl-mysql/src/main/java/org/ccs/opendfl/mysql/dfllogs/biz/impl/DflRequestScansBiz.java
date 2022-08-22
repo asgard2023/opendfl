@@ -1,6 +1,7 @@
 package org.ccs.opendfl.mysql.dfllogs.biz.impl;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.github.pagehelper.PageHelper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -278,7 +279,7 @@ public class DflRequestScansBiz extends BaseService<DflRequestScansPo> implement
     }
 
     private boolean changeData(DflRequestScansPo scansPo, RequestVo requestVo, Integer operUser) {
-        if (StringUtils.isNotBlank(scansPo.getMethod()) && StringUtils.isNotBlank(scansPo.getBeanName())) {
+        if (CharSequenceUtil.isNotBlank(scansPo.getMethod()) && CharSequenceUtil.isNotBlank(scansPo.getBeanName())) {
             return false;
         }
         scansPo.setMethod(requestVo.getMethod());

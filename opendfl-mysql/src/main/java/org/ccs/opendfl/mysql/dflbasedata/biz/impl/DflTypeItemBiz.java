@@ -1,6 +1,6 @@
 package org.ccs.opendfl.mysql.dflbasedata.biz.impl;
 
-import com.alibaba.druid.util.StringUtils;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.github.pagehelper.PageHelper;
 import org.ccs.opendfl.core.constants.CacheTimeType;
 import org.ccs.opendfl.mysql.base.BaseService;
@@ -125,7 +125,7 @@ public class DflTypeItemBiz extends BaseService<DflTypeItemPo> implements IDflTy
             for(DflTypeItemPo itemPo: typeItems){
                 vo=new TypeItemVo();
                 vo.setId(itemPo.getCode());
-                if(StringUtils.isNumber(itemPo.getCode())){
+                if(CharSequenceUtil.isNumeric(itemPo.getCode())){
                     vo.setId(Integer.parseInt(itemPo.getCode()));
                 }
                 vo.setName(itemPo.getName());

@@ -2,7 +2,6 @@ package org.ccs.opendfl.mysql.dflcore.biz;
 
 import org.ccs.opendfl.mysql.base.IBaseService;
 import org.ccs.opendfl.mysql.dflcore.po.DflFrequencyPo;
-import org.ccs.opendfl.mysql.dfllogs.po.DflRequestScansPo;
 
 import java.util.List;
 import java.util.Map;
@@ -68,4 +67,6 @@ public interface IDflFrequencyBiz extends IBaseService<DflFrequencyPo> {
     public Long getFrequencyMaxUpdateTime();
 
     public List<DflFrequencyPo> findFrequencyByNewlyModify(Long modifyTime);
+
+    public List<DflFrequencyPo> getFrequencyByUris(List<String> uris, String fields);
 }

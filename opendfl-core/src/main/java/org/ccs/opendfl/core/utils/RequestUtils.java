@@ -1,6 +1,7 @@
 package org.ccs.opendfl.core.utils;
 
 
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
@@ -245,7 +246,7 @@ public class RequestUtils {
      * @return 转换成数字类型的ip地址
      */
     public static String getIpConvertNums(String ipAddress) {
-        if (StringUtils.isBlank(ipAddress)) {
+        if (CharSequenceUtil.isBlank(ipAddress)) {
             return ipAddress;
         }
         //none表示不起作，忽略

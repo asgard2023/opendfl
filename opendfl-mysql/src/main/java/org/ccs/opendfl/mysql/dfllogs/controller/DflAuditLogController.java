@@ -1,8 +1,8 @@
 package org.ccs.opendfl.mysql.dfllogs.controller;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.utils.RequestUtils;
-import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.utils.ValidateUtils;
 import org.ccs.opendfl.mysql.auth.CheckAuthorization;
 import org.ccs.opendfl.mysql.auth.CheckLogin;
@@ -76,7 +76,7 @@ public class DflAuditLogController extends BaseController {
         }
         Map<String, Object> params = this.createAllParams(request);
         ValidateUtils.checkTimeDateLimit(params, "uri,uriId,ip,uid,user.nickname");
-        if (StringUtils.isNotBlank(entity.getIp())) {
+        if (CharSequenceUtil.isNotBlank(entity.getIp())) {
             entity.setIp(RequestUtils.convertIpv4(entity.getIp()));
             params.put("ip", entity.getIp());
         }
@@ -93,7 +93,7 @@ public class DflAuditLogController extends BaseController {
             if (t.getUriPo() != null) {
                 t.setUri(t.getUriPo().getUri());
             }
-            if (StringUtils.isNumeric(t.getIp())) {
+            if (CharSequenceUtil.isNumeric(t.getIp())) {
                 t.setIp(RequestUtils.getNumConvertIp(Long.parseLong(t.getIp())));
             }
         });

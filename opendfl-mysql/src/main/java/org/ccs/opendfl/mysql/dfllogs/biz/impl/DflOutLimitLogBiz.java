@@ -1,8 +1,8 @@
 package org.ccs.opendfl.mysql.dfllogs.biz.impl;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.github.pagehelper.PageHelper;
-import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.mysql.base.BaseService;
 import org.ccs.opendfl.mysql.base.ISelfInject;
 import org.ccs.opendfl.mysql.base.MyPageInfo;
@@ -128,13 +128,13 @@ public class DflOutLimitLogBiz extends BaseService<DflOutLimitLogPo> implements 
         String startTime = (String) paramsMap.get("startTime");
         String endTime = (String) paramsMap.get("endTime");
         String orderBy = pageInfo.getOrderBy();
-        if (StringUtils.isBlank(entity.getUri())) {
+        if (CharSequenceUtil.isBlank(entity.getUri())) {
             entity.setUri(null);
         }
 
         String findType = (String) paramsMap.get("findType");
         String userId = (String) paramsMap.get("userId");
-        if (StringUtils.isNotBlank(userId)) {
+        if (CharSequenceUtil.isNotBlank(userId)) {
             Long userUid = dflLogUserBiz.getUid(userId, null, null);
             if (userUid == null) {
                 userUid = -1L;

@@ -78,6 +78,7 @@ public class DflBlackWhiteItemBiz extends BaseService<DflBlackWhiteItemPo> imple
             criteria.andEqualTo("ifDel", entity.getIfDel());
         }
         this.addEqualByKey(criteria, "id", otherParams);
+        this.addEqualByKey(criteria, "status", otherParams);
         this.addEqualByKey(criteria, "blackwhiteId", otherParams);
     }
 
@@ -152,6 +153,7 @@ public class DflBlackWhiteItemBiz extends BaseService<DflBlackWhiteItemPo> imple
             return Collections.emptyList();
         }
         Example example = new Example(DflBlackWhiteItemPo.class);
+        example.selectProperties(DflBlackWhiteItemPo.BLACK_LIST_DATA.split(","));
         Example.Criteria criteria = example.createCriteria();
         criteria.andIn("blackwhiteId", whiteTypeIds);
         criteria.andEqualTo("ifDel", 0);
