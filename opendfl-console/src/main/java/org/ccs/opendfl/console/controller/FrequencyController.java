@@ -2,7 +2,6 @@ package org.ccs.opendfl.console.controller;
 
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.console.biz.IFrequencyLoginBiz;
 import org.ccs.opendfl.console.config.vo.RolePermitVo;
@@ -12,14 +11,16 @@ import org.ccs.opendfl.console.utils.AuditLogUtils;
 import org.ccs.opendfl.console.vo.FrequencyLimitVo;
 import org.ccs.opendfl.core.biz.*;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
+import org.ccs.opendfl.core.config.vo.LimitFrequencyConfigVo;
+import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
 import org.ccs.opendfl.core.constants.*;
 import org.ccs.opendfl.core.exception.PermissionDeniedException;
 import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.limitfrequency.FrequencyHandlerInterceptor;
-import org.ccs.opendfl.locks.biz.IRequestLockDataBiz;
-import org.ccs.opendfl.locks.limitlock.RequestLockHandlerInterceptor;
 import org.ccs.opendfl.core.utils.*;
 import org.ccs.opendfl.core.vo.*;
+import org.ccs.opendfl.locks.biz.IRequestLockDataBiz;
+import org.ccs.opendfl.locks.limitlock.RequestLockHandlerInterceptor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -285,7 +286,8 @@ public class FrequencyController {
     @RequestMapping(value = "/requestScans", method = {RequestMethod.POST, RequestMethod.GET})
     public ResultData requestScans(HttpServletRequest request, RequestVo requestVo
             , @RequestParam(value = "type", required = false, defaultValue = "current") String type
-            , @RequestParam(value = "day", required = false, defaultValue = "-1") Integer day) {
+            , @RequestParam(value = "day", required = false, defaultValue = "-1") Integer day
+            , @RequestParam(value = "ifFreqData", required = false, defaultValue = "1") Integer ifFreqData) {
         String token = RequestUtils.getToken(request);
         UserVo userVo = frequencyLoginBiz.getUserByToken(token);
         checkUserPermission(userVo, UserOperType.VIEW);
@@ -296,11 +298,91 @@ public class FrequencyController {
         List<RequestShowVo> showList = list.stream().map(RequestShowVo.class::cast).collect(Collectors.toList());
 
         if (StringUtils.isNotBlank(requestVo.getRequestUri())) {
-            showList = showList.stream().filter(t -> t.getRequestUri().contains(requestVo.getRequestUri())).collect(Collectors.toList());
+            showList = showList.stream().filter(t -> t.getRequestUri().contains(requestVo.getRequestUri()))
+                    //用于避免影响原对象缓存
+                    .map(t-> {
+                        RequestShowVo vo = new RequestShowVo();
+                        BeanUtils.copyProperties(t, vo);
+                        return vo;
+                    }).collect(Collectors.toList());
         }
 
         requestRunCount(type, day, showList);
+
+        if (ifFreqData == 1) {
+            loadFrequencyConfig(showList);
+        }
         return ResultData.success(showList);
+    }
+
+    /**
+     * 加载mysql的配置信息
+     *
+     * @param showList
+     */
+    private void loadFrequencyConfig(List<RequestShowVo> showList) {
+        List<LimitUriConfigVo> uriConfigs = frequencyConfiguration.getLimit().getUriConfigs();
+        List<LimitFrequencyConfigVo> freqs = frequencyConfiguration.getLimit().getFrequencyConfigs();
+        for (RequestShowVo showVo : showList) {
+            List<FrequencyVo> voList = showVo.getLimitFrequencys();
+
+            String[] methods = showVo.getMethod().split(",");
+            for (String method : methods) {
+                if (CharSequenceUtil.isBlank(method)) {
+                    continue;
+                }
+
+                //从Yml加载limit的frequencyConfigs配置数据
+                for (FrequencyVo vo : voList) {
+                    for (LimitFrequencyConfigVo freq : freqs) {
+                        if (CharSequenceUtil.equals(vo.getName(), freq.getName()) && vo.getTime() == freq.getTime() && freq.getFreqLimitType() == vo.getFreqLimitType()) {
+                            vo.setLimit(freq.getLimit());
+                            break;
+                        }
+                    }
+                }
+
+                //从Yml加载limit的uriConfigs配置数据
+                addUriConfigs(uriConfigs, showVo, voList, method);
+            }
+        }
+    }
+
+    /**
+     * 从yml加载配置数据
+     *
+     * @param uriConfigs
+     */
+    private void addUriConfigs(List<LimitUriConfigVo> uriConfigs, RequestShowVo showVo, List<FrequencyVo> voList, String method) {
+        List<LimitUriConfigVo> uriConfs = uriConfigs.stream().filter(t -> CharSequenceUtil.equals(showVo.getRequestUri(), t.getUri())
+                && (CharSequenceUtil.isBlank(t.getMethod()) || CharSequenceUtil.equals(method, t.getMethod()))).collect(Collectors.toList());
+        for (LimitUriConfigVo uriConfigVo : uriConfs) {
+            if (uriConfigVo.getFreqLimitType() == null) {
+                continue;
+            }
+
+            boolean isExist = isLoadExistVo(voList, uriConfigVo);
+            if (!isExist) {
+                FrequencyVo vo = FrequencyVo.toFrequencyVo(null, uriConfigVo);
+                vo.setMethod(showVo.getMethod());
+                voList.add(vo);
+            }
+        }
+    }
+
+    private boolean isLoadExistVo(List<FrequencyVo> voList, LimitUriConfigVo freqPo) {
+        boolean isExist = false;
+        for (FrequencyVo freqVo : voList) {
+            if (freqVo.getTime() == freqPo.getTime()
+                    && freqVo.getFreqLimitType().getType().intValue() == freqPo.getFreqLimitType().getType()
+                    && CharSequenceUtil.equals(freqVo.getMethod(), freqPo.getMethod())) {
+                freqVo.setLimit(freqPo.getLimit());
+                freqVo.setMethod(freqPo.getMethod());
+                isExist = true;
+                break;
+            }
+        }
+        return isExist;
     }
 
     private void addRequestRunTime(List<RequestShowVo> list) {
@@ -433,10 +515,11 @@ public class FrequencyController {
             methods = entity.getMethod().split(",");
         }
 
-        String ymlInfo="```yaml\n";
-        ymlInfo+="frequency:\n";
-        ymlInfo+="  limit:\n";
-        ymlInfo+="    uriConfigs:\n";
+        StringBuffer ymlInfo = new StringBuffer();
+        ymlInfo.append("```yaml\n");
+        ymlInfo.append("frequency:\n");
+        ymlInfo.append("  limit:\n");
+        ymlInfo.append("    uriConfigs:\n");
 
         for (String type : types) {
             FreqLimitType freqLimitType = FreqLimitType.parse(Integer.parseInt(type));
@@ -444,40 +527,41 @@ public class FrequencyController {
                 entity.setFreqLimitType(freqLimitType.getCode());
                 entity.setLimitType(FrequencyType.URI_CONFIG.getType());
                 if (methods == null) {
-                    ymlInfo+=toYmlInfo(entity);
+                    ymlInfo.append(toYmlInfo(entity));
                 } else {
                     for (String method : methods) {
-                        if(CharSequenceUtil.isBlank(method)){
+                        if (CharSequenceUtil.isBlank(method)) {
                             continue;
                         }
                         entity.setMethod(method.trim());
-                        ymlInfo+=toYmlInfo(entity);
+                        ymlInfo.append(toYmlInfo(entity));
                     }
                 }
             }
         }
-        ymlInfo+="```\n";
-        return ResultData.success(ymlInfo);
+        ymlInfo.append("```\n");
+        return ResultData.success(ymlInfo.toString());
     }
 
-    private String toYmlInfo(FrequencyLimitVo frequencyVo){
-        String infos="      - uri: "+frequencyVo.getUri()+"\n";
-        infos+="        method: "+frequencyVo.getMethod()+"\n";
-        infos+="        freqLimitType: "+frequencyVo.getFreqLimitType()+"\n";
-        infos+="        time: "+frequencyVo.getTime()+"\n";
-        infos+="        limit: "+frequencyVo.getLimitCount()+"\n";
-        infos+="        needLogin: "+(frequencyVo.getNeedLogin()==1)+"\n";
-        infos+="        log: "+(frequencyVo.getLog()==1)+"\n";
-        if(StrUtil.isNotBlank(frequencyVo.getAttrName())) {
-            infos += "        attrName: " + frequencyVo.getAttrName() + "\n";
+    private StringBuilder toYmlInfo(FrequencyLimitVo frequencyVo) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("      - uri: ").append(frequencyVo.getUri() + "\n");
+        sb.append("        method: ").append(frequencyVo.getMethod() + "\n");
+        sb.append("        freqLimitType: ").append(frequencyVo.getFreqLimitType() + "\n");
+        sb.append("        time: ").append(frequencyVo.getTime() + "\n");
+        sb.append("        limit: ").append(frequencyVo.getLimitCount() + "\n");
+        sb.append("        needLogin: ").append((frequencyVo.getNeedLogin() == 1) + "\n");
+        sb.append("        log: ").append((frequencyVo.getLog() == 1) + "\n");
+        if (CharSequenceUtil.isNotBlank(frequencyVo.getAttrName())) {
+            sb.append("        attrName: ").append(frequencyVo.getAttrName() + "\n");
         }
-        if(StrUtil.isNotBlank(frequencyVo.getErrMsg())) {
-            infos += "        errMsg: " + frequencyVo.getErrMsg() + "\n";
+        if (CharSequenceUtil.isNotBlank(frequencyVo.getErrMsg())) {
+            sb.append("        errMsg: ").append(frequencyVo.getErrMsg() + "\n");
         }
-        if(StrUtil.isNotBlank(frequencyVo.getErrMsgEn())) {
-            infos += "        errMsgEn: " + frequencyVo.getErrMsgEn() + "\n";
+        if (CharSequenceUtil.isNotBlank(frequencyVo.getErrMsgEn())) {
+            sb.append("        errMsgEn: ").append(frequencyVo.getErrMsgEn() + "\n");
         }
-        return infos;
+        return sb;
     }
 
 

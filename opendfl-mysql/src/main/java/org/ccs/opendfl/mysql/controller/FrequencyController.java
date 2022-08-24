@@ -318,7 +318,13 @@ public class FrequencyController extends BaseController {
 
         //支持按requestUri查询接口
         if (StringUtils.isNotBlank(requestVo.getRequestUri())) {
-            showList = showList.stream().filter(t -> t.getRequestUri().contains(requestVo.getRequestUri())).collect(Collectors.toList());
+            showList = showList.stream().filter(t -> t.getRequestUri().contains(requestVo.getRequestUri()))
+                    //用于避免影响原对象缓存
+                    .map(t-> {
+                        RequestShowVo vo = new RequestShowVo();
+                        BeanUtils.copyProperties(t, vo);
+                        return vo;
+                    }).collect(Collectors.toList());
         }
 
         //显示从启动到现在各接口的调用情况（调用次数，调用时间超过1秒的最大时长，超限次数）
