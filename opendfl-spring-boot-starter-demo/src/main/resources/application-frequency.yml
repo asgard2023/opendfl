@@ -34,7 +34,7 @@ frequency:
     uriConfigs:
       - uri: /frequencyTest/serverTimeUri
         method: GET
-        #默认limit
+        #限制类型(limit(默认),limitIp,userIp,ipUser,resUser,resIp)
         freqLimitType: limit
         time: 5
         limit: 8
