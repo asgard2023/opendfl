@@ -14,9 +14,18 @@ public class LimitUriConfigVo {
     private String uri;
     private String method;
     private String aliasName;
+    /**
+     * 间隔时间(秒)
+     */
     private Integer time;
+    /**
+     * 限制次数
+     */
     private Integer limit = 0;
-    private FreqLimitType freqLimitType;
+    /**
+     * 限制类型，默认limit
+     */
+    private FreqLimitType freqLimitType=FreqLimitType.LIMIT;
     private String attrName = "";
     private Integer status = 0;
     /**

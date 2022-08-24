@@ -17,7 +17,7 @@ frequency:
     items: 'ip,user,origin,'
     ips: '192.168.5.101'
     users: '5101,'
-    origins: 'localhost,'
+    origins: 'localhost,console.opendfl.org.cn,'
   #全局黑名单
   black:
     ifDeviceIdRequire: '0'
@@ -34,10 +34,13 @@ frequency:
     uriConfigs:
       - uri: /frequencyTest/serverTimeUri
         method: GET
+        #默认limit
+        freqLimitType: limit
         time: 5
         limit: 8
         attrName: account
       - uri: /frequencyTest/serverTimeUri
+        freqLimitType: limit
         time: 3600
         limit: 30
         userIp: 7
