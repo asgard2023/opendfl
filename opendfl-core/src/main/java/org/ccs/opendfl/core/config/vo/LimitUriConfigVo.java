@@ -27,7 +27,7 @@ public class LimitUriConfigVo {
      */
     private FreqLimitType freqLimitType=FreqLimitType.LIMIT;
     private String attrName = "";
-    private Integer status = 0;
+    private Integer status = 1;
     /**
      * 是否显示日志
      */
