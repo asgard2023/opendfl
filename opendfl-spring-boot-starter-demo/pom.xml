@@ -18,10 +18,16 @@
         <java.version>1.8</java.version>
         <maven.deploy.skip>true</maven.deploy.skip>
 
-        <opendfl-boot-starter.version>1.1</opendfl-boot-starter.version>
+        <opendfl-console.version>1.4</opendfl-console.version>
+        <opendfl-boot-starter.version>1.4</opendfl-boot-starter.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>cn.org.opendfl</groupId>
+            <artifactId>opendfl-console</artifactId>
+            <version>${opendfl-console.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

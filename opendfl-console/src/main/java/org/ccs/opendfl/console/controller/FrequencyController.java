@@ -1,17 +1,18 @@
 package org.ccs.opendfl.console.controller;
 
 
+import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.console.biz.IFrequencyLoginBiz;
 import org.ccs.opendfl.console.config.vo.RolePermitVo;
 import org.ccs.opendfl.console.config.vo.UserVo;
 import org.ccs.opendfl.console.constant.UserOperType;
 import org.ccs.opendfl.console.utils.AuditLogUtils;
+import org.ccs.opendfl.console.vo.FrequencyLimitVo;
 import org.ccs.opendfl.core.biz.*;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
-import org.ccs.opendfl.core.constants.FrequencyConstant;
-import org.ccs.opendfl.core.constants.RunCountType;
-import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
+import org.ccs.opendfl.core.constants.*;
 import org.ccs.opendfl.core.exception.PermissionDeniedException;
 import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.limitfrequency.FrequencyHandlerInterceptor;
@@ -414,6 +415,70 @@ public class FrequencyController {
         }
         showVo.setLimitFrequencys(tmpList);
     }
+
+    /**
+     * 频率限制配置表 新增
+     *
+     * @param request
+     * @param entity
+     * @return ResultData
+     * @author chenjh
+     * @date 2022-5-18 21:43:11
+     */
+    @RequestMapping(value = "/saveQuick", method = {RequestMethod.POST, RequestMethod.GET})
+    public ResultData saveQuick(FrequencyLimitVo entity, @RequestParam("freqLimitTypes") String freqLimitTypes, HttpServletRequest request) {
+        String[] types = freqLimitTypes.split(",");
+        String[] methods = null;
+        if (CharSequenceUtil.isNotBlank(entity.getMethod())) {
+            methods = entity.getMethod().split(",");
+        }
+
+        String ymlInfo="```yaml\n";
+        ymlInfo+="frequency:\n";
+        ymlInfo+="  limit:\n";
+        ymlInfo+="    uriConfigs:\n";
+
+        for (String type : types) {
+            FreqLimitType freqLimitType = FreqLimitType.parse(Integer.parseInt(type));
+            if (freqLimitType != null) {
+                entity.setFreqLimitType(freqLimitType.getCode());
+                entity.setLimitType(FrequencyType.URI_CONFIG.getType());
+                if (methods == null) {
+                    ymlInfo+=toYmlInfo(entity);
+                } else {
+                    for (String method : methods) {
+                        if(CharSequenceUtil.isBlank(method)){
+                            continue;
+                        }
+                        entity.setMethod(method.trim());
+                        ymlInfo+=toYmlInfo(entity);
+                    }
+                }
+            }
+        }
+        ymlInfo+="```\n";
+        return ResultData.success(ymlInfo);
+    }
+
+    private String toYmlInfo(FrequencyLimitVo frequencyVo){
+        String infos="      - uri: "+frequencyVo.getUri()+"\n";
+        infos+="        method: "+frequencyVo.getMethod()+"\n";
+        infos+="        freqLimitType: "+frequencyVo.getFreqLimitType()+"\n";
+        infos+="        time: "+frequencyVo.getTime()+"\n";
+        infos+="        limit: "+frequencyVo.getLimitCount()+"\n";
+        infos+="        needLogin: "+frequencyVo.getNeedLogin()+"\n";
+        if(StrUtil.isNotBlank(frequencyVo.getAttrName())) {
+            infos += "        attrName: " + frequencyVo.getAttrName() + "\n";
+        }
+        if(StrUtil.isNotBlank(frequencyVo.getErrMsg())) {
+            infos += "        errMsg: " + frequencyVo.getErrMsg() + "\n";
+        }
+        if(StrUtil.isNotBlank(frequencyVo.getErrMsgEn())) {
+            infos += "        errMsgEn: " + frequencyVo.getErrMsgEn() + "\n";
+        }
+        return infos;
+    }
+
 
     /**
      * 频率限制查询
