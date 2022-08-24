@@ -93,6 +93,13 @@ $(function () {
 });
 
 
+function loadError(r, e) {
+    $.messager.show({
+        title: 'Error:' + r.responseJSON.resultCode,
+        msg: r.responseJSON.errorMsg
+    });
+}
+
 
 function showToastmessage(title, msg){
     $.messager.show({

@@ -16,7 +16,9 @@
         <module>opendfl-demo-nacos</module>
         <module>opendfl-demo-web</module>
         <module>opendfl-spring-boot-starter</module>
+        <module>opendfl-spring-boot-starter-demo</module>
         <module>opendfl-mysql-spring-boot-starter</module>
+        <module>opendfl-mysql-spring-boot-starter-demo</module>
     </modules>
 
     <parent>
