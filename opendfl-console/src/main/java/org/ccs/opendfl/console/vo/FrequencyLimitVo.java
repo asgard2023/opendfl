@@ -60,9 +60,9 @@ public class FrequencyLimitVo {
     /**
      * 是否需要登入
      */
-    private Integer needLogin;
+    private Integer needLogin=0;
 
-    private Integer log;
+    private Integer log=0;
 
     /**
      * 异常消息

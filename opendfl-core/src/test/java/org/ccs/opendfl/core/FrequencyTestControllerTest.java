@@ -869,4 +869,35 @@ class FrequencyTestControllerTest {
         Assertions.assertTrue(successCount > 0, "successCount:" + successCount);
         Assertions.assertTrue(limtCount > 0, "ipUserCount:" + limtCount);
     }
+
+    /**
+     * 用户访问频率-没有用户（默认走IP）
+     * user request limit-- no userId use IP as default
+     */
+    @Test
+    void serverTimeUri() throws Exception {
+
+        int limtCount = 0;
+        int successCount = 0;
+        long time=System.currentTimeMillis();
+        String errorLimitType = "frequency:limit";
+        for (int i = 0; i < 20; i++) {
+            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeUri")
+                            .param("account", "data"+i)
+                            .param("userId", "123")
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andReturn();
+            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+            if (content.contains(errorLimitType)) {
+                limtCount++;
+            } else {
+                successCount++;
+            }
+            System.out.println("----serverTimeUri status=" + status + " content=" + content);
+        }
+        System.out.println("----serverTimeUri  successCount=" + successCount + " limtCount=" + limtCount+" time="+(System.currentTimeMillis()-time));
+        Assertions.assertEquals(8, successCount, "successCount:" + successCount);
+        Assertions.assertEquals(12, limtCount, "limtCount:" + limtCount);
+    }
 }

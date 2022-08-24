@@ -43,11 +43,9 @@ frequency:
         limit: 8
         attrName: account
       - uri: /frequencyTest/serverTimeUri
+        freqLimitType: limit
         time: 3600
         limit: 30
-        freqLimitType: limit
-        userIp: 7
-        ipUser: 7
         attrName: account
     #基于注解的频率限制
     frequencyConfigs:
