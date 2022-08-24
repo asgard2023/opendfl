@@ -466,7 +466,8 @@ public class FrequencyController {
         infos+="        freqLimitType: "+frequencyVo.getFreqLimitType()+"\n";
         infos+="        time: "+frequencyVo.getTime()+"\n";
         infos+="        limit: "+frequencyVo.getLimitCount()+"\n";
-        infos+="        needLogin: "+frequencyVo.getNeedLogin()+"\n";
+        infos+="        needLogin: "+frequencyVo.getNeedLogin()==1+"\n";
+        infos+="        log: "+frequencyVo.getLog()==1+"\n";
         if(StrUtil.isNotBlank(frequencyVo.getAttrName())) {
             infos += "        attrName: " + frequencyVo.getAttrName() + "\n";
         }

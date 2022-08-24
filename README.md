@@ -83,14 +83,14 @@ limit:
 limit:
   uriConfigs:
       - uri: /frequencyTest/serverTimeUri #依赖接口uri
+        #限制类型(limit(默认),limitIp,userIp,ipUser,resUser,resIp)
+        freqLimitType: limit
         time: 5
         limit: 8
         attrName: account
       - uri: /frequencyTest/serverTimeUri
         time: 3600
         limit: 30
-        userIp: 7
-        ipUser: 7
         attrName: account
 ```
 
