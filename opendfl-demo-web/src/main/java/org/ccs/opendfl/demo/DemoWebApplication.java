@@ -11,8 +11,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 //        , "org.ccs.opendfl.locks"
         , "org.ccs.opendfl.demo"})
 @EnableConfigurationProperties
-public class DemoApplication {
+public class DemoWebApplication {
     public static void main(String[] args) {
-        SpringApplication.run(DemoApplication.class, args);
+        SpringApplication.run(DemoWebApplication.class, args);
     }
 }

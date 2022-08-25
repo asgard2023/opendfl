@@ -5,6 +5,10 @@ info:
     version: 1.4
   redis: ${spring.redis.host}
 
+starter:
+  #支持关闭这个服务的Redis配置，由外其他类提供
+  redisCacheEnable: 1
+
 spring:
   profiles:
     include:
@@ -32,31 +36,6 @@ spring:
     sessionTimeoutMs: 5000
     #连接创建超时时间，单位毫秒
     connection-timeout-ms: 5000
-
-
-mybatis:
-  configuration:
-    map-underscore-to-camel-case: true
-  type-aliases-package: org.ccs.opendfl.mysql
-  mapper-locations: classpath:mappers/*/*.xml
-
-# TkMapper
-mapper:
-  identity: MYSQL
-  mappers: tk.mybatis.mapper.common.BaseMapper
-  not-empty: true
-  enum-as-simple-type: true
-
-# PageHelper分页插件
-pagehelper:
-  helperDialect: mysql
-  reasonable: true
-  supportMethodsArguments: true
-  params: count=countSql
-
-starter:
-  #支持关闭这个服务的Redis配置，由外其他类提供
-  redisCacheEnable: 1
 
 management:
   endpoints:
