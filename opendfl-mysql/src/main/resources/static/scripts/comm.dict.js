@@ -14,6 +14,11 @@ dict_if = [
     {id: '1', name: '是', color: 'red'}
 ];
 
+dict_if_all = [
+    {id: '', name: ''},
+    {id: '0', name: '否'},
+    {id: '1', name: '是', color: 'red'}
+];
 
 function getDictName(dict, id) {
     var name;

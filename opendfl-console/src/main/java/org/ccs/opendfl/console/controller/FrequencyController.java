@@ -295,16 +295,18 @@ public class FrequencyController {
         pkg = (String) CommUtils.nvl(pkg, "org.ccs.opendfl");
         AuditLogUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
         List<RequestVo> list = AnnotationControllerUtils.getControllerRequests(pkg);
-        List<RequestShowVo> showList = list.stream().map(RequestShowVo.class::cast).collect(Collectors.toList());
+        List<RequestShowVo> showList = list.stream().map(RequestShowVo.class::cast)
+                //用于避免影响原对象缓存
+                .map(t -> {
+                    RequestShowVo vo = new RequestShowVo();
+                    BeanUtils.copyProperties(t, vo);
+                    vo.setLimitFrequencys(new ArrayList<>(t.getLimitFrequencys()));
+                    return vo;
+                }).collect(Collectors.toList());
 
         if (StringUtils.isNotBlank(requestVo.getRequestUri())) {
             showList = showList.stream().filter(t -> t.getRequestUri().contains(requestVo.getRequestUri()))
-                    //用于避免影响原对象缓存
-                    .map(t-> {
-                        RequestShowVo vo = new RequestShowVo();
-                        BeanUtils.copyProperties(t, vo);
-                        return vo;
-                    }).collect(Collectors.toList());
+                    .collect(Collectors.toList());
         }
 
         requestRunCount(type, day, showList);
@@ -321,8 +323,6 @@ public class FrequencyController {
      * @param showList
      */
     private void loadFrequencyConfig(List<RequestShowVo> showList) {
-        List<LimitUriConfigVo> uriConfigs = frequencyConfiguration.getLimit().getUriConfigs();
-        List<LimitFrequencyConfigVo> freqs = frequencyConfiguration.getLimit().getFrequencyConfigs();
         for (RequestShowVo showVo : showList) {
             List<FrequencyVo> voList = showVo.getLimitFrequencys();
 
@@ -333,27 +333,38 @@ public class FrequencyController {
                 }
 
                 //从Yml加载limit的frequencyConfigs配置数据
-                for (FrequencyVo vo : voList) {
-                    for (LimitFrequencyConfigVo freq : freqs) {
-                        if (CharSequenceUtil.equals(vo.getName(), freq.getName()) && vo.getTime() == freq.getTime() && freq.getFreqLimitType() == vo.getFreqLimitType()) {
-                            vo.setLimit(freq.getLimit());
-                            break;
-                        }
-                    }
-                }
+                addFrequencyConfigs(voList);
 
                 //从Yml加载limit的uriConfigs配置数据
-                addUriConfigs(uriConfigs, showVo, voList, method);
+                addUriConfigs(showVo, voList, method);
             }
         }
     }
 
     /**
-     * 从yml加载配置数据
+     * 从Yml加载limit的frequencyConfigs配置数据
      *
-     * @param uriConfigs
+     * @param voList
      */
-    private void addUriConfigs(List<LimitUriConfigVo> uriConfigs, RequestShowVo showVo, List<FrequencyVo> voList, String method) {
+    private void addFrequencyConfigs(List<FrequencyVo> voList) {
+        List<LimitFrequencyConfigVo> frequencyConfigs = frequencyConfiguration.getLimit().getFrequencyConfigs();
+        for (FrequencyVo vo : voList) {
+            for (LimitFrequencyConfigVo freq : frequencyConfigs) {
+                if (CharSequenceUtil.equals(vo.getName(), freq.getName()) && vo.getTime() == freq.getTime() && freq.getFreqLimitType() == vo.getFreqLimitType()) {
+                    vo.setLimit(freq.getLimit());
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * 从Yml加载limit的uriConfigs配置数据
+     *
+     * @param showVo 接口数据
+     */
+    private void addUriConfigs(RequestShowVo showVo, List<FrequencyVo> voList, String method) {
+        List<LimitUriConfigVo> uriConfigs = frequencyConfiguration.getLimit().getUriConfigs();
         List<LimitUriConfigVo> uriConfs = uriConfigs.stream().filter(t -> CharSequenceUtil.equals(showVo.getRequestUri(), t.getUri())
                 && (CharSequenceUtil.isBlank(t.getMethod()) || CharSequenceUtil.equals(method, t.getMethod()))).collect(Collectors.toList());
         for (LimitUriConfigVo uriConfigVo : uriConfs) {
@@ -545,21 +556,21 @@ public class FrequencyController {
 
     private StringBuilder toYmlInfo(FrequencyLimitVo frequencyVo) {
         StringBuilder sb = new StringBuilder();
-        sb.append("      - uri: ").append(frequencyVo.getUri() + "\n");
-        sb.append("        method: ").append(frequencyVo.getMethod() + "\n");
-        sb.append("        freqLimitType: ").append(frequencyVo.getFreqLimitType() + "\n");
-        sb.append("        time: ").append(frequencyVo.getTime() + "\n");
+        sb.append("      - uri: ").append(frequencyVo.getUri()).append("\n");
+        sb.append("        method: ").append(frequencyVo.getMethod()).append("\n");
+        sb.append("        freqLimitType: ").append(frequencyVo.getFreqLimitType()).append("\n");
+        sb.append("        time: ").append(frequencyVo.getTime()).append("\n");
         sb.append("        limit: ").append(frequencyVo.getLimitCount() + "\n");
-        sb.append("        needLogin: ").append((frequencyVo.getNeedLogin() == 1) + "\n");
-        sb.append("        log: ").append((frequencyVo.getLog() == 1) + "\n");
+        sb.append("        needLogin: ").append((frequencyVo.getNeedLogin() == 1)).append("\n");
+        sb.append("        log: ").append((frequencyVo.getLog() == 1)).append("\n");
         if (CharSequenceUtil.isNotBlank(frequencyVo.getAttrName())) {
-            sb.append("        attrName: ").append(frequencyVo.getAttrName() + "\n");
+            sb.append("        attrName: ").append(frequencyVo.getAttrName()).append("\n");
         }
         if (CharSequenceUtil.isNotBlank(frequencyVo.getErrMsg())) {
-            sb.append("        errMsg: ").append(frequencyVo.getErrMsg() + "\n");
+            sb.append("        errMsg: ").append(frequencyVo.getErrMsg()).append("\n");
         }
         if (CharSequenceUtil.isNotBlank(frequencyVo.getErrMsgEn())) {
-            sb.append("        errMsgEn: ").append(frequencyVo.getErrMsgEn() + "\n");
+            sb.append("        errMsgEn: ").append(frequencyVo.getErrMsgEn()).append("\n");
         }
         return sb;
     }

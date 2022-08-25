@@ -5,6 +5,8 @@ import cn.hutool.core.text.CharSequenceUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.*;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
+import org.ccs.opendfl.core.config.vo.LimitFrequencyConfigVo;
+import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.constants.RunCountType;
 import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
@@ -314,17 +316,18 @@ public class FrequencyController extends BaseController {
         AuditLogUtils.addAuditLog(request, userVo, "list", "ok", TIME_NULL);
         //找出Controller下的所有注解，以及频率限制、分布式锁配置参数
         List<RequestVo> list = AnnotationControllerUtils.getControllerRequests(pkg);
-        List<RequestShowVo> showList = list.stream().map(RequestShowVo.class::cast).collect(Collectors.toList());
+        List<RequestShowVo> showList = list.stream().map(RequestShowVo.class::cast)
+                //用于避免影响原对象缓存
+                .map(t -> {
+                    RequestShowVo vo = new RequestShowVo();
+                    BeanUtils.copyProperties(t, vo);
+                    vo.setLimitFrequencys(new ArrayList<>(t.getLimitFrequencys()));
+                    return vo;
+                }).collect(Collectors.toList());
 
         //支持按requestUri查询接口
         if (StringUtils.isNotBlank(requestVo.getRequestUri())) {
-            showList = showList.stream().filter(t -> t.getRequestUri().contains(requestVo.getRequestUri()))
-                    //用于避免影响原对象缓存
-                    .map(t-> {
-                        RequestShowVo vo = new RequestShowVo();
-                        BeanUtils.copyProperties(t, vo);
-                        return vo;
-                    }).collect(Collectors.toList());
+            showList = showList.stream().filter(t -> t.getRequestUri().contains(requestVo.getRequestUri())).collect(Collectors.toList());
         }
 
         //显示从启动到现在各接口的调用情况（调用次数，调用时间超过1秒的最大时长，超限次数）
@@ -353,20 +356,94 @@ public class FrequencyController extends BaseController {
                 if (CharSequenceUtil.isBlank(method)) {
                     continue;
                 }
-                List<DflFrequencyPo> freqPos = freqList.stream().filter(t -> CharSequenceUtil.equals(showVo.getRequestUri(), t.getUri())
-                        && (CharSequenceUtil.isBlank(t.getMethod()) || CharSequenceUtil.equals(method, t.getMethod()))).collect(Collectors.toList());
-                for (DflFrequencyPo freqPo : freqPos) {
-                    if (freqPo.getFreqLimitType() == null) {
-                        continue;
-                    }
+                //从Yml加载limit的frequencyConfigs配置数据
+                addFrequencyConfigs(voList);
 
-                    boolean isExist = isLoadExistVo(voList, freqPo);
-                    if (!isExist) {
-                        voList.add(DflFrequencyPo.toFrequencyVo(freqPo));
-                    }
+                //从Yml加载limit的uriConfigs配置数据
+                addUriConfigs(showVo, voList, method);
+
+                //从数据库加载配置数据
+                addMysqlConfigs(freqList, showVo, voList, method);
+            }
+        }
+    }
+
+    /**
+     * 从Yml加载limit的uriConfigs配置数据
+     *
+     * @param showVo 接口数据
+     */
+    private void addUriConfigs(RequestShowVo showVo, List<FrequencyVo> voList, String method) {
+        List<LimitUriConfigVo> uriConfigs = frequencyConfiguration.getLimit().getUriConfigs();
+        List<LimitUriConfigVo> uriConfs = uriConfigs.stream().filter(t -> CharSequenceUtil.equals(showVo.getRequestUri(), t.getUri())
+                && (CharSequenceUtil.isBlank(t.getMethod()) || CharSequenceUtil.equals(method, t.getMethod()))).collect(Collectors.toList());
+        for (LimitUriConfigVo uriConfigVo : uriConfs) {
+            if (uriConfigVo.getFreqLimitType() == null) {
+                continue;
+            }
+
+            boolean isExist = isLoadExistVo(voList, uriConfigVo);
+            if (!isExist) {
+                FrequencyVo vo = FrequencyVo.toFrequencyVo(null, uriConfigVo);
+                vo.setMethod(showVo.getMethod());
+                voList.add(vo);
+            }
+        }
+    }
+
+    /**
+     * 从Yml加载limit的frequencyConfigs配置数据
+     *
+     * @param voList
+     */
+    private void addFrequencyConfigs(List<FrequencyVo> voList) {
+        List<LimitFrequencyConfigVo> frequencyConfigs = frequencyConfiguration.getLimit().getFrequencyConfigs();
+        for (FrequencyVo vo : voList) {
+            for (LimitFrequencyConfigVo freq : frequencyConfigs) {
+                if (CharSequenceUtil.equals(vo.getName(), freq.getName()) && vo.getTime() == freq.getTime() && freq.getFreqLimitType() == vo.getFreqLimitType()) {
+                    vo.setLimit(freq.getLimit());
+                    break;
                 }
             }
         }
+    }
+
+    /**
+     * 从数据库加载配置数据
+     *
+     * @param freqList
+     * @param showVo
+     * @param voList
+     * @param method
+     */
+    private void addMysqlConfigs(List<DflFrequencyPo> freqList, RequestShowVo showVo, List<FrequencyVo> voList, String method) {
+        List<DflFrequencyPo> freqPos = freqList.stream().filter(t -> CharSequenceUtil.equals(showVo.getRequestUri(), t.getUri())
+                && (CharSequenceUtil.isBlank(t.getMethod()) || CharSequenceUtil.equals(method, t.getMethod()))).collect(Collectors.toList());
+        for (DflFrequencyPo freqPo : freqPos) {
+            if (freqPo.getFreqLimitType() == null) {
+                continue;
+            }
+
+            boolean isExist = isLoadExistVo(voList, freqPo);
+            if (!isExist) {
+                voList.add(DflFrequencyPo.toFrequencyVo(freqPo));
+            }
+        }
+    }
+
+    private boolean isLoadExistVo(List<FrequencyVo> voList, LimitUriConfigVo freqPo) {
+        boolean isExist = false;
+        for (FrequencyVo freqVo : voList) {
+            if (freqVo.getTime() == freqPo.getTime()
+                    && freqVo.getFreqLimitType().getType().intValue() == freqPo.getFreqLimitType().getType()
+                    && CharSequenceUtil.equals(freqVo.getMethod(), freqPo.getMethod())) {
+                freqVo.setLimit(freqPo.getLimit());
+                freqVo.setMethod(freqPo.getMethod());
+                isExist = true;
+                break;
+            }
+        }
+        return isExist;
     }
 
     private boolean isLoadExistVo(List<FrequencyVo> voList, DflFrequencyPo freqPo) {
