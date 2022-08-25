@@ -117,8 +117,8 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTimeFreqRes")
-    @Frequency2(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_IP, attrName = "dataId", name = "serverTimeFreqResIpCount")
-    @Frequency3(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_USER, attrName = "dataId", name = "serverTimeFreqResUserCount")
+    @Frequency2(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_IP, attrName = "dataId", name = "serverTimeFreqRes")
+    @Frequency3(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_USER, attrName = "dataId", name = "serverTimeFreqRes", log = true)
     public Object serverTimeFreqRes(HttpServletRequest request) {
         String dataId=request.getParameter("dataId");
         log.info("----serverTimeFreqRes--userId={} dataId={}", request.getParameter(RequestParams.USER_ID), dataId);
@@ -164,8 +164,8 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTimeFreqIp")
-    @Frequency(time = 30, limit = 10, freqLimitType = FreqLimitType.IP_USER, name = "serverTimeFreqIpUser")
-    @Frequency2(time = 30, limit = 10, freqLimitType = FreqLimitType.USER_IP, name = "serverTimeFreqUserIp")
+    @Frequency(time = 30, limit = 10, freqLimitType = FreqLimitType.IP_USER, name = "serverTimeFreqIp")
+    @Frequency2(time = 30, limit = 10, freqLimitType = FreqLimitType.USER_IP, name = "serverTimeFreqIp")
     public Object serverTimeFreqIp(HttpServletRequest request) {
         log.info("----serverTimeFreqIp--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();

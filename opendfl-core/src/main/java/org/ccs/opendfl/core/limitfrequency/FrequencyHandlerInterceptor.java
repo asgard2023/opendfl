@@ -35,6 +35,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -179,11 +180,10 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             frequencyVo = new FrequencyVo();
             frequencyVo.setRequestUri(requestUri);
             //基于注解的频率限制
-            boolean isAllNull = this.limitByFrequency(handlerMethod, frequencyVo, strategyParams, params, response);
-            if (isAllNull) {
-                //基于yml配置的频率限制处理
-                this.limitByRequestConfig(requestVo, frequencyVo, strategyParams, params, response);
-            }
+            this.limitByFrequency(handlerMethod, frequencyVo, strategyParams, params, response);
+
+            //基于yml配置的频率限制处理
+            this.limitByRequestConfig(requestVo, frequencyVo, strategyParams, params, response);
 
             strategyParams = null;
             frequencyVo = null;
@@ -244,34 +244,39 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
      * @param response       HttpServletResponse
      * @return boolean
      */
-    private boolean limitByFrequency(HandlerMethod handlerMethod, FrequencyVo frequencyVo, RequestStrategyParamsVo strategyParams, Map<String, Object> params, HttpServletResponse response) throws FrequencyAttrNameBlankException {
-        boolean isAllNull = true;
-        FrequencyVo retVo = null;
-        Frequency methodFrequency = handlerMethod.getMethodAnnotation(Frequency.class);
-        retVo = FrequencyVo.toFrequencyVo(methodFrequency, frequencyVo);
-        isAllNull = retVo == null && isAllNull;
-        handleFrequency(response, params, retVo, strategyParams);
+    private void limitByFrequency(HandlerMethod handlerMethod, FrequencyVo frequencyVo, RequestStrategyParamsVo strategyParams, Map<String, Object> params, HttpServletResponse response) throws FrequencyAttrNameBlankException {
+        List<FrequencyVo> frequencyVoList = getMethodFrequencies(handlerMethod, strategyParams.getRequestUri());
+        for(FrequencyVo frequency : frequencyVoList){
+            handleFrequency(response, params, frequency, strategyParams);
+        }
+    }
 
-        Frequency2 methodFrequency2 = handlerMethod.getMethodAnnotation(Frequency2.class);
-        retVo = FrequencyVo.toFrequencyVo(methodFrequency2, frequencyVo);
-        isAllNull = retVo == null && isAllNull;
-        handleFrequency(response, params, retVo, strategyParams);
+    private static Map<String, List<FrequencyVo>> methodFrequencyMap=new ConcurrentHashMap<>(100);
+    private List<FrequencyVo> getMethodFrequencies(HandlerMethod handlerMethod, String requestUri) {
+        String code=requestUri+":"+handlerMethod.getMethod().getName();
+        List<FrequencyVo> list=methodFrequencyMap.get(code);
+        if(list == null){
+            list=new ArrayList<>();
+            FrequencyVo frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency.class), new FrequencyVo());
+            addFrequency(frequency, requestUri, list);
+            frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency2.class), new FrequencyVo());
+            addFrequency(frequency, requestUri, list);
+            frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency3.class), new FrequencyVo());
+            addFrequency(frequency, requestUri, list);
+            frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency4.class), new FrequencyVo());
+            addFrequency(frequency, requestUri, list);
+            frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency5.class), new FrequencyVo());
+            addFrequency(frequency, requestUri, list);
+            methodFrequencyMap.put(code, list);
+        }
+        return list;
+    }
 
-        Frequency3 methodFrequency3 = handlerMethod.getMethodAnnotation(Frequency3.class);
-        retVo = FrequencyVo.toFrequencyVo(methodFrequency3, frequencyVo);
-        isAllNull = retVo == null && isAllNull;
-        handleFrequency(response, params, retVo, strategyParams);
-
-        Frequency4 methodFrequency4 = handlerMethod.getMethodAnnotation(Frequency4.class);
-        retVo = FrequencyVo.toFrequencyVo(methodFrequency4, frequencyVo);
-        isAllNull = retVo == null && isAllNull;
-        handleFrequency(response, params, retVo, strategyParams);
-
-        Frequency5 methodFrequency5 = handlerMethod.getMethodAnnotation(Frequency5.class);
-        retVo = FrequencyVo.toFrequencyVo(methodFrequency5, frequencyVo);
-        isAllNull = retVo == null && isAllNull;
-        handleFrequency(response, params, retVo, strategyParams);
-        return isAllNull;
+    private void addFrequency(FrequencyVo frequency, String requestUri, List<FrequencyVo> list){
+        if(frequency!=null) {
+            frequency.setRequestUri(requestUri);
+            list.add(frequency);
+        }
     }
 
     /**
