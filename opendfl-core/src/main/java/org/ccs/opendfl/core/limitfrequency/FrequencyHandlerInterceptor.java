@@ -253,7 +253,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
 
     private static Map<String, List<FrequencyVo>> methodFrequencyMap=new ConcurrentHashMap<>(100);
     private List<FrequencyVo> getMethodFrequencies(HandlerMethod handlerMethod, String requestUri) {
-        String code=requestUri+":"+handlerMethod.getMethod().getName();
+        String code=handlerMethod.getBean().getClass().getSimpleName()+"/"+requestUri;
         List<FrequencyVo> list=methodFrequencyMap.get(code);
         if(list == null){
             list=new ArrayList<>();
