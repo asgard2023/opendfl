@@ -11,7 +11,7 @@
  Target Server Version : 80028
  File Encoding         : 65001
 
- Date: 19/08/2022 21:12:39
+ Date: 26/08/2022 08:51:30
 */
 
 SET NAMES utf8mb4;
@@ -38,7 +38,8 @@ CREATE TABLE `dfl_audit_log`  (
   INDEX `idx_create`(`create_time`) USING BTREE,
   INDEX `idx_user`(`user_id`) USING BTREE,
   INDEX `idx_uri`(`uri_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 520 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '后台管理审计日志' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 550 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '后台管理审计日志' ROW_FORMAT = DYNAMIC;
+
 
 -- ----------------------------
 -- Table structure for dfl_black_white
@@ -105,15 +106,16 @@ CREATE TABLE `dfl_frequency`  (
   `id` int NOT NULL AUTO_INCREMENT,
   `uri` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `uri_id` int NULL DEFAULT NULL,
+  `method` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `code` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '编码',
   `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '名称',
   `alias` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '别名，用于多个接口共用一个限制',
   `time` int NULL DEFAULT NULL COMMENT '时间间隔',
   `limit_count` int NULL DEFAULT NULL COMMENT '限制次数',
-  `user_ip_count` int NULL DEFAULT NULL COMMENT '一个用户允许IP个数',
-  `ip_user_count` int NULL DEFAULT NULL COMMENT '一个IP允许用户个数',
   `white_code` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '白名单编码',
   `limit_type` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '限制类型',
+  `freq_limit_type` tinyint NULL DEFAULT NULL,
+  `log` tinyint NULL DEFAULT NULL,
   `attr_name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '限制属性名',
   `need_login` tinyint NULL DEFAULT NULL COMMENT '是否需要登入',
   `err_msg` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '异常消息',
@@ -124,99 +126,95 @@ CREATE TABLE `dfl_frequency`  (
   `modify_time` datetime NULL DEFAULT NULL COMMENT '修改时间',
   `create_user` int NULL DEFAULT NULL COMMENT '创建人',
   `modify_user` int NULL DEFAULT NULL COMMENT '修改人',
-  `method` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `remark` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '备注',
-  `resource` tinyint NULL DEFAULT NULL,
-  `freq_limit_type` tinyint NULL DEFAULT NULL,
-  `log` tinyint NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 243 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '频率限制配置表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of dfl_frequency
 -- ----------------------------
-INSERT INTO `dfl_frequency` VALUES (18, '/frequencyTest/serverTimeFreqIp', 18, 'serverTimeFreqIp', NULL, '', 5, 5, 7, 7, 'none', 'frequency', '', 0, '', '', 0, 1, '2022-05-19 21:24:17', '2022-05-19 21:24:17', NULL, NULL, NULL, NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (19, '/frequencyTest/serverTimeFreq', 14, 'serverTimeFreq', NULL, '', 5, 3, 0, 0, 'none', 'frequency', '', 0, '每#{time}秒#{limit}次', '#{limit} times every #{time}s', 0, 1, '2022-05-19 21:24:23', '2022-08-13 07:24:32', NULL, 2, NULL, 'test', NULL, 1, 0);
-INSERT INTO `dfl_frequency` VALUES (20, '/frequencyTest/serverTimeFreq', 14, 'serverTimeFreq', NULL, '', 3600, 100, 0, 0, 'none', 'frequency2', '', 0, '', '', 0, 1, '2022-05-19 21:24:23', '2022-08-13 07:24:33', NULL, NULL, NULL, NULL, NULL, 1, 0);
-INSERT INTO `dfl_frequency` VALUES (21, '/frequencyTest/waitLockTestOrder', 20, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, 0, 1, '2022-05-19 21:24:28', '2022-05-19 21:24:28', NULL, NULL, 'GET', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (22, '/frequencyTest/serverTimeNeedLogin', 19, 'serverTimeNeedLogin', NULL, '', 5, 5, 0, 0, 'none', 'frequency', '', 1, '', '', 0, 1, '2022-05-19 21:24:31', '2022-08-13 07:24:40', NULL, NULL, NULL, NULL, NULL, 1, 0);
-INSERT INTO `dfl_frequency` VALUES (23, '/frequencyTest/serverTimeNeedLogin', 19, 'serverTimeNeedLogin', NULL, '', 3600, 100, 0, 0, 'none', 'frequency2', '', 1, '', '', 0, 1, '2022-05-19 21:24:31', '2022-08-13 07:24:41', NULL, NULL, NULL, NULL, NULL, 1, 0);
-INSERT INTO `dfl_frequency` VALUES (47, '/frequencyLogin/login', 26, 'frequencyLogin', NULL, '', 5, 4, 0, 0, 'none', 'frequency', 'username', 0, '', '', 0, 1, '2022-05-20 06:39:21', '2022-08-13 07:42:55', NULL, NULL, NULL, NULL, NULL, 1, 0);
-INSERT INTO `dfl_frequency` VALUES (48, '/frequencyLogin/login', 26, 'frequencyLogin', NULL, '', 3600, 30, 0, 0, 'none', 'frequency2', 'username', 0, '', '', 0, 1, '2022-05-20 06:39:21', '2022-08-13 07:42:56', NULL, NULL, NULL, NULL, NULL, 1, 0);
-INSERT INTO `dfl_frequency` VALUES (142, '/error', 27, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 08:08:51', '2022-05-21 08:08:51', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (166, '/frequencyTest/serverTimeUri', 16, NULL, NULL, NULL, 5, 5, NULL, NULL, NULL, NULL, NULL, 0, '超限提示test', '超限提示test2', 1, 1, '2022-05-21 08:35:47', '2022-05-21 08:47:38', NULL, 2, 'GET', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (167, '/dflcore/dflFrequency/list2', 28, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 08:35:56', '2022-05-21 08:35:56', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (168, '/dflcore/dflFrequency/save', 35, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 08:36:09', '2022-05-21 08:36:09', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (172, '/dflcore/dflBlackWhite/list2', 32, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 08:46:07', '2022-05-21 08:46:07', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (173, '/dflcore/dflBlackWhiteItem/list2', 31, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 08:46:07', '2022-05-21 08:46:07', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (174, '/dflcore/dflLocks/list2', 33, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 08:46:13', '2022-05-21 08:46:13', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (175, '/dflLogs/dflAuditLog/list2', 93, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 08:46:33', '2022-05-21 08:46:33', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (176, '/dflcore/dflFrequency/delete', 81, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 08:47:38', '2022-05-21 08:47:38', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (178, '/frequencyLogin/rsaKey', 25, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-21 15:53:16', '2022-05-21 15:53:16', NULL, NULL, 'GET', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (179, '/dflSystem/dflUser/list2', 45, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-21 15:56:18', '2022-05-21 15:56:18', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (180, '/frequencyTest/serverTimeUri', 16, NULL, NULL, NULL, 5, 5, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-21 15:58:26', '2022-05-21 17:59:38', NULL, -1, 'GET', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (181, '/frequencyTest/waitLockTestUser', 17, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-21 16:01:59', '2022-05-21 16:01:59', NULL, NULL, 'GET', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (182, '/dflLogs/dflOutLimitLog/list2', 105, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-21 16:02:34', '2022-05-21 16:02:34', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (183, '/dflcore/dflBlackWhite/save', 43, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-21 22:40:12', '2022-05-21 22:40:12', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (184, '/dflcore/dflLocks/save', 36, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-21 23:24:58', '2022-05-21 23:24:58', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (185, '/dflLogs/dflOutLockLog/list2', 107, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-21 23:29:22', '2022-05-21 23:29:22', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (186, '/dflLogs/dflOutLimitLog/listCount', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-22 00:05:50', '2022-05-22 00:05:50', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (187, '/frequency/getRunDays', 37, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-22 07:44:45', '2022-05-22 07:44:45', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (188, '/frequency/getRunCountTypeByDay', 38, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-22 07:44:45', '2022-05-22 07:44:45', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (189, '/frequency/requestScans', 39, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-22 07:44:45', '2022-05-22 07:44:45', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (190, '/dflBasedata/dflType/list2', 29, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-22 07:45:00', '2022-05-22 07:45:00', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (191, '/dflBasedata/dflTypeItem/list2', 30, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-22 07:45:00', '2022-05-22 07:45:00', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (192, '/frequency/requests', 53, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-25 00:21:14', '2022-05-25 00:21:14', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (193, '/dflSystem/dflSystemConfig/findSysconfigByParentId', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-25 00:21:27', '2022-05-25 00:21:27', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (194, '/frequencyReset/resetTicket', 162, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-25 04:02:13', '2022-05-25 04:02:13', NULL, NULL, 'GET', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (195, '/dflSystem/dflUser/save', 146, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:28:12', '2022-05-25 07:28:12', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (196, '/dflLogs/dflRequestScans/list2', 48, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:28:26', '2022-05-25 07:28:26', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (197, '/frequencyTest/waitLockTestOrderZk', 23, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:28:53', '2022-05-25 07:28:53', NULL, NULL, 'GET', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (198, '/frequencyTest/waitLockTestOrderEtcdKv', 21, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:29:23', '2022-05-25 07:29:23', NULL, NULL, 'GET', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (199, '/frequency/limits', 55, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:29:43', '2022-05-25 07:29:43', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (200, '/frequency/locks', 50, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:36:00', '2022-05-25 07:36:00', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (201, '/dflSystem/dflSystemConfig/view', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:38:18', '2022-05-25 07:38:18', NULL, NULL, 'GET', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (202, '/dflSystem/dflSystemConfig/save', 139, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:39:01', '2022-05-25 07:39:01', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (203, '/dflSystem/dflRole/list2', 127, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:39:38', '2022-05-25 07:39:38', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (204, '/dflSystem/dflRole/name/list', 126, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:39:41', '2022-05-25 07:39:41', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (205, '/dflSystem/dflUser/name/list', 145, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:39:41', '2022-05-25 07:39:41', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (206, '/dflSystem/dflUserRole/list2', 154, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:39:41', '2022-05-25 07:39:41', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (207, '/dflSystem/dflUserRole/save', 151, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:40:40', '2022-05-25 07:40:40', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (208, '/dflSystem/dflUser/changePassword', 142, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:41:12', '2022-05-25 07:41:12', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (209, '/dflcore/dflBlackWhiteItem/save', 44, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:42:18', '2022-05-25 07:42:18', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (210, '/dflSystem/dflResource/list2', 118, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:42:33', '2022-05-25 07:42:33', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (211, '/frequencyTest/waitLockTestOrderEtcdLock', 22, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-25 23:05:09', '2022-05-25 23:05:09', NULL, NULL, 'GET', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (212, '/frequencyReset/imageCaptcha', 163, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-28 19:21:07', '2022-05-28 19:21:07', NULL, NULL, 'GET', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (213, '/frequencyTest/monitor', 34, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-05-28 22:34:27', '2022-05-28 22:34:27', NULL, NULL, 'GET', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (214, '/dflSystem/dflSystemConfig/delete', 138, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-06-03 19:16:45', '2022-06-03 19:16:45', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (215, '/frequencyTest/serverTimeFreqDevice', 15, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-06-09 22:22:41', '2022-06-09 22:22:41', NULL, NULL, 'GET', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (216, '/frequencyTest/serverTimeFreq120', 166, 'serverTimeFreq120', NULL, '', 120, 5, 0, 0, 'none', 'frequency', '', 0, '', '', 0, 1, '2022-06-09 22:22:58', '2022-06-09 22:22:58', NULL, NULL, NULL, NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (217, '/frequencyTest/serverTimeFreq120', 166, 'serverTimeFreq120', NULL, '', 3600, 100, 0, 0, 'none', 'frequency2', '', 0, '', '', 0, 1, '2022-06-09 22:22:58', '2022-06-09 22:22:58', NULL, NULL, NULL, NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (218, '/frequencyTest/serverTimeFreq', 14, 'serverTimeFreqRes', NULL, '', 300, 10, 14, 14, 'none', 'frequency3', 'dataId', 0, '', '', 0, 1, '2022-06-10 22:47:50', '2022-06-10 22:47:50', NULL, NULL, NULL, NULL, 1, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (219, '/frequencyTest/serverTimeFreq', 14, 'serverTimeFreqIp', NULL, '', 300, 10, 14, 20, 'none', 'frequency3', 'dataId', 0, '', '', 0, 1, '2022-06-10 22:47:50', '2022-06-10 22:47:50', NULL, NULL, NULL, NULL, 1, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (220, '/frequencyTest/serverTimeFreq', 14, 'serverTimeFreqRes', NULL, '', 360, 10, 0, 0, 'none', 'frequency3', 'dataId', 0, '', '', 0, 1, '2022-06-14 21:16:52', '2022-06-14 21:16:52', NULL, NULL, NULL, NULL, 1, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (221, '/frequencyTest/serverTimeFreq', 14, 'serverTimeFreqIp', NULL, '', 360, 10, 0, 10, 'none', 'frequency3', 'dataId', 0, '', '', 0, 1, '2022-06-14 21:16:52', '2022-06-14 21:16:52', NULL, NULL, NULL, NULL, 1, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (222, '/frequencyTest/serverTimeFreqIpUser', 165, 'serverTimeFreqIpUser', NULL, '', 5, 5, 0, 7, 'none', 'frequency', '', 0, '', '', 0, 1, '2022-06-17 22:59:42', '2022-08-13 07:24:02', NULL, NULL, NULL, NULL, 0, 4, 0);
-INSERT INTO `dfl_frequency` VALUES (223, '/frequencyTest/serverTimeFreqUserIp', 170, 'serverTimeFreqUserIp', NULL, '', 5, 100, 7, 0, 'none', 'frequency', '', 0, '', '', 0, 1, '2022-06-17 22:59:45', '2022-08-13 07:24:15', NULL, NULL, NULL, NULL, 0, 3, 0);
-INSERT INTO `dfl_frequency` VALUES (224, '/frequencyTest/serverTimeJsonFreq', 168, 'serverTimeJsonFreq', NULL, '', 5, 5, 0, 0, 'none', 'frequency', '', 0, '', '', 0, 1, '2022-06-17 22:59:51', '2022-08-13 07:24:22', NULL, NULL, NULL, NULL, 0, 1, 0);
-INSERT INTO `dfl_frequency` VALUES (225, '/frequencyTest/serverTimeStreamFreq', 167, 'serverTimeStreamFreq', NULL, '', 5, 5, 0, 0, 'none', 'frequency', '', 0, '', '', 0, 1, '2022-06-17 23:00:15', '2022-08-13 07:24:49', NULL, NULL, NULL, NULL, 0, 1, 0);
-INSERT INTO `dfl_frequency` VALUES (226, '/frequencyTest/serverTimeFreqLimitIp', NULL, 'serverTimeFreqLimitIp', NULL, '', 5, 10, 0, 0, 'none', 'frequency', '', 0, '', '', 0, 1, '2022-06-18 07:35:52', '2022-08-13 07:24:09', NULL, NULL, NULL, NULL, 0, 2, 0);
-INSERT INTO `dfl_frequency` VALUES (227, '/frequencyTest/serverTimeFreq', 14, 'serverTimeFreqRes', NULL, '', 60, 10, 0, 0, 'none', 'frequency3', 'dataId', 0, '', '', 0, 1, '2022-06-18 07:39:22', '2022-06-18 07:39:22', NULL, NULL, NULL, NULL, 1, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (228, '/frequencyTest/serverTimeFreq', 14, 'serverTimeFreqIp', NULL, '', 60, 10, 0, 10, 'none', 'frequency3', 'dataId', 0, '', '', 0, 1, '2022-06-18 07:39:22', '2022-06-18 07:39:22', NULL, NULL, NULL, NULL, 1, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (229, '/frequencyTest/serverTimeFreqIp', 18, 'serverTimeFreqIp', NULL, '', 30, 100, 7, 7, 'none', 'frequency', '', 0, '', '', 0, 1, '2022-06-18 22:32:22', '2022-06-18 22:32:22', NULL, NULL, NULL, NULL, 0, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (230, '/frequencyReset/resetLimits', 161, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-07-01 19:05:01', '2022-07-01 19:05:01', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (231, '/frequencyTest/serverTimeFreqResIp', NULL, 'serverTimeFreqResIp', NULL, '', 60, 10, NULL, NULL, 'none', 'frequency2', 'dataId', 0, '', '', 0, 1, '2022-08-13 07:24:01', '2022-08-13 07:24:01', NULL, NULL, NULL, NULL, NULL, 5, 0);
-INSERT INTO `dfl_frequency` VALUES (232, '/frequencyTest/serverTimeFreqResUser', NULL, 'serverTimeFreqResUser', NULL, '', 60, 10, NULL, NULL, 'none', 'frequency2', 'dataId', 0, '', '', 0, 1, '2022-08-13 07:24:39', '2022-08-13 07:24:39', NULL, NULL, NULL, NULL, NULL, 6, 0);
-INSERT INTO `dfl_frequency` VALUES (233, '/frequencyTest/serverTimeFreqAttrCheck', 181, 'serverTimeFreqAttrCheck', NULL, '', 5, 50, NULL, NULL, 'none', 'frequency', 'dataId', 0, '', '', 0, 1, '2022-08-13 07:24:42', '2022-08-13 07:24:42', NULL, NULL, NULL, NULL, NULL, 1, 0);
-INSERT INTO `dfl_frequency` VALUES (234, '/frequencyTest/serverTimeFreqAttrCheck', 181, 'serverTimeFreqAttrCheck', NULL, '', 3600, 100, NULL, NULL, 'none', 'frequency2', 'dataId', 0, '', '', 0, 1, '2022-08-13 07:24:43', '2022-08-13 07:24:43', NULL, NULL, NULL, NULL, NULL, 1, 0);
-INSERT INTO `dfl_frequency` VALUES (235, '/frequencyTest/serverTimeFreqAttr', NULL, 'serverTimeFreqAttr', NULL, '', 5, 50, NULL, NULL, 'none', 'frequency', 'dataId', 0, '', '', 0, 1, '2022-08-13 07:24:48', '2022-08-13 07:24:48', NULL, NULL, NULL, NULL, NULL, 1, 0);
-INSERT INTO `dfl_frequency` VALUES (236, '/frequencyTest/serverTimeFreqIp', 18, 'serverTimeFreqIpUser', NULL, '', 30, 10, NULL, NULL, 'none', 'frequency', '', 0, '', '', 0, 1, '2022-08-13 07:25:02', '2022-08-13 07:25:02', NULL, NULL, NULL, NULL, NULL, 4, 0);
-INSERT INTO `dfl_frequency` VALUES (237, '/frequencyTest/serverTimeFreqIp', 18, 'serverTimeFreqUserIp', NULL, '', 30, 10, NULL, NULL, 'none', 'frequency2', '', 0, '', '', 0, 1, '2022-08-13 07:25:04', '2022-08-13 07:25:04', NULL, NULL, NULL, NULL, NULL, 3, 0);
-INSERT INTO `dfl_frequency` VALUES (238, '/frequencyTest/serverTimeFreqRes', 182, 'serverTimeFreqResIpCount', NULL, '', 60, 10, NULL, NULL, 'none', 'frequency2', 'dataId', 0, '', '', 0, 1, '2022-08-13 07:25:28', '2022-08-13 07:25:28', NULL, NULL, NULL, NULL, NULL, 5, 0);
-INSERT INTO `dfl_frequency` VALUES (239, '/frequencyTest/serverTimeFreqRes', 182, 'serverTimeFreqResUserCount', NULL, '', 60, 10, NULL, NULL, 'none', 'frequency3', 'dataId', 0, '', '', 0, 1, '2022-08-13 07:25:29', '2022-08-13 07:25:29', NULL, NULL, NULL, NULL, NULL, 6, 0);
-INSERT INTO `dfl_frequency` VALUES (240, '/frequencyTest/serverTimeFreqAttr', 177, 'serverTimeFreqAttr', NULL, '', 3600, 100, NULL, NULL, 'none', 'frequency2', 'dataId', 0, '', '', 0, 1, '2022-08-13 07:25:30', '2022-08-13 07:25:30', NULL, NULL, NULL, NULL, NULL, 1, 0);
-INSERT INTO `dfl_frequency` VALUES (241, '/dflBasedata/dflType/save', 40, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-08-13 07:45:57', '2022-08-13 07:45:57', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
-INSERT INTO `dfl_frequency` VALUES (242, '/dflBasedata/dflTypeItem/save', 41, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uriConfig', NULL, 0, NULL, NULL, 0, 1, '2022-08-13 07:46:35', '2022-08-13 07:46:35', NULL, NULL, 'POST', NULL, NULL, NULL, 0);
+INSERT INTO `dfl_frequency` VALUES (18, '/frequencyTest/serverTimeFreqIp', 18, NULL, 'serverTimeFreqIp', NULL, '', 5, 5, 'none', 'frequency', 1, 0, '', 0, '', '', 0, 1, '2022-05-19 21:24:17', '2022-05-19 21:24:17', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (19, '/frequencyTest/serverTimeFreq', 14, NULL, 'serverTimeFreq', NULL, '', 5, 3, 'none', 'frequency', 1, 0, '', 0, '每#{time}秒#{limit}次', '#{limit} times every #{time}s', 0, 1, '2022-05-19 21:24:23', '2022-08-13 07:24:32', NULL, 2, 'test');
+INSERT INTO `dfl_frequency` VALUES (20, '/frequencyTest/serverTimeFreq', 14, NULL, 'serverTimeFreq', NULL, '', 3600, 100, 'none', 'frequency2', 1, 0, '', 0, '', '', 0, 1, '2022-05-19 21:24:23', '2022-08-13 07:24:33', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (21, '/frequencyTest/waitLockTestOrder', 20, 'GET', NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-19 21:24:28', '2022-05-19 21:24:28', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (22, '/frequencyTest/serverTimeNeedLogin', 19, NULL, 'serverTimeNeedLogin', NULL, '', 5, 5, 'none', 'frequency', 1, 0, '', 1, '', '', 0, 1, '2022-05-19 21:24:31', '2022-08-13 07:24:40', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (23, '/frequencyTest/serverTimeNeedLogin', 19, NULL, 'serverTimeNeedLogin', NULL, '', 3600, 100, 'none', 'frequency2', 1, 0, '', 1, '', '', 0, 1, '2022-05-19 21:24:31', '2022-08-13 07:24:41', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (47, '/frequencyLogin/login', 26, NULL, 'frequencyLogin', NULL, '', 5, 4, 'none', 'frequency', 1, 0, 'username', 0, '', '', 0, 1, '2022-05-20 06:39:21', '2022-08-13 07:42:55', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (48, '/frequencyLogin/login', 26, NULL, 'frequencyLogin', NULL, '', 3600, 30, 'none', 'frequency2', 1, 0, 'username', 0, '', '', 0, 1, '2022-05-20 06:39:21', '2022-08-13 07:42:56', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (142, '/error', 27, 'POST', NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 08:08:51', '2022-05-21 08:08:51', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (166, '/frequencyTest/serverTimeUri', 16, 'GET', NULL, NULL, NULL, 5, 5, NULL, NULL, 1, 0, NULL, 0, '超限提示test', '超限提示test2', 1, 1, '2022-05-21 08:35:47', '2022-05-21 08:47:38', NULL, 2, NULL);
+INSERT INTO `dfl_frequency` VALUES (167, '/dflcore/dflFrequency/list2', 28, 'POST', NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 08:35:56', '2022-05-21 08:35:56', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (168, '/dflcore/dflFrequency/save', 35, 'POST', NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 08:36:09', '2022-05-21 08:36:09', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (172, '/dflcore/dflBlackWhite/list2', 32, 'POST', NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 08:46:07', '2022-05-21 08:46:07', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (173, '/dflcore/dflBlackWhiteItem/list2', 31, 'POST', NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 08:46:07', '2022-05-21 08:46:07', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (174, '/dflcore/dflLocks/list2', 33, 'POST', NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 08:46:13', '2022-05-21 08:46:13', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (175, '/dflLogs/dflAuditLog/list2', 93, 'POST', NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 08:46:33', '2022-05-21 08:46:33', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (176, '/dflcore/dflFrequency/delete', 81, 'POST', NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 08:47:38', '2022-05-21 08:47:38', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (178, '/frequencyLogin/rsaKey', 25, 'GET', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 15:53:16', '2022-05-21 15:53:16', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (179, '/dflSystem/dflUser/list2', 45, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 15:56:18', '2022-05-21 15:56:18', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (180, '/frequencyTest/serverTimeUri', 16, 'GET', NULL, NULL, NULL, 5, 5, NULL, 'uriConfig', 1, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 15:58:26', '2022-05-21 17:59:38', NULL, -1, NULL);
+INSERT INTO `dfl_frequency` VALUES (181, '/frequencyTest/waitLockTestUser', 17, 'GET', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 16:01:59', '2022-05-21 16:01:59', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (182, '/dflLogs/dflOutLimitLog/list2', 105, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 16:02:34', '2022-05-21 16:02:34', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (183, '/dflcore/dflBlackWhite/save', 43, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 22:40:12', '2022-05-21 22:40:12', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (184, '/dflcore/dflLocks/save', 36, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 23:24:58', '2022-05-21 23:24:58', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (185, '/dflLogs/dflOutLockLog/list2', 107, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-21 23:29:22', '2022-05-21 23:29:22', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (186, '/dflLogs/dflOutLimitLog/listCount', NULL, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-22 00:05:50', '2022-05-22 00:05:50', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (187, '/frequency/getRunDays', 37, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-22 07:44:45', '2022-05-22 07:44:45', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (188, '/frequency/getRunCountTypeByDay', 38, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-22 07:44:45', '2022-05-22 07:44:45', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (189, '/frequency/requestScans', 39, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-22 07:44:45', '2022-05-22 07:44:45', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (190, '/dflBasedata/dflType/list2', 29, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-22 07:45:00', '2022-05-22 07:45:00', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (191, '/dflBasedata/dflTypeItem/list2', 30, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-22 07:45:00', '2022-05-22 07:45:00', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (192, '/frequency/requests', 53, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-25 00:21:14', '2022-05-25 00:21:14', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (193, '/dflSystem/dflSystemConfig/findSysconfigByParentId', NULL, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-25 00:21:27', '2022-05-25 00:21:27', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (194, '/frequencyReset/resetTicket', 162, 'GET', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-25 04:02:13', '2022-05-25 04:02:13', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (195, '/dflSystem/dflUser/save', 146, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:28:12', '2022-05-25 07:28:12', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (196, '/dflLogs/dflRequestScans/list2', 48, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:28:26', '2022-05-25 07:28:26', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (197, '/frequencyTest/waitLockTestOrderZk', 23, 'GET', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:28:53', '2022-05-25 07:28:53', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (198, '/frequencyTest/waitLockTestOrderEtcdKv', 21, 'GET', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:29:23', '2022-05-25 07:29:23', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (199, '/frequency/limits', 55, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:29:43', '2022-05-25 07:29:43', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (200, '/frequency/locks', 50, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:36:00', '2022-05-25 07:36:00', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (201, '/dflSystem/dflSystemConfig/view', NULL, 'GET', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:38:18', '2022-05-25 07:38:18', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (202, '/dflSystem/dflSystemConfig/save', 139, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:39:01', '2022-05-25 07:39:01', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (203, '/dflSystem/dflRole/list2', 127, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:39:38', '2022-05-25 07:39:38', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (204, '/dflSystem/dflRole/name/list', 126, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:39:41', '2022-05-25 07:39:41', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (205, '/dflSystem/dflUser/name/list', 145, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:39:41', '2022-05-25 07:39:41', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (206, '/dflSystem/dflUserRole/list2', 154, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:39:41', '2022-05-25 07:39:41', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (207, '/dflSystem/dflUserRole/save', 151, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:40:40', '2022-05-25 07:40:40', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (208, '/dflSystem/dflUser/changePassword', 142, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:41:12', '2022-05-25 07:41:12', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (209, '/dflcore/dflBlackWhiteItem/save', 44, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:42:18', '2022-05-25 07:42:18', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (210, '/dflSystem/dflResource/list2', 118, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-25 07:42:33', '2022-05-25 07:42:33', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (211, '/frequencyTest/waitLockTestOrderEtcdLock', 22, 'GET', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-25 23:05:09', '2022-05-25 23:05:09', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (212, '/frequencyReset/imageCaptcha', 163, 'GET', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-28 19:21:07', '2022-05-28 19:21:07', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (213, '/frequencyTest/monitor', 34, 'GET', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-05-28 22:34:27', '2022-05-28 22:34:27', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (214, '/dflSystem/dflSystemConfig/delete', 138, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-06-03 19:16:45', '2022-06-03 19:16:45', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (215, '/frequencyTest/serverTimeFreqDevice', 15, 'GET', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-06-09 22:22:41', '2022-06-09 22:22:41', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (216, '/frequencyTest/serverTimeFreq120', 166, NULL, 'serverTimeFreq120', NULL, '', 120, 5, 'none', 'frequency', 1, 0, '', 0, '', '', 0, 1, '2022-06-09 22:22:58', '2022-06-09 22:22:58', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (217, '/frequencyTest/serverTimeFreq120', 166, NULL, 'serverTimeFreq120', NULL, '', 3600, 100, 'none', 'frequency2', 1, 0, '', 0, '', '', 0, 1, '2022-06-09 22:22:58', '2022-06-09 22:22:58', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (218, '/frequencyTest/serverTimeFreq', 14, NULL, 'serverTimeFreqRes', NULL, '', 300, 10, 'none', 'frequency3', 1, 0, 'dataId', 0, '', '', 0, 1, '2022-06-10 22:47:50', '2022-06-10 22:47:50', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (219, '/frequencyTest/serverTimeFreq', 14, NULL, 'serverTimeFreqIp', NULL, '', 300, 10, 'none', 'frequency3', 1, 0, 'dataId', 0, '', '', 0, 1, '2022-06-10 22:47:50', '2022-06-10 22:47:50', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (220, '/frequencyTest/serverTimeFreq', 14, NULL, 'serverTimeFreqRes', NULL, '', 360, 10, 'none', 'frequency3', 1, 0, 'dataId', 0, '', '', 0, 1, '2022-06-14 21:16:52', '2022-06-14 21:16:52', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (221, '/frequencyTest/serverTimeFreq', 14, NULL, 'serverTimeFreqIp', NULL, '', 360, 10, 'none', 'frequency3', 1, 0, 'dataId', 0, '', '', 0, 1, '2022-06-14 21:16:52', '2022-06-14 21:16:52', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (222, '/frequencyTest/serverTimeFreqIpUser', 165, NULL, 'serverTimeFreqIpUser', NULL, '', 5, 5, 'none', 'frequency', 4, 0, '', 0, '', '', 0, 1, '2022-06-17 22:59:42', '2022-08-13 07:24:02', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (223, '/frequencyTest/serverTimeFreqUserIp', 170, NULL, 'serverTimeFreqUserIp', NULL, '', 5, 100, 'none', 'frequency', 3, 0, '', 0, '', '', 0, 1, '2022-06-17 22:59:45', '2022-08-13 07:24:15', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (224, '/frequencyTest/serverTimeJsonFreq', 168, NULL, 'serverTimeJsonFreq', NULL, '', 5, 5, 'none', 'frequency', 1, 0, '', 0, '', '', 0, 1, '2022-06-17 22:59:51', '2022-08-13 07:24:22', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (225, '/frequencyTest/serverTimeStreamFreq', 167, NULL, 'serverTimeStreamFreq', NULL, '', 5, 5, 'none', 'frequency', 1, 0, '', 0, '', '', 0, 1, '2022-06-17 23:00:15', '2022-08-13 07:24:49', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (226, '/frequencyTest/serverTimeFreqLimitIp', NULL, NULL, 'serverTimeFreqLimitIp', NULL, '', 5, 10, 'none', 'frequency', 2, 0, '', 0, '', '', 0, 1, '2022-06-18 07:35:52', '2022-08-13 07:24:09', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (227, '/frequencyTest/serverTimeFreq', 14, NULL, 'serverTimeFreqRes', NULL, '', 60, 10, 'none', 'frequency3', 1, 0, 'dataId', 0, '', '', 0, 1, '2022-06-18 07:39:22', '2022-06-18 07:39:22', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (228, '/frequencyTest/serverTimeFreq', 14, NULL, 'serverTimeFreqIp', NULL, '', 60, 10, 'none', 'frequency3', 1, 0, 'dataId', 0, '', '', 0, 1, '2022-06-18 07:39:22', '2022-06-18 07:39:22', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (229, '/frequencyTest/serverTimeFreqIp', 18, NULL, 'serverTimeFreqIp', NULL, '', 30, 100, 'none', 'frequency', 1, 0, '', 0, '', '', 0, 1, '2022-06-18 22:32:22', '2022-06-18 22:32:22', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (230, '/frequencyReset/resetLimits', 161, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-07-01 19:05:01', '2022-07-01 19:05:01', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (231, '/frequencyTest/serverTimeFreqResIp', NULL, NULL, 'serverTimeFreqResIp', NULL, '', 60, 10, 'none', 'frequency2', 5, 0, 'dataId', 0, '', '', 0, 1, '2022-08-13 07:24:01', '2022-08-13 07:24:01', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (232, '/frequencyTest/serverTimeFreqResUser', NULL, NULL, 'serverTimeFreqResUser', NULL, '', 60, 10, 'none', 'frequency2', 6, 0, 'dataId', 0, '', '', 0, 1, '2022-08-13 07:24:39', '2022-08-13 07:24:39', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (233, '/frequencyTest/serverTimeFreqAttrCheck', 181, NULL, 'serverTimeFreqAttrCheck', NULL, '', 5, 50, 'none', 'frequency', 1, 0, 'dataId', 0, '', '', 0, 1, '2022-08-13 07:24:42', '2022-08-13 07:24:42', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (234, '/frequencyTest/serverTimeFreqAttrCheck', 181, NULL, 'serverTimeFreqAttrCheck', NULL, '', 3600, 100, 'none', 'frequency2', 1, 0, 'dataId', 0, '', '', 0, 1, '2022-08-13 07:24:43', '2022-08-13 07:24:43', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (235, '/frequencyTest/serverTimeFreqAttr', NULL, NULL, 'serverTimeFreqAttr', NULL, '', 5, 50, 'none', 'frequency', 1, 0, 'dataId', 0, '', '', 0, 1, '2022-08-13 07:24:48', '2022-08-13 07:24:48', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (236, '/frequencyTest/serverTimeFreqIp', 18, NULL, 'serverTimeFreqIpUser', NULL, '', 30, 10, 'none', 'frequency', 4, 0, '', 0, '', '', 0, 1, '2022-08-13 07:25:02', '2022-08-13 07:25:02', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (237, '/frequencyTest/serverTimeFreqIp', 18, NULL, 'serverTimeFreqUserIp', NULL, '', 30, 10, 'none', 'frequency2', 3, 0, '', 0, '', '', 0, 1, '2022-08-13 07:25:04', '2022-08-13 07:25:04', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (238, '/frequencyTest/serverTimeFreqRes', 182, NULL, 'serverTimeFreqResIpCount', NULL, '', 60, 10, 'none', 'frequency2', 5, 0, 'dataId', 0, '', '', 0, 1, '2022-08-13 07:25:28', '2022-08-13 07:25:28', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (239, '/frequencyTest/serverTimeFreqRes', 182, NULL, 'serverTimeFreqResUserCount', NULL, '', 60, 10, 'none', 'frequency3', 6, 0, 'dataId', 0, '', '', 0, 1, '2022-08-13 07:25:29', '2022-08-13 07:25:29', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (240, '/frequencyTest/serverTimeFreqAttr', 177, NULL, 'serverTimeFreqAttr', NULL, '', 3600, 100, 'none', 'frequency2', 1, 0, 'dataId', 0, '', '', 0, 1, '2022-08-13 07:25:30', '2022-08-13 07:25:30', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (241, '/dflBasedata/dflType/save', 40, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-08-13 07:45:57', '2022-08-13 07:45:57', NULL, NULL, NULL);
+INSERT INTO `dfl_frequency` VALUES (242, '/dflBasedata/dflTypeItem/save', 41, 'POST', NULL, NULL, NULL, 0, 0, NULL, 'uriConfig', NULL, 0, NULL, 0, NULL, NULL, 0, 1, '2022-08-13 07:46:35', '2022-08-13 07:46:35', NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for dfl_locks
@@ -268,6 +266,7 @@ CREATE TABLE `dfl_log_user`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 73 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '用于非数字的userId转Long型uid，以减少日志存储量，并提高性能\r\n' ROW_FORMAT = DYNAMIC;
 
+
 -- ----------------------------
 -- Table structure for dfl_out_limit_log
 -- ----------------------------
@@ -302,7 +301,7 @@ CREATE TABLE `dfl_out_limit_log`  (
   INDEX `idx_uri`(`uri_id`) USING BTREE,
   INDEX `idx_create`(`create_time`) USING BTREE,
   INDEX `idx_uid`(`uid`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2155 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '频率限制超限日志' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 2160 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '频率限制超限日志' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for dfl_out_lock_log
