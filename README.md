@@ -40,7 +40,7 @@
 <dependency>
     <groupId>cn.org.opendfl</groupId>
     <artifactId>opendfl-mysql-spring-boot-starter</artifactId>
-    <version>1.0</version>
+    <version>1.4</version>
 </dependency>
 ```
 
