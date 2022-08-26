@@ -46,7 +46,7 @@
     </developers>
 
     <properties>
-        <java.version>17</java.version>
+        <java.version>1.8</java.version>
         <!-- config -->
         <opendfl-core.version>1.4</opendfl-core.version>
         <opendfl-core-locks.version>1.4</opendfl-core-locks.version>
