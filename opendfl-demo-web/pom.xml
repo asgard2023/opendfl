@@ -5,10 +5,10 @@
     <parent>
 		<groupId>cn.org.opendfl</groupId>
 		<artifactId>opendfl-parent</artifactId>
-		<version>1.4</version>
+		<version>1.5</version>
 	</parent>
     <artifactId>opendfl-demo-web</artifactId>
-    <version>1.4</version>
+    <version>1.5</version>
     <name>opendfl-demo-web</name>
     <packaging>war</packaging>
     <description>opendfl demo web</description>

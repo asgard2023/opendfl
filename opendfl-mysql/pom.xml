@@ -5,10 +5,10 @@
     <parent>
 		<groupId>cn.org.opendfl</groupId>
 		<artifactId>opendfl-parent</artifactId>
-		<version>1.4</version>
+		<version>1.5</version>
 	</parent>
     <artifactId>opendfl-mysql</artifactId>
-    <version>1.4</version>
+    <version>1.5</version>
     <name>opendfl-mysql</name>
     <packaging>jar</packaging>
     <description>opendfl mysql support</description>

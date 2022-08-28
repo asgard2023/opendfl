@@ -10,14 +10,14 @@
     </parent>
     <groupId>cn.org.opendfl</groupId>
     <artifactId>opendfl-mysql-spring-boot-starter</artifactId>
-    <version>1.4</version>
+    <version>1.5</version>
     <name>opendfl-mysql-spring-boot-starter</name>
     <description>opendfl-mysql of spring-boot-starter</description>
     <url>https://github.com/asgard2023/opendfl</url>
 
     <properties>
-        <opendfl-core.version>1.4</opendfl-core.version>
-        <opendfl-mysql.version>1.4</opendfl-mysql.version>
+        <opendfl-core.version>1.5</opendfl-core.version>
+        <opendfl-mysql.version>1.5</opendfl-mysql.version>
     </properties>
 
     <dependencies>
