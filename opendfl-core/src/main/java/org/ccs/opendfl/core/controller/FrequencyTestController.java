@@ -184,6 +184,18 @@ public class FrequencyTestController {
         return System.currentTimeMillis();
     }
 
+    @RequestMapping(value="/serverTimeUriPostGet", method = {RequestMethod.GET, RequestMethod.POST})
+    public Object serverTimeUriPostGet(HttpServletRequest request) {
+        log.info("----serverTimeUriPostGet--account={}", request.getParameter("account"));
+        return System.currentTimeMillis();
+    }
+
+    @RequestMapping(value="/serverTimeUriPostGet2", method = {RequestMethod.GET, RequestMethod.POST})
+    public Object serverTimeUriPostGet2(HttpServletRequest request) {
+        log.info("----serverTimeUriPostGet2--account={}", request.getParameter("account"));
+        return System.currentTimeMillis();
+    }
+
     /**
      * json参数测试
      *

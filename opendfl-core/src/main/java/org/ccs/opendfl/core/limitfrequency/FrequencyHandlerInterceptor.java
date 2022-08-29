@@ -9,10 +9,7 @@ import org.ccs.opendfl.core.biz.IUserBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.OpendflConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
-import org.ccs.opendfl.core.constants.FrequencyConstant;
-import org.ccs.opendfl.core.constants.FrequencyType;
-import org.ccs.opendfl.core.constants.OutLimitType;
-import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
+import org.ccs.opendfl.core.constants.*;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.FrequencyAttrNameBlankException;
 import org.ccs.opendfl.core.strategy.black.BlackChain;
@@ -177,13 +174,11 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
                 return false;
             }
 
-            frequencyVo = new FrequencyVo();
-            frequencyVo.setRequestUri(requestUri);
             //基于注解的频率限制
-            this.limitByFrequency(handlerMethod, frequencyVo, strategyParams, params, response);
+            this.limitByFrequency(handlerMethod, strategyParams, params, response);
 
             //基于yml配置的频率限制处理
-            this.limitByRequestConfig(requestVo, frequencyVo, strategyParams, params, response);
+            this.limitByUriConfig(requestVo, strategyParams, params, response);
 
             strategyParams = null;
             frequencyVo = null;
@@ -238,43 +233,44 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
      * 基于@Frequency注释的限制
      *
      * @param handlerMethod  HandlerMethod
-     * @param frequencyVo    FrequencyVo
      * @param strategyParams RequestStrategyParamsVo
      * @param params         Map<String, Object>
      * @param response       HttpServletResponse
      * @return boolean
      */
-    private void limitByFrequency(HandlerMethod handlerMethod, FrequencyVo frequencyVo, RequestStrategyParamsVo strategyParams, Map<String, Object> params, HttpServletResponse response) throws FrequencyAttrNameBlankException {
-        List<FrequencyVo> frequencyVoList = getMethodFrequencies(handlerMethod, strategyParams.getRequestUri());
+    private void limitByFrequency(HandlerMethod handlerMethod, RequestStrategyParamsVo strategyParams, Map<String, Object> params, HttpServletResponse response) throws FrequencyAttrNameBlankException {
+        List<FrequencyVo> frequencyVoList = getMethodFrequencies(handlerMethod, strategyParams.getMethodName(), strategyParams.getRequestUri());
         for(FrequencyVo frequency : frequencyVoList){
+            frequencyConfigBiz.limitBySysconfigLoad(frequency, strategyParams.getCurTime());
             handleFrequency(response, params, frequency, strategyParams);
         }
     }
 
     private static Map<String, List<FrequencyVo>> methodFrequencyMap=new ConcurrentHashMap<>(100);
-    private List<FrequencyVo> getMethodFrequencies(HandlerMethod handlerMethod, String requestUri) {
+    private List<FrequencyVo> getMethodFrequencies(HandlerMethod handlerMethod, String method, String requestUri) {
         String code=handlerMethod.getBean().getClass().getSimpleName()+"/"+requestUri;
         List<FrequencyVo> list=methodFrequencyMap.get(code);
         if(list == null){
             list=new ArrayList<>();
             FrequencyVo frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency.class), new FrequencyVo());
-            addFrequency(frequency, requestUri, list);
+            addFrequency(frequency, method, requestUri, list);
             frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency2.class), new FrequencyVo());
-            addFrequency(frequency, requestUri, list);
+            addFrequency(frequency, method, requestUri, list);
             frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency3.class), new FrequencyVo());
-            addFrequency(frequency, requestUri, list);
+            addFrequency(frequency, method, requestUri, list);
             frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency4.class), new FrequencyVo());
-            addFrequency(frequency, requestUri, list);
+            addFrequency(frequency, method, requestUri, list);
             frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency5.class), new FrequencyVo());
-            addFrequency(frequency, requestUri, list);
+            addFrequency(frequency, method, requestUri, list);
             methodFrequencyMap.put(code, list);
         }
         return list;
     }
 
-    private void addFrequency(FrequencyVo frequency, String requestUri, List<FrequencyVo> list){
+    private void addFrequency(FrequencyVo frequency, String method, String requestUri, List<FrequencyVo> list){
         if(frequency!=null) {
             frequency.setRequestUri(requestUri);
+            frequency.setMethod(method);
             list.add(frequency);
         }
     }
@@ -283,12 +279,11 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
      * 基于uri地址的频率限制
      *
      * @param requestVo      RequestVo
-     * @param frequencyVo    FrequencyVo
      * @param strategyParams RequestStrategyParamsVo
      * @param params         Map<String, Object>
      * @param response       HttpServletResponse
      */
-    private void limitByRequestConfig(RequestVo requestVo, FrequencyVo frequencyVo, RequestStrategyParamsVo strategyParams, Map<String, Object> params, HttpServletResponse response) throws FrequencyAttrNameBlankException {
+    private void limitByUriConfig(RequestVo requestVo, RequestStrategyParamsVo strategyParams, Map<String, Object> params, HttpServletResponse response) throws FrequencyAttrNameBlankException {
         frequencyConfigBiz.limitBySysconfigUri(requestVo);
         List<LimitUriConfigVo> limitConfigList = requestVo.getLimitRequests();
         for (LimitUriConfigVo uriConfigVo : limitConfigList) {
@@ -296,7 +291,8 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             if (uriConfigVo.getStatus() != 1) {
                 continue;
             }
-            frequencyVo = FrequencyVo.toFrequencyVo(frequencyVo, uriConfigVo);
+            FrequencyVo frequencyVo = FrequencyVo.toFrequencyVo(null, uriConfigVo);
+            requestVo.setRequestUri(strategyParams.getRequestUri());
             frequencyVo.setSysconfig(true);
             handleFrequency(response, params, frequencyVo, strategyParams);
         }
@@ -394,8 +390,6 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         }
         long curTime = strategyParams.getCurTime();
 
-
-        frequencyConfigBiz.limitBySysconfigLoad(frequency, curTime);
         final int limit = frequency.getLimit();
         final int time = frequency.getTime();
         if (time == 0 || limit == 0) {

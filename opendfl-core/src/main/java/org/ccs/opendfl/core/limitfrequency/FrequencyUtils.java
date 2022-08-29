@@ -292,6 +292,8 @@ public class FrequencyUtils {
         sb.append(":");
         sb.append(frequency.getName());
         sb.append(":");
+        sb.append(frequency.getMethod());
+        sb.append(":");
         sb.append(frequency.getTime());
         return sb;
     }

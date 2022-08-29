@@ -521,11 +521,6 @@ public class FrequencyController {
     @RequestMapping(value = "/saveQuick", method = {RequestMethod.POST, RequestMethod.GET})
     public ResultData saveQuick(FrequencyLimitVo entity, @RequestParam("freqLimitTypes") String freqLimitTypes, HttpServletRequest request) {
         String[] types = freqLimitTypes.split(",");
-        String[] methods = null;
-        if (CharSequenceUtil.isNotBlank(entity.getMethod())) {
-            methods = entity.getMethod().split(",");
-        }
-
         StringBuffer ymlInfo = new StringBuffer();
         ymlInfo.append("```yaml\n");
         ymlInfo.append("frequency:\n");
@@ -537,17 +532,7 @@ public class FrequencyController {
             if (freqLimitType != null) {
                 entity.setFreqLimitType(freqLimitType.getCode());
                 entity.setLimitType(FrequencyType.URI_CONFIG.getType());
-                if (methods == null) {
-                    ymlInfo.append(toYmlInfo(entity));
-                } else {
-                    for (String method : methods) {
-                        if (CharSequenceUtil.isBlank(method)) {
-                            continue;
-                        }
-                        entity.setMethod(method.trim());
-                        ymlInfo.append(toYmlInfo(entity));
-                    }
-                }
+                ymlInfo.append(toYmlInfo(entity));
             }
         }
         ymlInfo.append("```\n");

@@ -376,7 +376,7 @@ public class FrequencyController extends BaseController {
     private void addUriConfigs(RequestShowVo showVo, List<FrequencyVo> voList, String method) {
         List<LimitUriConfigVo> uriConfigs = frequencyConfiguration.getLimit().getUriConfigs();
         List<LimitUriConfigVo> uriConfs = uriConfigs.stream().filter(t -> CharSequenceUtil.equals(showVo.getRequestUri(), t.getUri())
-                && (CharSequenceUtil.isBlank(t.getMethod()) || CharSequenceUtil.equals(method, t.getMethod()))).collect(Collectors.toList());
+                && (CharSequenceUtil.isBlank(t.getMethod()) || t.getMethod().contains(method))).collect(Collectors.toList());
         for (LimitUriConfigVo uriConfigVo : uriConfs) {
             if (uriConfigVo.getFreqLimitType() == null) {
                 continue;
@@ -418,7 +418,7 @@ public class FrequencyController extends BaseController {
      */
     private void addMysqlConfigs(List<DflFrequencyPo> freqList, RequestShowVo showVo, List<FrequencyVo> voList, String method) {
         List<DflFrequencyPo> freqPos = freqList.stream().filter(t -> CharSequenceUtil.equals(showVo.getRequestUri(), t.getUri())
-                && (CharSequenceUtil.isBlank(t.getMethod()) || CharSequenceUtil.equals(method, t.getMethod()))).collect(Collectors.toList());
+                && (CharSequenceUtil.isBlank(t.getMethod()) || t.getMethod().contains(method))).collect(Collectors.toList());
         for (DflFrequencyPo freqPo : freqPos) {
             if (freqPo.getFreqLimitType() == null) {
                 continue;
@@ -436,7 +436,7 @@ public class FrequencyController extends BaseController {
         for (FrequencyVo freqVo : voList) {
             if (freqVo.getTime() == freqPo.getTime()
                     && freqVo.getFreqLimitType().getType().intValue() == freqPo.getFreqLimitType().getType()
-                    && CharSequenceUtil.equals(freqVo.getMethod(), freqPo.getMethod())) {
+                    && freqVo.getMethod().contains(freqPo.getMethod())) {
                 freqVo.setLimit(freqPo.getLimit());
                 freqVo.setMethod(freqPo.getMethod());
                 isExist = true;
@@ -554,7 +554,7 @@ public class FrequencyController extends BaseController {
             if (StringUtils.isNotBlank(requestVo.getRequestUri()) && !t.getRequestUri().contains(requestVo.getRequestUri())) {
                 return;
             }
-            if (StringUtils.isNotBlank(requestVo.getMethod()) && !StringUtils.equals(t.getMethod(), requestVo.getMethod())) {
+            if (StringUtils.isNotBlank(requestVo.getMethod()) && t.getMethod().contains(requestVo.getMethod())) {
                 return;
             }
             RequestShowVo showVo = new RequestShowVo();

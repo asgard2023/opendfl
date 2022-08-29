@@ -110,10 +110,8 @@ public class FrequencyConfigBiz implements IFrequencyConfigBiz {
         List<LimitUriConfigVo> list = new ArrayList<>();
         for (LimitUriConfigVo uriConfigVo : limitConfigs) {
             if (StringUtils.equals(requestUri, uriConfigVo.getUri())) {
-                boolean isSameMethod = StringUtils.equals(uriConfigVo.getMethod(), requestVo.getMethod());
-                boolean isEmptyMethod = StringUtils.isBlank(uriConfigVo.getMethod());
                 //uriConfig支持请求方法,如GET/POST
-                if (isEmptyMethod || !isEmptyMethod && isSameMethod) {
+                if (StringUtils.isBlank(uriConfigVo.getMethod()) || uriConfigVo.getMethod().contains(requestVo.getMethod())) {
                     list.add(uriConfigVo);
                 }
             }

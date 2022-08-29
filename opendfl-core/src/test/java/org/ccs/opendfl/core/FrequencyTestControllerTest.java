@@ -900,4 +900,124 @@ class FrequencyTestControllerTest {
         Assertions.assertEquals(8, successCount, "successCount:" + successCount);
         Assertions.assertEquals(12, limtCount, "limtCount:" + limtCount);
     }
+
+    /**
+     * 用户访问频率-没有用户（默认走IP）
+     * user request limit-- no userId use IP as default
+     */
+    @Test
+    void serverTimeUriPostGet_get() throws Exception {
+        int limtCount = 0;
+        int successCount = 0;
+        long time=System.currentTimeMillis();
+        String errorLimitType = "frequency:limit";
+        for (int i = 0; i < 20; i++) {
+            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeUriPostGet")
+                            .param("account", "data"+i)
+                            .param("userId", "123")
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andReturn();
+            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+            if (content.contains(errorLimitType)) {
+                limtCount++;
+            } else {
+                successCount++;
+            }
+            System.out.println("----serverTimeUriPostGet_get status=" + status + " content=" + content);
+        }
+        System.out.println("----serverTimeUriPostGet_get  successCount=" + successCount + " limtCount=" + limtCount+" time="+(System.currentTimeMillis()-time));
+        Assertions.assertEquals(8, successCount, "successCount:" + successCount);
+        Assertions.assertEquals(12, limtCount, "limtCount:" + limtCount);
+    }
+
+    /**
+     * 用户访问频率-没有用户（默认走IP）
+     * user request limit-- no userId use IP as default
+     */
+    @Test
+    void serverTimeUriPostGet_post() throws Exception {
+        int limtCount = 0;
+        int successCount = 0;
+        long time=System.currentTimeMillis();
+        String errorLimitType = "frequency:limit";
+        for (int i = 0; i < 20; i++) {
+            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/frequencyTest/serverTimeUriPostGet")
+                            .param("account", "data"+i)
+                            .param("userId", "123")
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andReturn();
+            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+            if (content.contains(errorLimitType)) {
+                limtCount++;
+            } else {
+                successCount++;
+            }
+            System.out.println("----serverTimeUriPostGet_post status=" + status + " content=" + content);
+        }
+        System.out.println("----serverTimeUriPostGet_post  successCount=" + successCount + " limtCount=" + limtCount+" time="+(System.currentTimeMillis()-time));
+        Assertions.assertEquals(8, successCount, "successCount:" + successCount);
+        Assertions.assertEquals(12, limtCount, "limtCount:" + limtCount);
+    }
+
+    /**
+     * 用户访问频率-没有用户（默认走IP）
+     * user request limit-- no userId use IP as default
+     */
+    @Test
+    void serverTimeUriPostGet2_get() throws Exception {
+        int limtCount = 0;
+        int successCount = 0;
+        long time=System.currentTimeMillis();
+        String errorLimitType = "frequency:limit";
+        for (int i = 0; i < 20; i++) {
+            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeUriPostGet2")
+                            .param("account", "data"+i)
+                            .param("userId", "123")
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andReturn();
+            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+            if (content.contains(errorLimitType)) {
+                limtCount++;
+            } else {
+                successCount++;
+            }
+            System.out.println("----serverTimeUriPostGet_post status=" + status + " content=" + content);
+        }
+        System.out.println("----serverTimeUriPostGet_post  successCount=" + successCount + " limtCount=" + limtCount+" time="+(System.currentTimeMillis()-time));
+        Assertions.assertEquals(8, successCount, "successCount:" + successCount);
+        Assertions.assertEquals(12, limtCount, "limtCount:" + limtCount);
+    }
+
+    /**
+     * 用户访问频率-没有用户（默认走IP）
+     * user request limit-- no userId use IP as default
+     */
+    @Test
+    void serverTimeUriPostGet2_post() throws Exception {
+        int limtCount = 0;
+        int successCount = 0;
+        long time=System.currentTimeMillis();
+        String errorLimitType = "frequency:limit";
+        for (int i = 0; i < 20; i++) {
+            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/frequencyTest/serverTimeUriPostGet2")
+                            .param("account", "data"+i)
+                            .param("userId", "123")
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andReturn();
+            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+            if (content.contains(errorLimitType)) {
+                limtCount++;
+            } else {
+                successCount++;
+            }
+            System.out.println("----serverTimeUriPostGet_post status=" + status + " content=" + content);
+        }
+        System.out.println("----serverTimeUriPostGet_post  successCount=" + successCount + " limtCount=" + limtCount+" time="+(System.currentTimeMillis()-time));
+        Assertions.assertEquals(8, successCount, "successCount:" + successCount);
+        Assertions.assertEquals(12, limtCount, "limtCount:" + limtCount);
+    }
 }

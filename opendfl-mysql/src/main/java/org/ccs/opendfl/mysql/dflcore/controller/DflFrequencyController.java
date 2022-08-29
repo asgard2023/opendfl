@@ -111,10 +111,6 @@ public class DflFrequencyController extends BaseController {
         entity.setModifyUser(getCurrentUserId());
         entity.setCreateUser(getCurrentUserId());
         String[] types = freqLimitTypes.split(",");
-        String[] methods = null;
-        if (CharSequenceUtil.isNotBlank(entity.getMethod())) {
-            methods = entity.getMethod().split(",");
-        }
         for (String type : types) {
             FreqLimitType freqLimitType = FreqLimitType.parse(Integer.parseInt(type));
             if (freqLimitType != null) {
@@ -122,17 +118,7 @@ public class DflFrequencyController extends BaseController {
                 entity.setId(null);
                 entity.setStatus(1);
                 entity.setLimitType(FrequencyType.URI_CONFIG.getType());
-                if (methods == null) {
-                    dflFrequencyBiz.saveDflFrequency(entity);
-                } else {
-                    for (String method : methods) {
-                        if(CharSequenceUtil.isBlank(method)){
-                            continue;
-                        }
-                        entity.setMethod(method.trim());
-                        dflFrequencyBiz.saveDflFrequency(entity);
-                    }
-                }
+                dflFrequencyBiz.saveDflFrequency(entity);
             }
         }
         return ResultData.success();

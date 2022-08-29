@@ -44,6 +44,18 @@ frequency:
         time: 3600
         limit: 30
         attrName: account
+      - uri: /frequencyTest/serverTimeUriPostGet
+        method: GET
+        freqLimitType: limit
+        time: 5
+        limit: 8
+        attrName: account
+      - uri: /frequencyTest/serverTimeUriPostGet
+        method: POST
+        freqLimitType: limit
+        time: 5
+        limit: 8
+        attrName: account
     #基于注解的频率限制
     frequencyConfigs:
       - name: serverTimeFreq

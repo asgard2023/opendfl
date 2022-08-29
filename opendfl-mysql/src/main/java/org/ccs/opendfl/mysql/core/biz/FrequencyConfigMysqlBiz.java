@@ -254,10 +254,8 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
             if (dflFrequencyPo.getTime() == null || dflFrequencyPo.getTime() == 0) {
                 continue;
             }
-            boolean isSameMethod = CharSequenceUtil.equals(dflFrequencyPo.getMethod(), method);
-            boolean isEmptyMethod = CharSequenceUtil.isBlank(dflFrequencyPo.getMethod());
             //uriConfig支持请求方法,如GET/POST
-            if (isEmptyMethod || !isEmptyMethod && isSameMethod) {
+            if (CharSequenceUtil.isBlank(dflFrequencyPo.getMethod()) || dflFrequencyPo.getMethod().contains(method)) {
                 LimitUriConfigVo uriConfigVo = DflFrequencyPo.toConfigVo(dflFrequencyPo);
                 list.add(uriConfigVo);
             }
