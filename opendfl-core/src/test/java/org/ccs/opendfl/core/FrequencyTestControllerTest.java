@@ -957,8 +957,8 @@ class FrequencyTestControllerTest {
             System.out.println("----serverTimeUriPostGet_post status=" + status + " content=" + content);
         }
         System.out.println("----serverTimeUriPostGet_post  successCount=" + successCount + " limtCount=" + limtCount+" time="+(System.currentTimeMillis()-time));
-        Assertions.assertEquals(8, successCount, "successCount:" + successCount);
-        Assertions.assertEquals(12, limtCount, "limtCount:" + limtCount);
+        Assertions.assertEquals(9, successCount, "successCount:" + successCount);
+        Assertions.assertEquals(11, limtCount, "limtCount:" + limtCount);
     }
 
     /**

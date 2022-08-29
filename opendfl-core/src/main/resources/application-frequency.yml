@@ -59,7 +59,7 @@ frequency:
         method: POST
         freqLimitType: limit
         time: 5
-        limit: 8
+        limit: 9
         attrName: account
       - uri: /frequencyTest/serverTimeUriPostGet2
         #method合并配置
