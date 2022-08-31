@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+    <title>opendfl-console</title>
+</head>
+<body>
+<b>OpenDFL Console</b><br/>
+<br/>
+<p>
+    <a href="indexEn.html">English</a> <br/>
+    <a href="login.html">登入</a> <br/>
+</p>
+
+<p>
+    <b>管理功能</b><br/>
+    <a href="pages/requestScans.html">扫描Controller所有接口</a> <br/>
+    <a href="pages/requests.html">有调用的接口</a> <br/>
+    <a href="pages/frequencys.html">有调用的频率限制接口</a><br/>
+    <a href="pages/locks.html">有调用的分布式锁接口</a><br/>
+    <a href="pages/captcha.html">验证码重置限制</a><br/>
+</p>
+
+
+<p>
+    <b>接口测试</b><br/>
+    <a href="/frequencyTest/monitor?userId=123">监控接口-30秒内超过0.5秒</a> <br/>
+    <a href="/frequencyTest/serverTime?userId=123">无限制</a> <br/>
+    <a href="/frequencyTest/serverTimeFreq?userId=123">@Frequency频率限制</a> <br/>
+    <a href="/frequencyTest/serverTimeFreq?userId=123&dataId=dd123">@Frequency频率限制 data</a> <br/>
+    <a href="/frequencyTest/serverTimeFreq?userId=123&dataId=dd124">@Frequency频率限制 ip</a> <br/>
+    <a href="/frequencyTest/serverTimeFreqIp?userId=123">@Frequency IP限制</a> <br/>
+    <a href="/frequencyTest/serverTimeNeedLogin">@Frequency需要登入</a> <br/>
+    <a href="/frequencyTest/serverTimeNeedLogin?userId=123">@Frequency已登入</a> <br/>
+    <a href="/frequencyTest/serverTimeUri?account=123">uriConfig频率限制</a> <br/>
+    <a href="/frequencyTest/serverTimeFreqDevice?deviceId=blackDevice123">设备号黑名单</a> <br/>
+    <a href="/frequencyTest/serverTimeFreq?userId=5103">用户黑名单</a> <br/>
+    <a href="/lockTest/waitLockTestUser?userId=123&sleepTime=1">@RequestLock用户锁</a> <br/>
+    <a href="/lockTest/waitLockTestOrder?userId=123&orderId=order123&sleepTime=1">@RequestLock订单锁 redis</a> <br/>
+    <a href="/lockTest/waitLockTestOrderEtcdKv?userId=123&orderId=order123&sleepTime=1">@RequestLock订单锁 etcd KV</a> <br/>
+    <a href="/lockTest/waitLockTestOrderEtcdLock?userId=123&orderId=order123&sleepTime=1">@RequestLock订单锁 etcd lock</a> <br/>
+    <a href="/lockTest/waitLockTestOrderZk?userId=123&orderId=order123&sleepTime=1">@RequestLock订单锁 ZK</a> <br/>
+</p>
+
+<p>
+    <b>系统管理</b><br/>
+    <a href="/pages/system/dflUser.html">用户管理</a> <br/>
+    <a href="/pages/system/dflRole.html">角色管理</a> <br/>
+    <a href="/pages/system/dflUserRole.html">用户角色管理</a> <br/>
+    <!--
+    <a href="/pages/system/dflResource.html">资源管理</a> <br/>
+    <a href="/pages/system/dflResourceTree.html">资源管理Tree</a> <br/>
+    <a href="/pages/system/dflResource.html">角色资源管理</a> <br/>
+    -->
+    <a href="/pages/system/dflSystemConfigTree.html">系统参数</a> <br/>
+    <a href="/pages/basedata/dflTypeManage.html">数据字典</a> <br/>
+</p>
+
+<p>
+    <b>日志查询</b><br/>
+    <a href="/pages/logs/dflAuditLog.html">审计日志</a> <br/>
+    <a href="/pages/logs/dflOutLimitLog.html">频率超限日志</a> <br/>
+    <a href="/pages/logs/dflOutLimitLogCount.html">频率超限日志统计</a> <br/>
+    <a href="/pages/logs/dflOutLockLog.html">分布式锁超限日志</a> <br/>
+    <a href="/pages/logs/dflRequestScans.html">controller接口</a> <br/>
+</p>
+
+<p>
+    <b>opendfl配置管理</b><br/>
+    <a href="/pages/dflcore/dflBlackWhiteManage.html">黑白名单</a> <br/>
+    <a href="/pages/dflcore/dflFrequency.html">频率限制</a> <br/>
+    <a href="/pages/dflcore/dflLocks.html">分布式锁</a> <br/>
+</p>
+
+</body>
+</html>
+
