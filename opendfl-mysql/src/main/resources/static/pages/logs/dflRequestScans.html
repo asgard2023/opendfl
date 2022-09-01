@@ -92,7 +92,7 @@
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="scanController()">扫描controller更新</a>
         </div>
         <table id="dg" class="easyui-datagrid"
-               data-options="headers:app.headers, onDblClickRow:onDblClick, onClickRow:onClick, onLoadError:loadError, onLoadSuccess:function(){$('.datagrid-btable').find('div.datagrid-cell').css('text-align','left');}"
+               data-options="fit:true, headers:app.headers, onDblClickRow:onDblClick, onClickRow:onClick, onLoadError:loadError, onLoadSuccess:function(){$('.datagrid-btable').find('div.datagrid-cell').css('text-align','left');}"
                toolbar="#toolbar" pagination="true"
                rownumbers="true" fitColumns="true" singleSelect="true" style="display:none;">
             <thead>

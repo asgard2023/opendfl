@@ -82,14 +82,13 @@
     </div>
 
 
-
+    <div id="helper-info" style="display: none">
+        1,限制次数limit=0表示配置错误，全部403拒绝<br/>
+        2,限制次数limit=-1表示功能关闭，频率限制不起作用<br/>
+        2,限制次数limit>0表示功能开启<br/>
+    </div>
     <!-- 查询结果 center -->
     <div data-options="region:'center', title:'查询结果'">
-        <div id="helper-info" style="display: none">
-            1,限制次数limit=0表示配置错误，全部403拒绝<br/>
-            2,限制次数limit=-1表示功能关闭，频率限制不起作用<br/>
-            2,限制次数limit>0表示功能开启<br/>
-        </div>
         <div id="toolbar" style="display:none;">
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true"
                onclick="onAdd()">新增</a>
@@ -103,7 +102,7 @@
         </div>
 
         <table id="dg" class="easyui-datagrid"
-               data-options="onDblClickRow:onDblClick,queryParams:function(){return $('#search-form').serializeJson();}, onClickRow:onClick, onLoadError:loadError, onLoadSuccess:function(){$('.datagrid-btable').find('div.datagrid-cell').css('text-align','left');}"
+               data-options="fit:true, onDblClickRow:onDblClick,queryParams:function(){return $('#search-form').serializeJson();}, onClickRow:onClick, onLoadError:loadError, onLoadSuccess:function(){$('.datagrid-btable').find('div.datagrid-cell').css('text-align','left');}"
                toolbar="#toolbar" pagination="true"
                rownumbers="true" fitColumns="true" singleSelect="true" style="display:none;">
             <thead>
@@ -295,16 +294,17 @@
         doSearch();
     });
 
-    var isBlock=false;
     function helperShow(){
-        if(!isBlock){
-            $('#helper-info').css('display','block');
-            isBlock=true;
-        }
-        else{
-            $('#helper-info').css('display','none');
-            isBlock=false;
-        }
+        $.messager.show({
+            title:'Helper-(auto close 4s)',
+            msg:$('#helper-info').html(),
+            showType:'show',
+            style:{
+                right:'',
+               // top:document.body.scrollTop+document.documentElement.scrollTop,
+                bottom:''
+            }
+        });
     }
 
     function doSearch() {

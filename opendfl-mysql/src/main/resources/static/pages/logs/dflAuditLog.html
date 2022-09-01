@@ -97,7 +97,7 @@
                onclick="onDestroy()">删除</a>
         </div>
         <table id="dg" class="easyui-datagrid"
-               data-options="onDblClickRow:onDblClick, onClickRow:onClick, onLoadError:loadError, onLoadSuccess:function(){$('.datagrid-btable').find('div.datagrid-cell').css('text-align','left');}"
+               data-options="fit:true, onDblClickRow:onDblClick, onClickRow:onClick, onLoadError:loadError, onLoadSuccess:function(){$('.datagrid-btable').find('div.datagrid-cell').css('text-align','left');}"
                toolbar="#toolbar" pagination="true" sortName="createTime" sortOrder="desc"
                rownumbers="true" fitColumns="true" singleSelect="true" style="display:none;">
             <thead>
