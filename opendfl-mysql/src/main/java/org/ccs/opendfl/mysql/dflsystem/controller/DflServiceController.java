@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,8 +42,8 @@ public class DflServiceController extends BaseController {
     /**
      * 服务表列表查询
      *
-     * @param request 请求
-     * @param entity 对象
+     * @param request  请求
+     * @param entity   对象
      * @param pageInfo 翻页对象
      * @return MyPageInfo 翻页结果
      * @date 2022-5-4 11:19:02
@@ -111,18 +112,17 @@ public class DflServiceController extends BaseController {
      * 服务表 删除
      *
      * @param request
-     * @param dflService
+     * @param id      服务ID
      * @return ResultData
      * @author chenjh
      * @date 2022-5-4 11:19:02
      */
 
     @RequestMapping(value = "/delete", method = {RequestMethod.POST, RequestMethod.DELETE})
-    public ResultData delete(DflServicePo dflService, HttpServletRequest request) {
-        String id = request.getParameter("id");
+    public ResultData delete(@RequestParam(name = "id", required = false) Integer id, HttpServletRequest request) {
         ValidateUtils.notNull(id, "id不能为空");
         String remark = request.getParameter("remark");
-        int v = dflServiceBiz.deleteDflService(dflService.getId(), this.getCurrentUserId(), remark);
+        int v = dflServiceBiz.deleteDflService(id, this.getCurrentUserId(), remark);
         return ResultData.success(v);
     }
 }

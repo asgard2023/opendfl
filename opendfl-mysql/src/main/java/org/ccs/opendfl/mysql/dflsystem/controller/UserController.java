@@ -4,14 +4,14 @@ import com.github.pagehelper.PageInfo;
 import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.utils.ValidateUtils;
+import org.ccs.opendfl.mysql.base.BaseController;
 import org.ccs.opendfl.mysql.dflsystem.biz.IUserBiz;
 import org.ccs.opendfl.mysql.dflsystem.po.UserPo;
-import org.ccs.opendfl.mysql.base.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -38,8 +38,8 @@ public class UserController extends BaseController {
     /**
      * 列表查询
      *
-     * @param request 请求
-     * @param entity 对象
+     * @param request  请求
+     * @param entity   对象
      * @param pageInfo 翻页对象
      * @return MyPageInfo 翻页结果
      * @date 2022-3-30 21:27:43
@@ -102,18 +102,17 @@ public class UserController extends BaseController {
      * 删除
      *
      * @param request
-     * @param user
+     * @param id      用户ID
      * @return ResultData
      * @author Chenjh
      * @date 2022-3-30 21:27:43
      */
 
     @RequestMapping(value = "/delete", method = {RequestMethod.POST, RequestMethod.GET})
-    public ResultData delete(UserPo user, HttpServletRequest request) {
-        String id = request.getParameter("id");
+    public ResultData delete(@RequestParam(name = "id", required = false) Integer id, HttpServletRequest request) {
         ValidateUtils.notNull(id, "id不能为空");
         String remark = request.getParameter("remark");
-        int v = userBiz.deleteUser(Integer.parseInt(id), getCurrentUsername(), remark);
+        int v = userBiz.deleteUser(id, this.getCurrentUsername(), remark);
         return ResultData.success(v);
     }
 }

@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -110,18 +111,17 @@ public class DflLogUserController extends BaseController {
      * 用于非数字的userId转Long型uid，以减少日志存储量，并提高性能 删除
      *
      * @param request
-     * @param dflLogUser
+     * @param id      数据id
      * @return ResultData
      * @author chenjh
      * @date 2022-5-10 22:16:27
      */
 
     @RequestMapping(value = "/delete", method = {RequestMethod.POST, RequestMethod.GET})
-    public ResultData delete(DflLogUserPo dflLogUser, HttpServletRequest request) {
-        String id = request.getParameter("id");
+    public ResultData delete(@RequestParam(name = "id", required = false) Long id, HttpServletRequest request) {
         ValidateUtils.notNull(id, "id不能为空");
         String remark = request.getParameter("remark");
-        int v = dflLogUserBiz.deleteDflLogUser(dflLogUser.getId(), this.getCurrentUserId(), remark);
+        int v = dflLogUserBiz.deleteDflLogUser(id, this.getCurrentUserId(), remark);
         return ResultData.success(v);
     }
 }

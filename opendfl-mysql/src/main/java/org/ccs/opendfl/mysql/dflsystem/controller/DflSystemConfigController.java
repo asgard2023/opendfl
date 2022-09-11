@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -191,7 +192,7 @@ public class DflSystemConfigController extends BaseController {
      * 系统参数配置(树形结构) 删除
      *
      * @param request
-     * @param dflSystemConfig
+     * @param id      系统参数ID
      * @return ResultData
      * @author chenjh
      * @date 2022-5-3 20:27:48
@@ -200,11 +201,10 @@ public class DflSystemConfigController extends BaseController {
     @RequestMapping(value = "/delete", method = {RequestMethod.POST, RequestMethod.DELETE})
     @CheckLogin
     @CheckAuthorization("admin")
-    public ResultData delete(DflSystemConfigPo dflSystemConfig, HttpServletRequest request) {
-        String id = request.getParameter("id");
+    public ResultData delete(@RequestParam(name = "id", required = false) Integer id, HttpServletRequest request) {
         ValidateUtils.notNull(id, "id不能为空");
         String remark = request.getParameter("remark");
-        int v = dflSystemConfigBiz.deleteDflSystemConfig(Integer.parseInt(id), this.getCurrentUserId(), remark);
+        int v = dflSystemConfigBiz.deleteDflSystemConfig(id, this.getCurrentUserId(), remark);
         return ResultData.success(v);
     }
 }

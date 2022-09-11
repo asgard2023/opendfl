@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -117,7 +118,7 @@ public class DflTypeController extends BaseController {
      * 删除
      *
      * @param request
-     * @param dflType
+     * @param id      数据id
      * @return ResultData
      * @author chenjh
      * @date 2022-5-3 20:31:07
@@ -125,11 +126,10 @@ public class DflTypeController extends BaseController {
 
     @RequestMapping(value = "/delete", method = {RequestMethod.POST, RequestMethod.DELETE})
     @CheckLogin
-    public ResultData delete(DflTypePo dflType, HttpServletRequest request) {
-        String id = request.getParameter("id");
+    public ResultData delete(@RequestParam(name = "id", required = false) Integer id, HttpServletRequest request) {
         ValidateUtils.notNull(id, "id不能为空");
         String remark = request.getParameter("remark");
-        int v = dflTypeBiz.deleteDflType(Integer.parseInt(id), this.getCurrentUserId(), remark);
+        int v = dflTypeBiz.deleteDflType(id, this.getCurrentUserId(), remark);
         return ResultData.success(v);
     }
 }

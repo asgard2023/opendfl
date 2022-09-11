@@ -22,10 +22,7 @@ import org.ccs.opendfl.mysql.dfllogs.vo.DflOutLimitLogCountVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -234,18 +231,17 @@ public class DflOutLimitLogController extends BaseController {
      * 频率限制超限日志 删除
      *
      * @param request
-     * @param dflOutLimitLog
+     * @param id      数据id
      * @return ResultData
      * @author chenjh
      * @date 2022-5-6 23:21:44
      */
     @RequestMapping(value = "/delete", method = {RequestMethod.POST, RequestMethod.GET})
     @CheckAuthorization("admin")
-    public ResultData delete(DflOutLimitLogPo dflOutLimitLog, HttpServletRequest request) {
-        String id = request.getParameter("id");
+    public ResultData delete(@RequestParam(name = "id", required = false) Long id, HttpServletRequest request) {
         ValidateUtils.notNull(id, "id不能为空");
         String remark = request.getParameter("remark");
-        int v = dflOutLimitLogBiz.deleteDflOutLimitLog(dflOutLimitLog.getId(), this.getCurrentUserId(), remark);
+        int v = dflOutLimitLogBiz.deleteDflOutLimitLog(id, this.getCurrentUserId(), remark);
         return ResultData.success(v);
     }
 }

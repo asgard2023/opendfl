@@ -43,8 +43,8 @@ public class DflRequestScansController extends BaseController {
     /**
      * 所有接口方法（通过扫码所有controller接口）列表查询
      *
-     * @param request 请求
-     * @param entity 对象
+     * @param request  请求
+     * @param entity   对象
      * @param pageInfo 翻页对象
      * @return MyPageInfo 翻页结果
      * @author chenjh
@@ -130,18 +130,17 @@ public class DflRequestScansController extends BaseController {
      * 所有接口方法（通过扫码所有controller接口） 删除
      *
      * @param request
-     * @param dflRequestScans
+     * @param id      数据id
      * @return ResultData
      * @author chenjh
      * @date 2022-5-10 22:12:23
      */
     @RequestMapping(value = "/delete", method = {RequestMethod.POST, RequestMethod.GET})
     @CheckAuthorization("admin")
-    public ResultData delete(DflRequestScansPo dflRequestScans, HttpServletRequest request) {
-        String id = request.getParameter("id");
+    public ResultData delete(@RequestParam(name = "id", required = false) Integer id, HttpServletRequest request) {
         ValidateUtils.notNull(id, "id不能为空");
         String remark = request.getParameter("remark");
-        int v = dflRequestScansBiz.deleteDflRequestScans(dflRequestScans.getId(), this.getCurrentUserId(), remark);
+        int v = dflRequestScansBiz.deleteDflRequestScans(id, this.getCurrentUserId(), remark);
         return ResultData.success(v);
     }
 }

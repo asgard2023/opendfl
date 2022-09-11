@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -113,18 +114,17 @@ public class DflBlackWhiteController extends BaseController {
      * 黑白名单 删除
      *
      * @param request
-     * @param dflBlackWhite
+     * @param id      数据id
      * @return ResultData
      * @author chenjh
      * @date 2022-5-18 21:44:47
      */
     @RequestMapping(value = "/delete", method = {RequestMethod.POST, RequestMethod.GET})
     @CheckAuthorization("admin")
-    public ResultData delete(DflBlackWhitePo dflBlackWhite, HttpServletRequest request) {
-        String id = request.getParameter("id");
+    public ResultData delete(@RequestParam(name = "id", required = false) Integer id, HttpServletRequest request) {
         ValidateUtils.notNull(id, "id不能为空");
         String remark = request.getParameter("remark");
-        int v = dflBlackWhiteBiz.deleteDflBlackWhite(dflBlackWhite.getId(), this.getCurrentUserId(), remark);
+        int v = dflBlackWhiteBiz.deleteDflBlackWhite(id, this.getCurrentUserId(), remark);
         return ResultData.success(v);
     }
 }

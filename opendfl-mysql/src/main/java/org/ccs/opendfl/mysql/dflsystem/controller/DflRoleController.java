@@ -15,10 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -47,8 +44,8 @@ public class DflRoleController extends BaseController {
     /**
      * 角色表列表查询
      *
-     * @param request 请求
-     * @param entity 对象
+     * @param request  请求
+     * @param entity   对象
      * @param pageInfo 翻页对象
      * @return MyPageInfo 翻页结果
      * @author chenjh
@@ -139,7 +136,7 @@ public class DflRoleController extends BaseController {
      * 角色表 删除
      *
      * @param request
-     * @param dflRole
+     * @param id      角色ID
      * @return ResultData
      * @author chenjh
      * @date 2022-5-3 20:25:42
@@ -148,11 +145,10 @@ public class DflRoleController extends BaseController {
     @RequestMapping(value = "/delete", method = {RequestMethod.POST, RequestMethod.DELETE})
     @CheckLogin
     @CheckAuthorization("admin")
-    public ResultData delete(DflRolePo dflRole, HttpServletRequest request) {
-        String id = request.getParameter("id");
+    public ResultData delete(@RequestParam(name = "id", required = false) Integer id, HttpServletRequest request) {
         ValidateUtils.notNull(id, "id不能为空");
         String remark = request.getParameter("remark");
-        int v = dflRoleBiz.deleteDflRole(Integer.parseInt(id), this.getCurrentUserId(), remark);
+        int v = dflRoleBiz.deleteDflRole(id, this.getCurrentUserId(), remark);
         return ResultData.success(v);
     }
 }

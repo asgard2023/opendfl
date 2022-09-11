@@ -18,10 +18,7 @@ import org.ccs.opendfl.mysql.vo.UserVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -149,18 +146,17 @@ public class DflAuditLogController extends BaseController {
      * 后台管理审计日志 删除
      *
      * @param request
-     * @param dflAuditLog
+     * @param id      数据id
      * @return ResultData
      * @author chenjh
      * @date 2022-5-6 23:20:31
      */
 
     @RequestMapping(value = "/delete", method = {RequestMethod.POST, RequestMethod.GET})
-    public ResultData delete(DflAuditLogPo dflAuditLog, HttpServletRequest request) {
-        String id = request.getParameter("id");
+    public ResultData delete(@RequestParam(name = "id", required = false) Long id, HttpServletRequest request) {
         ValidateUtils.notNull(id, "id不能为空");
         String remark = request.getParameter("remark");
-        int v = dflAuditLogBiz.deleteDflAuditLog(dflAuditLog.getId(), this.getCurrentUserId(), remark);
+        int v = dflAuditLogBiz.deleteDflAuditLog(id, this.getCurrentUserId(), remark);
         return ResultData.success(v);
     }
 }

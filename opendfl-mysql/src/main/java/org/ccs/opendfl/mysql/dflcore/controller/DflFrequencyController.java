@@ -145,18 +145,17 @@ public class DflFrequencyController extends BaseController {
      * 频率限制配置表 删除
      *
      * @param request
-     * @param dflFrequency
+     * @param id      数据id
      * @return ResultData
      * @author chenjh
      * @date 2022-5-18 21:43:11
      */
     @RequestMapping(value = "/delete", method = {RequestMethod.POST, RequestMethod.GET})
     @CheckAuthorization("admin")
-    public ResultData delete(DflFrequencyPo dflFrequency, HttpServletRequest request) {
-        String id = request.getParameter("id");
+    public ResultData delete(@RequestParam(name = "id", required = false) Integer id, HttpServletRequest request) {
         ValidateUtils.notNull(id, "id不能为空");
         String remark = request.getParameter("remark");
-        int v = dflFrequencyBiz.deleteDflFrequency(dflFrequency.getId(), this.getCurrentUserId(), remark);
+        int v = dflFrequencyBiz.deleteDflFrequency(id, this.getCurrentUserId(), remark);
         return ResultData.success(v);
     }
 }

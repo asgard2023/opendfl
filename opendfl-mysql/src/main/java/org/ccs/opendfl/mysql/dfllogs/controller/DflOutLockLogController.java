@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -160,18 +161,17 @@ public class DflOutLockLogController extends BaseController {
      * 分布式锁超限日志 删除
      *
      * @param request
-     * @param dflOutLockLog
+     * @param id      数据id
      * @return ResultData
      * @author chenjh
      * @date 2022-5-6 23:22:04
      */
 
     @RequestMapping(value = "/delete", method = {RequestMethod.POST, RequestMethod.GET})
-    public ResultData delete(DflOutLockLogPo dflOutLockLog, HttpServletRequest request) {
-        String id = request.getParameter("id");
+    public ResultData delete(@RequestParam(name = "id", required = false) Long id, HttpServletRequest request) {
         ValidateUtils.notNull(id, "id不能为空");
         String remark = request.getParameter("remark");
-        int v = dflOutLockLogBiz.deleteDflOutLockLog(dflOutLockLog.getId(), this.getCurrentUserId(), remark);
+        int v = dflOutLockLogBiz.deleteDflOutLockLog(id, this.getCurrentUserId(), remark);
         return ResultData.success(v);
     }
 }
