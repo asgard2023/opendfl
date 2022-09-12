@@ -30,9 +30,9 @@
 
     <!--scm信息-->
     <scm>
-        <url>http://translate-demo.opendfl.org.cn/index.html</url>
-        <connection>scm:git:https://github.com/asgard2023/data-translate.git</connection>
-        <developerConnection>scm:git:https://github.com/asgard2023/data-translate.git</developerConnection>
+        <url>http://console.mysql.opendfl.org.cn/index.html</url>
+        <connection>scm:git:https://github.com/asgard2023/opendfl.git</connection>
+        <developerConnection>scm:git:https://github.com/asgard2023/opendfl.git</developerConnection>
     </scm>
 
     <!--发布者信息-->
@@ -40,8 +40,8 @@
         <developer>
             <name>chenjh</name>
             <email>asgard2023@outlook.com</email>
-            <organization>http://translate-demo.opendfl.org.cn/index.html</organization>
-            <organizationUrl>http://translate-demo.opendfl.org.cn/index.html</organizationUrl>
+            <organization>http://console.mysql.opendfl.org.cn/index.html</organization>
+            <organizationUrl>http://console.mysql.opendfl.org.cn/index.html</organizationUrl>
         </developer>
     </developers>
 
