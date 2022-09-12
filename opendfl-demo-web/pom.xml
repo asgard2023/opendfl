@@ -13,7 +13,6 @@
     <packaging>war</packaging>
     <description>opendfl demo web</description>
     <properties>
-        <java.version>17</java.version>
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>

@@ -15,7 +15,6 @@
     <description>opendfl-msqyl spring-boot-demo</description>
 
     <properties>
-        <java.version>17</java.version>
         <maven.deploy.skip>true</maven.deploy.skip>
 
         <opendfl-spring-boot-starter.version>1.5</opendfl-spring-boot-starter.version>
