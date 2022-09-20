@@ -5,7 +5,12 @@ import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.constants.ReqSysType;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.ResultCode;
+import org.ccs.opendfl.core.limitfrequency.FrequencyUtils;
 import org.ccs.opendfl.core.strategy.limits.FreqLimitChain;
+import org.ccs.opendfl.core.strategy.limits.impl.FreqLimitIpStrategy;
+import org.ccs.opendfl.core.strategy.limits.impl.FreqLimitIpUserStrategy;
+import org.ccs.opendfl.core.strategy.limits.impl.FreqLimitLimitStrategy;
+import org.ccs.opendfl.core.strategy.limits.impl.FreqLimitUserIpStrategy;
 import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
 import org.junit.jupiter.api.Assertions;
@@ -21,13 +26,69 @@ import org.springframework.test.context.ActiveProfiles;
 class FreqLimitChainTest {
     @Autowired
     private FreqLimitChain freqLimitChain;
-    private String deviceId="freqTest123";
+    private String deviceId = "freqTest123";
 
     @BeforeEach
     void init() {
         System.out.println("----init----");
         String freqTypeItems = "limit,limitIp,userIp,ipUser,";
         freqLimitChain.sortStrategies(freqTypeItems);
+    }
+
+    @Test
+    void getRedisKeyBase() {
+        FrequencyVo frequencyVo = new FrequencyVo();
+        frequencyVo.setFreqLimitType(FreqLimitType.LIMIT_IP);
+        frequencyVo.setTime(60);
+        frequencyVo.setMethod("method");
+        frequencyVo.setName("name");
+        String key = FrequencyUtils.getRedisKeyBase(frequencyVo).toString();
+        System.out.println(key);
+    }
+
+    @Test
+    void getRedisKey() {
+        FrequencyVo frequencyVo = new FrequencyVo();
+        frequencyVo.setFreqLimitType(FreqLimitType.LIMIT_IP);
+        frequencyVo.setTime(60);
+        frequencyVo.setMethod("method");
+        frequencyVo.setName("name");
+        String ip="192.168.1.101";
+        String key = FreqLimitIpStrategy.getRedisKey(frequencyVo, ip);
+        System.out.println(key+" "+key.hashCode());
+
+        key = FreqLimitIpUserStrategy.getRedisKey(frequencyVo, ip);
+        System.out.println(key+" "+key.hashCode());
+
+        key = FreqLimitLimitStrategy.getRedisKey(frequencyVo, "123", ip);
+        System.out.println(key+" "+key.hashCode());
+
+        key = FreqLimitUserIpStrategy.getRedisKey(frequencyVo, "123");
+        System.out.println(key+" "+key.hashCode());
+    }
+
+    @Test
+    void getRedisKey2() {
+        FrequencyVo frequencyVo = new FrequencyVo();
+        frequencyVo.setFreqLimitType(FreqLimitType.LIMIT_IP);
+        frequencyVo.setTime(60);
+        frequencyVo.setMethod("method");
+        frequencyVo.setName("name");
+        String ip="192.168.1.101";
+        String key = FrequencyUtils.getRedisKey(frequencyVo, ip);
+        System.out.println(key+" "+key.hashCode());
+
+        frequencyVo.setFreqLimitType(FreqLimitType.IP_USER);
+        key = FrequencyUtils.getRedisKey(frequencyVo, ip);
+        System.out.println(key+" "+key.hashCode());
+
+        frequencyVo.setFreqLimitType(FreqLimitType.USER_IP);
+        key = FrequencyUtils.getRedisKey(frequencyVo, "123"+":"+ ip);
+        System.out.println(key+" "+key.hashCode());
+
+        frequencyVo.setFreqLimitType(FreqLimitType.LIMIT);
+        key = FrequencyUtils.getRedisKey(frequencyVo, "123");
+        System.out.println(key+" "+key.hashCode());
     }
 
     @Test
@@ -45,7 +106,7 @@ class FreqLimitChainTest {
 
         String freqTypeItems = "limit,limitIp,userIp,ipUser,";
         freqLimitChain.sortStrategies(freqTypeItems);
-        ReqSysType reqSysType =ReqSysType.PC;
+        ReqSysType reqSysType = ReqSysType.PC;
         long time = System.currentTimeMillis();
         int successCount = 0;
         int failCount = 0;
@@ -83,7 +144,7 @@ class FreqLimitChainTest {
         String ip = "192.168.5.101";
         String requestUri = "/frequencyTest/serverTimeFreqIpUser";
         String methodName = "serverTimeFreqIpUser";
-        ReqSysType reqSysType =ReqSysType.PC;
+        ReqSysType reqSysType = ReqSysType.PC;
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
 
@@ -118,10 +179,10 @@ class FreqLimitChainTest {
         String lang = null;
         String ip = "192.168.5.101";
         String requestUri = "/frequencyTest/serverTimeFreq";
-        ReqSysType reqSysType =ReqSysType.PC;
+        ReqSysType reqSysType = ReqSysType.PC;
         String methodName = "serverTimeFreq";
         Long curTime = System.currentTimeMillis();
-        RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip,deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
+        RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
 
         FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.LIMIT);
         frequencyVo.setLimit(1000);
@@ -154,10 +215,10 @@ class FreqLimitChainTest {
         String lang = null;
         String ip = "192.168.5.101";
         String requestUri = "/frequencyTest/serverTimeFreq";
-        ReqSysType reqSysType =ReqSysType.PC;
+        ReqSysType reqSysType = ReqSysType.PC;
         String methodName = "serverTimeFreq";
         Long curTime = System.currentTimeMillis();
-        RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip,deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
+        RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
 
         FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.LIMIT);
         frequencyVo.setLimit(1000);
@@ -190,10 +251,10 @@ class FreqLimitChainTest {
         String lang = null;
         String ip = "192.168.5.101";
         String requestUri = "/frequencyTest/serverTimeFreq";
-        ReqSysType reqSysType =ReqSysType.PC;
+        ReqSysType reqSysType = ReqSysType.PC;
         String methodName = "serverTimeFreq";
         Long curTime = System.currentTimeMillis();
-        RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip,deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
+        RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
 
         FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.LIMIT);
         frequencyVo.setLimit(3);
@@ -210,13 +271,13 @@ class FreqLimitChainTest {
                 strategyParamsVo.getChainOper().clearChain();
                 this.freqLimitChain.doCheckLimit(freqLimitChain, strategyParamsVo);
                 successCount++;
-                log.debug("-----i={} time={}", i, System.currentTimeMillis()-time);
+                log.debug("-----i={} time={}", i, System.currentTimeMillis() - time);
             } catch (BaseException e) {
                 failCount++;
                 log.error("-----count={} methodName={} title={} error={}", i, methodName, e.getTitle(), e.getMessage());
             }
         }
-        log.info("-----doCheckLimit_limit--successCount={} failCount={} runTime={}/{}", successCount, failCount, System.currentTimeMillis() - time,System.currentTimeMillis() - curTime);
+        log.info("-----doCheckLimit_limit--successCount={} failCount={} runTime={}/{}", successCount, failCount, System.currentTimeMillis() - time, System.currentTimeMillis() - curTime);
 //        Assertions.assertEquals(1000, successCount, "successCount:" + successCount);
 //        Assertions.assertEquals(20, failCount, "failCount:" + failCount);
     }
@@ -227,7 +288,7 @@ class FreqLimitChainTest {
         String ip = "192.168.5.101";
         String requestUri = "/frequencyTest/serverTimeFreq";
         String methodName = "serverTimeFreq";
-        ReqSysType reqSysType =ReqSysType.PC;
+        ReqSysType reqSysType = ReqSysType.PC;
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
 
