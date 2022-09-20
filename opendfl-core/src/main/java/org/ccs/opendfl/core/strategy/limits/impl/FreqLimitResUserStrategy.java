@@ -42,12 +42,8 @@ public class FreqLimitResUserStrategy implements FreqLimitStrategy {
     }
 
     public static String getRedisKey(FrequencyVo frequency, String userId, String attrValue) {
-        StringBuilder sb = FrequencyUtils.getRedisKeyBase(frequency);
-        sb.append(":");
-        sb.append(userId);
-        sb.append(":");
-        sb.append(attrValue);
-        return sb.toString();
+        frequency.setFreqLimitType(LIMIT_TYPE);
+        return FrequencyUtils.getRedisKey(frequency, userId+":"+attrValue);
     }
 
     @Override

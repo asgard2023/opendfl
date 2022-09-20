@@ -297,4 +297,24 @@ public class FrequencyUtils {
         sb.append(frequency.getTime());
         return sb;
     }
+
+    public static String getRedisKey(FrequencyVo frequency, String dataKey) {
+        StringBuilder sbBase = new StringBuilder();
+        sbBase.append(frequencyConfiguration.getRedisPrefix());
+        sbBase.append(":");
+        sbBase.append(frequency.getFreqLimitType().getType());
+        StringBuilder sb = new StringBuilder();
+        sb.append(":");
+        sb.append(frequency.getName());
+        sb.append(":");
+        sb.append(frequency.getMethod());
+        sb.append(":");
+        sb.append(frequency.getTime());
+        sb.append(":");
+        sb.append(dataKey);
+        if(frequencyConfiguration.getIfKeyHash()==1){
+            return sbBase+":"+sb.toString().hashCode();
+        }
+        return sbBase+":"+sb;
+    }
 }

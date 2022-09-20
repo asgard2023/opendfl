@@ -28,6 +28,10 @@ import java.util.Map;
 public class FrequencyConfiguration {
     private Character ifActive = '1';
     private String redisPrefix = "limitCount";
+    /**
+     * 是否开启频率限制key hash以压缩key长度
+     */
+    private Integer ifKeyHash=0;
     private Map<String, String> whiteCodeUsers;
     /**
      * 启动时每个接口前100次接口调用白名单可输出日志
