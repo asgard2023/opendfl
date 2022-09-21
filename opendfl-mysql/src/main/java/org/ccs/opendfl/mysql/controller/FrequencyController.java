@@ -384,7 +384,7 @@ public class FrequencyController extends BaseController {
 
             boolean isExist = isLoadExistVo(voList, uriConfigVo);
             if (!isExist) {
-                FrequencyVo vo = FrequencyVo.toFrequencyVo(null, uriConfigVo);
+                FrequencyVo vo = FrequencyVo.toFrequencyVo(uriConfigVo);
                 vo.setMethod(showVo.getMethod());
                 voList.add(vo);
             }

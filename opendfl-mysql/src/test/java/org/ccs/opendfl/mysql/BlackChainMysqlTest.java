@@ -35,11 +35,9 @@ class BlackChainMysqlTest {
         blackChain.sortStrategies(freqTypeItems);
     }
 
-    private FrequencyVo getFrequencyServerTime(String requestUri) {
-        FrequencyVo frequencyVo = new FrequencyVo();
+    private FrequencyVo getFrequencyServerTime(String requestUri, String name, int time) {
+        FrequencyVo frequencyVo = new FrequencyVo(name, time, null, null, null, null);
         frequencyVo.setRequestUri(requestUri);
-        frequencyVo.setName("serverTimeFreq");
-        frequencyVo.setTime(5);
         frequencyVo.setErrMsg(ResultCode.USER_FREQUENCY_ERROR.getMsg());
         frequencyVo.setErrMsgEn(ResultCode.USER_FREQUENCY_ERROR.getMsg());
         return frequencyVo;
@@ -50,13 +48,12 @@ class BlackChainMysqlTest {
         String lang = null;
         String ip = "192.168.5.105";
         String requestUri = "/frequencyTest/serverTime";
-        ReqSysType reqSysType =ReqSysType.PC;
+        ReqSysType reqSysType = ReqSysType.PC;
         String methodName = "serverTime";
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo;
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
-        frequencyVo.setName("serverTime");
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, "serverTime", 5);
         frequencyVo.setLimit(1000);
 
         String freqTypeItems = "ip,user,";
@@ -90,15 +87,14 @@ class BlackChainMysqlTest {
     void doCheckLimit_blackIp() {
         String lang = null;
         String ip = "192.168.5.103";
-        ip= ""+RequestUtils.getIpConvertNum(ip);
+        ip = "" + RequestUtils.getIpConvertNum(ip);
         String requestUri = "/frequencyTest/serverTime";
-        ReqSysType reqSysType =ReqSysType.PC;
+        ReqSysType reqSysType = ReqSysType.PC;
         String methodName = "serverTime";
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo;
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
-        frequencyVo.setName("serverTime");
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, "serverTime", 5);
         frequencyVo.setLimit(1000);
 
         String freqTypeItems = "ip,user,";
@@ -131,13 +127,12 @@ class BlackChainMysqlTest {
     void doCheckLimit_blackUser() {
         String lang = null;
         String requestUri = "/frequencyTest/serverTime";
-        ReqSysType reqSysType =ReqSysType.PC;
+        ReqSysType reqSysType = ReqSysType.PC;
         String methodName = "serverTime";
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo;
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
-        frequencyVo.setName("serverTime");
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, "serverTime", 5);
         frequencyVo.setLimit(1000);
 
         String blackUser = "5103";
@@ -150,7 +145,7 @@ class BlackChainMysqlTest {
         for (int i = 0; i < 20; i++) {
             try {
                 String ip = "192.168.5.2" + i;
-                ip= ""+RequestUtils.getIpConvertNum(ip);
+                ip = "" + RequestUtils.getIpConvertNum(ip);
                 strategyParamsVo = new RequestStrategyParamsVo(lang, ip, null, methodName, requestUri, reqSysType.getCode(), curTime);
                 strategyParamsVo.load(frequencyVo, blackUser);
                 strategyParamsVo.getChainOper().clearChain();

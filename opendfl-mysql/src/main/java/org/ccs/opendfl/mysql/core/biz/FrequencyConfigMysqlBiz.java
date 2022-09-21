@@ -7,7 +7,6 @@ import org.ccs.opendfl.core.biz.IFrequencyConfigBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.OpendflConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
-import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.constants.FrequencyConstant;
 import org.ccs.opendfl.core.constants.FrequencyType;
 import org.ccs.opendfl.core.utils.StringUtils;
@@ -47,14 +46,15 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
     /**
      * 有修改日志一下
      *
-     * @param frequency FrequencyVo
+     * @param frequencyNew FrequencyVo
      */
-    private boolean checkChange(FrequencyVo frequencyExist, FrequencyVo frequency) {
+    private boolean checkChange(FrequencyMysqlVo frequencyExist, FrequencyMysqlVo frequencyNew) {
         boolean isChanged = false;
-        if (frequencyExist == null || frequencyExist.hashCode() != frequency.hashCode()) {
+        if (frequencyExist == null || frequencyExist.hashCode() != frequencyNew.hashCode()) {
             isChanged = true;
         }
         if (isChanged) {
+            FrequencyVo frequency = frequencyNew.getFrequency();
             log.info("----checkChange--name={} time={} limit={} freqLimitType={} errorMsg={}"
                     , frequency.getName(), frequency.getTime(), frequency.getLimit(), frequency.getFreqLimitType(), frequency.getErrMsg());
         }
@@ -93,11 +93,10 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
 
         if (frequencyExist != null) {
             if (frequencyExist.getStatus() != null && frequencyExist.getStatus() == CommonStatus.VALID.getStatus()) {
-                frequency.setLimit(frequencyExist.getLimit());
-                frequency.setFreqLimitType(frequencyExist.getFreqLimitType());
-                frequency.setErrMsg(frequencyExist.getErrMsg());
-                frequency.setErrMsgEn(frequencyExist.getErrMsgEn());
-                frequency.setSysconfig(frequencyExist.isSysconfig());
+                frequency.setLimit(frequencyExist.getFrequency().getLimit());
+                frequency.setErrMsg(frequencyExist.getFrequency().getErrMsg());
+                frequency.setErrMsgEn(frequencyExist.getFrequency().getErrMsgEn());
+                frequency.setSysconfig(frequencyExist.getFrequency().isSysconfig());
             }
         }
     }
@@ -156,12 +155,14 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
     }
 
     private FrequencyMysqlVo getFrequencyMysqlVo(FrequencyVo frequency, DflFrequencyPo frequencyPo) {
-        FrequencyMysqlVo frequencyMysql = FrequencyMysqlVo.copy(frequency);
+        FrequencyMysqlVo frequencyMysql = new FrequencyMysqlVo();
+        frequencyMysql.setFrequency(frequency);
+        frequencyMysql.setStatus(frequencyPo.getStatus());
         //如果数据状态无效，则用原来的默认值
-        frequencyMysql.setLimit(frequencyPo.getLimitCount());
-        frequencyMysql.setFreqLimitType(FreqLimitType.parse(frequencyPo.getFreqLimitType()));
-        frequencyMysql.setErrMsg(frequencyPo.getErrMsg());
-        frequencyMysql.setErrMsgEn(frequencyPo.getErrMsgEn());
+        frequencyMysql.getFrequency().setLimit(frequencyPo.getLimitCount());
+//        frequencyMysql.setFreqLimitType(FreqLimitType.parse(frequencyPo.getFreqLimitType()));
+        frequencyMysql.getFrequency().setErrMsg(frequencyPo.getErrMsg());
+        frequencyMysql.getFrequency().setErrMsgEn(frequencyPo.getErrMsgEn());
         frequencyMysql.setStatus(frequencyPo.getStatus());
         return frequencyMysql;
     }
@@ -342,13 +343,8 @@ public class FrequencyConfigMysqlBiz implements IFrequencyConfigBiz {
             if (frequencyMysqlExist == null) {
                 log.info("----reloadNewlyFrequency--cacheKey={} uri={}", cacheKey, modifyInfo.getUri());
             }
-            FrequencyVo frequencyVo = new FrequencyVo();
-            frequencyVo.setName(modifyInfo.getCode());
-            frequencyVo.setAliasName(modifyInfo.getAlias());
-            frequencyVo.setTime(modifyInfo.getTime());
+            FrequencyVo frequencyVo = DflFrequencyPo.toFrequencyVo(modifyInfo);
             frequencyVo.setRequestUri(modifyInfo.getUri());
-            frequencyVo.setLimitType(modifyInfo.getLimitType());
-            frequencyVo.setAttrName(modifyInfo.getAttrName());
             frequencyVo.setNeedLogin(NumberUtil.equals(modifyInfo.getNeedLogin(), 1));
             frequencyVo.setLog(NumberUtil.equals(modifyInfo.getLog(), 1));
             frequencyVo.setWhiteCode(modifyInfo.getWhiteCode());

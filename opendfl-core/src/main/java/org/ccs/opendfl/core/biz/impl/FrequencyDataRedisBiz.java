@@ -45,7 +45,7 @@ public class FrequencyDataRedisBiz implements IFrequencyDataBiz {
                 Long expireSecond = redisTemplate.getExpire(redisKey);
                 copy.setErrMsg("limit:count=" + count + ",expireSec=" + expireSecond);
                 tmpList.add(copy.toCopy());
-            } else if (frequency.getFreqLimitType()==FreqLimitType.USER_IP) {
+            } else if (frequency.getFreqLimitType() == FreqLimitType.USER_IP) {
                 redisKey = FreqLimitUserIpStrategy.getRedisKey(frequency, account);
                 isExist = redisTemplate.hasKey(redisKey);
                 if (isExist) {
@@ -71,7 +71,7 @@ public class FrequencyDataRedisBiz implements IFrequencyDataBiz {
         Collection<FrequencyVo> limits = FrequencyHandlerInterceptor.freqMap.values();
         List<FrequencyVo> tmpList = new ArrayList<>();
         for (FrequencyVo frequency : limits) {
-            if (frequency.getFreqLimitType()== FreqLimitType.USER_IP) {
+            if (frequency.getFreqLimitType() == FreqLimitType.USER_IP) {
                 continue;
             }
             String redisKey = FreqLimitIpUserStrategy.getRedisKey(frequency, ip);
@@ -91,11 +91,10 @@ public class FrequencyDataRedisBiz implements IFrequencyDataBiz {
     @Override
     public List<String> freqEvictList(String code, List<Integer> timeList, String account) {
         List<String> list = new ArrayList<>();
-        FrequencyVo frequencyVo = new FrequencyVo();
+        FrequencyVo frequencyVo = null;
         String info;
         for (Integer time : timeList) {
-            frequencyVo.setName(code);
-            frequencyVo.setTime(time);
+            frequencyVo = new FrequencyVo(code, time, null, null, null, null);
             info = freqEvict(frequencyVo, account);
             list.add(info);
             info = freqUserIpEvict(frequencyVo, account);
@@ -121,7 +120,7 @@ public class FrequencyDataRedisBiz implements IFrequencyDataBiz {
     }
 
     @Override
-    public String freqEvictLimitIp(FrequencyVo frequency, String ip){
+    public String freqEvictLimitIp(FrequencyVo frequency, String ip) {
         String key = FreqLimitIpStrategy.getRedisKey(frequency, ip);
         boolean isExist = redisTemplate.hasKey(key);
         if (isExist) {
@@ -196,7 +195,6 @@ public class FrequencyDataRedisBiz implements IFrequencyDataBiz {
         redisTemplate.delete(redisKey);
         return redisKey + "=" + count;
     }
-
 
 
 }

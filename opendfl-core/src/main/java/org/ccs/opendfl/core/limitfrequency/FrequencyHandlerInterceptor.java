@@ -252,20 +252,22 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         List<FrequencyVo> list=methodFrequencyMap.get(code);
         if(list == null){
             list=new ArrayList<>();
-            FrequencyVo frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency.class), new FrequencyVo());
+            FrequencyVo frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency.class));
             addFrequency(frequency, method, requestUri, list);
-            frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency2.class), new FrequencyVo());
+            frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency2.class));
             addFrequency(frequency, method, requestUri, list);
-            frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency3.class), new FrequencyVo());
+            frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency3.class));
             addFrequency(frequency, method, requestUri, list);
-            frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency4.class), new FrequencyVo());
+            frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency4.class));
             addFrequency(frequency, method, requestUri, list);
-            frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency5.class), new FrequencyVo());
+            frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency5.class));
             addFrequency(frequency, method, requestUri, list);
             methodFrequencyMap.put(code, list);
         }
         return list;
     }
+
+
 
     private void addFrequency(FrequencyVo frequency, String method, String requestUri, List<FrequencyVo> list){
         if(frequency!=null) {
@@ -291,7 +293,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             if (uriConfigVo.getStatus() != 1) {
                 continue;
             }
-            FrequencyVo frequencyVo = FrequencyVo.toFrequencyVo(null, uriConfigVo);
+            FrequencyVo frequencyVo = FrequencyVo.toFrequencyVo(uriConfigVo);
             requestVo.setRequestUri(strategyParams.getRequestUri());
             frequencyVo.setSysconfig(true);
             handleFrequency(response, params, frequencyVo, strategyParams);

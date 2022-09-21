@@ -11,12 +11,12 @@ import lombok.Getter;
 @Data
 @Getter
 public class RequestStrategyParamsVo {
-    private String requestUri;
+    private final String requestUri;
     private final String lang;
     private final String methodName;
 
     private FrequencyVo frequency;
-    private long curTime;
+    private final long curTime;
     private final String ip;
     private final String sysType;
     /**
@@ -32,7 +32,7 @@ public class RequestStrategyParamsVo {
      */
     private String userId;
     private String attrValue;
-    private ChainOperVo chainOper = new ChainOperVo();
+    private final ChainOperVo chainOper = new ChainOperVo();
 
     public RequestStrategyParamsVo(String lang, String ip, String deviceId, String methodName, String requestUri, String sysType, long curTime) {
         this(lang, ip, null, deviceId, methodName, requestUri, sysType, curTime);
@@ -49,10 +49,11 @@ public class RequestStrategyParamsVo {
         this.curTime = curTime;
     }
 
-    public void load(FrequencyVo frequency, String userId){
+    public void load(FrequencyVo frequency, String userId) {
         this.frequency = frequency;
         this.userId = userId;
     }
+
     public void load(FrequencyVo frequency, String userId, String attrValue) {
         this.frequency = frequency;
         this.userId = userId;

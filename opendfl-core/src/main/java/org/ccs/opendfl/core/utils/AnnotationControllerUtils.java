@@ -319,15 +319,15 @@ public class AnnotationControllerUtils {
     private static FrequencyVo toLimitFrequency(Annotation annotation, List<FrequencyVo> frequencyVos, StringBuilder limitTypes, StringBuilder attrNameSb) {
         FrequencyVo frequencyVo = null;
         if (annotation instanceof Frequency) {
-            frequencyVo = FrequencyVo.toFrequencyVo((Frequency) annotation, FrequencyVo.newInstance());
+            frequencyVo = FrequencyVo.toFrequencyVo((Frequency) annotation);
         } else if (annotation instanceof Frequency2) {
-            frequencyVo = FrequencyVo.toFrequencyVo((Frequency2) annotation, FrequencyVo.newInstance());
+            frequencyVo = FrequencyVo.toFrequencyVo((Frequency2) annotation);
         } else if (annotation instanceof Frequency3) {
-            frequencyVo = FrequencyVo.toFrequencyVo((Frequency3) annotation, FrequencyVo.newInstance());
+            frequencyVo = FrequencyVo.toFrequencyVo((Frequency3) annotation);
         } else if (annotation instanceof Frequency4) {
-            frequencyVo = FrequencyVo.toFrequencyVo((Frequency4) annotation, FrequencyVo.newInstance());
+            frequencyVo = FrequencyVo.toFrequencyVo((Frequency4) annotation);
         } else if (annotation instanceof Frequency5) {
-            frequencyVo = FrequencyVo.toFrequencyVo((Frequency5) annotation, FrequencyVo.newInstance());
+            frequencyVo = FrequencyVo.toFrequencyVo((Frequency5) annotation);
         }
         if (frequencyVo != null) {
             frequencyVos.add(frequencyVo);

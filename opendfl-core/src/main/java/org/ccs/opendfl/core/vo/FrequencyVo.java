@@ -5,21 +5,20 @@ import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
 import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.constants.FrequencyType;
 import org.ccs.opendfl.core.limitfrequency.*;
-import org.springframework.beans.BeanUtils;
 
 import java.util.Objects;
 
 @Data
 public class FrequencyVo {
-    private String name;
-    private String aliasName;
+    private final String name;
+    private final String aliasName;
     private String requestUri;
     private String method;
-    private String limitType;
-    private int time = 0;
+    private final String limitType;
+    private final int time;
     private int limit = 0;
-    private FreqLimitType freqLimitType;
-    private String attrName;
+    private final FreqLimitType freqLimitType;
+    private final String attrName;
     private String whiteCode;
     private String errMsg;
     private String errMsgEn;
@@ -27,166 +26,191 @@ public class FrequencyVo {
     private boolean needLogin;
     /**
      * 是否显示日志
+     *
      * @return
      */
     private boolean log;
     private Long createTime;
-    public static final FrequencyVo instance = new FrequencyVo();
 
-    /**
-     * 用于提高创建对象的性能
-     *
-     * @return 得先用户缓存队解（instance）
-     */
-    public static FrequencyVo newInstance() {
-        return new FrequencyVo();
-    }
-
-    public static FrequencyVo toVo(String name, int time) {
-        FrequencyVo vo = new FrequencyVo();
-        vo.setName(name);
-        vo.setTime(time);
-        return vo;
-    }
-
-    public static FrequencyVo toFrequencyVo(FrequencyVo frequency, LimitUriConfigVo uriConfigVo) {
-        FrequencyVo vo = frequency;
-        if (frequency == null) {
-            vo = FrequencyVo.newInstance();
+    public static FrequencyVo toFrequencyVo(LimitUriConfigVo uriConfigVo) {
+        if (uriConfigVo == null) {
+            return null;
         }
-        vo.setLimitType(FrequencyType.URI_CONFIG.getType());
-        vo.method=uriConfigVo.getMethod();
-        vo.name = uriConfigVo.getUri();
-        vo.aliasName = uriConfigVo.getAliasName();
-        vo.time = uriConfigVo.getTime();
-        vo.limit = uriConfigVo.getLimit();
-        vo.freqLimitType = uriConfigVo.getFreqLimitType();
-        vo.errMsg = uriConfigVo.getErrMsg();
-        vo.errMsgEn = uriConfigVo.getErrMsgEn();
-        vo.whiteCode = uriConfigVo.getWhiteCode();
-        vo.attrName = uriConfigVo.getAttrName();
-        vo.log=uriConfigVo.isLog();
-        return vo;
+        return new FrequencyVo(uriConfigVo);
     }
 
-    public static FrequencyVo toFrequencyVo(Frequency frequency, FrequencyVo vo) {
+    public FrequencyVo(String code, int time, FreqLimitType freqLimitType, String limitType, String aliasName, String attrName) {
+        this.name = code;
+        this.time = time;
+
+        this.limitType = limitType;
+
+        this.aliasName = aliasName;
+        this.freqLimitType = freqLimitType;
+        this.errMsg = null;
+        this.errMsgEn = null;
+        this.whiteCode = null;
+        this.attrName = attrName;
+        this.log = false;
+    }
+
+    public FrequencyVo(LimitUriConfigVo uriConfigVo) {
+        this.limitType = FrequencyType.URI_CONFIG.getType();
+        this.method = uriConfigVo.getMethod();
+        this.name = uriConfigVo.getUri();
+        this.aliasName = uriConfigVo.getAliasName();
+        this.time = uriConfigVo.getTime();
+        this.limit = uriConfigVo.getLimit();
+        this.freqLimitType = uriConfigVo.getFreqLimitType();
+        this.errMsg = uriConfigVo.getErrMsg();
+        this.errMsgEn = uriConfigVo.getErrMsgEn();
+        this.whiteCode = uriConfigVo.getWhiteCode();
+        this.attrName = uriConfigVo.getAttrName();
+        this.log = uriConfigVo.isLog();
+    }
+
+
+    public static FrequencyVo toFrequencyVo(Frequency frequency) {
         if (frequency == null) {
             return null;
         }
-        vo.setLimitType(FrequencyType.FREQUENCY.getType());
-        vo.name = frequency.name();
-        vo.aliasName = frequency.aliasName();
-        vo.time = frequency.time();
-        vo.limit = frequency.limit();
-        vo.freqLimitType = frequency.freqLimitType();
-        vo.errMsg = frequency.errMsg();
-        vo.errMsgEn = frequency.errMsgEn();
-        vo.whiteCode = frequency.whiteCode();
-        vo.attrName = frequency.attrName();
-        vo.sysconfig = frequency.sysconfig();
-        vo.needLogin = frequency.needLogin();
-        vo.log=frequency.log();
-        return vo;
+        return new FrequencyVo(frequency);
+    }
+
+    public static FrequencyVo toFrequencyVo(Frequency2 frequency) {
+        if (frequency == null) {
+            return null;
+        }
+        return new FrequencyVo(frequency);
+    }
+
+    public static FrequencyVo toFrequencyVo(Frequency3 frequency) {
+        if (frequency == null) {
+            return null;
+        }
+        return new FrequencyVo(frequency);
+    }
+
+    public static FrequencyVo toFrequencyVo(Frequency4 frequency) {
+        if (frequency == null) {
+            return null;
+        }
+        return new FrequencyVo(frequency);
+    }
+
+    public static FrequencyVo toFrequencyVo(Frequency5 frequency) {
+        if (frequency == null) {
+            return null;
+        }
+        return new FrequencyVo(frequency);
+    }
+
+
+    /**
+     * @param frequency 频率限制
+     * @return 转vo对应
+     */
+    public FrequencyVo(Frequency frequency) {
+        this.limitType = FrequencyType.FREQUENCY.getType();
+        this.name = frequency.name();
+        this.aliasName = frequency.aliasName();
+        this.time = frequency.time();
+        this.limit = frequency.limit();
+        this.freqLimitType = frequency.freqLimitType();
+        this.errMsg = frequency.errMsg();
+        this.errMsgEn = frequency.errMsgEn();
+        this.whiteCode = frequency.whiteCode();
+        this.attrName = frequency.attrName();
+        this.sysconfig = frequency.sysconfig();
+        this.needLogin = frequency.needLogin();
+        this.log = frequency.log();
     }
 
     /**
      * @param frequency 频率限制
-     * @param vo        复用已有对象
      * @return 转vo对应
      */
-    public static FrequencyVo toFrequencyVo(Frequency2 frequency, FrequencyVo vo) {
-        if (frequency == null) {
-            return null;
-        }
-        vo.setLimitType(FrequencyType.FREQUENCY2.getType());
-        vo.name = frequency.name();
-        vo.aliasName = frequency.aliasName();
-        vo.time = frequency.time();
-        vo.limit = frequency.limit();
-        vo.freqLimitType = frequency.freqLimitType();
-        vo.errMsg = frequency.errMsg();
-        vo.errMsgEn = frequency.errMsgEn();
-        vo.whiteCode = frequency.whiteCode();
-        vo.attrName = frequency.attrName();
-        vo.sysconfig = frequency.sysconfig();
-        vo.needLogin = frequency.needLogin();
-        vo.log=frequency.log();
-        return vo;
+    public FrequencyVo(Frequency2 frequency) {
+        this.limitType = FrequencyType.FREQUENCY2.getType();
+        this.name = frequency.name();
+        this.aliasName = frequency.aliasName();
+        this.time = frequency.time();
+        this.limit = frequency.limit();
+        this.freqLimitType = frequency.freqLimitType();
+        this.errMsg = frequency.errMsg();
+        this.errMsgEn = frequency.errMsgEn();
+        this.whiteCode = frequency.whiteCode();
+        this.attrName = frequency.attrName();
+        this.sysconfig = frequency.sysconfig();
+        this.needLogin = frequency.needLogin();
+        this.log = frequency.log();
     }
 
-    /**
-     * @param frequency 频率限制
-     * @param vo        复用已有对象
-     * @return 转vo对应
-     */
-    public static FrequencyVo toFrequencyVo(Frequency3 frequency, FrequencyVo vo) {
-        if (frequency == null) {
-            return null;
-        }
-        vo.setLimitType(FrequencyType.FREQUENCY3.getType());
-        vo.name = frequency.name();
-        vo.aliasName = frequency.aliasName();
-        vo.time = frequency.time();
-        vo.limit = frequency.limit();
-        vo.freqLimitType = frequency.freqLimitType();
-        vo.errMsg = frequency.errMsg();
-        vo.errMsgEn = frequency.errMsgEn();
-        vo.whiteCode = frequency.whiteCode();
-        vo.attrName = frequency.attrName();
-        vo.sysconfig = frequency.sysconfig();
-        vo.needLogin = frequency.needLogin();
-        vo.log=frequency.log();
-        return vo;
+    public FrequencyVo(Frequency3 frequency) {
+        this.limitType = FrequencyType.FREQUENCY3.getType();
+        this.name = frequency.name();
+        this.aliasName = frequency.aliasName();
+        this.time = frequency.time();
+        this.limit = frequency.limit();
+        this.freqLimitType = frequency.freqLimitType();
+        this.errMsg = frequency.errMsg();
+        this.errMsgEn = frequency.errMsgEn();
+        this.whiteCode = frequency.whiteCode();
+        this.attrName = frequency.attrName();
+        this.sysconfig = frequency.sysconfig();
+        this.needLogin = frequency.needLogin();
+        this.log = frequency.log();
     }
 
-    /**
-     * @param frequency 频率限制
-     * @param vo        复用已有对象
-     * @return 转vo对应
-     */
-    public static FrequencyVo toFrequencyVo(Frequency4 frequency, FrequencyVo vo) {
-        if (frequency == null) {
-            return null;
-        }
-        vo.setLimitType(FrequencyType.FREQUENCY3.getType());
-        vo.name = frequency.name();
-        vo.aliasName = frequency.aliasName();
-        vo.time = frequency.time();
-        vo.limit = frequency.limit();
-        vo.errMsg = frequency.errMsg();
-        vo.errMsgEn = frequency.errMsgEn();
-        vo.whiteCode = frequency.whiteCode();
-        vo.attrName = frequency.attrName();
-        vo.sysconfig = frequency.sysconfig();
-        vo.freqLimitType = frequency.freqLimitType();
-        vo.needLogin = frequency.needLogin();
-        vo.log=frequency.log();
-        return vo;
+    public FrequencyVo(Frequency4 frequency) {
+        this.limitType = FrequencyType.FREQUENCY4.getType();
+        this.name = frequency.name();
+        this.aliasName = frequency.aliasName();
+        this.time = frequency.time();
+        this.limit = frequency.limit();
+        this.freqLimitType = frequency.freqLimitType();
+        this.errMsg = frequency.errMsg();
+        this.errMsgEn = frequency.errMsgEn();
+        this.whiteCode = frequency.whiteCode();
+        this.attrName = frequency.attrName();
+        this.sysconfig = frequency.sysconfig();
+        this.needLogin = frequency.needLogin();
+        this.log = frequency.log();
     }
 
-    /**
-     * @param frequency 频率限制
-     * @param vo        复用已有对象
-     * @return 转vo对应
-     */
-    public static FrequencyVo toFrequencyVo(Frequency5 frequency, FrequencyVo vo) {
-        if (frequency == null) {
-            return null;
-        }
-        vo.setLimitType(FrequencyType.FREQUENCY3.getType());
-        vo.name = frequency.name();
-        vo.aliasName = frequency.aliasName();
-        vo.time = frequency.time();
-        vo.limit = frequency.limit();
-        vo.freqLimitType = frequency.freqLimitType();
-        vo.errMsg = frequency.errMsg();
-        vo.errMsgEn = frequency.errMsgEn();
-        vo.whiteCode = frequency.whiteCode();
-        vo.attrName = frequency.attrName();
-        vo.sysconfig = frequency.sysconfig();
-        vo.needLogin = frequency.needLogin();
-        vo.log=frequency.log();
-        return vo;
+    public FrequencyVo(Frequency5 frequency) {
+        this.limitType = FrequencyType.FREQUENCY5.getType();
+        this.name = frequency.name();
+        this.aliasName = frequency.aliasName();
+        this.time = frequency.time();
+        this.limit = frequency.limit();
+        this.freqLimitType = frequency.freqLimitType();
+        this.errMsg = frequency.errMsg();
+        this.errMsgEn = frequency.errMsgEn();
+        this.whiteCode = frequency.whiteCode();
+        this.attrName = frequency.attrName();
+        this.sysconfig = frequency.sysconfig();
+        this.needLogin = frequency.needLogin();
+        this.log = frequency.log();
+    }
+
+    public FrequencyVo(FrequencyVo frequency) {
+        this.limitType = FrequencyType.FREQUENCY5.getType();
+        this.name = frequency.getName();
+        this.aliasName = frequency.getAliasName();
+        this.time = frequency.getTime();
+        this.limit = frequency.getLimit();
+        this.freqLimitType = frequency.getFreqLimitType();
+        this.errMsg = frequency.getErrMsg();
+        this.errMsgEn = frequency.getErrMsgEn();
+        this.whiteCode = frequency.getWhiteCode();
+        this.attrName = frequency.getAttrName();
+        this.sysconfig = frequency.isSysconfig();
+        this.needLogin = frequency.isNeedLogin();
+        this.log = frequency.isLog();
+
+        this.requestUri = frequency.getRequestUri();
+        this.method = frequency.getMethod();
     }
 
 
@@ -196,7 +220,7 @@ public class FrequencyVo {
                 "name='" + name + '\'' +
                 ", time=" + time +
                 ", limit=" + limit +
-                ", freqLimitType=" + (freqLimitType!=null?freqLimitType.getCode():"") +
+                ", freqLimitType=" + (freqLimitType != null ? freqLimitType.getCode() : "") +
 //                ", pageReachLog=" + pageReachLog +
                 ", attrName='" + attrName + '\'' +
                 ", whiteCode=" + whiteCode +
@@ -214,8 +238,6 @@ public class FrequencyVo {
 
 
     public FrequencyVo toCopy() {
-        FrequencyVo obj = new FrequencyVo();
-        BeanUtils.copyProperties(this, obj);
-        return obj;
+        return new FrequencyVo(this);
     }
 }
