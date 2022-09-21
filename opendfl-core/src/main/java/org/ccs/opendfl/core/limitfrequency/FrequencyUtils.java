@@ -298,11 +298,11 @@ public class FrequencyUtils {
         return sb;
     }
 
-    public static String getRedisKey(FrequencyVo frequency, String dataKey) {
+    public static String getRedisKey(FrequencyVo frequency, FreqLimitType limitType, String dataKey) {
         StringBuilder sbBase = new StringBuilder();
         sbBase.append(frequencyConfiguration.getRedisPrefix());
         sbBase.append(":");
-        sbBase.append(frequency.getFreqLimitType().getType());
+        sbBase.append(limitType.getType());
         StringBuilder sb = new StringBuilder();
         sb.append(":");
         sb.append(frequency.getName());

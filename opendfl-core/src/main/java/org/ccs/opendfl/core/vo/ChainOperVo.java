@@ -22,7 +22,5 @@ public class ChainOperVo {
 
     public void clearChain() {
         this.pos = 0;
-        this.whiteStrategy = null;
-        this.blackStrategy = null;
     }
 }

@@ -34,8 +34,7 @@ public class FreqLimitResIpStrategy implements FreqLimitStrategy {
     }
 
     public static String getRedisKey(FrequencyVo frequency, String ip, String attrValue) {
-        frequency.setFreqLimitType(LIMIT_TYPE);
-        return FrequencyUtils.getRedisKey(frequency, ip + ":" + attrValue);
+        return FrequencyUtils.getRedisKey(frequency, LIMIT_TYPE, ip + ":" + attrValue);
     }
 
     @Override

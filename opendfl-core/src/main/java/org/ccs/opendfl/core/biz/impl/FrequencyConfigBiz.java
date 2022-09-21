@@ -67,7 +67,6 @@ public class FrequencyConfigBiz implements IFrequencyConfigBiz {
 
         if (frequencyExist != null) {
             frequency.setLimit(frequencyExist.getLimit());
-            frequency.setFreqLimitType(frequencyExist.getFreqLimitType());
             frequency.setSysconfig(frequencyExist.isSysconfig());
         }
     }

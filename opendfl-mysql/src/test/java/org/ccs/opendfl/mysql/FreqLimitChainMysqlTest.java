@@ -44,10 +44,8 @@ class FreqLimitChainMysqlTest {
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo;
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
-        frequencyVo.setName("serverTimeFreqUserIp");
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, "serverTimeFreqUserIp", 5, FreqLimitType.USER_IP);
         frequencyVo.setLimit(1000);
-        frequencyVo.setFreqLimitType(FreqLimitType.USER_IP);
 
         String freqTypeItems = "limit,limitIp,userIp,ipUser,";
         freqLimitChain.sortStrategies(freqTypeItems);
@@ -72,31 +70,34 @@ class FreqLimitChainMysqlTest {
         Assertions.assertEquals(10, failCount, "failCount:" + failCount);
     }
 
-    private FrequencyVo getFrequencyServerTime(String requestUri) {
-        FrequencyVo frequencyVo = new FrequencyVo();
+    private FrequencyVo getFrequencyServerTime(String requestUri, String code, int time) {
+        return getFrequencyServerTime(requestUri, code, time, null);
+    }
+
+    private FrequencyVo getFrequencyServerTime(String requestUri, String code, int time, FreqLimitType freqLimitType) {
+        FrequencyVo frequencyVo = new FrequencyVo(code, time, freqLimitType, null, null, null);
         frequencyVo.setRequestUri(requestUri);
-        frequencyVo.setName("serverTimeFreq");
-        frequencyVo.setTime(5);
+//        frequencyVo.setName("serverTimeFreq");
+//        frequencyVo.setTime(5);
         frequencyVo.setErrMsg(ResultCode.USER_FREQUENCY_ERROR.getMsg());
         frequencyVo.setErrMsgEn(ResultCode.USER_FREQUENCY_ERROR.getMsg());
         return frequencyVo;
     }
 
+
     @Test
     void doCheckLimit_ipUser() {
         String lang = null;
         String ip = "192.168.5.101";
-        ip= RequestUtils.convertIpv4(ip);
+        ip = RequestUtils.convertIpv4(ip);
         String requestUri = "/frequencyTest/serverTimeFreqIpUser";
         String methodName = "serverTimeFreqIpUser";
         ReqSysType reqSysType = ReqSysType.PC;
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, "serverTimeFreqIpUser", 5);
         frequencyVo.setLimit(1000);
-        frequencyVo.setFreqLimitType(FreqLimitType.IP_USER);
-        frequencyVo.setName("serverTimeFreqIpUser");
 
         String freqTypeItems = "limit,limitIp,userIp,ipUser,";
 
@@ -124,14 +125,15 @@ class FreqLimitChainMysqlTest {
     void doCheckLimit_all() {
         String lang = null;
         String ip = "192.168.5.101";
-        ip= RequestUtils.convertIpv4(ip);
+        ip = RequestUtils.convertIpv4(ip);
         String requestUri = "/frequencyTest/serverTimeFreq";
         ReqSysType reqSysType = ReqSysType.PC;
         String methodName = "serverTimeFreq";
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, "serverTimeFreq", 5);
+        ;
         frequencyVo.setLimit(100);
 
         String freqTypeItems = "limit,limitIp,userIp,ipUser,";
@@ -145,10 +147,9 @@ class FreqLimitChainMysqlTest {
                 strategyParamsVo.load(frequencyVo, "131");
                 strategyParamsVo.getChainOper().clearChain();
                 this.freqLimitChain.doCheckLimit(freqLimitChain, strategyParamsVo);
-                if(!strategyParamsVo.getChainOper().isFail()) {
+                if (!strategyParamsVo.getChainOper().isFail()) {
                     successCount++;
-                }
-                else{
+                } else {
                     failCount++;
                 }
             } catch (BaseException e) {
@@ -166,16 +167,16 @@ class FreqLimitChainMysqlTest {
     void doCheckLimit_limit() {
         String lang = null;
         String ip = "192.168.5.101";
-        ip= RequestUtils.convertIpv4(ip);
+        ip = RequestUtils.convertIpv4(ip);
         String requestUri = "/frequencyTest/serverTimeFreq";
         ReqSysType reqSysType = ReqSysType.PC;
         String methodName = "serverTimeFreq";
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, "serverTimeFreq", 60);
+        ;
         frequencyVo.setLimit(100);
-        frequencyVo.setTime(60);
 
         String freqTypeItems = "limit,";
 
@@ -204,14 +205,14 @@ class FreqLimitChainMysqlTest {
     void doCheckLimit_limitIp() {
         String lang = null;
         String ip = "192.168.5.109";
-        ip= RequestUtils.convertIpv4(ip);
+        ip = RequestUtils.convertIpv4(ip);
         String requestUri = "/frequencyTest/serverTimeFreq";
         ReqSysType reqSysType = ReqSysType.PC;
         String methodName = "serverTimeFreq";
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, "serverTimeFreq", 5);
         frequencyVo.setLimit(10);
 
         String freqTypeItems = "limitIp,";
@@ -243,16 +244,15 @@ class FreqLimitChainMysqlTest {
     void doCheckLimit_noLimit() {
         String lang = null;
         String ip = "192.168.5.101";
-        ip= RequestUtils.convertIpv4(ip);
+        ip = RequestUtils.convertIpv4(ip);
         String requestUri = "/frequencyTest/serverTimeFreq";
         String methodName = "serverTimeFreq";
         ReqSysType reqSysType = ReqSysType.PC;
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, "serverTimeFreq", 60);
         frequencyVo.setLimit(100);
-        frequencyVo.setTime(60);
 
         String freqTypeItems = "limit,userIp,ipUser,";
 

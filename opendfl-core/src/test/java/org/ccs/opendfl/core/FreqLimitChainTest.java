@@ -100,8 +100,7 @@ class FreqLimitChainTest {
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo;
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.USER_IP);
-        frequencyVo.setName("serverTimeFreqUserIp");
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.USER_IP, "serverTimeFreqUserIp", 30); ;
         frequencyVo.setLimit(10);
 
         String freqTypeItems = "limit,limitIp,userIp,ipUser,";
@@ -127,12 +126,9 @@ class FreqLimitChainTest {
         Assertions.assertEquals(10, failCount, "failCount:" + failCount);
     }
 
-    private FrequencyVo getFrequencyServerTime(String requestUri, FreqLimitType freqLimitType) {
-        FrequencyVo frequencyVo = new FrequencyVo();
+    private FrequencyVo getFrequencyServerTime(String requestUri, FreqLimitType freqLimitType, String name, int time) {
+        FrequencyVo frequencyVo = new FrequencyVo(name, time, freqLimitType, null, null, null);
         frequencyVo.setRequestUri(requestUri);
-        frequencyVo.setName("serverTimeFreq");
-        frequencyVo.setTime(30);
-        frequencyVo.setFreqLimitType(freqLimitType);
         frequencyVo.setErrMsg(ResultCode.USER_FREQUENCY_ERROR.getMsg());
         frequencyVo.setErrMsgEn(ResultCode.USER_FREQUENCY_ERROR.getMsg());
         return frequencyVo;
@@ -148,9 +144,8 @@ class FreqLimitChainTest {
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.IP_USER);
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.IP_USER, "serverTimeFreqIpUser", 30);
         frequencyVo.setLimit(10);
-        frequencyVo.setName("serverTimeFreqIpUser");
 
         String freqTypeItems = "limit,limitIp,userIp,ipUser,";
 
@@ -184,7 +179,7 @@ class FreqLimitChainTest {
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.LIMIT);
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.LIMIT, "serverTimeFreq", 30);
         frequencyVo.setLimit(1000);
 
         String freqTypeItems = "limit,limitIp,userIp,ipUser,";
@@ -220,7 +215,7 @@ class FreqLimitChainTest {
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.LIMIT);
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.LIMIT, "serverTimeFreq", 30);
         frequencyVo.setLimit(1000);
 
         String freqTypeItems = "limit,";
@@ -256,7 +251,7 @@ class FreqLimitChainTest {
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.LIMIT);
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.LIMIT, "serverTimeFreq", 30);
         frequencyVo.setLimit(3);
 
         String freqTypeItems = "limit,";
@@ -292,7 +287,7 @@ class FreqLimitChainTest {
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo = new RequestStrategyParamsVo(lang, ip, deviceId, methodName, requestUri, reqSysType.getCode(), curTime);
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.LIMIT);
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, FreqLimitType.LIMIT, "serverTimeFreq", 30);
         frequencyVo.setLimit(1000);
 
         String freqTypeItems = "limit,userIp,ipUser,";

@@ -99,7 +99,7 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTimeFreqResIp")
-    @Frequency2(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_IP, attrName = "dataId", name = "serverTimeFreqResIp")
+    @Frequency2(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_IP, attrName = "dataId", name = "serverTimeFreqResIp", log = true)
     public Object serverTimeFreqResIp(HttpServletRequest request) {
         String dataId=request.getParameter("dataId");
         log.info("----serverTimeFreqResIp--userId={} dataId={}", request.getParameter(RequestParams.USER_ID), dataId);
@@ -108,7 +108,7 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTimeFreqResUser")
-    @Frequency2(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_USER, attrName = "dataId", name = "serverTimeFreqResUser")
+    @Frequency2(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_USER, attrName = "dataId", name = "serverTimeFreqResUser", log = true)
     public Object serverTimeFreqResUser(HttpServletRequest request) {
         String dataId=request.getParameter("dataId");
         log.info("----serverTimeFreqResUser--userId={} dataId={}", request.getParameter(RequestParams.USER_ID), dataId);
@@ -170,6 +170,21 @@ public class FrequencyTestController {
         log.info("----serverTimeFreqIp--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();
     }
+
+    @GetMapping("/serverTimeFreqIpUv")
+    @Frequency(time = 30, limit = 10, freqLimitType = FreqLimitType.IP_USER, name = "serverTimeFreqIp")
+    public Object serverTimeFreqIpUv(HttpServletRequest request) {
+        log.info("----serverTimeFreqIp--userId={}", request.getParameter(RequestParams.USER_ID));
+        return System.currentTimeMillis();
+    }
+
+    @GetMapping("/serverTimeLimitIp")
+    @Frequency(time = 30, limit = 10, freqLimitType = FreqLimitType.LIMIT_IP, name = "serverTimeLimitIp")
+    public Object serverTimeLimitIp(HttpServletRequest request) {
+        log.info("----serverTimeLimitIp--userId={}", request.getParameter(RequestParams.USER_ID));
+        return System.currentTimeMillis();
+    }
+
 
     @GetMapping("/serverTimeFreqDevice")
     public Object serverTimeFreqDevice(HttpServletRequest request) {

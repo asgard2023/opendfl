@@ -37,11 +37,10 @@ public class FreqLimitLimitStrategy implements FreqLimitStrategy {
     }
 
     public static String getRedisKey(FrequencyVo frequency, String userId, String ip) {
-        frequency.setFreqLimitType(LIMIT_TYPE);
         if (userId == null) {
-            return FrequencyUtils.getRedisKey(frequency, "noUser:" + ip);
+            return FrequencyUtils.getRedisKey(frequency, LIMIT_TYPE, "noUser:" + ip);
         } else {
-            return FrequencyUtils.getRedisKey(frequency, userId);
+            return FrequencyUtils.getRedisKey(frequency, LIMIT_TYPE, userId);
         }
     }
 

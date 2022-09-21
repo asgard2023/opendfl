@@ -11,7 +11,6 @@ import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -39,11 +38,9 @@ class WhiteChainMysqlTest {
         whiteChain.sortStrategies(freqTypeItems);
     }
 
-    private FrequencyVo getFrequencyServerTime(String requestUri) {
-        FrequencyVo frequencyVo = new FrequencyVo();
+    private FrequencyVo getFrequencyServerTime(String requestUri, String name, int time) {
+        FrequencyVo frequencyVo = new FrequencyVo(name, time, null, null, null, null);
         frequencyVo.setRequestUri(requestUri);
-        frequencyVo.setName("serverTimeFreq");
-        frequencyVo.setTime(5);
         frequencyVo.setErrMsg(ResultCode.USER_FREQUENCY_ERROR.getMsg());
         frequencyVo.setErrMsgEn(ResultCode.USER_FREQUENCY_ERROR.getMsg());
         return frequencyVo;
@@ -60,8 +57,7 @@ class WhiteChainMysqlTest {
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo;
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
-        frequencyVo.setName("serverTime");
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, "serverTime", 5);
         frequencyVo.setLimit(1000);
 
         String freqTypeItems = "ip,user,";
@@ -98,8 +94,7 @@ class WhiteChainMysqlTest {
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo;
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
-        frequencyVo.setName("serverTime");
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, "serverTime", 5);
         frequencyVo.setLimit(1000);
 
         String freqTypeItems = "ip,user,";
@@ -133,8 +128,7 @@ class WhiteChainMysqlTest {
         Long curTime = System.currentTimeMillis();
         RequestStrategyParamsVo strategyParamsVo;
 
-        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri);
-        frequencyVo.setName("serverTime");
+        FrequencyVo frequencyVo = getFrequencyServerTime(requestUri, "serverTime", 5);
         frequencyVo.setLimit(1000);
 
         String whiteUser = "5101";
