@@ -1,6 +1,5 @@
 package org.ccs.opendfl.mysql.dflcore.controller;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.constants.FrequencyType;
 import org.ccs.opendfl.core.exception.ResultData;
@@ -12,6 +11,7 @@ import org.ccs.opendfl.mysql.base.MyPageInfo;
 import org.ccs.opendfl.mysql.base.PageVO;
 import org.ccs.opendfl.mysql.dflcore.biz.IDflFrequencyBiz;
 import org.ccs.opendfl.mysql.dflcore.po.DflFrequencyPo;
+import org.ccs.opendfl.mysql.dflcore.vo.DflFrequencyConfigCountVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +65,24 @@ public class DflFrequencyController extends BaseController {
         }
         pageInfo = dflFrequencyBiz.findPageBy(entity, pageInfo, this.createAllParams(request));
         return pageInfo;
+    }
+
+    /**
+     * uri频率限制配置统计
+     *
+     * @param request
+     * @param pageInfo
+     * @return
+     */
+    @RequestMapping(value = "/listUriConfigCounts", method = {RequestMethod.POST, RequestMethod.GET})
+    @CheckLogin
+    public PageVO<DflFrequencyConfigCountVo> listUriConfigCounts(HttpServletRequest request, DflFrequencyConfigCountVo entity, MyPageInfo<DflFrequencyConfigCountVo> pageInfo) {
+        if (pageInfo.getPageSize() == 0) {
+            pageInfo.setPageSize(getPageSize());
+        }
+        this.pageSortBy(pageInfo);
+        pageInfo = dflFrequencyBiz.uriConfigCounts(entity, pageInfo);
+        return new PageVO(pageInfo);
     }
 
     @RequestMapping(value = "/list2", method = {RequestMethod.POST, RequestMethod.GET})

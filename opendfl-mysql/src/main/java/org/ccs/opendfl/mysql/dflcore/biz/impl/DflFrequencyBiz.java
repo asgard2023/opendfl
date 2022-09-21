@@ -1,6 +1,7 @@
 package org.ccs.opendfl.mysql.dflcore.biz.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.PageHelper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -15,6 +16,7 @@ import org.ccs.opendfl.mysql.constant.CommonStatus;
 import org.ccs.opendfl.mysql.dflcore.biz.IDflFrequencyBiz;
 import org.ccs.opendfl.mysql.dflcore.mapper.DflFrequencyMapper;
 import org.ccs.opendfl.mysql.dflcore.po.DflFrequencyPo;
+import org.ccs.opendfl.mysql.dflcore.vo.DflFrequencyConfigCountVo;
 import org.ccs.opendfl.mysql.dfllogs.biz.IDflRequestScansBiz;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -302,5 +304,21 @@ public class DflFrequencyBiz extends BaseService<DflFrequencyPo> implements IDfl
         criteria.andIsNotNull("time");
         criteria.andGreaterThan("modifyTime", new Date(modifyTime));
         return this.mapper.selectByExample(example);
+    }
+
+    public MyPageInfo<DflFrequencyConfigCountVo> uriConfigCounts(DflFrequencyConfigCountVo entity, MyPageInfo<DflFrequencyConfigCountVo> pageInfo){
+        if(StrUtil.isBlank(entity.getUri())){
+            entity.setUri(null);
+        }
+        String orderSql=null;
+        if(StrUtil.isBlank(pageInfo.getOrderBy())){
+            pageInfo.setOrderBy("cout");
+        }
+        if (StringUtil.isNotEmpty(pageInfo.getOrderBy()) && StringUtil.isNotEmpty(pageInfo.getOrder())) {
+            orderSql=StringUtil.camelhumpToUnderline(pageInfo.getOrderBy()) + " " + pageInfo.getOrder();
+        }
+        PageHelper.startPage(pageInfo.getPageNum(), pageInfo.getPageSize()).setOrderBy(orderSql);
+        List<DflFrequencyConfigCountVo> list= mapper.uriConfigCounts(entity.getUri());
+        return new MyPageInfo<>(list);
     }
 }
