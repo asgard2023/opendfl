@@ -9,7 +9,10 @@ import org.ccs.opendfl.core.biz.IUserBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.config.OpendflConfiguration;
 import org.ccs.opendfl.core.config.vo.LimitUriConfigVo;
-import org.ccs.opendfl.core.constants.*;
+import org.ccs.opendfl.core.constants.FrequencyConstant;
+import org.ccs.opendfl.core.constants.FrequencyType;
+import org.ccs.opendfl.core.constants.OutLimitType;
+import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.FrequencyAttrNameBlankException;
 import org.ccs.opendfl.core.strategy.black.BlackChain;
@@ -35,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -444,15 +448,15 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             if (CharSequenceUtil.isNotBlank(userId)) {
                 strategyParams.setUserId(userId);
             }
-            //支持从post报文中获取attrName对应的值
-            if (StringUtils.isNotBlank(frequency.getAttrName())) {
-                String attrName = frequency.getAttrName();
-                attrValue = FrequencyUtils.getAttrNameValue(params, reqObj, attrName);
-                //attrName的属性值为空，则不处理，由功能本身做参数验证
-                if (StringUtils.isBlank(attrValue)) {
-                    log.warn("----handleFrequency={} attrName={} attrValue is null ignore limit, need checkNull on interface", frequency.getName(), attrName);
-                    throw new FrequencyAttrNameBlankException(attrName + " is blank,need checkNull on interface");
-                }
+        }
+        //支持从post报文中获取attrName对应的值
+        if (StringUtils.isNotBlank(frequency.getAttrName())) {
+            String attrName = frequency.getAttrName();
+            attrValue = FrequencyUtils.getAttrNameValue(params, reqObj, attrName);
+            //attrName的属性值为空，则不处理，由功能本身做参数验证
+            if (StringUtils.isBlank(attrValue)) {
+                log.warn("----handleFrequency={} attrName={} attrValue is null ignore limit, need checkNull on interface", frequency.getName(), attrName);
+                throw new FrequencyAttrNameBlankException(attrName + " is blank,need checkNull on interface");
             }
         }
         return attrValue;
