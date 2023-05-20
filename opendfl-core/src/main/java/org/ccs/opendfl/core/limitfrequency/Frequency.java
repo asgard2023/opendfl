@@ -19,11 +19,11 @@ public @interface Frequency {
 
     /**
      * 编码，uniqueKey
-     * 如果多个接口的name相同，则支持跨接口限制，即：访问次数一起算，但limit是区分的
+     * 如果多个接口的name相同，则支持跨接口限制，即：访问次数一起算，为空默认为接口uri
      *
      * @return name
      */
-    String name() default "all";
+    String name() default "";
 
     /**
      * 只相当于分组，没有实际作用，允许重复

@@ -1,6 +1,7 @@
 package org.ccs.opendfl.core.limitfrequency;
 
 
+import cn.hutool.core.text.CharSequenceUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.ccs.opendfl.core.biz.IOutLogBiz;
@@ -299,15 +300,13 @@ public class FrequencyUtils {
     }
 
     public static String getRedisKey(FrequencyVo frequency, FreqLimitType limitType, String dataKey) {
+        String methodCode = CharSequenceUtil.isNotBlank(frequency.getName())?frequency.getName():frequency.getRequestUri();
         StringBuilder sbBase = new StringBuilder();
         sbBase.append(frequencyConfiguration.getRedisPrefix());
         sbBase.append(":");
         sbBase.append(limitType.getType());
         StringBuilder sb = new StringBuilder();
-        sb.append(":");
-        sb.append(frequency.getName());
-        sb.append(":");
-        sb.append(frequency.getMethod());
+        sb.append(methodCode);
         sb.append(":");
         sb.append(frequency.getTime());
         sb.append(":");
