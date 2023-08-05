@@ -53,8 +53,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     @Autowired
     private FrequencyConfiguration frequencyConfiguration;
-    @Autowired
-    private OpendflConfiguration opendflConfiguration;
     @Resource(name = "frequencyConfigBiz")
     private IFrequencyConfigBiz frequencyConfigBiz;
     @Autowired
@@ -177,12 +175,21 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return false;
             }
+            //是否异步
+            if(frequencyConfiguration.isAsync()) {
+                //基于注解的频率限制
+                this.limitByFrequencyAsync(handlerMethod, strategyParams, params, response);
 
-            //基于注解的频率限制
-            this.limitByFrequency(handlerMethod, strategyParams, params, response);
+                //基于yml配置的频率限制处理
+                this.limitByUriConfigAsync(requestVo, strategyParams, params, response);
+            }
+            else{
+                //基于注解的频率限制
+                this.limitByFrequency(handlerMethod, strategyParams, params, response);
 
-            //基于yml配置的频率限制处理
-            this.limitByUriConfig(requestVo, strategyParams, params, response);
+                //基于yml配置的频率限制处理
+                this.limitByUriConfig(requestVo, strategyParams, params, response);
+            }
 
             strategyParams = null;
             frequencyVo = null;
@@ -250,6 +257,28 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         }
     }
 
+    private void limitByFrequencyAsync(HandlerMethod handlerMethod, RequestStrategyParamsVo strategyParams, Map<String, Object> params, HttpServletResponse response) throws FrequencyAttrNameBlankException {
+        List<FrequencyVo> frequencyVoList = getMethodFrequencies(handlerMethod, strategyParams.getMethodName(), strategyParams.getRequestUri());
+        List<CompletableFuture<Void>> futures = new ArrayList<>(frequencyVoList.size());
+        List<Throwable> collectedExceptions = new ArrayList<>();
+        for(FrequencyVo frequency : frequencyVoList){
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                        frequencyConfigBiz.limitBySysconfigLoad(frequency, strategyParams.getCurTime());
+                        handleFrequency(response, params, frequency, strategyParams);
+                    }
+            ).exceptionally(exception -> {
+                if(exception!=null) {
+                    collectedExceptions.add(exception);
+                }
+                return null;
+            });
+            futures.add(future);
+        }
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).join();
+        CommUtils.throwOnAnyException(collectedExceptions);
+    }
+
     private static Map<String, List<FrequencyVo>> methodFrequencyMap=new ConcurrentHashMap<>(100);
     private List<FrequencyVo> getMethodFrequencies(HandlerMethod handlerMethod, String method, String requestUri) {
         String code=handlerMethod.getBean().getClass().getSimpleName()+"/"+requestUri;
@@ -304,6 +333,36 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         }
     }
 
+    private void limitByUriConfigAsync(RequestVo requestVo, RequestStrategyParamsVo strategyParams, Map<String, Object> params, HttpServletResponse response) throws FrequencyAttrNameBlankException {
+        frequencyConfigBiz.limitBySysconfigUri(requestVo);
+        List<LimitUriConfigVo> limitConfigList = requestVo.getLimitRequests();
+        List<CompletableFuture<Void>> futures = new ArrayList<>(limitConfigList.size());
+        List<Throwable> collectedExceptions = new ArrayList<>();
+        for (LimitUriConfigVo uriConfigVo : limitConfigList) {
+            //无效数据不算
+            if (uriConfigVo.getStatus() != 1) {
+                continue;
+            }
+            FrequencyVo frequencyVo = FrequencyVo.toFrequencyVo(uriConfigVo);
+            requestVo.setRequestUri(strategyParams.getRequestUri());
+            frequencyVo.setSysconfig(true);
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                handleFrequency(response, params, frequencyVo, strategyParams);
+                    }
+            ).exceptionally(exception -> {
+                if(exception!=null) {
+                    collectedExceptions.add(exception);
+                }
+                return null;
+            });
+            futures.add(future);
+        }
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).join();
+        CommUtils.throwOnAnyException(collectedExceptions);
+    }
+
+
     private String getConvertIp(String ip) {
         try {
             if (!(RequestUtils.isIpv6Address(ip))) {
@@ -334,7 +393,7 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         startTime.remove();
         requestKey.remove();
         //最大时长处理间隔
-        final long runTimeInterval = frequencyConfiguration.getMaxRunTimeInterval() * FrequencyConstant.TIME_MILLISECOND_TO_SECOND;
+        final int runTimeInterval = frequencyConfiguration.getMaxRunTimeInterval() * FrequencyConstant.TIME_MILLISECOND_TO_SECOND;
         //接口调用时长记录
         requestRunTime(key, requestStartTime, runTimeInterval);
         //保存调用次数
@@ -489,9 +548,8 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
     private RequestVo logFirstLoadRequest(HandlerMethod handlerMethod, String method, RequestStrategyParamsVo strategyParams) {
         String key = strategyParams.getRequestUri() + "." + method;
         requestKey.set(key);
-        RequestVo requestVo = requestVoMap.get(key);
-        if (requestVo == null) {
-            requestVo = new RequestVo();
+        RequestVo request = requestVoMap.computeIfAbsent(key, k->{
+            RequestVo requestVo = new RequestVo();
             requestVo.setCounter(new AtomicInteger());
             requestVo.setLimitCounter(new AtomicInteger());
             requestVo.setRequestUri(strategyParams.getRequestUri());
@@ -499,10 +557,10 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
             requestVo.setMethod(method);
             requestVo.setMethodName(handlerMethod.getMethod().getName());
             requestVo.setCreateTime(strategyParams.getCurTime());
-            requestVoMap.put(key, requestVo);
-        }
-        requestVo.getCounter().incrementAndGet();
-        return requestVo;
+            return requestVo;
+        });
+        request.getCounter().incrementAndGet();
+        return request;
     }
 
     private boolean isNoLimit(Object handler) {

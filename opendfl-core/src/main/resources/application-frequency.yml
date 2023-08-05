@@ -32,6 +32,8 @@ frequency:
   #接口限制
   limit:
     items: 'limit,limitIp,userIp,ipUser,resUser,resIp,'
+    #是否启用异步限制检查，异步则多个限制同时检查，同步则多个限制逐级检查
+    async: true
     #间格时间内超限日志，例如>=3600时超限后的每次访问都将记录
     outLimitLogTime: 3600
     #基于uri的限制

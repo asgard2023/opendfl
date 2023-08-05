@@ -3,6 +3,7 @@ package org.ccs.opendfl.core;
 
 import com.alibaba.fastjson.JSONObject;
 import org.ccs.opendfl.core.filter.HttpServletRequestReplacedFilter;
+import org.ccs.opendfl.core.utils.CommUtils;
 import org.ccs.opendfl.core.utils.LangType;
 import org.ccs.opendfl.core.utils.RequestParams;
 import org.ccs.opendfl.core.vo.RequestTestVo;
@@ -22,6 +23,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -56,29 +60,46 @@ class FrequencyTestControllerTest {
      */
     @Test
     void serverTimeFreq_dataId() throws Exception {
-
-        int limtCount = 0;
-        int successCount = 0;
+        AtomicInteger limtCount = new AtomicInteger();
+        AtomicInteger successCount = new AtomicInteger();
         long time=System.currentTimeMillis();
+        List<CompletableFuture<Void>> futureList = new ArrayList<>(20);
         String errorLimitType = "frequency:limit";
         for (int i = 0; i < 20; i++) {
-            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreq")
-                            .param("dataId", "data"+i)
-                            .param("userId", "123")
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andReturn();
-            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
-            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
-            if (content.contains(errorLimitType)) {
-                limtCount++;
-            } else {
-                successCount++;
-            }
-            System.out.println("----serverTimeFreq_dataId status=" + status + " content=" + content);
+            final int iFinal = i;
+            CompletableFuture future=CompletableFuture.runAsync(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        runTask();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                private void runTask() throws Exception{
+                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreq")
+                                    .param("dataId", "data"+iFinal)
+                                    .param("userId", "123")
+                                    .accept(MediaType.APPLICATION_JSON))
+                            .andReturn();
+                    int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+                    String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+                    if (content.contains(errorLimitType)) {
+                        limtCount.incrementAndGet();
+                    } else {
+                        successCount.incrementAndGet();
+                    }
+                    System.out.println("----serverTimeFreq_dataId status=" + status + " content=" + content);
+                }
+            });
+            futureList.add(future);
         }
+        CompletableFuture.allOf(futureList.toArray(new CompletableFuture[futureList.size()])).join();
+
         System.out.println("----serverTimeFreq_dataId  successCount=" + successCount + " limtCount=" + limtCount+" time="+(System.currentTimeMillis()-time));
-        Assertions.assertEquals(10, successCount, "successCount:" + successCount);
-        Assertions.assertEquals(10, limtCount, "limtCount:" + limtCount);
+        Assertions.assertEquals(10, successCount.get(), "successCount");
+        Assertions.assertEquals(10, limtCount.get(), "limtCount");
     }
 
     /**
@@ -87,29 +108,46 @@ class FrequencyTestControllerTest {
      */
     @Test
     void serverTimeFreq_userId() throws Exception {
-
-        int limtCount = 0;
-        int successCount = 0;
+        AtomicInteger limtCount = new AtomicInteger();
+        AtomicInteger successCount = new AtomicInteger();
         long time=System.currentTimeMillis();
+        List<CompletableFuture<Void>> futureList = new ArrayList<>(20);
         String errorLimitType = "frequency:limit";
         for (int i = 0; i < 20; i++) {
-            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreq")
-                            .param("dataId", "data"+i)
-                            .param("userId", "test1234")
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andReturn();
-            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
-            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
-            if (content.contains(errorLimitType)) {
-                limtCount++;
-            } else {
-                successCount++;
-            }
-            System.out.println("----serverTimeFreq_dataId status=" + status + " content=" + content);
+            final int iFinal = i;
+            CompletableFuture future=CompletableFuture.runAsync(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        runTask();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                private void runTask() throws Exception{
+                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreq")
+                                    .param("dataId", "data"+iFinal)
+                                    .param("userId", "test1234")
+                                    .accept(MediaType.APPLICATION_JSON))
+                            .andReturn();
+                    int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+                    String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+                    if (content.contains(errorLimitType)) {
+                        limtCount.incrementAndGet();
+                    } else {
+                        successCount.incrementAndGet();
+                    }
+                    System.out.println("----serverTimeFreq_dataId status=" + status + " content=" + content);
+                }
+            });
+            futureList.add(future);
         }
+        CompletableFuture.allOf(futureList.toArray(new CompletableFuture[futureList.size()])).join();
+
         System.out.println("----serverTimeFreq_dataId  successCount=" + successCount + " limtCount=" + limtCount+" time="+(System.currentTimeMillis()-time));
-        Assertions.assertEquals(10, successCount, "successCount:" + successCount);
-        Assertions.assertEquals(10, limtCount, "limtCount:" + limtCount);
+        Assertions.assertEquals(10, successCount.get(), "successCount:" + successCount);
+        Assertions.assertEquals(10, limtCount.get(), "limtCount:" + limtCount);
     }
 
     /**
@@ -118,102 +156,172 @@ class FrequencyTestControllerTest {
      */
     @Test
     void serverTimeFreqAttr_dataId() throws Exception {
-
-        int limtCount = 0;
-        int successCount = 0;
+        AtomicInteger limtCount = new AtomicInteger();
+        AtomicInteger successCount = new AtomicInteger();
         long time=System.currentTimeMillis();
+        List<CompletableFuture<Void>> futureList = new ArrayList<>(20);
         String errorLimitType = "frequency:limit";
         for (int i = 0; i < 20; i++) {
-            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqAttr")
-                            .param("dataId", "data"+i)
-                            .param("userId", "1234")
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andReturn();
-            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
-            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
-            if (content.contains(errorLimitType)) {
-                limtCount++;
-            } else {
-                successCount++;
-            }
-            System.out.println("----serverTimeFreqAttr_dataId status=" + status + " content=" + content);
+            final int iFinal = i;
+            CompletableFuture future=CompletableFuture.runAsync(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        runTask();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                private void runTask() throws Exception{
+                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqAttr")
+                                    .param("dataId", "data"+iFinal)
+                                    .param("userId", "1234")
+                                    .accept(MediaType.APPLICATION_JSON))
+                            .andReturn();
+                    int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+                    String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+                    if (content.contains(errorLimitType)) {
+                        limtCount.incrementAndGet();
+                    } else {
+                        successCount.incrementAndGet();
+                    }
+                    System.out.println("----serverTimeFreqAttr_dataId status=" + status + " content=" + content);
+                }
+            });
+            futureList.add(future);
         }
+        CompletableFuture.allOf(futureList.toArray(new CompletableFuture[futureList.size()])).join();
+
         System.out.println("----serverTimeFreqAttr_dataId  successCount=" + successCount + " limtCount=" + limtCount+" time="+(System.currentTimeMillis()-time));
-        Assertions.assertTrue(successCount > 0, "successCount:" + successCount);
-        Assertions.assertTrue(limtCount == 0, "limtCount:" + limtCount);
+        Assertions.assertTrue(successCount.get() > 0, "successCount:" + successCount);
+        Assertions.assertEquals(0, limtCount.get(), "limtCount:" + limtCount);
     }
 
     @Test
     void serverTimeFreqAttr_noDataId() throws Exception {
-        int limtCount = 0;
-        int successCount = 0;
+        AtomicInteger limtCount = new AtomicInteger();
+        AtomicInteger successCount = new AtomicInteger();
         long time=System.currentTimeMillis();
+        List<CompletableFuture<Void>> futureList = new ArrayList<>(20);
         String errorLimitType = "frequency:limit";
         for (int i = 0; i < 20; i++) {
-            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqAttr")
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andReturn();
-            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
-            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
-            if (content.contains(errorLimitType)) {
-                limtCount++;
-            } else {
-                successCount++;
-            }
-            System.out.println("----serverTimeFreqAttr_noDataId status=" + status + " content=" + content);
+            final int iFinal = i;
+            CompletableFuture future=CompletableFuture.runAsync(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        runTask();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                private void runTask() throws Exception{
+                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqAttr")
+                                    .accept(MediaType.APPLICATION_JSON))
+                            .andReturn();
+                    int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+                    String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+                    if (content.contains(errorLimitType)) {
+                        limtCount.incrementAndGet();
+                    } else {
+                        successCount.incrementAndGet();
+                    }
+                    System.out.println("----serverTimeFreqAttr_noDataId status=" + status + " content=" + content);
+                }
+            });
+            futureList.add(future);
         }
+        CompletableFuture.allOf(futureList.toArray(new CompletableFuture[futureList.size()])).join();
         System.out.println("----serverTimeFreqAttr_noDataId  successCount=" + successCount + " limtCount=" + limtCount+" time="+(System.currentTimeMillis()-time));
-        Assertions.assertTrue(successCount == 20, "successCount:" + successCount);
-        Assertions.assertTrue(limtCount  == 0, "limtCount:" + limtCount);
+        Assertions.assertEquals(20, limtCount.get(), "successCount:" + successCount);
+        Assertions.assertEquals(0, limtCount.get(), "limtCount:" + limtCount);
     }
 
     @Test
     void serverTimeFreqAttrCheck_noDataId() throws Exception {
-        int limtCount = 0;
-        int successCount = 0;
+        AtomicInteger limtCount = new AtomicInteger();
+        AtomicInteger successCount = new AtomicInteger();
         long time=System.currentTimeMillis();
+        List<CompletableFuture<Void>> futureList = new ArrayList<>(20);
         String errorLimitType = "frequency:limit";
         for (int i = 0; i < 20; i++) {
-            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqAttrCheck")
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andReturn();
-            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
-            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
-            if (content.contains(errorLimitType)) {
-                limtCount++;
-            } else {
-                successCount++;
-            }
-            System.out.println("----serverTimeFreqAttrCheck_noDataId status=" + status + " content=" + content);
+            final int iFinal = i;
+            CompletableFuture future=CompletableFuture.runAsync(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        runTask();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                private void runTask() throws Exception{
+                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqAttrCheck")
+                                    .accept(MediaType.APPLICATION_JSON))
+                            .andReturn();
+                    int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+                    String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+                    if (content.contains(errorLimitType)) {
+                        limtCount.incrementAndGet();
+                    } else {
+                        successCount.incrementAndGet();
+                    }
+                    System.out.println("----serverTimeFreqAttrCheck_noDataId status=" + status + " content=" + content);
+                }
+            });
+            futureList.add(future);
         }
+        CompletableFuture.allOf(futureList.toArray(new CompletableFuture[futureList.size()])).join();
+
         System.out.println("----serverTimeFreqAttrCheck_noDataId  successCount=" + successCount + " limtCount=" + limtCount+" time="+(System.currentTimeMillis()-time));
-        Assertions.assertTrue(successCount == 20, "successCount:" + successCount);
-        Assertions.assertTrue(limtCount == 0, "limtCount:" + limtCount);
+        Assertions.assertEquals(20, limtCount.get(), "successCount:" + successCount);
+        Assertions.assertEquals(0, limtCount.get(), "limtCount:" + limtCount);
     }
 
     @Test
     void serverTimeFreqAttrCheck_dataId() throws Exception {
-        int limtCount = 0;
-        int successCount = 0;
+        AtomicInteger limtCount = new AtomicInteger();
+        AtomicInteger successCount = new AtomicInteger();
         long time=System.currentTimeMillis();
+        List<CompletableFuture<Void>> futureList = new ArrayList<>(20);
         String errorLimitType = "frequency:limit";
         for (int i = 0; i < 20; i++) {
-            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqAttrCheck")
-                            .param("dataId", "data"+i)
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andReturn();
-            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
-            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
-            if (content.contains(errorLimitType)) {
-                limtCount++;
-            } else {
-                successCount++;
-            }
-            System.out.println("----serverTimeFreqAttrCheck_dataId status=" + status + " content=" + content);
+            final int iFinal = i;
+            CompletableFuture future=CompletableFuture.runAsync(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        runTask();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                private void runTask() throws Exception{
+                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqAttrCheck")
+                                    .param("dataId", "data"+iFinal)
+                                    .accept(MediaType.APPLICATION_JSON))
+                            .andReturn();
+                    int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+                    String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+                    if (content.contains(errorLimitType)) {
+                        limtCount.incrementAndGet();
+                    } else {
+                        successCount.incrementAndGet();
+                    }
+                    System.out.println("----serverTimeFreqAttrCheck_dataId status=" + status + " content=" + content);
+                }
+            });
+            futureList.add(future);
         }
+        CompletableFuture.allOf(futureList.toArray(new CompletableFuture[futureList.size()])).join();
+
         System.out.println("----serverTimeFreqAttrCheck_dataId  successCount=" + successCount + " limtCount=" + limtCount+" time="+(System.currentTimeMillis()-time));
-        Assertions.assertTrue(successCount > 0, "successCount:" + successCount);
-        Assertions.assertTrue(limtCount == 0, "limtCount:" + limtCount);
+        Assertions.assertTrue(successCount.get() > 0, "successCount:" + successCount);
+        Assertions.assertEquals(0, limtCount.get(), "limtCount:" + limtCount);
     }
 
     /**
@@ -389,10 +497,10 @@ class FrequencyTestControllerTest {
         int successCount = 0;
         String errorLimitTypeResUser = "frequency:resUser";
         String errorLimitTypeResIp = "frequency:resIp";
-        String blackIp="192.168.0.1";
+        String blackIp="192.168.0.2";
         for (int i = 0; i < 20; i++) {
-            String userId = "1234";
-            String dataId="abcf";
+            String userId = "12347";
+            String dataId="abcf7";
             MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqRes")
                             .param("userId", userId)
                             .param("dataId", dataId)
@@ -411,10 +519,15 @@ class FrequencyTestControllerTest {
             }
             System.out.println("----serverTimeFreqRes status=" + status + " content=" + content);
         }
+        System.out.println("----serverTimeFreqRes  successCount=" + successCount + " limtCountResUser=" + limtCountResUser+" limtCountResIp="+limtCountResIp+" time="+(System.currentTimeMillis()-time));
+        Assertions.assertEquals(10, successCount, "successCount:" + successCount);
+        Assertions.assertEquals(10, limtCountResUser, "limtCountResUser:" + limtCountResUser);
+        Assertions.assertEquals(0, limtCountResIp, "limtCountResIp:" + limtCountResIp);
 
+        blackIp="192.168.0.3";
         for (int i = 0; i < 20; i++) {
-            String userId = "1234";
-            String dataId="abcf";
+            String userId = "12347";
+            String dataId="abcf7";
             MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeFreqRes")
                             .param("userId", userId+i)
                             .param("dataId", dataId)
@@ -877,28 +990,45 @@ class FrequencyTestControllerTest {
     @Test
     void serverTimeUri() throws Exception {
 
-        int limtCount = 0;
-        int successCount = 0;
+        AtomicInteger limtCount = new AtomicInteger();
+        AtomicInteger successCount = new AtomicInteger();
         long time=System.currentTimeMillis();
+        List<CompletableFuture<Void>> futureList = new ArrayList<>(20);
         String errorLimitType = "frequency:limit";
         for (int i = 0; i < 20; i++) {
-            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeUri")
-                            .param("account", "data"+i)
-                            .param("userId", "123")
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andReturn();
-            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
-            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
-            if (content.contains(errorLimitType)) {
-                limtCount++;
-            } else {
-                successCount++;
-            }
-            System.out.println("----serverTimeUri status=" + status + " content=" + content);
+            final int iFinal = i;
+            CompletableFuture future=CompletableFuture.runAsync(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        runTask();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                private void runTask() throws Exception{
+                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeUri")
+                                    .param("account", "data"+iFinal)
+                                    .param("userId", "123")
+                                    .accept(MediaType.APPLICATION_JSON))
+                            .andReturn();
+                    int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+                    String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+                    if (content.contains(errorLimitType)) {
+                        limtCount.incrementAndGet();
+                    } else {
+                        successCount.incrementAndGet();
+                    }
+                    System.out.println("----serverTimeUri status=" + status + " content=" + content);
+                }
+            });
+            futureList.add(future);
         }
+        CompletableFuture.allOf(futureList.toArray(new CompletableFuture[futureList.size()])).join();
         System.out.println("----serverTimeUri  successCount=" + successCount + " limtCount=" + limtCount+" time="+(System.currentTimeMillis()-time));
-        Assertions.assertEquals(8, successCount, "successCount:" + successCount);
-        Assertions.assertEquals(12, limtCount, "limtCount:" + limtCount);
+        Assertions.assertEquals(8, successCount.get(), "successCount:" + successCount);
+        Assertions.assertEquals(12, limtCount.get(), "limtCount:" + limtCount);
     }
 
     /**
@@ -907,28 +1037,45 @@ class FrequencyTestControllerTest {
      */
     @Test
     void serverTimeUriPostGet_get() throws Exception {
-        int limtCount = 0;
-        int successCount = 0;
+        AtomicInteger limtCount = new AtomicInteger();
+        AtomicInteger successCount = new AtomicInteger();
         long time=System.currentTimeMillis();
+        List<CompletableFuture<Void>> futureList = new ArrayList<>(20);
         String errorLimitType = "frequency:limit";
         for (int i = 0; i < 20; i++) {
-            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeUriPostGet")
-                            .param("account", "data"+i)
-                            .param("userId", "123")
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andReturn();
-            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
-            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
-            if (content.contains(errorLimitType)) {
-                limtCount++;
-            } else {
-                successCount++;
-            }
-            System.out.println("----serverTimeUriPostGet_get status=" + status + " content=" + content);
+            final int iFinal = i;
+            CompletableFuture future=CompletableFuture.runAsync(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        runTask();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                private void runTask() throws Exception{
+                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeUriPostGet")
+                                    .param("account", "data"+iFinal)
+                                    .param("userId", "123")
+                                    .accept(MediaType.APPLICATION_JSON))
+                            .andReturn();
+                    int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+                    String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+                    if (content.contains(errorLimitType)) {
+                        limtCount.incrementAndGet();
+                    } else {
+                        successCount.incrementAndGet();
+                    }
+                    System.out.println("----serverTimeUriPostGet_get status=" + status + " content=" + content);
+                }
+            });
+            futureList.add(future);
         }
+        CompletableFuture.allOf(futureList.toArray(new CompletableFuture[futureList.size()])).join();
         System.out.println("----serverTimeUriPostGet_get  successCount=" + successCount + " limtCount=" + limtCount+" time="+(System.currentTimeMillis()-time));
-        Assertions.assertEquals(8, successCount, "successCount:" + successCount);
-        Assertions.assertEquals(12, limtCount, "limtCount:" + limtCount);
+        Assertions.assertEquals(8, successCount.get(), "successCount:" + successCount);
+        Assertions.assertEquals(12, limtCount.get(), "limtCount:" + limtCount);
     }
 
     /**
@@ -937,28 +1084,45 @@ class FrequencyTestControllerTest {
      */
     @Test
     void serverTimeUriPostGet_post() throws Exception {
-        int limtCount = 0;
-        int successCount = 0;
+        AtomicInteger limtCount = new AtomicInteger();
+        AtomicInteger successCount = new AtomicInteger();
         long time=System.currentTimeMillis();
         String errorLimitType = "frequency:limit";
+        List<CompletableFuture<Void>> futureList = new ArrayList<>(20);
         for (int i = 0; i < 20; i++) {
-            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/frequencyTest/serverTimeUriPostGet")
-                            .param("account", "data"+i)
-                            .param("userId", "123")
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andReturn();
-            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
-            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
-            if (content.contains(errorLimitType)) {
-                limtCount++;
-            } else {
-                successCount++;
-            }
-            System.out.println("----serverTimeUriPostGet_post status=" + status + " content=" + content);
+            final int iFinal = i;
+            CompletableFuture future=CompletableFuture.runAsync(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        runTask();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                private void runTask() throws Exception{
+                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/frequencyTest/serverTimeUriPostGet")
+                                    .param("account", "data"+iFinal)
+                                    .param("userId", "123")
+                                    .accept(MediaType.APPLICATION_JSON))
+                            .andReturn();
+                    int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+                    String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+                    if (content.contains(errorLimitType)) {
+                        limtCount.incrementAndGet();
+                    } else {
+                        successCount.incrementAndGet();
+                    }
+                    System.out.println("----serverTimeUriPostGet_post status=" + status + " content=" + content);
+                }
+            });
+            futureList.add(future);
         }
+        CompletableFuture.allOf(futureList.toArray(new CompletableFuture[futureList.size()])).join();
         System.out.println("----serverTimeUriPostGet_post  successCount=" + successCount + " limtCount=" + limtCount+" time="+(System.currentTimeMillis()-time));
-        Assertions.assertEquals(9, successCount, "successCount:" + successCount);
-        Assertions.assertEquals(11, limtCount, "limtCount:" + limtCount);
+        Assertions.assertEquals(9, successCount.get(), "successCount");
+        Assertions.assertEquals(11, limtCount.get(), "limtCount");
     }
 
     /**
@@ -967,28 +1131,45 @@ class FrequencyTestControllerTest {
      */
     @Test
     void serverTimeUriPostGet2_get() throws Exception {
-        int limtCount = 0;
-        int successCount = 0;
+        AtomicInteger limtCount = new AtomicInteger();
+        AtomicInteger successCount = new AtomicInteger();
         long time=System.currentTimeMillis();
         String errorLimitType = "frequency:limit";
+        List<CompletableFuture<Void>> futureList = new ArrayList<>(20);
         for (int i = 0; i < 20; i++) {
-            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeUriPostGet2")
-                            .param("account", "data"+i)
-                            .param("userId", "123")
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andReturn();
-            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
-            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
-            if (content.contains(errorLimitType)) {
-                limtCount++;
-            } else {
-                successCount++;
-            }
-            System.out.println("----serverTimeUriPostGet_post status=" + status + " content=" + content);
+            final int iFinal = i;
+            CompletableFuture future=CompletableFuture.runAsync(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        runTask();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                private void runTask() throws Exception{
+                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/frequencyTest/serverTimeUriPostGet2")
+                                    .param("account", "data"+iFinal)
+                                    .param("userId", "123")
+                                    .accept(MediaType.APPLICATION_JSON))
+                            .andReturn();
+                    int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+                    String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+                    if (content.contains(errorLimitType)) {
+                        limtCount.incrementAndGet();
+                    } else {
+                        successCount.incrementAndGet();
+                    }
+                    System.out.println("----serverTimeUriPostGet_post status=" + status + " content=" + content);
+                }
+            });
+            futureList.add(future);
         }
+        CompletableFuture.allOf(futureList.toArray(new CompletableFuture[futureList.size()])).join();
         System.out.println("----serverTimeUriPostGet_post  successCount=" + successCount + " limtCount=" + limtCount+" time="+(System.currentTimeMillis()-time));
-        Assertions.assertEquals(8, successCount, "successCount:" + successCount);
-        Assertions.assertEquals(12, limtCount, "limtCount:" + limtCount);
+        Assertions.assertEquals(8, successCount.get(), "successCount:" + successCount);
+        Assertions.assertEquals(12, limtCount.get(), "limtCount:" + limtCount);
     }
 
     /**
@@ -997,27 +1178,44 @@ class FrequencyTestControllerTest {
      */
     @Test
     void serverTimeUriPostGet2_post() throws Exception {
-        int limtCount = 0;
-        int successCount = 0;
+        AtomicInteger limtCount = new AtomicInteger();
+        AtomicInteger successCount = new AtomicInteger();
         long time=System.currentTimeMillis();
         String errorLimitType = "frequency:limit";
+        List<CompletableFuture<Void>> futureList = new ArrayList<>(20);
         for (int i = 0; i < 20; i++) {
-            MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/frequencyTest/serverTimeUriPostGet2")
-                            .param("account", "data"+i)
-                            .param("userId", "123")
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andReturn();
-            int status = mvcResult.getResponse().getStatus();                 //得到返回代码
-            String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
-            if (content.contains(errorLimitType)) {
-                limtCount++;
-            } else {
-                successCount++;
-            }
-            System.out.println("----serverTimeUriPostGet_post status=" + status + " content=" + content);
+            final int iFinal = i;
+            CompletableFuture future=CompletableFuture.runAsync(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        runTask();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                private void runTask() throws Exception{
+                    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/frequencyTest/serverTimeUriPostGet2")
+                                    .param("account", "data"+iFinal)
+                                    .param("userId", "123")
+                                    .accept(MediaType.APPLICATION_JSON))
+                            .andReturn();
+                    int status = mvcResult.getResponse().getStatus();                 //得到返回代码
+                    String content = mvcResult.getResponse().getContentAsString();    //得到返回结果
+                    if (content.contains(errorLimitType)) {
+                        limtCount.incrementAndGet();
+                    } else {
+                        successCount.incrementAndGet();
+                    }
+                    System.out.println("----serverTimeUriPostGet_post status=" + status + " content=" + content);
+                }
+            });
+            futureList.add(future);
         }
+        CompletableFuture.allOf(futureList.toArray(new CompletableFuture[futureList.size()])).join();
         System.out.println("----serverTimeUriPostGet_post  successCount=" + successCount + " limtCount=" + limtCount+" time="+(System.currentTimeMillis()-time));
-        Assertions.assertEquals(8, successCount, "successCount:" + successCount);
-        Assertions.assertEquals(12, limtCount, "limtCount:" + limtCount);
+        Assertions.assertEquals(8, successCount.get(), "successCount");
+        Assertions.assertEquals(12, limtCount.get(), "limtCount");
     }
 }
