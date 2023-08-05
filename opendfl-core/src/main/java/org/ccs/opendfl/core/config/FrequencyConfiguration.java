@@ -28,6 +28,7 @@ import java.util.Map;
 public class FrequencyConfiguration {
     private Character ifActive = '1';
     private String redisPrefix = "limitCount";
+    private boolean async=true;
     /**
      * 是否开启频率限制key hash以压缩key长度
      */

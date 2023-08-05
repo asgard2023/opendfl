@@ -1,5 +1,8 @@
 package org.ccs.opendfl.core.utils;
 
+import cn.hutool.core.collection.CollUtil;
+import org.ccs.opendfl.core.exception.BaseException;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -92,7 +95,7 @@ public final class CommUtils {
         return str;
     }
 
-    public static String concat(Collection list, String splitChar) {
+    public static String concat(Collection<?> list, String splitChar) {
         if (list == null) {
             return null;
         }
@@ -211,5 +214,19 @@ public final class CommUtils {
             }
         }
         return url;
+    }
+
+    public static void throwOnAnyException(List<Throwable> collectedExceptions) {
+        if(CollUtil.isNotEmpty(collectedExceptions)){
+            for(Throwable throwable: collectedExceptions) {
+                if (throwable != null) {
+                    if(throwable.getCause() instanceof BaseException)
+                        throw (BaseException) throwable.getCause();
+                    else {
+                        throw new UnknownError(throwable.getMessage());
+                    }
+                }
+            }
+        }
     }
 }

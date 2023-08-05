@@ -54,6 +54,13 @@ public class FrequencyVo {
         this.log = false;
     }
 
+    /**
+     * 用于Controller查询
+     */
+    public FrequencyVo(){
+        this(new LimitUriConfigVo());
+    }
+
     public FrequencyVo(LimitUriConfigVo uriConfigVo) {
         this.limitType = FrequencyType.URI_CONFIG.getType();
         this.method = uriConfigVo.getMethod();
