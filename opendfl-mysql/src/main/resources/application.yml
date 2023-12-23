@@ -14,7 +14,7 @@ spring:
     include:
       - opendfl
       - frequency
-      - requestlock
+#      - requestlock
   redis:
     host: 10.0.8.3
     password: ''

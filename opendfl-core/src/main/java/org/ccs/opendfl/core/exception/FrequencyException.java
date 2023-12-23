@@ -11,4 +11,23 @@ public class FrequencyException extends BaseException {
     public FrequencyException() {
         super(resultCode.getCode(), resultCode.getMsg());
     }
+
+    private String freqCode;
+    private String limitType;
+
+    public String getFreqCode() {
+        return freqCode;
+    }
+
+    public void setFreqCode(String freqCode) {
+        this.freqCode = freqCode;
+    }
+
+    public String getLimitType() {
+        return limitType;
+    }
+
+    public void setLimitType(String limitType) {
+        this.limitType = limitType;
+    }
 }

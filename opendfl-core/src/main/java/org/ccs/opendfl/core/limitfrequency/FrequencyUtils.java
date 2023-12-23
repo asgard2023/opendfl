@@ -239,14 +239,18 @@ public class FrequencyUtils {
         LangType langType = LangType.parse(lang);
         String limitInfo = getLimitInfo(langType);
         if (frequency == null) {
-            BaseException exception = new FrequencyException(limitInfo);
+            FrequencyException exception = new FrequencyException(limitInfo);
             exception.setTitle(title);
+            exception.setFreqCode(frequency.getName());
+            exception.setLimitType(frequency.getFreqLimitType().getCode());
             throw exception;
         }
 
         String errMsg = getErrMsg(frequency, langType);
-        BaseException exception = new FrequencyException(limitInfo + ":" + errMsg);
+        FrequencyException exception = new FrequencyException(limitInfo + ":" + errMsg);
         exception.setTitle(title);
+        exception.setFreqCode(frequency.getName());
+        exception.setLimitType(frequency.getFreqLimitType().getCode());
         throw exception;
     }
 

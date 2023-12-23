@@ -6,14 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IMaxRunTimeBiz;
 import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.constants.FreqLimitType;
-import org.ccs.opendfl.core.constants.FrequencyConstant;
-import org.ccs.opendfl.core.constants.ReqLockType;
 import org.ccs.opendfl.core.exception.FailedException;
 import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.limitfrequency.Frequency;
-import org.ccs.opendfl.core.limitfrequency.Frequency2;
-import org.ccs.opendfl.core.limitfrequency.Frequency3;
-import org.ccs.opendfl.core.limitlock.RequestLock;
+import org.ccs.opendfl.core.limitfrequency.Frequencys;
 import org.ccs.opendfl.core.utils.RequestParams;
 import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.utils.StringUtils;
@@ -73,54 +69,61 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTimeFreq")
-    @Frequency(time = 5, limit = 10, name = "serverTimeFreq", log=true)
-    @Frequency2(time = 3600, limit = 20, name = "serverTimeFreq", log=true)
+    @Frequencys({@Frequency(time = 5, limit = 10, name = "serverTimeFreq", log = true)
+            , @Frequency(time = 3600, limit = 20, name = "serverTimeFreq", log = true)})
     public Object serverTimeFreq(HttpServletRequest request) {
         log.info("----serverTimeFreq--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();
     }
 
     @GetMapping("/serverTimeFreqAttr")
-    @Frequency(time = 5, limit = 50, name = "serverTimeFreqAttr", attrName = "dataId")
-    @Frequency2(time = 3600, limit = 100, name = "serverTimeFreqAttr", attrName = "dataId")
+    @Frequencys({@Frequency(time = 5, limit = 50, name = "serverTimeFreqAttr", attrName = "dataId")
+            , @Frequency(time = 3600, limit = 100, name = "serverTimeFreqAttr", attrName = "dataId")})
     public Object serverTimeFreqAttr(HttpServletRequest request) {
         log.info("----serverTimeFreqAttr--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();
     }
 
     @GetMapping("/serverTimeFreqAttrCheck")
-    @Frequency(time = 5, limit = 50, name = "serverTimeFreqAttrCheck", attrName = "dataId")
-    @Frequency2(time = 3600, limit = 100, name = "serverTimeFreqAttrCheck", attrName = "dataId")
+    @Frequencys({
+            @Frequency(time = 5, limit = 50, name = "serverTimeFreqAttrCheck", attrName = "dataId")
+            , @Frequency(time = 3600, limit = 100, name = "serverTimeFreqAttrCheck", attrName = "dataId")
+    })
     public Object serverTimeFreqAttrCheck(HttpServletRequest request) {
         log.info("----serverTimeFreqAttrCheck--userId={}", request.getParameter(RequestParams.USER_ID));
-        String dataId=request.getParameter("dataId");
+        String dataId = request.getParameter("dataId");
         ValidateUtils.notNull(dataId, "dataId is null");
         return System.currentTimeMillis();
     }
 
     @GetMapping("/serverTimeFreqResIp")
-    @Frequency2(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_IP, attrName = "dataId", name = "serverTimeFreqResIp", log = true)
+    @Frequencys({
+            @Frequency(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_IP, attrName = "dataId", name = "serverTimeFreqResIp", log = true)
+    })
     public Object serverTimeFreqResIp(HttpServletRequest request) {
-        String dataId=request.getParameter("dataId");
+        String dataId = request.getParameter("dataId");
         log.info("----serverTimeFreqResIp--userId={} dataId={}", request.getParameter(RequestParams.USER_ID), dataId);
         ValidateUtils.notNull(dataId, "dataId is null");
         return System.currentTimeMillis();
     }
 
     @GetMapping("/serverTimeFreqResUser")
-    @Frequency2(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_USER, attrName = "dataId", name = "serverTimeFreqResUser", log = true)
+        @Frequencys({@Frequency(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_USER, attrName = "dataId", name = "serverTimeFreqResUser", log = true)
+    })
     public Object serverTimeFreqResUser(HttpServletRequest request) {
-        String dataId=request.getParameter("dataId");
+        String dataId = request.getParameter("dataId");
         log.info("----serverTimeFreqResUser--userId={} dataId={}", request.getParameter(RequestParams.USER_ID), dataId);
         ValidateUtils.notNull(dataId, "dataId is null");
         return System.currentTimeMillis();
     }
 
     @GetMapping("/serverTimeFreqRes")
-    @Frequency2(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_IP, attrName = "dataId", name = "serverTimeFreqRes")
-    @Frequency3(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_USER, attrName = "dataId", name = "serverTimeFreqRes", log = true)
+    @Frequencys({
+            @Frequency(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_IP, attrName = "dataId", name = "serverTimeFreqRes"),
+            @Frequency(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_USER, attrName = "dataId", name = "serverTimeFreqRes", log = true)
+    })
     public Object serverTimeFreqRes(HttpServletRequest request) {
-        String dataId=request.getParameter("dataId");
+        String dataId = request.getParameter("dataId");
         log.info("----serverTimeFreqRes--userId={} dataId={}", request.getParameter(RequestParams.USER_ID), dataId);
         ValidateUtils.notNull(dataId, "dataId is null");
         return System.currentTimeMillis();
@@ -134,16 +137,20 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTimeNeedLogin")
-    @Frequency(time = 5, limit = 5, needLogin = true, name = "serverTimeNeedLogin")
-    @Frequency2(time = 3600, needLogin = true, limit = 100, name = "serverTimeNeedLogin")
+    @Frequencys({
+            @Frequency(time = 5, limit = 5, needLogin = true, name = "serverTimeNeedLogin"),
+            @Frequency(time = 3600, needLogin = true, limit = 100, name = "serverTimeNeedLogin")
+    })
     public Object serverTimeNeedLogin(HttpServletRequest request) {
         log.info("----serverTimeNeedLogin--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();
     }
 
     @GetMapping("/serverTimeFreq120")
-    @Frequency(time = 120, limit = 5, name = "serverTimeFreq120")
-    @Frequency2(time = 3600, limit = 100, name = "serverTimeFreq120")
+    @Frequencys({
+            @Frequency(time = 120, limit = 5, name = "serverTimeFreq120"),
+            @Frequency(time = 3600, limit = 100, name = "serverTimeFreq120")
+    })
     public Object serverTimeFreq120(HttpServletRequest request) {
         log.info("----serverTimeFreq120--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();
@@ -164,8 +171,10 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTimeFreqIp")
-    @Frequency(time = 30, limit = 10, freqLimitType = FreqLimitType.IP_USER, name = "serverTimeFreqIp")
-    @Frequency2(time = 30, limit = 10, freqLimitType = FreqLimitType.USER_IP, name = "serverTimeFreqIp")
+    @Frequencys({
+            @Frequency(time = 30, limit = 10, freqLimitType = FreqLimitType.IP_USER, name = "serverTimeFreqIp"),
+            @Frequency(time = 30, limit = 10, freqLimitType = FreqLimitType.USER_IP, name = "serverTimeFreqIp")
+    })
     public Object serverTimeFreqIp(HttpServletRequest request) {
         log.info("----serverTimeFreqIp--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();
@@ -199,13 +208,13 @@ public class FrequencyTestController {
         return System.currentTimeMillis();
     }
 
-    @RequestMapping(value="/serverTimeUriPostGet", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/serverTimeUriPostGet", method = {RequestMethod.GET, RequestMethod.POST})
     public Object serverTimeUriPostGet(HttpServletRequest request) {
         log.info("----serverTimeUriPostGet--account={}", request.getParameter("account"));
         return System.currentTimeMillis();
     }
 
-    @RequestMapping(value="/serverTimeUriPostGet2", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/serverTimeUriPostGet2", method = {RequestMethod.GET, RequestMethod.POST})
     public Object serverTimeUriPostGet2(HttpServletRequest request) {
         log.info("----serverTimeUriPostGet2--account={}", request.getParameter("account"));
         return System.currentTimeMillis();

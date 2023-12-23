@@ -285,29 +285,26 @@ public class FrequencyHandlerInterceptor implements HandlerInterceptor {
         List<FrequencyVo> list=methodFrequencyMap.get(code);
         if(list == null){
             list=new ArrayList<>();
-            FrequencyVo frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency.class));
-            addFrequency(frequency, method, requestUri, list);
-            frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency2.class));
-            addFrequency(frequency, method, requestUri, list);
-            frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency3.class));
-            addFrequency(frequency, method, requestUri, list);
-            frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency4.class));
-            addFrequency(frequency, method, requestUri, list);
-            frequency = FrequencyVo.toFrequencyVo(handlerMethod.getMethodAnnotation(Frequency5.class));
-            addFrequency(frequency, method, requestUri, list);
+            Frequencys frequencys = handlerMethod.getMethodAnnotation(Frequencys.class);
+            if(frequencys!=null) {
+                for (Frequency frequency : frequencys.value()) {
+                    addFrequency(frequency, method, requestUri, list);
+                }
+            }
+            Frequency frequency = handlerMethod.getMethodAnnotation(Frequency.class);
+            if(frequency!=null){
+                addFrequency(frequency, method, requestUri, list);
+            }
             methodFrequencyMap.put(code, list);
         }
         return list;
     }
 
-
-
-    private void addFrequency(FrequencyVo frequency, String method, String requestUri, List<FrequencyVo> list){
-        if(frequency!=null) {
-            frequency.setRequestUri(requestUri);
-            frequency.setMethod(method);
-            list.add(frequency);
-        }
+    private static void addFrequency(Frequency frequency, String method, String requestUri, List<FrequencyVo> list) {
+        FrequencyVo frequencyVo = FrequencyVo.toFrequencyVo(frequency);
+        frequencyVo.setRequestUri(requestUri);
+        frequencyVo.setMethod(method);
+        list.add(frequencyVo);
     }
 
     /**

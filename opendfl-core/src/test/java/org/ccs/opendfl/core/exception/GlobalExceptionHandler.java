@@ -88,7 +88,13 @@ public class GlobalExceptionHandler {
         } else {
             logger.warn("----handleBaseException method={} request={}\n error:{}", request.getMethod(), parameterMap, e.getMessage());
         }
-        return ResultData.error(e);
+        ResultData resultData = ResultData.error(e);
+        if(e instanceof FrequencyException){
+            FrequencyException frequencyException = (FrequencyException)e;
+            resultData.setErrorType(frequencyException.getLimitType());
+            resultData.setFreqCode(frequencyException.getFreqCode());
+        }
+        return resultData;
     }
 
 

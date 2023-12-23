@@ -8,7 +8,7 @@ import org.ccs.opendfl.core.biz.IRsaBiz;
 import org.ccs.opendfl.core.exception.FailedException;
 import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.limitfrequency.Frequency;
-import org.ccs.opendfl.core.limitfrequency.Frequency2;
+import org.ccs.opendfl.core.limitfrequency.Frequencys;
 import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.utils.ValidateUtils;
@@ -87,8 +87,8 @@ public class FrequencyLoginController {
      * @return 返回登入数据
      */
     @PostMapping("/login")
-    @Frequency(time = 5, limit = 4, name = "frequencyLogin", attrName = "username")
-    @Frequency2(time = 3600, limit = 30, name = "frequencyLogin", attrName = "username")
+    @Frequencys({@Frequency(time = 5, limit = 4, name = "frequencyLogin", attrName = "username")
+            , @Frequency(time = 3600, limit = 30, name = "frequencyLogin", attrName = "username")})
     public ResultData login(UserVo user, @RequestParam(value = "clientIdRsa", required = false) String clientIdRsa, HttpServletRequest request) {
         ValidateUtils.notNull(clientIdRsa, "clientIdRsa is null");
         String username = user.getUsername();

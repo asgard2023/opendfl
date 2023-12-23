@@ -2,10 +2,7 @@ package org.ccs.opendfl.mysql.exception;
 
 
 import com.alibaba.druid.util.StringUtils;
-import org.ccs.opendfl.core.exception.BaseException;
-import org.ccs.opendfl.core.exception.FailedException;
-import org.ccs.opendfl.core.exception.ResultData;
-import org.ccs.opendfl.core.exception.UnknownException;
+import org.ccs.opendfl.core.exception.*;
 import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.mysql.dflsystem.constant.SystemConfigCodes;
 import org.ccs.opendfl.mysql.dflsystem.utils.SystemConfig;
@@ -99,7 +96,13 @@ public class GlobalExceptionHandler {
         } else {
             logger.warn("----handleBaseException method={} request={}\n error:{}", request.getMethod(), parameterMap, e.getMessage());
         }
-        return ResultData.error(e);
+        ResultData resultData = ResultData.error(e);
+        if(e instanceof FrequencyException){
+            FrequencyException frequencyException = (FrequencyException)e;
+            resultData.setErrorType(frequencyException.getLimitType());
+            resultData.setFreqCode(frequencyException.getFreqCode());
+        }
+        return resultData;
     }
 
     @ExceptionHandler(SecurityException.class)

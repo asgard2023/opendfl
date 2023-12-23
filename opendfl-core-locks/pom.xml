@@ -5,10 +5,10 @@
     <parent>
 		<groupId>cn.org.opendfl</groupId>
 		<artifactId>opendfl-parent</artifactId>
-		<version>1.5</version>
+		<version>1.6</version>
 	</parent>
     <artifactId>opendfl-core-locks</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
     <name>opendfl-core-locks</name>
     <description>opendfl:Open distributed frequency limitation</description>
     <properties>
