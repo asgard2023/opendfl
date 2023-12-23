@@ -69,8 +69,10 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTimeFreq")
-    @Frequencys({@Frequency(time = 5, limit = 10, name = "serverTimeFreq", log = true)
-            , @Frequency(time = 3600, limit = 20, name = "serverTimeFreq", log = true)})
+    @Frequencys({
+            @Frequency(time = 5, limit = 10, name = "serverTimeFreq", log = true),
+            @Frequency(time = 3600, limit = 20, name = "serverTimeFreq", log = true)
+    })
     public Object serverTimeFreq(HttpServletRequest request) {
         log.info("----serverTimeFreq--userId={}", request.getParameter(RequestParams.USER_ID));
         return System.currentTimeMillis();
@@ -108,7 +110,7 @@ public class FrequencyTestController {
     }
 
     @GetMapping("/serverTimeFreqResUser")
-        @Frequencys({@Frequency(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_USER, attrName = "dataId", name = "serverTimeFreqResUser", log = true)
+    @Frequencys({@Frequency(time = 60, limit = 10, freqLimitType = FreqLimitType.RES_USER, attrName = "dataId", name = "serverTimeFreqResUser", log = true)
     })
     public Object serverTimeFreqResUser(HttpServletRequest request) {
         String dataId = request.getParameter("dataId");
