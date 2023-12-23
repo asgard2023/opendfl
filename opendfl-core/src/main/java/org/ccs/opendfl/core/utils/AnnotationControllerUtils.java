@@ -6,7 +6,8 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.ccs.opendfl.core.limitfrequency.*;
+import org.ccs.opendfl.core.limitfrequency.Frequency;
+import org.ccs.opendfl.core.limitfrequency.Frequencys;
 import org.ccs.opendfl.core.limitlock.RequestLock;
 import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestLockVo;
@@ -187,12 +188,9 @@ public class AnnotationControllerUtils {
             String annotationUri = getMethodUri(annotation, methodTypeSb);
             methodType = methodTypeSb.toString();
             if (annotationUri == null) {
-                FrequencyVo frequencyVo = toLimitFrequency(annotation, frequencyVoList, limitTypes, attrNameSb);
-                RequestLockVo requestLockVo = null;
-                if (frequencyVo == null) {
-                    requestLockVo = toLimitLock(annotation, requestLockVos, limitTypes, attrNameSb);
-                }
-                if (frequencyVo == null && requestLockVo == null) {
+                boolean hasFrequency = toLimitFrequency(annotation, frequencyVoList, limitTypes, attrNameSb);
+                RequestLockVo requestLockVo = toLimitLock(annotation, requestLockVos, limitTypes, attrNameSb);
+                if (!hasFrequency && requestLockVo == null) {
                     otherAnnotations.add(annotation);
                 }
             }
@@ -316,25 +314,30 @@ public class AnnotationControllerUtils {
      * @param limitTypes   StringBuilder
      * @return
      */
-    private static FrequencyVo toLimitFrequency(Annotation annotation, List<FrequencyVo> frequencyVos, StringBuilder limitTypes, StringBuilder attrNameSb) {
+    private static boolean toLimitFrequency(Annotation annotation, List<FrequencyVo> frequencyVos, StringBuilder limitTypes, StringBuilder attrNameSb) {
+        boolean hasFrequency = false;
         FrequencyVo frequencyVo = null;
         if (annotation instanceof Frequency) {
-            frequencyVo = FrequencyVo.toFrequencyVo((Frequency) annotation);
-        } else if (annotation instanceof Frequency2) {
-            frequencyVo = FrequencyVo.toFrequencyVo((Frequency2) annotation);
-        } else if (annotation instanceof Frequency3) {
-            frequencyVo = FrequencyVo.toFrequencyVo((Frequency3) annotation);
-        } else if (annotation instanceof Frequency4) {
-            frequencyVo = FrequencyVo.toFrequencyVo((Frequency4) annotation);
-        } else if (annotation instanceof Frequency5) {
-            frequencyVo = FrequencyVo.toFrequencyVo((Frequency5) annotation);
-        }
-        if (frequencyVo != null) {
+            hasFrequency=true;
+            frequencyVo=getFrequencyAnnotation((Frequency) annotation, limitTypes, attrNameSb);
             frequencyVos.add(frequencyVo);
-            limitTypes.append(frequencyVo.getLimitType()).append(",");
-            if (frequencyVo.getAttrName() != null && !attrNameSb.toString().contains(frequencyVo.getAttrName())) {
-                attrNameSb.append(frequencyVo.getAttrName());
+        }
+        else if(annotation instanceof Frequencys){
+            hasFrequency=true;
+            Frequencys frequencys = (Frequencys)annotation;
+            for(Frequency frequencyObj: frequencys.value()){
+                frequencyVo=getFrequencyAnnotation(frequencyObj, limitTypes, attrNameSb);
+                frequencyVos.add(frequencyVo);
             }
+        }
+        return hasFrequency;
+    }
+
+    private static FrequencyVo getFrequencyAnnotation(Frequency frequency, StringBuilder limitTypes, StringBuilder attrNameSb){
+        FrequencyVo frequencyVo = FrequencyVo.toFrequencyVo(frequency);
+        limitTypes.append(frequencyVo.getLimitType()).append(",");
+        if (frequencyVo.getAttrName() != null && !attrNameSb.toString().contains(frequencyVo.getAttrName())) {
+            attrNameSb.append(frequencyVo.getAttrName());
         }
         return frequencyVo;
     }

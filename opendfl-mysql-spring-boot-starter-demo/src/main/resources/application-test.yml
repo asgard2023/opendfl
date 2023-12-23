@@ -6,7 +6,7 @@ info:
 
 spring:
   redis:
-    host: 192.168.1.254
+    host: 192.168.0.40
     #password: 'testjd2019'
     port: 6379
     database: 1
@@ -15,20 +15,20 @@ spring:
         max-idle: 100
         max-wait: 1000ms
   etcd:
-    endpoints: http://192.168.1.254:2379,http://192.168.1.254:2380,http://192.168.1.254:2381
+    endpoints: http://192.168.0.40:2379,http://192.168.0.40:2380,http://192.168.0.40:2381
   zookeeper:
     baseSleepTimeMs: 1000
     #重试次数
     maxRetries: 3
     #zookeeper服务连接id与端口
-    address: 192.168.1.254:2181
+    address: 192.168.0.40:2181
     #会话超时时间，单位毫秒
     sessionTimeoutMs: 5000
     #连接创建超时时间，单位毫秒
     connection-timeout-ms: 5000
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://192.168.1.254:3306/opendfl_dev?allowPublicKeyRetrieval=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+    url: jdbc:mysql://192.168.0.40:3306/opendfl_dev?allowPublicKeyRetrieval=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
     username: opendfl_dev
     password: jh@123456
     driver-class-name: com.mysql.cj.jdbc.Driver

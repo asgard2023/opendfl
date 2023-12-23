@@ -86,8 +86,6 @@ public class FrequencyResetController {
     @RequestMapping(value = "/resetLimits", method = {RequestMethod.GET, RequestMethod.POST})
     public ResultData resetLimits(HttpServletRequest request
             , @RequestParam(value = "clientId", required = false) String clientId
-            , @RequestParam(value = "type", required = false) String type
-            , @RequestParam(value = "funcCode", required = false) String funcCode
             , @RequestParam(value = "verifyCode", required = false) String verifyCode
             , FrequencyVo frequency) {
         if (StringUtils.isEmpty(clientId)) {

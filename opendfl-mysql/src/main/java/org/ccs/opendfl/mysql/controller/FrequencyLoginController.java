@@ -3,10 +3,11 @@ package org.ccs.opendfl.mysql.controller;
 import cn.hutool.core.text.CharSequenceUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.ccs.opendfl.core.biz.IRsaBiz;
+import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.FailedException;
 import org.ccs.opendfl.core.exception.ResultData;
 import org.ccs.opendfl.core.limitfrequency.Frequency;
-import org.ccs.opendfl.core.limitfrequency.Frequency2;
+import org.ccs.opendfl.core.limitfrequency.Frequencys;
 import org.ccs.opendfl.core.utils.RequestUtils;
 import org.ccs.opendfl.core.utils.ValidateUtils;
 import org.ccs.opendfl.mysql.dflsystem.biz.IDflUserLoginBiz;
@@ -72,7 +73,10 @@ public class FrequencyLoginController {
             map.put("clientIdRsa", clientIdRsa);
             map.put("funcCode", funcCode);
             return ResultData.success(map);
-        } catch (Exception e) {
+        }catch (BaseException e){
+            throw e;
+        }
+        catch (Exception e) {
             log.error("----generateRSAKey--clientIdRsa={}", clientIdRsa, e);
             throw new FailedException(e.getMessage());
         }
@@ -87,8 +91,10 @@ public class FrequencyLoginController {
      */
     @PostMapping("/login")
 
-    @Frequency(time = 5, limit = 4, name = "frequencyLogin", attrName = "username")
-    @Frequency2(time = 3600, limit = 30, name = "frequencyLogin", attrName = "username")
+    @Frequencys({
+            @Frequency(time = 5, limit = 4, name = "frequencyLogin", attrName = "username"),
+            @Frequency(time = 3600, limit = 30, name = "frequencyLogin", attrName = "username")
+    })
     public ResultData login(UserVo user, @RequestParam(value = "clientIdRsa", required = false) String clientIdRsa, HttpServletRequest request) {
         ValidateUtils.notNull(clientIdRsa, "clientIdRsa is null");
         String username = user.getUsername();

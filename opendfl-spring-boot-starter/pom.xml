@@ -10,13 +10,13 @@
     </parent>
     <groupId>cn.org.opendfl</groupId>
     <artifactId>opendfl-spring-boot-starter</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
     <name>opendfl-spring-boot-starter</name>
     <description>opendfl of spring-boot-starter</description>
 
     <properties>
-        <opendfl-core.version>1.5</opendfl-core.version>
-        <opendfl-core-locks.version>1.5</opendfl-core-locks.version>
+        <opendfl-core.version>1.6</opendfl-core.version>
+        <opendfl-core-locks.version>1.6</opendfl-core-locks.version>
     </properties>
 
     <dependencies>

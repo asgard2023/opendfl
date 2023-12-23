@@ -11,6 +11,8 @@ public class ResultData {
     private String resultCode;
     private String errorMsg;
     private Object data;
+
+    private String freqCode;
     private String errorType = "sys";
 
     private ResultData(String resultCode, String errorMsg, Object data, String errorType) {
@@ -82,5 +84,13 @@ public class ResultData {
 
     public void setErrorType(String errorType) {
         this.errorType = errorType;
+    }
+
+    public String getFreqCode() {
+        return freqCode;
+    }
+
+    public void setFreqCode(String freqCode) {
+        this.freqCode = freqCode;
     }
 }

@@ -159,8 +159,10 @@ public class RequestLockHandlerInterceptor implements HandlerInterceptor {
                 } else {
                     logger.warn("----preHandle--lockKey={} time={} dataId={} ip={} limited", lockKey, time, attrValue, ip);
                     String title = "frequency:lock";
-                    BaseException baseException = new FrequencyException("重复任务限制:" + String.format(errMsg, attrValue));
+                    FrequencyException baseException = new FrequencyException("重复任务限制:" + String.format(errMsg, attrValue));
                     baseException.setTitle(title);
+                    baseException.setFreqCode(requestLockVo.getName());
+                    baseException.setLimitType(requestLockVo.getLockType());
 
                     ip = RequestUtils.convertIpv4(ip);
                     outLogBiz.addLockLog(requestLockVo, userId, ip, deviceId, sysType, attrName, attrValue, null);
