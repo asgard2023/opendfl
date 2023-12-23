@@ -37,22 +37,15 @@ class FreqLimitChainTest {
 
     @Test
     void getRedisKeyBase() {
-        FrequencyVo frequencyVo = new FrequencyVo();
-        frequencyVo.setFreqLimitType(FreqLimitType.LIMIT_IP);
-        frequencyVo.setTime(60);
+        FrequencyVo frequencyVo = new FrequencyVo("name", 60, FreqLimitType.LIMIT_IP, null, null, null);
         frequencyVo.setMethod("method");
-        frequencyVo.setName("name");
         String key = FrequencyUtils.getRedisKeyBase(frequencyVo).toString();
         System.out.println(key);
     }
 
     @Test
     void getRedisKey() {
-        FrequencyVo frequencyVo = new FrequencyVo();
-        frequencyVo.setFreqLimitType(FreqLimitType.LIMIT_IP);
-        frequencyVo.setTime(60);
-        frequencyVo.setMethod("method");
-        frequencyVo.setName("name");
+        FrequencyVo frequencyVo = new FrequencyVo("name", 60, FreqLimitType.LIMIT_IP, null, null, null);
         String ip="192.168.1.101";
         String key = FreqLimitIpStrategy.getRedisKey(frequencyVo, ip);
         System.out.println(key+" "+key.hashCode());
@@ -69,25 +62,21 @@ class FreqLimitChainTest {
 
     @Test
     void getRedisKey2() {
-        FrequencyVo frequencyVo = new FrequencyVo();
-        frequencyVo.setFreqLimitType(FreqLimitType.LIMIT_IP);
-        frequencyVo.setTime(60);
-        frequencyVo.setMethod("method");
-        frequencyVo.setName("name");
+        FrequencyVo frequencyVo = new FrequencyVo("name", 60, FreqLimitType.LIMIT_IP, null, null, null);
         String ip="192.168.1.101";
-        String key = FrequencyUtils.getRedisKey(frequencyVo, ip);
+        String key = FrequencyUtils.getRedisKey(frequencyVo, frequencyVo.getFreqLimitType(), ip);
         System.out.println(key+" "+key.hashCode());
 
-        frequencyVo.setFreqLimitType(FreqLimitType.IP_USER);
-        key = FrequencyUtils.getRedisKey(frequencyVo, ip);
+        frequencyVo = new FrequencyVo("name", 60, FreqLimitType.IP_USER, null, null, null);
+        key = FrequencyUtils.getRedisKey(frequencyVo, frequencyVo.getFreqLimitType(), ip);
         System.out.println(key+" "+key.hashCode());
 
-        frequencyVo.setFreqLimitType(FreqLimitType.USER_IP);
-        key = FrequencyUtils.getRedisKey(frequencyVo, "123"+":"+ ip);
+        frequencyVo = new FrequencyVo("name", 60, FreqLimitType.USER_IP, null, null, null);
+        key = FrequencyUtils.getRedisKey(frequencyVo, frequencyVo.getFreqLimitType(), "123"+":"+ ip);
         System.out.println(key+" "+key.hashCode());
 
-        frequencyVo.setFreqLimitType(FreqLimitType.LIMIT);
-        key = FrequencyUtils.getRedisKey(frequencyVo, "123");
+        frequencyVo = new FrequencyVo("name", 60, FreqLimitType.LIMIT, null, null, null);
+        key = FrequencyUtils.getRedisKey(frequencyVo, frequencyVo.getFreqLimitType(), "123");
         System.out.println(key+" "+key.hashCode());
     }
 
