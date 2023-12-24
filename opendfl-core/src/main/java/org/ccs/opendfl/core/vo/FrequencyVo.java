@@ -57,7 +57,7 @@ public class FrequencyVo {
     /**
      * 用于Controller查询
      */
-    public FrequencyVo(){
+    public FrequencyVo() {
         this(new LimitUriConfigVo());
     }
 
@@ -66,11 +66,10 @@ public class FrequencyVo {
         this.method = uriConfigVo.getMethod();
         this.name = uriConfigVo.getUri();
         this.aliasName = uriConfigVo.getAliasName();
-        if(uriConfigVo.getTime()!=null) {
+        if (uriConfigVo.getTime() != null) {
             this.time = uriConfigVo.getTime();
-        }
-        else{
-            this.time=0;
+        } else {
+            this.time = 0;
         }
         this.limit = uriConfigVo.getLimit();
         this.freqLimitType = uriConfigVo.getFreqLimitType();
@@ -110,7 +109,7 @@ public class FrequencyVo {
     }
 
     public FrequencyVo(FrequencyVo frequency) {
-        this.limitType = FrequencyType.FREQUENCY5.getType();
+        this.limitType = FrequencyType.FREQUENCY.getType();
         this.name = frequency.getName();
         this.aliasName = frequency.getAliasName();
         this.time = frequency.getTime();

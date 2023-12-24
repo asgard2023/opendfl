@@ -8,7 +8,7 @@
 * 对应的数据attrName属性具有全局唯一，如果本ID有请求未完成，后续同样的ID请求全部拒绝
 * 支持Redis,Zookeeper,ETCD
 ## 2，支持基于Frequency注解的频率限制
-* 支持3级频率限制@Frequency,@Frequency2,@Frequency3
+* 支持多级频率限制@Frequencys,或单个@Frequency
 * 查看所有请求过的uri统计，见http://localhost:8080/frequency/limits?pwd=xxx
 * 基于本注解的频率限制后就不支持基于uri的频率限制
 ## 3，支持基于uri的频率限制

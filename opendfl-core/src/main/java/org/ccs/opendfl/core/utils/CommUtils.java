@@ -77,11 +77,18 @@ public final class CommUtils {
      * 取数据前maxLength位
      *
      * @param str       字符
-     * @param maxLength 最多取的字符个数
+     * @param maxLength 最多取的字符个数，如果是负数，从后面截取
      * @return 截取后的字符
      */
     public static String getStringLimit(String str, int maxLength) {
-        return str != null && str.length() > maxLength ? str.substring(0, maxLength) : str;
+        if(str==null){
+            return str;
+        }
+        int len = str.length();
+        if(maxLength<0){
+            return len > -maxLength ? str.substring(len+maxLength) : str;
+        }
+        return len > maxLength ? str.substring(0, maxLength) : str;
     }
 
     public static String getStringFirst(String str, String split) {

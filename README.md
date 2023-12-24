@@ -60,8 +60,10 @@ Support type:Redis,Zookeeper,ETCD
  * 1小时限100次
  */
 @GetMapping("/serverTimeFreq")
-@Frequency(time = 5, limit = 5, name = "serverTimeFreq")
-@Frequency2(time =3600, limit = 100, name = "serverTimeFreq")
+@Frequencys({
+        @Frequency(time = 5, limit = 10, name = "serverTimeFreq", log = true),
+        @Frequency(time = 3600, limit = 20, name = "serverTimeFreq", log = true)
+})
 public Long serverTimeFreq(HttpServletRequest request){
     return System.currentTimeMillis();
 }

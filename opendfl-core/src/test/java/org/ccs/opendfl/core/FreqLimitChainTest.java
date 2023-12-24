@@ -5,7 +5,12 @@ import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.constants.ReqSysType;
 import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.ResultCode;
+import org.ccs.opendfl.core.limitfrequency.FrequencyUtils;
 import org.ccs.opendfl.core.strategy.limits.FreqLimitChain;
+import org.ccs.opendfl.core.strategy.limits.impl.FreqLimitIpStrategy;
+import org.ccs.opendfl.core.strategy.limits.impl.FreqLimitIpUserStrategy;
+import org.ccs.opendfl.core.strategy.limits.impl.FreqLimitLimitStrategy;
+import org.ccs.opendfl.core.strategy.limits.impl.FreqLimitUserIpStrategy;
 import org.ccs.opendfl.core.vo.FrequencyVo;
 import org.ccs.opendfl.core.vo.RequestStrategyParamsVo;
 import org.junit.jupiter.api.Assertions;
@@ -28,6 +33,51 @@ class FreqLimitChainTest {
         System.out.println("----init----");
         String freqTypeItems = "limit,limitIp,userIp,ipUser,";
         freqLimitChain.sortStrategies(freqTypeItems);
+    }
+
+    @Test
+    void getRedisKeyBase() {
+        FrequencyVo frequencyVo = new FrequencyVo("name", 60, FreqLimitType.LIMIT_IP, null, null, null);
+        frequencyVo.setMethod("method");
+        String key = FrequencyUtils.getRedisKeyBase(frequencyVo).toString();
+        System.out.println(key);
+    }
+
+    @Test
+    void getRedisKey() {
+        FrequencyVo frequencyVo = new FrequencyVo("name", 60, FreqLimitType.LIMIT_IP, null, null, null);
+        String ip="192.168.1.101";
+        String key = FreqLimitIpStrategy.getRedisKey(frequencyVo, ip);
+        System.out.println(key+" "+key.hashCode());
+
+        key = FreqLimitIpUserStrategy.getRedisKey(frequencyVo, ip);
+        System.out.println(key+" "+key.hashCode());
+
+        key = FreqLimitLimitStrategy.getRedisKey(frequencyVo, "123", ip);
+        System.out.println(key+" "+key.hashCode());
+
+        key = FreqLimitUserIpStrategy.getRedisKey(frequencyVo, "123");
+        System.out.println(key+" "+key.hashCode());
+    }
+
+    @Test
+    void getRedisKey2() {
+        FrequencyVo frequencyVo = new FrequencyVo("name", 60, FreqLimitType.LIMIT_IP, null, null, null);
+        String ip="192.168.1.101";
+        String key = FrequencyUtils.getRedisKey(frequencyVo, frequencyVo.getFreqLimitType(), ip);
+        System.out.println(key+" "+key.hashCode());
+
+        frequencyVo = new FrequencyVo("name", 60, FreqLimitType.IP_USER, null, null, null);
+        key = FrequencyUtils.getRedisKey(frequencyVo, frequencyVo.getFreqLimitType(), ip);
+        System.out.println(key+" "+key.hashCode());
+
+        frequencyVo = new FrequencyVo("name", 60, FreqLimitType.USER_IP, null, null, null);
+        key = FrequencyUtils.getRedisKey(frequencyVo, frequencyVo.getFreqLimitType(), "123"+":"+ ip);
+        System.out.println(key+" "+key.hashCode());
+
+        frequencyVo = new FrequencyVo("name", 60, FreqLimitType.LIMIT, null, null, null);
+        key = FrequencyUtils.getRedisKey(frequencyVo, frequencyVo.getFreqLimitType(), "123");
+        System.out.println(key+" "+key.hashCode());
     }
 
     @Test
