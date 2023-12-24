@@ -261,7 +261,7 @@ public class FrequencyUtils {
             errMsg = FrequencyUtils.getErrMsg(frequency, langType);
         }
 
-        String limitCode = "100030";
+        String limitCode = ResultCode.USER_FREQUENCY_ERROR.getCode();
         if (OutLimitType.BLACK == limitType) {
             limitCode = ResultCode.USER_BLACK_ERROR.getCode();
         } else if (OutLimitType.WHITE == limitType) {
