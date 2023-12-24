@@ -335,7 +335,7 @@ public class AnnotationControllerUtils {
 
     private static FrequencyVo getFrequencyAnnotation(Frequency frequency, StringBuilder limitTypes, StringBuilder attrNameSb){
         FrequencyVo frequencyVo = FrequencyVo.toFrequencyVo(frequency);
-        limitTypes.append(frequencyVo.getLimitType()).append(",");
+        limitTypes.append(frequencyVo.getFreqLimitType().getCode()).append(",");
         if (frequencyVo.getAttrName() != null && !attrNameSb.toString().contains(frequencyVo.getAttrName())) {
             attrNameSb.append(frequencyVo.getAttrName());
         }

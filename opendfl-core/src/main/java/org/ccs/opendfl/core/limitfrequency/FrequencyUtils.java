@@ -128,11 +128,7 @@ public class FrequencyUtils {
         if (frequencyConfiguration.getRunCountCacheDay().intValue() == 0) {
             return;
         }
-        Map<String, AtomicInteger> typeCountMap = outLimitCountMap.get(typeCode);
-        if (typeCountMap == null) {
-            typeCountMap = new ConcurrentHashMap<>();
-            outLimitCountMap.put(typeCode, typeCountMap);
-        }
+        Map<String, AtomicInteger> typeCountMap = outLimitCountMap.computeIfAbsent(typeCode, k->new ConcurrentHashMap<>());
         AtomicInteger counter = typeCountMap.get(strategyParams.getRequestUri());
         if (counter == null) {
             counter = new AtomicInteger();
@@ -158,11 +154,7 @@ public class FrequencyUtils {
             isLog = true;
             initLogrMap.put(key, isLog);
         }
-        AtomicInteger counter = counterMap.get(key);
-        if (counter == null) {
-            counter = new AtomicInteger();
-            counterMap.put(key, counter);
-        }
+        AtomicInteger counter = counterMap.computeIfAbsent(key, k->new AtomicInteger());
         if (isLog) {
             int count = counter.incrementAndGet();
             if (count > frequencyConfiguration.getInitLogCount()) {
@@ -241,8 +233,6 @@ public class FrequencyUtils {
         if (frequency == null) {
             FrequencyException exception = new FrequencyException(limitInfo);
             exception.setTitle(title);
-            exception.setFreqCode(frequency.getName());
-            exception.setLimitType(frequency.getFreqLimitType().getCode());
             throw exception;
         }
 

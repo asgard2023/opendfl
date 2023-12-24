@@ -29,7 +29,7 @@ public class GetRequestJsonUtil {
             throws IOException {
         String submitMehtod = request.getMethod();
         // GET
-        if (submitMehtod.equals("GET")) {
+        if ("GET".equals(submitMehtod)) {
             return new String(request.getQueryString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8).replaceAll("%22", "\"");
             // POST
         } else {

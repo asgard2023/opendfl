@@ -23,7 +23,7 @@ public class HttpServletRequestReplacedFilter implements Filter {
         if (request instanceof HttpServletRequest) {
             HttpServletRequest request2 = (HttpServletRequest) request;
             //忽略GET请求
-            if (!request2.getMethod().equals("GET")) {
+            if (!"GET".equals(request2.getMethod())) {
                 requestWrapper = new MyHttpServletRequestWrapper(request2);
             }
         }
