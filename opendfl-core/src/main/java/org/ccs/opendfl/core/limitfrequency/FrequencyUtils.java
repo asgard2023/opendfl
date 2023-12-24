@@ -10,9 +10,9 @@ import org.ccs.opendfl.core.config.FrequencyConfiguration;
 import org.ccs.opendfl.core.constants.FreqLimitType;
 import org.ccs.opendfl.core.constants.OutLimitType;
 import org.ccs.opendfl.core.constants.WhiteBlackCheckType;
-import org.ccs.opendfl.core.exception.BaseException;
 import org.ccs.opendfl.core.exception.FrequencyException;
 import org.ccs.opendfl.core.exception.ResultCode;
+import org.ccs.opendfl.core.utils.CommUtils;
 import org.ccs.opendfl.core.utils.LangType;
 import org.ccs.opendfl.core.utils.StringUtils;
 import org.ccs.opendfl.core.vo.FrequencyVo;
@@ -316,7 +316,8 @@ public class FrequencyUtils {
         sb.append(":");
         sb.append(dataKey);
         if(frequencyConfiguration.getIfKeyHash()==1){
-            return sbBase+":"+sb.toString().hashCode();
+            String dataKeyEnd = CommUtils.getStringLimit(dataKey, -6);
+            return sbBase+":"+sb.toString().hashCode()+":"+dataKeyEnd;
         }
         return sbBase+":"+sb;
     }

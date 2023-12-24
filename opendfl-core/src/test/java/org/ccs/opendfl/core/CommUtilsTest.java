@@ -14,4 +14,11 @@ public class CommUtilsTest {
         url= CommUtils.getDomain(url);
         Assertions.assertEquals("175.178.252.112", url);
     }
+
+    @Test
+    void getStringLimit(){
+        String str = "abcd12345";
+        System.out.println(CommUtils.getStringLimit(str, 3));
+        System.out.println(CommUtils.getStringLimit(str, -3));
+    }
 }
