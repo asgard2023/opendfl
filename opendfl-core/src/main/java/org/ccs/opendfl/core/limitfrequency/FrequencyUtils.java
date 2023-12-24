@@ -315,10 +315,15 @@ public class FrequencyUtils {
         sb.append(frequency.getTime());
         sb.append(":");
         sb.append(dataKey);
+        String resultKey = sbBase+":"+sb;
         if(frequencyConfiguration.getIfKeyHash()==1){
             String dataKeyEnd = CommUtils.getStringLimit(dataKey, -6);
-            return sbBase+":"+sb.toString().hashCode()+":"+dataKeyEnd;
+            String hashKey = sbBase+":"+sb.toString().hashCode()+":"+dataKeyEnd;
+            //key长度取小的
+            if(hashKey.length()>resultKey.length()){
+                return resultKey;
+            }
         }
-        return sbBase+":"+sb;
+        return resultKey;
     }
 }
