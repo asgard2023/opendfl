@@ -26,8 +26,6 @@ public class FrequencyVo {
     private boolean needLogin;
     /**
      * 是否显示日志
-     *
-     * @return
      */
     private boolean log;
     private Long createTime;
@@ -90,7 +88,6 @@ public class FrequencyVo {
 
     /**
      * @param frequency 频率限制
-     * @return 转vo对应
      */
     public FrequencyVo(Frequency frequency) {
         this.limitType = FrequencyType.FREQUENCY.getType();
