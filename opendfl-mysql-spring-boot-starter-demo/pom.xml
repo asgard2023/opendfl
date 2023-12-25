@@ -10,14 +10,14 @@
     </parent>
     <groupId>cn.org.opendfl</groupId>
     <artifactId>opendfl-mysql-spring-boot-demo</artifactId>
-    <version>1.6</version>
+    <version>1.7</version>
     <name>opendfl-mysql-spring-boot-demo</name>
     <description>opendfl-msqyl spring-boot-demo</description>
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
 
-        <opendfl-spring-boot-starter.version>1.6</opendfl-spring-boot-starter.version>
+        <opendfl-spring-boot-starter.version>1.7</opendfl-spring-boot-starter.version>
     </properties>
 
     <dependencies>

@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>opendfl-demo-nacos</artifactId>
-    <version>1.6</version>
+    <version>1.7</version>
     <name>opendfl-demo-nacos</name>
     <packaging>war</packaging>
     <description>opendfl demo nacos</description>
@@ -19,8 +19,8 @@
         <spring.boot.version>2.4.2</spring.boot.version>
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.javadoc.skip>true</maven.javadoc.skip>
-        <opendfl-core.version>1.6</opendfl-core.version>
-        <opendfl-core-locks.version>1.6</opendfl-core-locks.version>
+        <opendfl-core.version>1.7</opendfl-core.version>
+        <opendfl-core-locks.version>1.7</opendfl-core-locks.version>
     </properties>
     <dependencies>
         <dependency>

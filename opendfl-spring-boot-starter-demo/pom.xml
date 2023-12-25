@@ -10,15 +10,15 @@
     </parent>
     <groupId>cn.org.opendfl</groupId>
     <artifactId>opendfl-spring-boot-demo</artifactId>
-    <version>1.6</version>
+    <version>1.7</version>
     <name>opendfl-spring-boot-demo</name>
     <description>opendfl spring-boot-demo</description>
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
 
-        <opendfl-console.version>1.6</opendfl-console.version>
-        <opendfl-boot-starter.version>1.6</opendfl-boot-starter.version>
+        <opendfl-console.version>1.7</opendfl-console.version>
+        <opendfl-boot-starter.version>1.7</opendfl-boot-starter.version>
     </properties>
 
     <dependencies>
