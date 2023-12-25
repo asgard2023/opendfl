@@ -93,7 +93,7 @@ public class GlobalExceptionHandler {
         ResultData resultData = ResultData.error(e);
         if(e instanceof FrequencyException){
             FrequencyException frequencyException = (FrequencyException)e;
-            resultData.setErrorType(frequencyException.getLimitType());
+            resultData.setErrorType(frequencyException.getTitle());
             resultData.setFreqCode(frequencyException.getFreqCode());
         }
         return resultData;
